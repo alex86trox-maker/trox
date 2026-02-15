@@ -79,7 +79,7 @@
                                     .fil1 {fill:white}
                                     .fil0 {fill:white;fill-rule:nonzero}
                                 </style>
-                                <!-- Filtros (no se usan activamente pero se mantienen) -->
+                                <!-- Filtros (no se usan activamente) -->
                                 <filter id="gamuza" x="0%" y="0%" width="100%" height="100%">
                                     <feTurbulence baseFrequency="0.03" numOctaves="1" result="turb"/>
                                     <feColorMatrix in="turb" type="saturate" values="0"/>
@@ -340,7 +340,7 @@
         <h1 class="text-[20vw] font-black uppercase leading-none tracking-tighter">ACHE</h1>
     </div>
 
-    <!-- ========== SCRIPT PRINCIPAL ========== -->
+    <!-- ========== SCRIPT PRINCIPAL (con correcciones) ========== -->
     <script>
         (function() {
             "use strict";
@@ -361,8 +361,10 @@
                 finish: 'smooth'
             };
 
-            // Colores permitidos para la suela
+            // Colores permitidos para la suela (blanco, negro, gris, café)
             const SOLE_ALLOWED_COLORS = ['#ffffff', '#000000', '#6B7280', '#8B4513'];
+            // Colores permitidos para el forro (blanco y negro)
+            const FORRO_ALLOWED_COLORS = ['#ffffff', '#000000'];
 
             // --- MAPA DE COLORES -> TRAZOS (13 colores) ---
             const STROKE_MAP = {
@@ -476,12 +478,18 @@
                 }
             }
 
-            // --- GESTIÓN DE COLORES HABILITADOS PARA SUELA ---
+            // --- GESTIÓN DE COLORES HABILITADOS POR PARTE ---
             function updateColorOptionsForPart(part) {
                 document.querySelectorAll('.color-option').forEach(btn => {
                     const color = btn.dataset.color;
                     if (part === 'suela') {
                         if (SOLE_ALLOWED_COLORS.includes(color)) {
+                            btn.classList.remove('disabled');
+                        } else {
+                            btn.classList.add('disabled');
+                        }
+                    } else if (part === 'forro') {
+                        if (FORRO_ALLOWED_COLORS.includes(color)) {
                             btn.classList.remove('disabled');
                         } else {
                             btn.classList.add('disabled');
@@ -521,8 +529,10 @@
                 if (colorBtn && !colorBtn.classList.contains('disabled')) {
                     setActiveColor(colorBtn, false);
                 } else {
-                    if (part === 'suela') {
-                        const firstAllowed = document.querySelector('.color-option[data-color="#ffffff"]');
+                    // Si el color actual no está permitido, seleccionar el primer color permitido
+                    if (part === 'suela' || part === 'forro') {
+                        const allowed = part === 'suela' ? SOLE_ALLOWED_COLORS : FORRO_ALLOWED_COLORS;
+                        const firstAllowed = document.querySelector(`.color-option[data-color="${allowed[0]}"]`);
                         if (firstAllowed) setActiveColor(firstAllowed, true);
                     }
                 }
