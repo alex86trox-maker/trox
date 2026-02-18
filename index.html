@@ -338,10 +338,10 @@
             const STATE = {
                 activePart: 'suela',
                 colors: {
-                    suela: '#ffffff',
-                    hilo: '#ffffff',
+                    suela: '#ffffff',      // blanco
+                    hilo: '#F5F5DC',       // beige
                     cordones: '#ffffff',
-                    forro: '#ffffff',
+                    forro: '#ffffff',       // blanco
                     logo: '#000000',
                     capellada1: '#ffffff',
                     capellada2: '#ffffff',
@@ -351,8 +351,16 @@
                 size: 39 // talla por defecto
             };
 
-            // Colores permitidos para la suela (blanco, negro, gris, café) - gris #6B7280, café #8B4513
-            const SOLE_ALLOWED_COLORS = ['#ffffff', '#000000', '#6B7280', '#8B4513'];
+            // Definir colores permitidos por componente
+            const PART_ALLOWED_COLORS = {
+                suela: ['#ffffff', '#000000', '#6B7280', '#8B4513'], // blanco, negro, gris, café
+                hilo: ['#F5F5DC', '#000000'], // beige, negro
+                forro: ['#ffffff', '#000000'], // blanco, negro
+                // el resto no tienen restricciones (todos los 12 colores)
+            };
+
+            // Colores totales (para referencia)
+            const ALL_COLORS = ['#ffffff', '#000000', '#8BC34A', '#66CDAA', '#FF0000', '#FFEB3B', '#4169E1', '#00CED1', '#9C27B0', '#800020', '#F5F5DC', '#8B4513'];
 
             // --- MAPA DE COLORES -> TRAZOS (12 colores) ---
             const STROKE_MAP = {
@@ -465,18 +473,15 @@
                 }
             }
 
-            // --- GESTIÓN DE COLORES HABILITADOS PARA SUELA ---
+            // --- GESTIÓN DE COLORES HABILITADOS SEGÚN PARTE ACTIVA ---
             function updateColorOptionsForPart(part) {
+                const allowed = PART_ALLOWED_COLORS[part] || ALL_COLORS; // si no hay restricción, todos
                 document.querySelectorAll('.color-option').forEach(btn => {
                     const color = btn.dataset.color;
-                    if (part === 'suela') {
-                        if (SOLE_ALLOWED_COLORS.includes(color)) {
-                            btn.classList.remove('disabled');
-                        } else {
-                            btn.classList.add('disabled');
-                        }
-                    } else {
+                    if (allowed.includes(color)) {
                         btn.classList.remove('disabled');
+                    } else {
+                        btn.classList.add('disabled');
                     }
                 });
             }
@@ -505,15 +510,23 @@
 
                 updateColorOptionsForPart(part);
 
-                const currentColor = STATE.colors[part] || '#ffffff';
-                const colorBtn = document.querySelector(`.color-option[data-color="${currentColor}"]`);
-                if (colorBtn && !colorBtn.classList.contains('disabled')) {
-                    setActiveColor(colorBtn, false);
-                } else {
-                    if (part === 'suela') {
-                        const firstAllowed = document.querySelector('.color-option[data-color="#ffffff"]');
-                        if (firstAllowed) setActiveColor(firstAllowed, true);
+                // Verificar si el color actual de la parte es válido; si no, seleccionar el primer color permitido
+                const currentColor = STATE.colors[part];
+                const allowed = PART_ALLOWED_COLORS[part] || ALL_COLORS;
+                if (!allowed.includes(currentColor)) {
+                    // Buscar el primer color permitido y aplicarlo
+                    const firstAllowed = allowed[0];
+                    if (firstAllowed) {
+                        // Actualizar el estado y la UI
+                        if (UPDATERS[part]) UPDATERS[part](firstAllowed);
+                        // Marcar el botón de color correspondiente como activo
+                        const colorBtn = document.querySelector(`.color-option[data-color="${firstAllowed}"]`);
+                        if (colorBtn) setActiveColor(colorBtn, false);
                     }
+                } else {
+                    // Si es válido, solo marcar el botón como activo
+                    const colorBtn = document.querySelector(`.color-option[data-color="${currentColor}"]`);
+                    if (colorBtn) setActiveColor(colorBtn, false);
                 }
             }
 
@@ -647,13 +660,13 @@
                     });
                 }
 
-                // Colores iniciales
-                setActivePart('suela');
+                // Aplicar colores iniciales según STATE
                 Object.entries(STATE.colors).forEach(([part, color]) => {
                     if (UPDATERS[part]) UPDATERS[part](color);
                 });
-                const defaultColorBtn = document.querySelector('.color-option[data-color="#ffffff"]');
-                if (defaultColorBtn) setActiveColor(defaultColorBtn, false);
+
+                // Establecer parte activa inicial (suela)
+                setActivePart('suela');
 
                 // Acabado inicial
                 setActiveFinish('smooth');
