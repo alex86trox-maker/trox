@@ -278,7 +278,7 @@
                             </div>
                         </div>
 
-                        <!-- 03 – ACABADO DE CUERO (sin efecto visual, ninguna activa por defecto) -->
+                        <!-- 03 – ACABADO DE CUERO (sin efecto visual, ninguna activa por defecto, toggle) -->
                         <div class="mb-10">
                             <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Acabado de Cuero</span>
                             <div class="mt-4 space-y-3" id="finishSelector">
@@ -554,29 +554,35 @@
                 }
             }
 
-            // --- ACTIVAR ACABADO EN UI (sin cambios en el SVG) ---
-            function setActiveFinish(finish) {
-                // Si se hace clic en el mismo que ya está activo, no hacemos nada (o podríamos desactivar, pero optamos por mantenerlo activo)
-                if (STATE.finish === finish) return;
-
-                // Desactivar todos
-                document.querySelectorAll('.finish-option').forEach(btn => {
-                    btn.classList.remove('active', 'border-black');
-                    btn.classList.add('border-gray-100');
-                    btn.querySelector('div:last-child')?.classList.remove('border-4', 'border-black');
-                    btn.querySelector('div:last-child')?.classList.add('border', 'border-gray-300');
-                });
-
-                // Activar el seleccionado
-                const selected = document.querySelector(`.finish-option[data-finish="${finish}"]`);
-                if (selected) {
-                    selected.classList.add('active', 'border-black');
-                    selected.classList.remove('border-gray-100');
-                    selected.querySelector('div:last-child')?.classList.remove('border', 'border-gray-300');
-                    selected.querySelector('div:last-child')?.classList.add('border-4', 'border-black');
+            // --- TOGGLE ACABADO EN UI (sin cambios en el SVG) ---
+            function toggleFinish(finish) {
+                // Si se hace clic en el mismo que ya está activo, desactivar
+                if (STATE.finish === finish) {
+                    // Desactivar todos
+                    document.querySelectorAll('.finish-option').forEach(btn => {
+                        btn.classList.remove('active', 'border-black');
+                        btn.classList.add('border-gray-100');
+                        btn.querySelector('div:last-child')?.classList.remove('border-4', 'border-black');
+                        btn.querySelector('div:last-child')?.classList.add('border', 'border-gray-300');
+                    });
+                    STATE.finish = null;
+                } else {
+                    // Desactivar todos y activar el seleccionado
+                    document.querySelectorAll('.finish-option').forEach(btn => {
+                        btn.classList.remove('active', 'border-black');
+                        btn.classList.add('border-gray-100');
+                        btn.querySelector('div:last-child')?.classList.remove('border-4', 'border-black');
+                        btn.querySelector('div:last-child')?.classList.add('border', 'border-gray-300');
+                    });
+                    const selected = document.querySelector(`.finish-option[data-finish="${finish}"]`);
+                    if (selected) {
+                        selected.classList.add('active', 'border-black');
+                        selected.classList.remove('border-gray-100');
+                        selected.querySelector('div:last-child')?.classList.remove('border', 'border-gray-300');
+                        selected.querySelector('div:last-child')?.classList.add('border-4', 'border-black');
+                    }
+                    STATE.finish = finish;
                 }
-
-                STATE.finish = finish;
             }
 
             // --- INICIALIZACIÓN ---
@@ -598,7 +604,7 @@
                     if (btn) {
                         e.preventDefault();
                         const finish = btn.dataset.finish;
-                        setActiveFinish(finish);
+                        toggleFinish(finish);
                     }
                 });
 
@@ -681,7 +687,6 @@
                 setActivePart('suela');
 
                 // Acabado inicial: ninguna activa (ya está en el HTML)
-                // Solo aseguramos que STATE.finish sea null
                 STATE.finish = null;
             });
         })();
