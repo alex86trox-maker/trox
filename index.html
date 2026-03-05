@@ -1,179 +1,157 @@
 <style>
-    /* Contenedor principal que mantiene la relación 16:9 y sin márgenes */
+    /* ========================================================= */
+    /* CONTENEDOR CON DIMENSIONES FIJAS: 1350px x 750px        */
+    /* Panel izquierdo 400px, área SVG 950px                   */
+    /* ========================================================= */
+
+    /* Contenedor principal con dimensiones fijas en desktop */
     .personalizador-wrapper {
-        max-width: 100%;
-        margin: 0 !important;
+        max-width: 1350px;                /* Ancho máximo total (400+950) */
+        width: 100%;                       /* Ocupa el 100% hasta 1350px */
+        height: 750px;                      /* Alto fijo de 750px */
+        margin: 2rem auto !important;       /* Centrado y separación */
         padding: 0 !important;
-        background-color: #f0f0f0;
+        background: transparent;
         display: block;
+        border-radius: 32px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        overflow: hidden;                   /* Importante para bordes redondeados */
+        transition: box-shadow 0.3s ease;
     }
-    .personalizador-wrapper .aspect-ratio-box {
-        position: relative;
-        width: 100%;
-        /* Relación 16:9 fija SIEMPRE (alto = ancho * 9/16) */
-        padding-top: 56.25%; /* 9/16 = 0.5625 */
-        background: #fff;
-        overflow: hidden;
-        margin: 0;
-        padding: 0;
-    }
-    .personalizador-wrapper .aspect-ratio-box .mi-personalizador {
-        position: absolute;
-        top: 0;
-        left: 0;
+
+    /* Eliminamos el aspect-ratio-box, el personalizador ocupa todo el contenedor */
+    .personalizador-wrapper .mi-personalizador {
         width: 100%;
         height: 100%;
-        all: initial; /* reset, pero dentro del contexto */
-        display: block;
         font-family: 'Manrope', sans-serif;
         -webkit-font-smoothing: antialiased;
+        border-radius: 32px;
+        overflow: hidden;
+        background-color: white;
+        display: flex;                      /* Aseguramos que el main se expanda */
+        flex-direction: column;
     }
-    /* Aseguramos que el contenido del personalizador herede el tamaño */
+
+    /* Ajustamos el main para que ocupe todo el alto */
+    .personalizador-wrapper .mi-personalizador main {
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+    }
+
     .personalizador-wrapper .mi-personalizador * {
         box-sizing: border-box;
     }
-    /* ELIMINADA la media query que cambiaba a 9:16 en móvil */
 
-    /* --- INICIO MODIFICACIONES PARA ELIMINAR ESPACIO BLANCO INFERIOR --- */
-    /* Forzar que el panel izquierdo (aside) ocupe toda la altura y su contenido se distribuya */
+    /* --- PANEL IZQUIERDO: ANCHO 400px FIJO --- */
     .mi-personalizador aside {
-        height: 100% !important;
+        width: 400px !important;
+        background: #ffffff !important;
+        box-shadow: 4px 0 20px -5px rgba(0, 0, 0, 0.08) !important;
+        border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
         display: flex !important;
         flex-direction: column !important;
-        overflow: hidden; /* Evitar scroll no deseado */
+        height: 100% !important;
+        overflow: hidden;
+        flex-shrink: 0;                     /* Evita que se encoja */
     }
-    .mi-personalizador aside > div {
-        flex: 1 1 auto !important;
-        display: flex;
-        flex-direction: column;
-        min-height: 0; /* Necesario para que el contenido interior respete el flex */
-    }
-    /* El contenedor interno con padding debe crecer y permitir scroll si es necesario */
+
+    /* Scroll elegante en el contenido del panel */
     .mi-personalizador aside .flex-col.p-5 {
         flex: 1 1 auto !important;
-        overflow-y: auto; /* Scroll solo en el contenido si es demasiado largo */
-        padding-bottom: 1rem; /* Ajustar último padding para evitar espacio extra */
-    }
-    /* Asegurar que el último elemento (precio y botón) no tenga margen inferior extra */
-    .mi-personalizador aside .border-t {
-        margin-top: auto; /* Empuja el contenido hacia arriba si hay espacio */
-    }
-    /* Ajuste para que el selector de talla no se desborde */
-    .mi-personalizador #sizeSelector {
-        flex-wrap: wrap;
-        max-height: none;
-    }
-    /* En móviles, mantener consistencia */
-    @media (max-width: 768px) {
-        .mi-personalizador aside {
-            height: auto !important; /* En móvil la altura la define el contenido */
-            min-height: 200px;
-        }
-        .mi-personalizador aside .flex-col.p-5 {
-            overflow-y: visible;
-        }
-    }
-    /* --- FIN MODIFICACIONES --- */
-
-    /* --- MEJORAS DE DISEÑO PARA EL MENÚ IZQUIERDO (ANCHO 520px) --- */
-    /* Fondo sutil y sombra para el panel */
-    .mi-personalizador aside {
-        width: 520px !important; /* Reducido de 650px a 520px */
-        background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%) !important;
-        box-shadow: 4px 0 20px -5px rgba(0, 0, 0, 0.1) !important;
-        border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+        overflow-y: auto !important;
+        padding: 1rem 0.75rem 1rem 0.75rem !important;
+        scrollbar-width: thin;
+        scrollbar-color: #c0c0c0 #f0f0f0;
     }
 
-    /* Ajuste de padding interior para aprovechar mejor el espacio */
-    .mi-personalizador aside .flex-col.p-5 {
-        padding: 0.875rem !important; /* 14px en lugar de 20px */
+    /* Scrollbar personalizada (Webkit) */
+    .mi-personalizador aside .flex-col.p-5::-webkit-scrollbar {
+        width: 5px;
+    }
+    .mi-personalizador aside .flex-col.p-5::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 10px;
+    }
+    .mi-personalizador aside .flex-col.p-5::-webkit-scrollbar-thumb {
+        background: #c0c0c0;
+        border-radius: 10px;
+    }
+    .mi-personalizador aside .flex-col.p-5::-webkit-scrollbar-thumb:hover {
+        background: #a0a0a0;
     }
 
-    /* Tipografía más elegante para títulos de sección */
-    .mi-personalizador aside .text-\[0\.7rem\].font-bold.uppercase {
-        letter-spacing: 0.15em !important;
-        position: relative;
-        display: inline-block;
-        padding-bottom: 4px;
-        border-bottom: 2px solid #32CD32;
-        margin-bottom: 12px !important;
-        font-weight: 600 !important;
-        color: #2d2d2d !important;
-    }
-
-    /* Mejora para el título principal */
+    /* Títulos y textos */
     .mi-personalizador aside h1 {
         font-weight: 300 !important;
         letter-spacing: 0.1em !important;
         color: #1a1a1a !important;
         border-left: 4px solid #32CD32;
-        padding-left: 12px;
+        padding-left: 10px;
         line-height: 1.3;
         font-size: 1.1rem !important;
         margin-bottom: 4px !important;
     }
 
-    /* Línea "HECHO A MANO" */
     .mi-personalizador aside p.text-\[0\.55rem\] {
         color: #888 !important;
         font-weight: 400 !important;
         margin-top: 4px !important;
-        margin-bottom: 16px !important;
+        margin-bottom: 14px !important;
         font-size: 0.5rem !important;
+        letter-spacing: 0.2em;
     }
 
-    /* Botones de selector de tipo (Tenis / Botas) */
+    /* Selector de tipo (Tenis/Botas) */
+    .mi-personalizador .type-selector {
+        gap: 0.5rem;
+        margin-bottom: 1.2rem !important;
+    }
     .mi-personalizador .type-btn {
-        border-radius: 30px !important;
-        padding: 6px 12px !important;
-        font-weight: 600 !important;
-        transition: all 0.2s ease !important;
+        border-radius: 40px !important;
+        padding: 0.5rem 0.8rem !important;
+        font-weight: 700 !important;
+        font-size: 0.75rem !important;
         border: 1px solid #e0e0e0 !important;
-        background: #fff !important;
-        font-size: 0.7rem !important;
+        background: white !important;
+        transition: all 0.2s ease !important;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #444;
     }
     .mi-personalizador .type-btn.active {
         background: #32CD32 !important;
         border-color: #32CD32 !important;
         color: white !important;
-        box-shadow: 0 4px 10px rgba(50, 205, 50, 0.3) !important;
+        box-shadow: 0 8px 16px -4px rgba(50, 205, 50, 0.4) !important;
     }
 
-    /* Opciones de color */
-    .mi-personalizador .color-option {
-        transform: scale(1);
-        transition: transform 0.15s ease, box-shadow 0.15s ease !important;
-        border: none !important;
-        background: transparent !important;
-    }
-    .mi-personalizador .color-option:hover {
-        transform: scale(1.1);
-        z-index: 2;
-    }
-    .mi-personalizador .color-option.active {
-        border: 2px solid #32CD32 !important;
-        box-shadow: 0 0 0 4px rgba(50, 205, 50, 0.2) !important;
-        transform: scale(1.1);
-    }
-    .mi-personalizador .color-option .h-7.w-7 {
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
-        border: 1px solid rgba(0,0,0,0.1);
-        height: 1.6rem !important;
-        width: 1.6rem !important;
-    }
-
-    /* Botones de selección de componente */
-    .mi-personalizador .part-btn {
-        border-radius: 20px !important;
+    /* Títulos de sección */
+    .mi-personalizador aside .text-\[0\.7rem\].font-bold.uppercase {
         font-size: 0.65rem !important;
-        padding: 6px 8px !important;
+        letter-spacing: 0.15em !important;
+        color: #2d2d2d !important;
+        display: inline-block;
+        padding-bottom: 4px;
+        border-bottom: 2px solid #32CD32;
+        margin-bottom: 12px !important;
         font-weight: 600 !important;
-        transition: all 0.2s ease !important;
+    }
+
+    /* Botones de componente */
+    .mi-personalizador .part-btn {
+        border-radius: 30px !important;
+        padding: 0.4rem 0.4rem !important;
+        font-size: 0.65rem !important;
+        font-weight: 700 !important;
         border: 1px solid #eaeaea !important;
-        background: #fff !important;
+        background: white !important;
+        transition: all 0.15s ease !important;
+        text-align: center;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        color: #444;
     }
     .mi-personalizador .part-btn:hover {
         background: #f5f5f5 !important;
@@ -184,792 +162,814 @@
         background: #32CD32 !important;
         border-color: #32CD32 !important;
         color: white !important;
-        box-shadow: 0 4px 8px rgba(50, 205, 50, 0.2) !important;
+        box-shadow: 0 4px 12px rgba(50, 205, 50, 0.3) !important;
     }
 
-    /* Opciones de acabado */
+    /* Colores */
+    .mi-personalizador #colorSelector {
+        gap: 0.4rem !important;
+        margin-top: 0.5rem;
+    }
+    .mi-personalizador .color-option {
+        transform: scale(1);
+        transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+        border: none !important;
+        background: transparent !important;
+        padding: 2px;
+    }
+    .mi-personalizador .color-option:hover {
+        transform: scale(1.1);
+    }
+    .mi-personalizador .color-option.active {
+        transform: scale(1.15);
+        filter: drop-shadow(0 0 6px rgba(50, 205, 50, 0.6));
+    }
+    .mi-personalizador .color-option .h-7.w-7 {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+        border: 2px solid white !important;
+        outline: 1px solid rgba(0,0,0,0.1);
+        height: 1.7rem !important;
+        width: 1.7rem !important;
+    }
+
+    /* Acabados */
     .mi-personalizador .finish-option {
-        border-radius: 16px !important;
-        transition: all 0.2s ease !important;
+        border-radius: 20px !important;
+        padding: 0.5rem 0.8rem !important;
         border: 1px solid #eee !important;
-        background: #fff !important;
-        padding: 8px 12px !important;
-    }
-    .mi-personalizador .finish-option:hover {
-        background: #f9f9f9 !important;
-        border-color: #32CD32 !important;
-    }
-    .mi-personalizador .finish-option.active {
-        border-color: #32CD32 !important;
-        background: #f0fff0 !important;
-        box-shadow: 0 4px 12px rgba(50, 205, 50, 0.15) !important;
-    }
-    .mi-personalizador .finish-option .finish-indicator {
+        background: white !important;
         transition: all 0.2s ease !important;
-    }
-    .mi-personalizador .finish-option.active .finish-indicator {
-        border-color: #32CD32 !important;
-        background: #32CD32 !important;
     }
     .mi-personalizador .finish-option .text-xs {
-        font-size: 0.7rem !important;
+        font-size: 0.65rem !important;
     }
     .mi-personalizador .finish-option .text-\[0\.6rem\] {
-        font-size: 0.55rem !important;
+        font-size: 0.5rem !important;
     }
 
-    /* Selector de talla */
+    /* Tallas - AHORA CIRCULARES PERFECTOS */
     .mi-personalizador .size-option {
-        border-radius: 50% !important;
-        width: 36px !important;
-        height: 36px !important;
+        border-radius: 50% !important;      /* Cambiado de 40% a 50% para círculo perfecto */
+        width: 2.2rem !important;
+        height: 2.2rem !important;
+        font-weight: 700 !important;
+        font-size: 0.8rem !important;
+        border: 1px solid #ddd !important;
+        background: white !important;
+        transition: all 0.15s ease !important;
+        color: #333;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-weight: 600 !important;
-        transition: all 0.15s ease !important;
-        border: 1px solid #ddd !important;
-        background: white !important;
-        font-size: 0.85rem !important;
-    }
-    .mi-personalizador .size-option:hover {
-        border-color: #32CD32 !important;
-        color: #32CD32 !important;
-        transform: scale(1.05);
-    }
-    .mi-personalizador .size-option.active {
-        background: #32CD32 !important;
-        border-color: #32CD32 !important;
-        color: white !important;
-        box-shadow: 0 4px 10px rgba(50, 205, 50, 0.3) !important;
-        transform: scale(1.1);
+        padding: 0 !important;               /* Asegura que el texto esté centrado */
     }
 
-    /* Sección de precio */
+    /* Sección de precio y botón */
     .mi-personalizador aside .border-t {
-        background: #f8f8f8 !important;
-        border-radius: 24px 24px 0 0 !important;
-        padding: 16px 12px !important;
-        margin-top: 20px !important;
-        border-top: none !important;
-        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.02) !important;
+        background: white !important;
+        border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+        padding: 0.8rem 0.75rem !important;
+        margin-top: 0.3rem !important;
     }
     .mi-personalizador aside .border-t .text-xl {
         font-size: 1.8rem !important;
-        font-weight: 400 !important;
-        color: #1a1a1a !important;
-    }
-    .mi-personalizador aside .border-t .text-\[0\.65rem\] {
-        color: #666 !important;
         font-weight: 500 !important;
     }
-
-    /* Botón COMPRAR */
     .mi-personalizador #comprar-personalizado {
-        background: linear-gradient(135deg, #32CD32, #28a428) !important;
-        border-radius: 40px !important;
         font-size: 1rem !important;
-        padding: 14px !important;
-        box-shadow: 0 8px 20px rgba(50, 205, 50, 0.4) !important;
-        border: none !important;
-        transition: all 0.2s ease !important;
-    }
-    .mi-personalizador #comprar-personalizado:hover {
-        transform: translateY(-2px) scale(1.02) !important;
-        box-shadow: 0 12px 28px rgba(50, 205, 50, 0.5) !important;
-    }
-    .mi-personalizador #comprar-personalizado:active {
-        transform: translateY(0) scale(0.98) !important;
-        box-shadow: 0 4px 12px rgba(50, 205, 50, 0.4) !important;
+        padding: 0.8rem 1rem !important;
     }
 
-    /* Prevenir desbordamiento horizontal en zoom */
-    .mi-personalizador aside .flex-col.p-5 {
-        overflow-x: hidden !important;
-        max-width: 100%;
+    /* Área SVG (ocupa el resto, 950px aproximadamente) */
+    .mi-personalizador .shoe-canvas-gradient {
+        background: radial-gradient(circle at 20% 30%, #ffffff, #f0f0f0) !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1;                            /* Toma el ancho restante */
+        min-width: 0;                        /* Evita desbordes */
     }
 
-    /* Ajustes responsivos para móvil */
-    @media (max-width: 1024px) {
+    /* Barra de herramientas */
+    .mi-personalizador .toolbar {
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(12px) saturate(180%) !important;
+        border-radius: 60px !important;
+        padding: 0.6rem 1.2rem !important;
+        box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.2) !important;
+        border: 1px solid rgba(255,255,255,0.5) !important;
+        bottom: 1.8rem;
+    }
+
+    /* Ajustes responsivos: cuando la pantalla es menor a 1350px, el alto se adapta */
+    @media (max-width: 1350px) {
+        .personalizador-wrapper {
+            height: auto;                    /* El alto se vuelve automático */
+            min-height: 600px;                /* Altura mínima para mantener proporción */
+        }
         .mi-personalizador aside {
-            width: 40% !important;
-            min-width: 280px;
+            width: 35% !important;            /* Pasa a porcentaje */
+            min-width: 280px;                  /* Pero nunca menos de 280px */
         }
     }
+
+    /* ========================================================= */
+    /* MEJORA PARA MÓVIL: SVG ARRIBA, PANEL ABAJO              */
+    /* ========================================================= */
     @media (max-width: 768px) {
-        .mi-personalizador aside .text-\[0\.7rem\].font-bold.uppercase {
-            font-size: 0.8rem !important;
+        .mi-personalizador main {
+            flex-direction: column-reverse !important; /* SVG arriba, panel abajo */
+        }
+        .mi-personalizador aside {
+            width: 100% !important;
+            height: auto !important;          /* Altura según contenido */
+            border-right: none !important;
+            border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
         }
         .mi-personalizador .size-option {
-            width: 32px !important;
-            height: 32px !important;
-        }
-        .mi-personalizador aside .border-t .text-xl {
-            font-size: 1.6rem !important;
-        }
-        .mi-personalizador #comprar-personalizado {
-            font-size: 1rem !important;
-            padding: 14px !important;
-        }
-        .mi-personalizador .part-btn {
-            white-space: normal;
-            font-size: 0.6rem !important;
-            padding: 4px 6px !important;
+            width: 2rem !important;           /* Un poco más pequeño en móvil */
+            height: 2rem !important;
         }
     }
+
+    /* Las media queries originales para móvil se mantienen intactas */
+    @media (max-width: 768px) {
+        /* Las reglas originales ya están dentro del código interno, no las duplicamos */
+    }
+
     @media (max-width: 400px) {
         .mi-personalizador .color-option .h-7.w-7 {
             height: 1.4rem !important;
             width: 1.4rem !important;
         }
+        .mi-personalizador .part-btn {
+            font-size: 0.55rem !important;
+            padding: 0.3rem 0.2rem !important;
+        }
+        .mi-personalizador .size-option {
+            width: 1.8rem !important;
+            height: 1.8rem !important;
+            font-size: 0.7rem !important;
+        }
+    }
+
+    /* Notificaciones */
+    .mi-personalizador .notificacion-exito {
+        background: #32CD32 !important;
+        color: white !important;
+        border-radius: 60px !important;
+        padding: 0.8rem 1.8rem !important;
+        font-weight: 600 !important;
+        box-shadow: 0 15px 30px -10px rgba(50, 205, 50, 0.5) !important;
     }
 </style>
 
+<!-- ========================================================= -->
+<!-- CONTENEDOR CON DIMENSIONES FIJAS 1350x750                -->
+<!-- ========================================================= -->
 <div class="personalizador-wrapper">
-    <div class="aspect-ratio-box">
-        <!-- ========================================= -->
-        <!-- CÓDIGO ORIGINAL (con mejoras responsive) -->
-        <!-- ========================================= -->
-        <div class="mi-personalizador">
-            <!-- Tailwind (con prefijo 'tw-') -->
-            <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-            <script>
-                tailwind.config = {
-                    prefix: 'tw-',
-                    darkMode: 'class',
-                    theme: {
-                        extend: {
-                            colors: { primary: '#000', accent: '#ec4913', background: { light: '#f8f6f6', dark: '#221510' } },
-                            fontFamily: { display: ['Manrope', 'sans-serif'] },
-                            borderRadius: { DEFAULT: '0.25rem', lg: '0.5rem', xl: '0.75rem', full: '9999px' }
-                        }
+    <!-- El div .mi-personalizador ahora es hijo directo, sin aspect-ratio -->
+    <div class="mi-personalizador">
+        <!-- CÓDIGO ORIGINAL COMPLETO (sin ninguna modificación) -->
+        <!-- Tailwind (con prefijo 'tw-') -->
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <script>
+            tailwind.config = {
+                prefix: 'tw-',
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: { primary: '#000', accent: '#ec4913', background: { light: '#f8f6f6', dark: '#221510' } },
+                        fontFamily: { display: ['Manrope', 'sans-serif'] },
+                        borderRadius: { DEFAULT: '0.25rem', lg: '0.5rem', xl: '0.75rem', full: '9999px' }
                     }
-                };
-            </script>
-            <!-- Fuentes e iconos -->
-            <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
-            <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200,0,0" rel="stylesheet">
-            <!-- Librería para confeti -->
-            <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+                }
+            };
+        </script>
+        <!-- Fuentes e iconos -->
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200,0,0" rel="stylesheet">
+        <!-- Librería para confeti -->
+        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
 
-            <style>
-                /* Reset y estilos base (adaptados para estar dentro de wrapper) */
-                .mi-personalizador {
-                    all: initial;
-                    display: block;
-                    font-family: 'Manrope', sans-serif;
-                    -webkit-font-smoothing: antialiased;
-                    height: 100%;
-                    width: 100%;
-                    overflow: hidden;
-                }
-                .mi-personalizador * {
-                    box-sizing: border-box;
-                }
-                .mi-personalizador .shoe-canvas-gradient {
-                    background: radial-gradient(circle at center, #fff 0%, #f3f4f6 100%);
-                }
-                .mi-personalizador #shoe-container {
-                    width: 100%;
-                    height: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                .mi-personalizador #shoe-svg {
-                    width: 100%;
-                    height: 100%;
-                    max-width: 100%;
-                    max-height: 100%;
-                    object-fit: contain;
-                }
-                /* Resto de estilos (sin cambios) */
-                .mi-personalizador .active-part {
-                    border-color: #000 !important;
-                    background-color: rgba(0,0,0,0.05) !important;
-                }
-                .mi-personalizador .color-option.active {
-                    border-width: 2px;
-                    border-color: #000;
-                    box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
-                }
-                .mi-personalizador .color-option.disabled {
-                    opacity: 0.3;
-                    pointer-events: none;
-                    cursor: not-allowed;
-                }
-                .mi-personalizador .finish-option.active {
-                    border-color: #000 !important;
-                    background-color: rgba(0,0,0,0.05) !important;
-                }
-                .mi-personalizador .finish-option.active .finish-indicator {
-                    border-width: 4px;
-                    border-color: #000;
-                }
-                .mi-personalizador .custom-scrollbar::-webkit-scrollbar {
-                    width: 4px;
-                }
-                .mi-personalizador .custom-scrollbar::-webkit-scrollbar-track {
-                    background: #f1f1f1;
-                }
-                .mi-personalizador .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: #ccc;
-                    border-radius: 4px;
-                }
-                .mi-personalizador .size-option.active {
-                    background-color: #32CD32 !important;
-                    border-color: #32CD32 !important;
-                    color: white !important;
-                }
-                .mi-personalizador #comprar-personalizado {
-                    display: block !important;
-                    visibility: visible !important;
-                    opacity: 1 !important;
-                    background-color: #32CD32 !important;
-                    color: white !important;
-                    border: none;
-                    cursor: pointer;
-                    font-size: 1.1rem !important;
-                    padding: 0.75rem 1rem !important;
-                    width: 100%;
-                    border-radius: 0.5rem;
-                    font-weight: 800;
-                    text-transform: uppercase;
-                    letter-spacing: 0.05em;
-                    transition: all 0.2s;
-                    white-space: normal;
-                    word-break: break-word;
-                }
-                .mi-personalizador #comprar-personalizado:hover {
-                    transform: scale(1.02);
-                    background-color: #2db82d !important;
-                }
-                .mi-personalizador #comprar-personalizado:active {
-                    transform: scale(0.98);
-                }
-                .mi-personalizador #comprar-personalizado:disabled {
-                    opacity: 0.6;
-                    cursor: not-allowed;
-                    transform: none;
-                }
-                .mi-personalizador #mensaje-carga {
-                    display: none;
-                    text-align: center;
-                    margin-top: 12px;
-                    padding: 10px;
-                    background: #f0f0f0;
-                    border-radius: 6px;
-                    color: #32CD32;
-                    font-weight: bold;
-                }
-                .mi-personalizador .notificacion-exito {
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background-color: #32CD32;
-                    color: white;
-                    padding: 12px 24px;
-                    border-radius: 50px;
-                    font-weight: bold;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                    z-index: 9999;
-                    animation: slideIn 0.3s ease-out;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
-                .mi-personalizador .notificacion-exito::before {
-                    content: "✓";
-                    font-size: 1.2rem;
-                    font-weight: bold;
-                }
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
+        <style>
+            /* Reset y estilos base (adaptados para estar dentro de wrapper) */
+            .mi-personalizador {
+                all: initial;
+                display: block;
+                font-family: 'Manrope', sans-serif;
+                -webkit-font-smoothing: antialiased;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+            }
+            .mi-personalizador * {
+                box-sizing: border-box;
+            }
+            .mi-personalizador .shoe-canvas-gradient {
+                background: radial-gradient(circle at center, #fff 0%, #f3f4f6 100%);
+            }
+            .mi-personalizador #shoe-container {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .mi-personalizador #shoe-svg {
+                width: 100%;
+                height: 100%;
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            }
+            /* Resto de estilos (sin cambios) */
+            .mi-personalizador .active-part {
+                border-color: #000 !important;
+                background-color: rgba(0,0,0,0.05) !important;
+            }
+            .mi-personalizador .color-option.active {
+                border-width: 2px;
+                border-color: #000;
+                box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
+            }
+            .mi-personalizador .color-option.disabled {
+                opacity: 0.3;
+                pointer-events: none;
+                cursor: not-allowed;
+            }
+            .mi-personalizador .finish-option.active {
+                border-color: #000 !important;
+                background-color: rgba(0,0,0,0.05) !important;
+            }
+            .mi-personalizador .finish-option.active .finish-indicator {
+                border-width: 4px;
+                border-color: #000;
+            }
+            .mi-personalizador .custom-scrollbar::-webkit-scrollbar {
+                width: 4px;
+            }
+            .mi-personalizador .custom-scrollbar::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+            .mi-personalizador .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: #ccc;
+                border-radius: 4px;
+            }
+            .mi-personalizador .size-option.active {
+                background-color: #32CD32 !important;
+                border-color: #32CD32 !important;
+                color: white !important;
+            }
+            .mi-personalizador #comprar-personalizado {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                background-color: #32CD32 !important;
+                color: white !important;
+                border: none;
+                cursor: pointer;
+                font-size: 1.1rem !important;
+                padding: 0.75rem 1rem !important;
+                width: 100%;
+                border-radius: 0.5rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                transition: all 0.2s;
+                white-space: normal;
+                word-break: break-word;
+            }
+            .mi-personalizador #comprar-personalizado:hover {
+                transform: scale(1.02);
+                background-color: #2db82d !important;
+            }
+            .mi-personalizador #comprar-personalizado:active {
+                transform: scale(0.98);
+            }
+            .mi-personalizador #comprar-personalizado:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
+            }
+            .mi-personalizador #mensaje-carga {
+                display: none;
+                text-align: center;
+                margin-top: 12px;
+                padding: 10px;
+                background: #f0f0f0;
+                border-radius: 6px;
+                color: #32CD32;
+                font-weight: bold;
+            }
+            .mi-personalizador .notificacion-exito {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: #32CD32;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 50px;
+                font-weight: bold;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 9999;
+                animation: slideIn 0.3s ease-out;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .mi-personalizador .notificacion-exito::before {
+                content: "✓";
+                font-size: 1.2rem;
+                font-weight: bold;
+            }
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
 
-                /* Utilidades (mismo subconjunto) */
-                .mi-personalizador .relative { position: relative; }
-                .mi-personalizador .absolute { position: absolute; }
-                .mi-personalizador .flex { display: flex; }
-                .mi-personalizador .flex-col { flex-direction: column; }
-                .mi-personalizador .flex-row { flex-direction: row; }
-                .mi-personalizador .flex-1 { flex: 1 1 0%; }
-                .mi-personalizador .items-center { align-items: center; }
-                .mi-personalizador .justify-center { justify-content: center; }
-                .mi-personalizador .justify-between { justify-content: space-between; }
-                .mi-personalizador .w-full { width: 100%; }
-                .mi-personalizador .h-full { height: 100%; }
-                .mi-personalizador .p-5 { padding: 1.25rem; }
-                .mi-personalizador .p-4 { padding: 1rem; }
-                .mi-personalizador .p-3 { padding: 0.75rem; }
-                .mi-personalizador .p-2 { padding: 0.5rem; }
-                .mi-personalizador .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
-                .mi-personalizador .px-4 { padding-left: 1rem; padding-right: 1rem; }
-                .mi-personalizador .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-                .mi-personalizador .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-                .mi-personalizador .pb-2 { padding-bottom: 0.5rem; }
-                .mi-personalizador .mb-4 { margin-bottom: 1rem; }
-                .mi-personalizador .mb-3 { margin-bottom: 0.75rem; }
-                .mi-personalizador .mb-2 { margin-bottom: 0.5rem; }
-                .mi-personalizador .mt-2 { margin-top: 0.5rem; }
-                .mi-personalizador .gap-2 { gap: 0.5rem; }
-                .mi-personalizador .gap-1 { gap: 0.25rem; }
-                .mi-personalizador .space-y-2 > * + * { margin-top: 0.5rem; }
-                .mi-personalizador .rounded-full { border-radius: 9999px; }
-                .mi-personalizador .rounded-lg { border-radius: 0.5rem; }
-                .mi-personalizador .border { border: 1px solid; }
-                .mi-personalizador .border-r { border-right-width: 1px; }
-                .mi-personalizador .border-t { border-top-width: 1px; }
-                .mi-personalizador .border-gray-200 { border-color: #e5e7eb; }
-                .mi-personalizador .border-gray-300 { border-color: #d1d5db; }
-                .mi-personalizador .border-black { border-color: #000; }
-                .mi-personalizador .bg-white { background-color: #fff; }
-                .mi-personalizador .bg-white\/50 { background-color: rgba(255,255,255,0.5); }
-                .mi-personalizador .text-white { color: #fff; }
-                .mi-personalizador .text-black { color: #000; }
-                .mi-personalizador .text-gray-500 { color: #6b7280; }
-                .mi-personalizador .text-gray-600 { color: #4b5563; }
-                .mi-personalizador .text-xs { font-size: 0.75rem; }
-                .mi-personalizador .text-sm { font-size: 0.875rem; }
-                .mi-personalizador .text-base { font-size: 1rem; }
-                .mi-personalizador .text-lg { font-size: 1.125rem; }
-                .mi-personalizador .text-xl { font-size: 1.25rem; }
-                .mi-personalizador .font-light { font-weight: 300; }
-                .mi-personalizador .font-bold { font-weight: 700; }
-                .mi-personalizador .font-extrabold { font-weight: 800; }
-                .mi-personalizador .uppercase { text-transform: uppercase; }
-                .mi-personalizador .tracking-tight { letter-spacing: -0.025em; }
-                .mi-personalizador .tracking-wider { letter-spacing: 0.05em; }
-                .mi-personalizador .tracking-widest { letter-spacing: 0.1em; }
-                .mi-personalizador .leading-none { line-height: 1; }
-                .mi-personalizador .text-left { text-align: left; }
-                .mi-personalizador .text-right { text-align: right; }
-                .mi-personalizador .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-                .mi-personalizador .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.05); }
-                .mi-personalizador .drop-shadow-\[0_35px_35px_rgba\(0\2c 0\2c 0\2c 0\.15\)\] { filter: drop-shadow(0 35px 35px rgba(0,0,0,0.15)); }
-                .mi-personalizador .transition-all { transition: all 0.15s cubic-bezier(0.4,0,0.2,1); }
-                .mi-personalizador .duration-700 { transition-duration: 700ms; }
-                .mi-personalizador .ease-out { transition-timing-function: cubic-bezier(0,0,0.2,1); }
-                .mi-personalizador .hover\:scale-\[1\.02\]:hover { transform: scale(1.02); }
-                .mi-personalizador .hover\:border-gray-400:hover { border-color: #9ca3af; }
-                .mi-personalizador .hover\:bg-gray-50:hover { background-color: #f9fafb; }
-                .mi-personalizador .pointer-events-none { pointer-events: none; }
-                .mi-personalizador .select-none { user-select: none; }
-                .mi-personalizador .bottom-8 { bottom: 2rem; }
-                .mi-personalizador .left-1\/2 { left: 50%; }
-                .mi-personalizador .-translate-x-1\/2 { transform: translateX(-50%); }
-                .mi-personalizador .backdrop-blur-lg { backdrop-filter: blur(16px); }
-                .mi-personalizador .overflow-y-auto { overflow-y: auto; }
-                .mi-personalizador .grid { display: grid; }
-                .mi-personalizador .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-                .mi-personalizador .flex-wrap { flex-wrap: wrap; }
-                .mi-personalizador .h-9 { height: 2.25rem; }
-                .mi-personalizador .w-9 { width: 2.25rem; }
-                .mi-personalizador .h-8 { height: 2rem; }
-                .mi-personalizador .w-8 { width: 2rem; }
-                .mi-personalizador .h-7 { height: 1.75rem; }
-                .mi-personalizador .w-7 { width: 1.75rem; }
-                .mi-personalizador .h-4 { height: 1rem; }
-                .mi-personalizador .w-4 { width: 1rem; }
-                .mi-personalizador .bg-black { background-color: #000; }
-                .mi-personalizador .bg-\[\#6B7280\] { background-color: #6B7280; }
-                .mi-personalizador .bg-\[\#8B4513\] { background-color: #8B4513; }
-                .mi-personalizador .bg-\[\#8BC34A\] { background-color: #8BC34A; }
-                .mi-personalizador .bg-\[\#66CDAA\] { background-color: #66CDAA; }
-                .mi-personalizador .bg-\[\#FF0000\] { background-color: #FF0000; }
-                .mi-personalizador .bg-\[\#FFEB3B\] { background-color: #FFEB3B; }
-                .mi-personalizador .bg-\[\#4169E1\] { background-color: #4169E1; }
-                .mi-personalizador .bg-\[\#00CED1\] { background-color: #00CED1; }
-                .mi-personalizador .bg-\[\#9C27B0\] { background-color: #9C27B0; }
-                .mi-personalizador .bg-\[\#800020\] { background-color: #800020; }
-                .mi-personalizador .bg-\[\#F5F5DC\] { background-color: #F5F5DC; }
-                .mi-personalizador .ring-4 { box-shadow: 0 0 0 4px rgba(0,0,0,0.1); }
-                .mi-personalizador .object-contain { object-fit: contain; }
-                .mi-personalizador .z-10 { z-index: 10; }
+            /* Utilidades (mismo subconjunto) */
+            .mi-personalizador .relative { position: relative; }
+            .mi-personalizador .absolute { position: absolute; }
+            .mi-personalizador .flex { display: flex; }
+            .mi-personalizador .flex-col { flex-direction: column; }
+            .mi-personalizador .flex-row { flex-direction: row; }
+            .mi-personalizador .flex-1 { flex: 1 1 0%; }
+            .mi-personalizador .items-center { align-items: center; }
+            .mi-personalizador .justify-center { justify-content: center; }
+            .mi-personalizador .justify-between { justify-content: space-between; }
+            .mi-personalizador .w-full { width: 100%; }
+            .mi-personalizador .h-full { height: 100%; }
+            .mi-personalizador .p-5 { padding: 1.25rem; }
+            .mi-personalizador .p-4 { padding: 1rem; }
+            .mi-personalizador .p-3 { padding: 0.75rem; }
+            .mi-personalizador .p-2 { padding: 0.5rem; }
+            .mi-personalizador .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+            .mi-personalizador .px-4 { padding-left: 1rem; padding-right: 1rem; }
+            .mi-personalizador .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+            .mi-personalizador .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+            .mi-personalizador .pb-2 { padding-bottom: 0.5rem; }
+            .mi-personalizador .mb-4 { margin-bottom: 1rem; }
+            .mi-personalizador .mb-3 { margin-bottom: 0.75rem; }
+            .mi-personalizador .mb-2 { margin-bottom: 0.5rem; }
+            .mi-personalizador .mt-2 { margin-top: 0.5rem; }
+            .mi-personalizador .gap-2 { gap: 0.5rem; }
+            .mi-personalizador .gap-1 { gap: 0.25rem; }
+            .mi-personalizador .space-y-2 > * + * { margin-top: 0.5rem; }
+            .mi-personalizador .rounded-full { border-radius: 9999px; }
+            .mi-personalizador .rounded-lg { border-radius: 0.5rem; }
+            .mi-personalizador .border { border: 1px solid; }
+            .mi-personalizador .border-r { border-right-width: 1px; }
+            .mi-personalizador .border-t { border-top-width: 1px; }
+            .mi-personalizador .border-gray-200 { border-color: #e5e7eb; }
+            .mi-personalizador .border-gray-300 { border-color: #d1d5db; }
+            .mi-personalizador .border-black { border-color: #000; }
+            .mi-personalizador .bg-white { background-color: #fff; }
+            .mi-personalizador .bg-white\/50 { background-color: rgba(255,255,255,0.5); }
+            .mi-personalizador .text-white { color: #fff; }
+            .mi-personalizador .text-black { color: #000; }
+            .mi-personalizador .text-gray-500 { color: #6b7280; }
+            .mi-personalizador .text-gray-600 { color: #4b5563; }
+            .mi-personalizador .text-xs { font-size: 0.75rem; }
+            .mi-personalizador .text-sm { font-size: 0.875rem; }
+            .mi-personalizador .text-base { font-size: 1rem; }
+            .mi-personalizador .text-lg { font-size: 1.125rem; }
+            .mi-personalizador .text-xl { font-size: 1.25rem; }
+            .mi-personalizador .font-light { font-weight: 300; }
+            .mi-personalizador .font-bold { font-weight: 700; }
+            .mi-personalizador .font-extrabold { font-weight: 800; }
+            .mi-personalizador .uppercase { text-transform: uppercase; }
+            .mi-personalizador .tracking-tight { letter-spacing: -0.025em; }
+            .mi-personalizador .tracking-wider { letter-spacing: 0.05em; }
+            .mi-personalizador .tracking-widest { letter-spacing: 0.1em; }
+            .mi-personalizador .leading-none { line-height: 1; }
+            .mi-personalizador .text-left { text-align: left; }
+            .mi-personalizador .text-right { text-align: right; }
+            .mi-personalizador .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+            .mi-personalizador .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.05); }
+            .mi-personalizador .drop-shadow-\[0_35px_35px_rgba\(0\2c 0\2c 0\2c 0\.15\)\] { filter: drop-shadow(0 35px 35px rgba(0,0,0,0.15)); }
+            .mi-personalizador .transition-all { transition: all 0.15s cubic-bezier(0.4,0,0.2,1); }
+            .mi-personalizador .duration-700 { transition-duration: 700ms; }
+            .mi-personalizador .ease-out { transition-timing-function: cubic-bezier(0,0,0.2,1); }
+            .mi-personalizador .hover\:scale-\[1\.02\]:hover { transform: scale(1.02); }
+            .mi-personalizador .hover\:border-gray-400:hover { border-color: #9ca3af; }
+            .mi-personalizador .hover\:bg-gray-50:hover { background-color: #f9fafb; }
+            .mi-personalizador .pointer-events-none { pointer-events: none; }
+            .mi-personalizador .select-none { user-select: none; }
+            .mi-personalizador .bottom-8 { bottom: 2rem; }
+            .mi-personalizador .left-1\/2 { left: 50%; }
+            .mi-personalizador .-translate-x-1\/2 { transform: translateX(-50%); }
+            .mi-personalizador .backdrop-blur-lg { backdrop-filter: blur(16px); }
+            .mi-personalizador .overflow-y-auto { overflow-y: auto; }
+            .mi-personalizador .grid { display: grid; }
+            .mi-personalizador .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .mi-personalizador .flex-wrap { flex-wrap: wrap; }
+            .mi-personalizador .h-9 { height: 2.25rem; }
+            .mi-personalizador .w-9 { width: 2.25rem; }
+            .mi-personalizador .h-8 { height: 2rem; }
+            .mi-personalizador .w-8 { width: 2rem; }
+            .mi-personalizador .h-7 { height: 1.75rem; }
+            .mi-personalizador .w-7 { width: 1.75rem; }
+            .mi-personalizador .h-4 { height: 1rem; }
+            .mi-personalizador .w-4 { width: 1rem; }
+            .mi-personalizador .bg-black { background-color: #000; }
+            .mi-personalizador .bg-\[\#6B7280\] { background-color: #6B7280; }
+            .mi-personalizador .bg-\[\#8B4513\] { background-color: #8B4513; }
+            .mi-personalizador .bg-\[\#8BC34A\] { background-color: #8BC34A; }
+            .mi-personalizador .bg-\[\#66CDAA\] { background-color: #66CDAA; }
+            .mi-personalizador .bg-\[\#FF0000\] { background-color: #FF0000; }
+            .mi-personalizador .bg-\[\#FFEB3B\] { background-color: #FFEB3B; }
+            .mi-personalizador .bg-\[\#4169E1\] { background-color: #4169E1; }
+            .mi-personalizador .bg-\[\#00CED1\] { background-color: #00CED1; }
+            .mi-personalizador .bg-\[\#9C27B0\] { background-color: #9C27B0; }
+            .mi-personalizador .bg-\[\#800020\] { background-color: #800020; }
+            .mi-personalizador .bg-\[\#F5F5DC\] { background-color: #F5F5DC; }
+            .mi-personalizador .ring-4 { box-shadow: 0 0 0 4px rgba(0,0,0,0.1); }
+            .mi-personalizador .object-contain { object-fit: contain; }
+            .mi-personalizador .z-10 { z-index: 10; }
 
-                /* Disposición escritorio: panel izquierdo, SVG derecho */
-                .mi-personalizador main {
-                    height: 100%;
-                    display: flex;
-                    flex-direction: row;
-                }
-                /* PANEL IZQUIERDO (ancho original 650px, sobrescrito por mejoras) */
+            /* Disposición escritorio: panel izquierdo, SVG derecho */
+            .mi-personalizador main {
+                height: 100%;
+                display: flex;
+                flex-direction: row;
+            }
+            /* PANEL IZQUIERDO (ancho original 650px, sobrescrito por mejoras) */
+            .mi-personalizador aside {
+                width: 650px;           /* Será sobrescrito por !important */
+                border-right: 1px solid #e5e7eb;
+                background-color: white;
+                display: flex;
+                flex-direction: column;
+            }
+            /* Barra de herramientas */
+            .mi-personalizador .toolbar {
+                position: absolute;
+                bottom: 2rem;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                gap: 1rem;
+                background: rgba(255,255,255,0.8);
+                backdrop-filter: blur(8px);
+                padding: 0.5rem 1rem;
+                border-radius: 9999px;
+                border: 1px solid #e5e7eb;
+                box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+                z-index: 20;
+            }
+            .mi-personalizador .toolbar button {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0;
+                font-size: 0.65rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                color: #6b7280;
+                transition: color 0.2s;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+            }
+            .mi-personalizador .toolbar button:hover {
+                color: #000;
+            }
+            .mi-personalizador .toolbar .material-symbols-outlined {
+                font-size: 1.2rem;
+            }
+            .mi-personalizador .toolbar .divider {
+                width: 1px;
+                height: 1.5rem;
+                background-color: #e5e7eb;
+            }
+
+            /* Selector de tipo */
+            .mi-personalizador .type-selector {
+                display: flex;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+            }
+            .mi-personalizador .type-btn {
+                flex: 1;
+                padding: 0.5rem;
+                border: 1px solid #e5e7eb;
+                border-radius: 0.5rem;
+                font-weight: 700;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                background: white;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .mi-personalizador .type-btn.active {
+                background-color: #000;
+                color: white;
+                border-color: #000;
+            }
+            /* Media query para pantallas pequeñas: el panel izquierdo se adapta */
+            @media (max-width: 1024px) {
                 .mi-personalizador aside {
-                    width: 650px;           /* Será sobrescrito por !important */
-                    border-right: 1px solid #e5e7eb;
-                    background-color: white;
-                    display: flex;
+                    width: 40%; /* se convierte en porcentaje para mantener proporción */
+                    min-width: 280px;
+                }
+            }
+            @media (max-width: 768px) {
+                .mi-personalizador main {
                     flex-direction: column;
                 }
-                /* Barra de herramientas */
+                .mi-personalizador aside {
+                    width: 100%;
+                    border-right: none;
+                    border-top: 1px solid #e5e7eb;
+                }
                 .mi-personalizador .toolbar {
-                    position: absolute;
-                    bottom: 2rem;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    display: flex;
-                    gap: 1rem;
-                    background: rgba(255,255,255,0.8);
-                    backdrop-filter: blur(8px);
-                    padding: 0.5rem 1rem;
-                    border-radius: 9999px;
-                    border: 1px solid #e5e7eb;
-                    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-                    z-index: 20;
+                    bottom: 1rem;
+                    padding: 0.3rem 0.8rem;
+                    gap: 0.5rem;
                 }
                 .mi-personalizador .toolbar button {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 0;
-                    font-size: 0.65rem;
-                    font-weight: 700;
-                    text-transform: uppercase;
-                    color: #6b7280;
-                    transition: color 0.2s;
-                    background: transparent;
-                    border: none;
-                    cursor: pointer;
-                }
-                .mi-personalizador .toolbar button:hover {
-                    color: #000;
+                    font-size: 0.5rem;
                 }
                 .mi-personalizador .toolbar .material-symbols-outlined {
-                    font-size: 1.2rem;
+                    font-size: 1rem;
                 }
-                .mi-personalizador .toolbar .divider {
-                    width: 1px;
+                /* Ajustes para que el contenido del panel se vea proporcionado */
+                .mi-personalizador .p-5 {
+                    padding: 0.75rem;
+                }
+                .mi-personalizador .text-xl {
+                    font-size: 1rem;
+                }
+                .mi-personalizador .text-[0.55rem] {
+                    font-size: 0.45rem;
+                }
+                .mi-personalizador .h-9, .mi-personalizador .w-9 {
+                    height: 1.75rem;
+                    width: 1.75rem;
+                }
+                .mi-personalizador .h-7, .mi-personalizador .w-7 {
+                    height: 1.25rem;
+                    width: 1.25rem;
+                }
+                .mi-personalizador .part-btn {
+                    padding: 0.25rem 0.5rem;
+                    font-size: 0.6rem;
+                }
+                .mi-personalizador .finish-option {
+                    padding: 0.5rem 0.75rem;
+                }
+                .mi-personalizador .finish-option .text-xs {
+                    font-size: 0.6rem;
+                }
+                .mi-personalizador .finish-option .text-[0.6rem] {
+                    font-size: 0.5rem;
+                }
+                .mi-personalizador .size-option {
+                    height: 1.75rem;
+                    width: 1.75rem;
+                    font-size: 0.7rem;
+                }
+                .mi-personalizador #comprar-personalizado {
+                    font-size: 0.9rem !important;
+                    padding: 0.5rem 0.75rem !important;
+                }
+                .mi-personalizador .text-[0.65rem] {
+                    font-size: 0.55rem;
+                }
+                .mi-personalizador .text-[0.7rem] {
+                    font-size: 0.6rem;
+                }
+                .mi-personalizador .mb-4 {
+                    margin-bottom: 0.5rem;
+                }
+            }
+            /* Ajuste para pantallas muy pequeñas (menos de 400px) */
+            @media (max-width: 400px) {
+                .mi-personalizador .h-9, .mi-personalizador .w-9 {
                     height: 1.5rem;
-                    background-color: #e5e7eb;
+                    width: 1.5rem;
                 }
-
-                /* Selector de tipo */
-                .mi-personalizador .type-selector {
-                    display: flex;
-                    gap: 0.5rem;
-                    margin-bottom: 1rem;
+                .mi-personalizador .h-7, .mi-personalizador .w-7 {
+                    height: 1rem;
+                    width: 1rem;
+                }
+                .mi-personalizador .part-btn {
+                    padding: 0.2rem 0.4rem;
+                    font-size: 0.5rem;
                 }
                 .mi-personalizador .type-btn {
-                    flex: 1;
-                    padding: 0.5rem;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 0.5rem;
-                    font-weight: 700;
-                    font-size: 0.75rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.05em;
-                    background: white;
-                    cursor: pointer;
-                    transition: all 0.2s;
+                    font-size: 0.6rem;
+                    padding: 0.3rem;
                 }
-                .mi-personalizador .type-btn.active {
-                    background-color: #000;
-                    color: white;
-                    border-color: #000;
+                .mi-personalizador .grid-cols-2 {
+                    gap: 0.25rem;
                 }
-                /* Media query para pantallas pequeñas: el panel izquierdo se adapta */
-                @media (max-width: 1024px) {
-                    .mi-personalizador aside {
-                        width: 40%; /* se convierte en porcentaje para mantener proporción */
-                        min-width: 280px;
-                    }
-                }
-                @media (max-width: 768px) {
-                    .mi-personalizador main {
-                        flex-direction: column;
-                    }
-                    .mi-personalizador aside {
-                        width: 100%;
-                        border-right: none;
-                        border-top: 1px solid #e5e7eb;
-                    }
-                    .mi-personalizador .toolbar {
-                        bottom: 1rem;
-                        padding: 0.3rem 0.8rem;
-                        gap: 0.5rem;
-                    }
-                    .mi-personalizador .toolbar button {
-                        font-size: 0.5rem;
-                    }
-                    .mi-personalizador .toolbar .material-symbols-outlined {
-                        font-size: 1rem;
-                    }
-                    /* Ajustes para que el contenido del panel se vea proporcionado */
-                    .mi-personalizador .p-5 {
-                        padding: 0.75rem;
-                    }
-                    .mi-personalizador .text-xl {
-                        font-size: 1rem;
-                    }
-                    .mi-personalizador .text-[0.55rem] {
-                        font-size: 0.45rem;
-                    }
-                    .mi-personalizador .h-9, .mi-personalizador .w-9 {
-                        height: 1.75rem;
-                        width: 1.75rem;
-                    }
-                    .mi-personalizador .h-7, .mi-personalizador .w-7 {
-                        height: 1.25rem;
-                        width: 1.25rem;
-                    }
-                    .mi-personalizador .part-btn {
-                        padding: 0.25rem 0.5rem;
-                        font-size: 0.6rem;
-                    }
-                    .mi-personalizador .finish-option {
-                        padding: 0.5rem 0.75rem;
-                    }
-                    .mi-personalizador .finish-option .text-xs {
-                        font-size: 0.6rem;
-                    }
-                    .mi-personalizador .finish-option .text-[0.6rem] {
-                        font-size: 0.5rem;
-                    }
-                    .mi-personalizador .size-option {
-                        height: 1.75rem;
-                        width: 1.75rem;
-                        font-size: 0.7rem;
-                    }
-                    .mi-personalizador #comprar-personalizado {
-                        font-size: 0.9rem !important;
-                        padding: 0.5rem 0.75rem !important;
-                    }
-                    .mi-personalizador .text-[0.65rem] {
-                        font-size: 0.55rem;
-                    }
-                    .mi-personalizador .text-[0.7rem] {
-                        font-size: 0.6rem;
-                    }
-                    .mi-personalizador .mb-4 {
-                        margin-bottom: 0.5rem;
-                    }
-                }
-                /* Ajuste para pantallas muy pequeñas (menos de 400px) */
-                @media (max-width: 400px) {
-                    .mi-personalizador .h-9, .mi-personalizador .w-9 {
-                        height: 1.5rem;
-                        width: 1.5rem;
-                    }
-                    .mi-personalizador .h-7, .mi-personalizador .w-7 {
-                        height: 1rem;
-                        width: 1rem;
-                    }
-                    .mi-personalizador .part-btn {
-                        padding: 0.2rem 0.4rem;
-                        font-size: 0.5rem;
-                    }
-                    .mi-personalizador .type-btn {
-                        font-size: 0.6rem;
-                        padding: 0.3rem;
-                    }
-                    .mi-personalizador .grid-cols-2 {
-                        gap: 0.25rem;
-                    }
-                }
-            </style>
+            }
+        </style>
 
-            <!-- CONTENIDO PRINCIPAL -->
-            <div class="relative flex flex-col h-full">
-                <main class="flex-1 flex">
-                    <!-- VISOR DEL ZAPATO (SVG) -->
-                    <div class="relative flex-1 shoe-canvas-gradient">
-                        <div class="flex items-center justify-center h-full p-4">
-                            <div id="shoe-container" class="relative w-full h-full flex items-center justify-center">
-                                <svg id="shoe-svg" viewBox="0 0 21000 29700" xmlns="http://www.w3.org/2000/svg"></svg>
-                            </div>
-                        </div>
-                        <!-- Barra de herramientas -->
-                        <div class="toolbar">
-                            <button id="rotateBtn">
-                                <span class="material-symbols-outlined">rotate_right</span>
-                                <span id="rotateLabel">360°</span>
-                            </button>
-                            <div class="divider"></div>
-                            <button id="zoomBtn">
-                                <span class="material-symbols-outlined">zoom_in</span>
-                                Detalles
-                            </button>
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="relative flex flex-col h-full">
+            <main class="flex-1 flex">
+                <!-- VISOR DEL ZAPATO (SVG) -->
+                <div class="relative flex-1 shoe-canvas-gradient">
+                    <div class="flex items-center justify-center h-full p-4">
+                        <div id="shoe-container" class="relative w-full h-full flex items-center justify-center">
+                            <svg id="shoe-svg" viewBox="0 0 21000 29700" xmlns="http://www.w3.org/2000/svg"></svg>
                         </div>
                     </div>
+                    <!-- Barra de herramientas -->
+                    <div class="toolbar">
+                        <button id="rotateBtn">
+                            <span class="material-symbols-outlined">rotate_right</span>
+                            <span id="rotateLabel">360°</span>
+                        </button>
+                        <div class="divider"></div>
+                        <button id="zoomBtn">
+                            <span class="material-symbols-outlined">zoom_in</span>
+                            Detalles
+                        </button>
+                    </div>
+                </div>
 
-                    <!-- PANEL DE PERSONALIZACIÓN (ahora 520px gracias a las mejoras) -->
-                    <aside class="flex flex-col border-r border-gray-200 bg-white">
-                        <div class="flex h-full flex-col p-5">
-                            <h1 class="text-xl font-light tracking-tight text-gray-900">PERSONALIZAR ACHEFOOTWEAR</h1>
-                            <p class="mt-0 text-[0.55rem] font-medium uppercase tracking-[0.1em] text-gray-400">HECHO A MANO · 8 COMPONENTES · 13 COLORES</p>
+                <!-- PANEL DE PERSONALIZACIÓN (400px) -->
+                <aside class="flex flex-col border-r border-gray-200 bg-white">
+                    <div class="flex h-full flex-col p-5">
+                        <h1 class="text-xl font-light tracking-tight text-gray-900">PERSONALIZAR ACHEFOOTWEAR</h1>
+                        <p class="mt-0 text-[0.55rem] font-medium uppercase tracking-[0.1em] text-gray-400">HECHO A MANO · 8 COMPONENTES · 13 COLORES</p>
 
-                            <div class="type-selector mt-3">
-                                <button id="type-tennis" class="type-btn active">Tenis</button>
-                                <button id="type-boots" class="type-btn">Botas</button>
-                            </div>
+                        <div class="type-selector mt-3">
+                            <button id="type-tennis" class="type-btn active">Tenis</button>
+                            <button id="type-boots" class="type-btn">Botas</button>
+                        </div>
 
-                            <!-- MATERIAL Y COLOR (13 colores) -->
-                            <div class="mb-4">
-                                <span class="text-[0.7rem] font-bold uppercase tracking-wider text-gray-500">MATERIAL Y COLOR</span>
-                                <div class="mt-2 flex flex-wrap gap-2" id="colorSelector">
-                                    <!-- (todos los botones de color, se mantienen igual) -->
-                                    <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#ffffff" data-color-name="Blanco"><span class="h-7 w-7 rounded-full bg-white shadow-inner"></span></button>
-                                    <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#000000" data-color-name="Negro"><span class="h-7 w-7 rounded-full bg-black shadow-inner"></span></button>
-                                    <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#6B7280" data-color-name="Gris"><span class="h-7 w-7 rounded-full bg-[#6B7280] shadow-inner"></span></button>
-                                    <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#8B4513" data-color-name="Café"><span class="h-7 w-7 rounded-full bg-[#8B4513] shadow-inner"></span></button>
-                                    <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#8BC34A" data-color-name="Verde Cali"><span class="h-7 w-7 rounded-full bg-[#8BC34A] shadow-inner"></span></button>
-                                    <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#66CDAA" data-color-name="Verde Aguamarina"><span class="h-7 w-7 rounded-full bg-[#66CDAA] shadow-inner"></span></button>
-                                    <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#FF0000" data-color-name="Rojo"><span class="h-7 w-7 rounded-full bg-[#FF0000] shadow-inner"></span></button>
-                                    <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#FFEB3B" data-color-name="Amarillo"><span class="h-7 w-7 rounded-full bg-[#FFEB3B] shadow-inner"></span></button>
-                                    <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#4169E1" data-color-name="Azul Rey"><span class="h-7 w-7 rounded-full bg-[#4169E1] shadow-inner"></span></button>
-                                    <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#00CED1" data-color-name="Azul Aguamarina"><span class="h-7 w-7 rounded-full bg-[#00CED1] shadow-inner"></span></button>
-                                    <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#9C27B0" data-color-name="Morado"><span class="h-7 w-7 rounded-full bg-[#9C27B0] shadow-inner"></span></button>
-                                    <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#800020" data-color-name="Vino Tinto"><span class="h-7 w-7 rounded-full bg-[#800020] shadow-inner"></span></button>
-                                    <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#F5F5DC" data-color-name="Beige"><span class="h-7 w-7 rounded-full bg-[#F5F5DC] shadow-inner"></span></button>
-                                </div>
-                            </div>
-
-                            <!-- SELECCIÓN DE COMPONENTE -->
-                            <div class="mb-4">
-                                <span class="text-[0.7rem] font-bold uppercase tracking-wider text-gray-500">SELECCIONAR COMPONENTE</span>
-                                <div class="mt-2 grid grid-cols-2 gap-2" id="partSelector">
-                                    <button data-part="suela" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">SUELA</button>
-                                    <button data-part="hilo" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">HILO</button>
-                                    <button data-part="cordones" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">CORDONES</button>
-                                    <button data-part="forro" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">FORRO</button>
-                                    <button data-part="logo" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">LOGO</button>
-                                    <button data-part="capellada1" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">PUNTERA</button>
-                                    <button data-part="capellada2" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">LATERAL</button>
-                                    <button data-part="capellada3" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">TALÓN</button>
-                                </div>
-                            </div>
-
-                            <!-- ACABADO DE CUERO -->
-                            <div class="mb-4">
-                                <span class="text-[0.7rem] font-bold uppercase tracking-wider text-gray-500">ACABADO DE CUERO</span>
-                                <div class="mt-2 space-y-1" id="finishSelector">
-                                    <button data-finish="smooth" data-finish-name="Cuero Liso" class="finish-option flex items-center justify-between w-full rounded-lg border border-gray-200 px-4 py-2 hover:border-gray-400 hover:bg-gray-50 transition-all">
-                                        <div class="text-left">
-                                            <p class="text-xs font-bold uppercase tracking-tight text-gray-800">Cuero Liso</p>
-                                            <p class="text-[0.6rem] text-gray-500">Acabado clásico</p>
-                                        </div>
-                                        <div class="finish-indicator h-4 w-4 rounded-full border-2 border-gray-300"></div>
-                                    </button>
-                                    <button data-finish="suede" data-finish-name="Cuero Gamuzado" class="finish-option flex items-center justify-between w-full rounded-lg border border-gray-200 px-4 py-2 hover:border-gray-400 hover:bg-gray-50 transition-all">
-                                        <div class="text-left">
-                                            <p class="text-xs font-bold uppercase tracking-tight text-gray-800">Cuero Gamuzado</p>
-                                            <p class="text-[0.6rem] text-gray-500">Textura aterciopelada</p>
-                                        </div>
-                                        <div class="finish-indicator h-4 w-4 rounded-full border-2 border-gray-300"></div>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- TALLA -->
-                            <div class="mb-4">
-                                <span class="text-[0.7rem] font-bold uppercase tracking-wider text-gray-500">TALLA</span>
-                                <div class="mt-2 flex flex-wrap gap-1" id="sizeSelector"></div>
-                            </div>
-
-                            <!-- PRECIO Y BOTÓN COMPRAR -->
-                            <div class="border-t border-gray-200 pt-4">
-                                <div class="mb-3 flex items-end justify-between">
-                                    <div>
-                                        <p class="text-[0.65rem] font-bold uppercase tracking-widest text-gray-500">Precio Total</p>
-                                        <p class="text-xl font-light tracking-tight text-gray-900" id="precio-total">$180.000</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-[0.65rem] font-bold uppercase tracking-widest text-gray-500">Envío</p>
-                                        <p class="text-xs font-medium text-gray-600">Gratis</p>
-                                    </div>
-                                </div>
-                                <button id="comprar-personalizado" class="w-full rounded-lg py-3 px-4 text-base font-extrabold uppercase tracking-wider text-white shadow-lg transition-all hover:scale-[1.02] hover:bg-[#2db82d] active:scale-[0.98]" style="background-color: #32CD32;">
-                                    COMPRAR
-                                </button>
-                                <div id="mensaje-carga" class="text-xs">Agregando al carrito...</div>
+                        <!-- MATERIAL Y COLOR (13 colores) -->
+                        <div class="mb-4">
+                            <span class="text-[0.7rem] font-bold uppercase tracking-wider text-gray-500">MATERIAL Y COLOR</span>
+                            <div class="mt-2 flex flex-wrap gap-2" id="colorSelector">
+                                <!-- (todos los botones de color, se mantienen igual) -->
+                                <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#ffffff" data-color-name="Blanco"><span class="h-7 w-7 rounded-full bg-white shadow-inner"></span></button>
+                                <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#000000" data-color-name="Negro"><span class="h-7 w-7 rounded-full bg-black shadow-inner"></span></button>
+                                <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#6B7280" data-color-name="Gris"><span class="h-7 w-7 rounded-full bg-[#6B7280] shadow-inner"></span></button>
+                                <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#8B4513" data-color-name="Café"><span class="h-7 w-7 rounded-full bg-[#8B4513] shadow-inner"></span></button>
+                                <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#8BC34A" data-color-name="Verde Cali"><span class="h-7 w-7 rounded-full bg-[#8BC34A] shadow-inner"></span></button>
+                                <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#66CDAA" data-color-name="Verde Aguamarina"><span class="h-7 w-7 rounded-full bg-[#66CDAA] shadow-inner"></span></button>
+                                <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#FF0000" data-color-name="Rojo"><span class="h-7 w-7 rounded-full bg-[#FF0000] shadow-inner"></span></button>
+                                <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#FFEB3B" data-color-name="Amarillo"><span class="h-7 w-7 rounded-full bg-[#FFEB3B] shadow-inner"></span></button>
+                                <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#4169E1" data-color-name="Azul Rey"><span class="h-7 w-7 rounded-full bg-[#4169E1] shadow-inner"></span></button>
+                                <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#00CED1" data-color-name="Azul Aguamarina"><span class="h-7 w-7 rounded-full bg-[#00CED1] shadow-inner"></span></button>
+                                <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#9C27B0" data-color-name="Morado"><span class="h-7 w-7 rounded-full bg-[#9C27B0] shadow-inner"></span></button>
+                                <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#800020" data-color-name="Vino Tinto"><span class="h-7 w-7 rounded-full bg-[#800020] shadow-inner"></span></button>
+                                <button class="color-option flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 transition-all" data-color="#F5F5DC" data-color-name="Beige"><span class="h-7 w-7 rounded-full bg-[#F5F5DC] shadow-inner"></span></button>
                             </div>
                         </div>
-                    </aside>
-                </main>
-            </div>
 
-            <div id="notificacion-container"></div>
+                        <!-- SELECCIÓN DE COMPONENTE -->
+                        <div class="mb-4">
+                            <span class="text-[0.7rem] font-bold uppercase tracking-wider text-gray-500">SELECCIONAR COMPONENTE</span>
+                            <div class="mt-2 grid grid-cols-2 gap-2" id="partSelector">
+                                <button data-part="suela" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">SUELA</button>
+                                <button data-part="hilo" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">HILO</button>
+                                <button data-part="cordones" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">CORDONES</button>
+                                <button data-part="forro" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">FORRO</button>
+                                <button data-part="logo" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">LOGO</button>
+                                <button data-part="capellada1" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">PUNTERA</button>
+                                <button data-part="capellada2" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">LATERAL</button>
+                                <button data-part="capellada3" class="part-btn rounded-lg border border-gray-200 px-4 py-1.5 text-left text-xs font-bold uppercase tracking-wide text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50">TALÓN</button>
+                            </div>
+                        </div>
 
-            <script>
-            // (El script original se mantiene intacto, sin modificaciones)
-            (function() {
-                "use strict";
+                        <!-- ACABADO DE CUERO -->
+                        <div class="mb-4">
+                            <span class="text-[0.7rem] font-bold uppercase tracking-wider text-gray-500">ACABADO DE CUERO</span>
+                            <div class="mt-2 space-y-1" id="finishSelector">
+                                <button data-finish="smooth" data-finish-name="Cuero Liso" class="finish-option flex items-center justify-between w-full rounded-lg border border-gray-200 px-4 py-2 hover:border-gray-400 hover:bg-gray-50 transition-all">
+                                    <div class="text-left">
+                                        <p class="text-xs font-bold uppercase tracking-tight text-gray-800">Cuero Liso</p>
+                                        <p class="text-[0.6rem] text-gray-500">Acabado clásico</p>
+                                    </div>
+                                    <div class="finish-indicator h-4 w-4 rounded-full border-2 border-gray-300"></div>
+                                </button>
+                                <button data-finish="suede" data-finish-name="Cuero Gamuzado" class="finish-option flex items-center justify-between w-full rounded-lg border border-gray-200 px-4 py-2 hover:border-gray-400 hover:bg-gray-50 transition-all">
+                                    <div class="text-left">
+                                        <p class="text-xs font-bold uppercase tracking-tight text-gray-800">Cuero Gamuzado</p>
+                                        <p class="text-[0.6rem] text-gray-500">Textura aterciopelada</p>
+                                    </div>
+                                    <div class="finish-indicator h-4 w-4 rounded-full border-2 border-gray-300"></div>
+                                </button>
+                            </div>
+                        </div>
 
-                // ---------- CONSTANTES ----------
-                const PRODUCTO_ID = 623;
-                const AJAX_URL = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+                        <!-- TALLA -->
+                        <div class="mb-4">
+                            <span class="text-[0.7rem] font-bold uppercase tracking-wider text-gray-500">TALLA</span>
+                            <div class="mt-2 flex flex-wrap gap-1" id="sizeSelector"></div>
+                        </div>
 
-                const STATE = {
-                    activePart: 'suela',
-                    colors: {
-                        suela: '#ffffff',
-                        hilo: '#ffffff',
-                        cordones: '#ffffff',
-                        forro: '#ffffff',
-                        logo: '#000000',
-                        capellada1: '#ffffff',
-                        capellada2: '#ffffff',
-                        capellada3: '#ffffff'
-                    },
-                    colorNames: {
-                        suela: 'Blanco',
-                        hilo: 'Blanco',
-                        cordones: 'Blanco',
-                        forro: 'Blanco',
-                        logo: 'Negro',
-                        capellada1: 'Blanco',
-                        capellada2: 'Blanco',
-                        capellada3: 'Blanco'
-                    },
-                    finish: null,
-                    finishName: 'Ninguno',
-                    size: 39,
-                    currentType: 'tennis'
-                };
+                        <!-- PRECIO Y BOTÓN COMPRAR -->
+                        <div class="border-t border-gray-200 pt-4">
+                            <div class="mb-3 flex items-end justify-between">
+                                <div>
+                                    <p class="text-[0.65rem] font-bold uppercase tracking-widest text-gray-500">Precio Total</p>
+                                    <p class="text-xl font-light tracking-tight text-gray-900" id="precio-total">$180.000</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[0.65rem] font-bold uppercase tracking-widest text-gray-500">Envío</p>
+                                    <p class="text-xs font-medium text-gray-600">Gratis</p>
+                                </div>
+                            </div>
+                            <button id="comprar-personalizado" class="w-full rounded-lg py-3 px-4 text-base font-extrabold uppercase tracking-wider text-white shadow-lg transition-all hover:scale-[1.02] hover:bg-[#2db82d] active:scale-[0.98]" style="background-color: #32CD32;">
+                                COMPRAR
+                            </button>
+                            <div id="mensaje-carga" class="text-xs">Agregando al carrito...</div>
+                        </div>
+                    </div>
+                </aside>
+            </main>
+        </div>
 
-                const PART_ALLOWED_COLORS = {
-                    suela: ['#ffffff', '#000000', '#6B7280', '#8B4513'],
-                    hilo: ['#ffffff', '#000000'],
-                    forro: ['#ffffff', '#000000'],
-                };
+        <div id="notificacion-container"></div>
 
-                const ALL_COLORS = ['#ffffff', '#000000', '#6B7280', '#8B4513', '#8BC34A', '#66CDAA', '#FF0000', '#FFEB3B', '#4169E1', '#00CED1', '#9C27B0', '#800020', '#F5F5DC'];
+        <script>
+        // (El script original se mantiene intacto, sin modificaciones)
+        (function() {
+            "use strict";
 
-                const COLOR_NAMES = {
-                    '#ffffff': 'Blanco',
-                    '#000000': 'Negro',
-                    '#6B7280': 'Gris',
-                    '#8B4513': 'Café',
-                    '#8BC34A': 'Verde Cali',
-                    '#66CDAA': 'Verde Aguamarina',
-                    '#FF0000': 'Rojo',
-                    '#FFEB3B': 'Amarillo',
-                    '#4169E1': 'Azul Rey',
-                    '#00CED1': 'Azul Aguamarina',
-                    '#9C27B0': 'Morado',
-                    '#800020': 'Vino Tinto',
-                    '#F5F5DC': 'Beige'
-                };
+            // ---------- CONSTANTES ----------
+            const PRODUCTO_ID = 623;
+            const AJAX_URL = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
 
-                const STROKE_MAP = {
-                    '#ffffff': { str: '#000000', str0: '#2B2B2A', str4: '#2B2B2A', str3: '#ffffff', str2: '#2B2B2A', str1: '#000000' },
-                    '#000000': { str: '#000000', str0: '#1a1a1a', str4: '#1a1a1a', str3: '#1a1a1a', str2: '#1a1a1a', str1: '#000000' },
-                    '#6B7280': { str: '#4B5563', str0: '#4B5563', str4: '#4B5563', str3: '#4B5563', str2: '#4B5563', str1: '#4B5563' },
-                    '#8B4513': { str: '#5a2c0c', str0: '#5a2c0c', str4: '#5a2c0c', str3: '#5a2c0c', str2: '#5a2c0c', str1: '#5a2c0c' },
-                    '#8BC34A': { str: '#5a8f2e', str0: '#5a8f2e', str4: '#5a8f2e', str3: '#5a8f2e', str2: '#5a8f2e', str1: '#5a8f2e' },
-                    '#66CDAA': { str: '#3c9b7a', str0: '#3c9b7a', str4: '#3c9b7a', str3: '#3c9b7a', str2: '#3c9b7a', str1: '#3c9b7a' },
-                    '#FF0000': { str: '#b30000', str0: '#b30000', str4: '#b30000', str3: '#b30000', str2: '#b30000', str1: '#b30000' },
-                    '#FFEB3B': { str: '#c7a600', str0: '#c7a600', str4: '#c7a600', str3: '#c7a600', str2: '#c7a600', str1: '#c7a600' },
-                    '#4169E1': { str: '#1e3f9e', str0: '#1e3f9e', str4: '#1e3f9e', str3: '#1e3f9e', str2: '#1e3f9e', str1: '#1e3f9e' },
-                    '#00CED1': { str: '#008b8e', str0: '#008b8e', str4: '#008b8e', str3: '#008b8e', str2: '#008b8e', str1: '#008b8e' },
-                    '#9C27B0': { str: '#6a1b7a', str0: '#6a1b7a', str4: '#6a1b7a', str3: '#6a1b7a', str2: '#6a1b7a', str1: '#6a1b7a' },
-                    '#800020': { str: '#4d0013', str0: '#4d0013', str4: '#4d0013', str3: '#4d0013', str2: '#4d0013', str1: '#4d0013' },
-                    '#F5F5DC': { str: '#c5c5a3', str0: '#c5c5a3', str4: '#c5c5a3', str3: '#c5c5a3', str2: '#c5c5a3', str1: '#c5c5a3' }
-                };
+            const STATE = {
+                activePart: 'suela',
+                colors: {
+                    suela: '#ffffff',
+                    hilo: '#ffffff',
+                    cordones: '#ffffff',
+                    forro: '#ffffff',
+                    logo: '#000000',
+                    capellada1: '#ffffff',
+                    capellada2: '#ffffff',
+                    capellada3: '#ffffff'
+                },
+                colorNames: {
+                    suela: 'Blanco',
+                    hilo: 'Blanco',
+                    cordones: 'Blanco',
+                    forro: 'Blanco',
+                    logo: 'Negro',
+                    capellada1: 'Blanco',
+                    capellada2: 'Blanco',
+                    capellada3: 'Blanco'
+                },
+                finish: null,
+                finishName: 'Ninguno',
+                size: 39,
+                currentType: 'tennis'
+            };
 
-                // ---------- SVG COMPLETOS (TENIS) ----------
-                const TENNIS_SVG = `<defs>
+            const PART_ALLOWED_COLORS = {
+                suela: ['#ffffff', '#000000', '#6B7280', '#8B4513'],
+                hilo: ['#ffffff', '#000000'],
+                forro: ['#ffffff', '#000000'],
+            };
+
+            const ALL_COLORS = ['#ffffff', '#000000', '#6B7280', '#8B4513', '#8BC34A', '#66CDAA', '#FF0000', '#FFEB3B', '#4169E1', '#00CED1', '#9C27B0', '#800020', '#F5F5DC'];
+
+            const COLOR_NAMES = {
+                '#ffffff': 'Blanco',
+                '#000000': 'Negro',
+                '#6B7280': 'Gris',
+                '#8B4513': 'Café',
+                '#8BC34A': 'Verde Cali',
+                '#66CDAA': 'Verde Aguamarina',
+                '#FF0000': 'Rojo',
+                '#FFEB3B': 'Amarillo',
+                '#4169E1': 'Azul Rey',
+                '#00CED1': 'Azul Aguamarina',
+                '#9C27B0': 'Morado',
+                '#800020': 'Vino Tinto',
+                '#F5F5DC': 'Beige'
+            };
+
+            const STROKE_MAP = {
+                '#ffffff': { str: '#000000', str0: '#2B2B2A', str4: '#2B2B2A', str3: '#ffffff', str2: '#2B2B2A', str1: '#000000' },
+                '#000000': { str: '#000000', str0: '#1a1a1a', str4: '#1a1a1a', str3: '#1a1a1a', str2: '#1a1a1a', str1: '#000000' },
+                '#6B7280': { str: '#4B5563', str0: '#4B5563', str4: '#4B5563', str3: '#4B5563', str2: '#4B5563', str1: '#4B5563' },
+                '#8B4513': { str: '#5a2c0c', str0: '#5a2c0c', str4: '#5a2c0c', str3: '#5a2c0c', str2: '#5a2c0c', str1: '#5a2c0c' },
+                '#8BC34A': { str: '#5a8f2e', str0: '#5a8f2e', str4: '#5a8f2e', str3: '#5a8f2e', str2: '#5a8f2e', str1: '#5a8f2e' },
+                '#66CDAA': { str: '#3c9b7a', str0: '#3c9b7a', str4: '#3c9b7a', str3: '#3c9b7a', str2: '#3c9b7a', str1: '#3c9b7a' },
+                '#FF0000': { str: '#b30000', str0: '#b30000', str4: '#b30000', str3: '#b30000', str2: '#b30000', str1: '#b30000' },
+                '#FFEB3B': { str: '#c7a600', str0: '#c7a600', str4: '#c7a600', str3: '#c7a600', str2: '#c7a600', str1: '#c7a600' },
+                '#4169E1': { str: '#1e3f9e', str0: '#1e3f9e', str4: '#1e3f9e', str3: '#1e3f9e', str2: '#1e3f9e', str1: '#1e3f9e' },
+                '#00CED1': { str: '#008b8e', str0: '#008b8e', str4: '#008b8e', str3: '#008b8e', str2: '#008b8e', str1: '#008b8e' },
+                '#9C27B0': { str: '#6a1b7a', str0: '#6a1b7a', str4: '#6a1b7a', str3: '#6a1b7a', str2: '#6a1b7a', str1: '#6a1b7a' },
+                '#800020': { str: '#4d0013', str0: '#4d0013', str4: '#4d0013', str3: '#4d0013', str2: '#4d0013', str1: '#4d0013' },
+                '#F5F5DC': { str: '#c5c5a3', str0: '#c5c5a3', str4: '#c5c5a3', str3: '#c5c5a3', str2: '#c5c5a3', str1: '#c5c5a3' }
+            };
+
+            // ---------- SVG COMPLETOS (TENIS) ----------
+            const TENNIS_SVG = `<defs>
   <style type="text/css">
     .str0 {stroke:#2B2B2A;stroke-width:35.28}
     .str1 {stroke:black;stroke-width:20}
@@ -1052,7 +1052,7 @@
  </g>
 </svg>`;
 
-                const BOOTS_SVG = `<defs>
+            const BOOTS_SVG = `<defs>
   <style type="text/css">
     .str0 {stroke:#2B2B2A;stroke-width:35.28}
     .str1 {stroke:black;stroke-width:20}
@@ -1150,407 +1150,405 @@
  </g>
 </svg>`;
 
-                // ---------- FUNCIONES DE ACTUALIZACIÓN ----------
-                const UPDATERS = {
-                    suela: function(color) {
-                        const stroke0 = STROKE_MAP[color]?.str0 || '#2B2B2A';
-                        const stroke1 = STROKE_MAP[color]?.str || '#000000';
-                        ['#suela_x0020_piso', '#suela'].forEach(id => {
-                            const g = document.querySelector(id);
-                            if (g) {
-                                g.querySelectorAll('.fil0, .fil1').forEach(el => el.style.fill = color);
-                                g.querySelectorAll('.str0').forEach(el => el.style.stroke = stroke0);
-                                g.querySelectorAll('.str1').forEach(el => el.style.stroke = stroke1);
-                            }
-                        });
-                        STATE.colors.suela = color;
-                        STATE.colorNames.suela = COLOR_NAMES[color] || color;
-                    },
-                    hilo: function(color) {
-                        const stroke = STROKE_MAP[color]?.str3 || '#2B2B2A';
-                        ['#hilo_x0020_suela', '#hilo'].forEach(id => {
-                            const g = document.querySelector(id);
-                            if (g) g.querySelectorAll('.str3').forEach(el => el.style.stroke = stroke);
-                        });
-                        STATE.colors.hilo = color;
-                        STATE.colorNames.hilo = COLOR_NAMES[color] || color;
-                    },
-                    cordones: function(color) {
-                        const stroke = STROKE_MAP[color]?.str4 || '#2B2B2A';
-                        const g = document.querySelector('#cordones');
+            // ---------- FUNCIONES DE ACTUALIZACIÓN ----------
+            const UPDATERS = {
+                suela: function(color) {
+                    const stroke0 = STROKE_MAP[color]?.str0 || '#2B2B2A';
+                    const stroke1 = STROKE_MAP[color]?.str || '#000000';
+                    ['#suela_x0020_piso', '#suela'].forEach(id => {
+                        const g = document.querySelector(id);
                         if (g) {
-                            g.querySelectorAll('.fil0').forEach(el => el.style.fill = color);
-                            g.querySelectorAll('.str4').forEach(el => el.style.stroke = stroke);
+                            g.querySelectorAll('.fil0, .fil1').forEach(el => el.style.fill = color);
+                            g.querySelectorAll('.str0').forEach(el => el.style.stroke = stroke0);
+                            g.querySelectorAll('.str1').forEach(el => el.style.stroke = stroke1);
                         }
-                        STATE.colors.cordones = color;
-                        STATE.colorNames.cordones = COLOR_NAMES[color] || color;
-                    },
-                    forro: function(color) {
-                        const g = document.querySelector('#forro');
-                        if (g) {
-                            g.querySelectorAll('.fil1').forEach(el => el.style.fill = color);
-                            if (STATE.currentType === 'boots') {
-                                g.querySelectorAll('.fil2').forEach(el => el.style.fill = color);
-                            }
-                            const stroke = STROKE_MAP[color]?.str1 || '#000000';
-                            g.querySelectorAll('.str1').forEach(el => el.style.stroke = stroke);
-                        }
-                        STATE.colors.forro = color;
-                        STATE.colorNames.forro = COLOR_NAMES[color] || color;
-                    },
-                    logo: function(color) {
-                        const stroke = STROKE_MAP[color]?.str || '#000000';
-                        const g = document.querySelector('#logo_x0020_ache');
-                        if (g) {
-                            g.querySelectorAll('.fil4').forEach(el => el.style.fill = color);
-                            g.querySelectorAll('.str1').forEach(el => el.style.stroke = stroke);
-                        }
-                        STATE.colors.logo = color;
-                        STATE.colorNames.logo = COLOR_NAMES[color] || color;
-                    },
-                    capellada1: function(color) {
-                        const stroke = STROKE_MAP[color]?.str || '#000000';
-                        const g = document.querySelector('#capellada_x0020_1');
-                        if (g) {
-                            g.querySelectorAll('.fil1').forEach(el => el.style.fill = color);
-                            g.querySelectorAll('.str1').forEach(el => el.style.stroke = stroke);
-                        }
-                        STATE.colors.capellada1 = color;
-                        STATE.colorNames.capellada1 = COLOR_NAMES[color] || color;
-                    },
-                    capellada2: function(color) {
-                        const g = document.querySelector('#capellada_x0020_2');
-                        if (g) {
-                            g.querySelectorAll('.fil0, .fil2').forEach(el => el.style.fill = color);
-                            const strokeTenis = STROKE_MAP[color]?.str4 || '#2B2B2A';
-                            const strokeBotas = STROKE_MAP[color]?.str1 || '#000000';
-                            g.querySelectorAll('.str4').forEach(el => el.style.stroke = strokeTenis);
-                            g.querySelectorAll('.str1').forEach(el => el.style.stroke = strokeBotas);
-                        }
-                        STATE.colors.capellada2 = color;
-                        STATE.colorNames.capellada2 = COLOR_NAMES[color] || color;
-                    },
-                    capellada3: function(color) {
-                        const stroke = STROKE_MAP[color]?.str || '#000000';
-                        const g = document.querySelector('#capellada_x0020_3');
-                        if (g) {
-                            g.querySelectorAll('.fil1').forEach(el => el.style.fill = color);
-                            g.querySelectorAll('.str1').forEach(el => el.style.stroke = stroke);
-                        }
-                        STATE.colors.capellada3 = color;
-                        STATE.colorNames.capellada3 = COLOR_NAMES[color] || color;
+                    });
+                    STATE.colors.suela = color;
+                    STATE.colorNames.suela = COLOR_NAMES[color] || color;
+                },
+                hilo: function(color) {
+                    const stroke = STROKE_MAP[color]?.str3 || '#2B2B2A';
+                    ['#hilo_x0020_suela', '#hilo'].forEach(id => {
+                        const g = document.querySelector(id);
+                        if (g) g.querySelectorAll('.str3').forEach(el => el.style.stroke = stroke);
+                    });
+                    STATE.colors.hilo = color;
+                    STATE.colorNames.hilo = COLOR_NAMES[color] || color;
+                },
+                cordones: function(color) {
+                    const stroke = STROKE_MAP[color]?.str4 || '#2B2B2A';
+                    const g = document.querySelector('#cordones');
+                    if (g) {
+                        g.querySelectorAll('.fil0').forEach(el => el.style.fill = color);
+                        g.querySelectorAll('.str4').forEach(el => el.style.stroke = stroke);
                     }
-                };
-
-                function setAletaFixedColor() {
-                    const aleta = document.querySelector('#aleta');
-                    if (aleta) {
-                        aleta.querySelectorAll('.fil1').forEach(el => el.style.fill = '#FFD700');
-                        aleta.querySelectorAll('.str1').forEach(el => el.style.stroke = '#b8860b');
+                    STATE.colors.cordones = color;
+                    STATE.colorNames.cordones = COLOR_NAMES[color] || color;
+                },
+                forro: function(color) {
+                    const g = document.querySelector('#forro');
+                    if (g) {
+                        g.querySelectorAll('.fil1').forEach(el => el.style.fill = color);
+                        if (STATE.currentType === 'boots') {
+                            g.querySelectorAll('.fil2').forEach(el => el.style.fill = color);
+                        }
+                        const stroke = STROKE_MAP[color]?.str1 || '#000000';
+                        g.querySelectorAll('.str1').forEach(el => el.style.stroke = stroke);
                     }
+                    STATE.colors.forro = color;
+                    STATE.colorNames.forro = COLOR_NAMES[color] || color;
+                },
+                logo: function(color) {
+                    const stroke = STROKE_MAP[color]?.str || '#000000';
+                    const g = document.querySelector('#logo_x0020_ache');
+                    if (g) {
+                        g.querySelectorAll('.fil4').forEach(el => el.style.fill = color);
+                        g.querySelectorAll('.str1').forEach(el => el.style.stroke = stroke);
+                    }
+                    STATE.colors.logo = color;
+                    STATE.colorNames.logo = COLOR_NAMES[color] || color;
+                },
+                capellada1: function(color) {
+                    const stroke = STROKE_MAP[color]?.str || '#000000';
+                    const g = document.querySelector('#capellada_x0020_1');
+                    if (g) {
+                        g.querySelectorAll('.fil1').forEach(el => el.style.fill = color);
+                        g.querySelectorAll('.str1').forEach(el => el.style.stroke = stroke);
+                    }
+                    STATE.colors.capellada1 = color;
+                    STATE.colorNames.capellada1 = COLOR_NAMES[color] || color;
+                },
+                capellada2: function(color) {
+                    const g = document.querySelector('#capellada_x0020_2');
+                    if (g) {
+                        g.querySelectorAll('.fil0, .fil2').forEach(el => el.style.fill = color);
+                        const strokeTenis = STROKE_MAP[color]?.str4 || '#2B2B2A';
+                        const strokeBotas = STROKE_MAP[color]?.str1 || '#000000';
+                        g.querySelectorAll('.str4').forEach(el => el.style.stroke = strokeTenis);
+                        g.querySelectorAll('.str1').forEach(el => el.style.stroke = strokeBotas);
+                    }
+                    STATE.colors.capellada2 = color;
+                    STATE.colorNames.capellada2 = COLOR_NAMES[color] || color;
+                },
+                capellada3: function(color) {
+                    const stroke = STROKE_MAP[color]?.str || '#000000';
+                    const g = document.querySelector('#capellada_x0020_3');
+                    if (g) {
+                        g.querySelectorAll('.fil1').forEach(el => el.style.fill = color);
+                        g.querySelectorAll('.str1').forEach(el => el.style.stroke = stroke);
+                    }
+                    STATE.colors.capellada3 = color;
+                    STATE.colorNames.capellada3 = COLOR_NAMES[color] || color;
                 }
+            };
 
-                function applyAllColors() {
-                    Object.entries(STATE.colors).forEach(([part, color]) => {
-                        if (UPDATERS[part]) UPDATERS[part](color);
-                    });
-                    setAletaFixedColor();
+            function setAletaFixedColor() {
+                const aleta = document.querySelector('#aleta');
+                if (aleta) {
+                    aleta.querySelectorAll('.fil1').forEach(el => el.style.fill = '#FFD700');
+                    aleta.querySelectorAll('.str1').forEach(el => el.style.stroke = '#b8860b');
                 }
+            }
 
-                function switchType(type) {
-                    if (type === STATE.currentType) return;
-                    STATE.currentType = type;
+            function applyAllColors() {
+                Object.entries(STATE.colors).forEach(([part, color]) => {
+                    if (UPDATERS[part]) UPDATERS[part](color);
+                });
+                setAletaFixedColor();
+            }
 
-                    const svgElement = document.getElementById('shoe-svg');
-                    if (!svgElement) return;
+            function switchType(type) {
+                if (type === STATE.currentType) return;
+                STATE.currentType = type;
 
-                    svgElement.innerHTML = type === 'boots' ? BOOTS_SVG : TENNIS_SVG;
-                    applyAllColors();
+                const svgElement = document.getElementById('shoe-svg');
+                if (!svgElement) return;
 
-                    document.getElementById('type-tennis').classList.toggle('active', type === 'tennis');
-                    document.getElementById('type-boots').classList.toggle('active', type === 'boots');
-                }
+                svgElement.innerHTML = type === 'boots' ? BOOTS_SVG : TENNIS_SVG;
+                applyAllColors();
 
-                // ---------- RESTO DE FUNCIONES (sin cambios) ----------
-                function updateColorOptionsForPart(part) {
-                    const allowed = PART_ALLOWED_COLORS[part] || ALL_COLORS;
-                    document.querySelectorAll('.color-option').forEach(btn => {
-                        const color = btn.dataset.color;
-                        if (allowed.includes(color)) {
-                            btn.classList.remove('disabled');
-                        } else {
-                            btn.classList.add('disabled');
-                        }
-                    });
-                }
+                document.getElementById('type-tennis').classList.toggle('active', type === 'tennis');
+                document.getElementById('type-boots').classList.toggle('active', type === 'boots');
+            }
 
-                function setActivePart(part) {
-                    STATE.activePart = part;
-                    document.querySelectorAll('.part-btn').forEach(btn => {
-                        if (btn.dataset.part === part) {
-                            btn.classList.add('active-part', 'border-black', 'bg-gray-50');
-                            btn.classList.remove('border-gray-200');
-                        } else {
-                            btn.classList.remove('active-part', 'border-black', 'bg-gray-50');
-                            btn.classList.add('border-gray-200');
-                        }
-                    });
-
-                    updateColorOptionsForPart(part);
-
-                    const currentColor = STATE.colors[part];
-                    const allowed = PART_ALLOWED_COLORS[part] || ALL_COLORS;
-                    if (!allowed.includes(currentColor)) {
-                        const firstAllowed = allowed[0];
-                        if (firstAllowed) {
-                            if (UPDATERS[part]) UPDATERS[part](firstAllowed);
-                            const colorBtn = document.querySelector(`.color-option[data-color="${firstAllowed}"]`);
-                            if (colorBtn) setActiveColor(colorBtn, false);
-                        }
+            // ---------- RESTO DE FUNCIONES (sin cambios) ----------
+            function updateColorOptionsForPart(part) {
+                const allowed = PART_ALLOWED_COLORS[part] || ALL_COLORS;
+                document.querySelectorAll('.color-option').forEach(btn => {
+                    const color = btn.dataset.color;
+                    if (allowed.includes(color)) {
+                        btn.classList.remove('disabled');
                     } else {
-                        const colorBtn = document.querySelector(`.color-option[data-color="${currentColor}"]`);
+                        btn.classList.add('disabled');
+                    }
+                });
+            }
+
+            function setActivePart(part) {
+                STATE.activePart = part;
+                document.querySelectorAll('.part-btn').forEach(btn => {
+                    if (btn.dataset.part === part) {
+                        btn.classList.add('active-part', 'border-black', 'bg-gray-50');
+                        btn.classList.remove('border-gray-200');
+                    } else {
+                        btn.classList.remove('active-part', 'border-black', 'bg-gray-50');
+                        btn.classList.add('border-gray-200');
+                    }
+                });
+
+                updateColorOptionsForPart(part);
+
+                const currentColor = STATE.colors[part];
+                const allowed = PART_ALLOWED_COLORS[part] || ALL_COLORS;
+                if (!allowed.includes(currentColor)) {
+                    const firstAllowed = allowed[0];
+                    if (firstAllowed) {
+                        if (UPDATERS[part]) UPDATERS[part](firstAllowed);
+                        const colorBtn = document.querySelector(`.color-option[data-color="${firstAllowed}"]`);
                         if (colorBtn) setActiveColor(colorBtn, false);
                     }
+                } else {
+                    const colorBtn = document.querySelector(`.color-option[data-color="${currentColor}"]`);
+                    if (colorBtn) setActiveColor(colorBtn, false);
                 }
+            }
 
-                function setActiveColor(button, applyColor = true) {
-                    if (button.classList.contains('disabled')) return;
+            function setActiveColor(button, applyColor = true) {
+                if (button.classList.contains('disabled')) return;
 
-                    document.querySelectorAll('.color-option').forEach(btn => {
-                        btn.classList.remove('active', 'border-2', 'border-black', 'ring-4', 'ring-black/10');
-                        btn.classList.add('border', 'border-gray-200');
+                document.querySelectorAll('.color-option').forEach(btn => {
+                    btn.classList.remove('active', 'border-2', 'border-black', 'ring-4', 'ring-black/10');
+                    btn.classList.add('border', 'border-gray-200');
+                });
+                button.classList.add('active', 'border-2', 'border-black', 'ring-4', 'ring-black/10');
+                button.classList.remove('border', 'border-gray-200');
+
+                if (applyColor) {
+                    const color = button.dataset.color;
+                    const part = STATE.activePart;
+                    if (UPDATERS[part]) UPDATERS[part](color);
+                }
+            }
+
+            function toggleFinish(button) {
+                const finish = button.dataset.finish;
+                const finishName = button.dataset.finishName;
+
+                if (STATE.finish === finish) {
+                    document.querySelectorAll('.finish-option').forEach(btn => {
+                        btn.classList.remove('active', 'border-black');
+                        btn.classList.add('border-gray-200');
+                        btn.querySelector('.finish-indicator')?.classList.remove('border-4', 'border-black');
+                        btn.querySelector('.finish-indicator')?.classList.add('border-2', 'border-gray-300');
                     });
-                    button.classList.add('active', 'border-2', 'border-black', 'ring-4', 'ring-black/10');
-                    button.classList.remove('border', 'border-gray-200');
-
-                    if (applyColor) {
-                        const color = button.dataset.color;
-                        const part = STATE.activePart;
-                        if (UPDATERS[part]) UPDATERS[part](color);
-                    }
+                    STATE.finish = null;
+                    STATE.finishName = 'Ninguno';
+                } else {
+                    document.querySelectorAll('.finish-option').forEach(btn => {
+                        btn.classList.remove('active', 'border-black');
+                        btn.classList.add('border-gray-200');
+                        btn.querySelector('.finish-indicator')?.classList.remove('border-4', 'border-black');
+                        btn.querySelector('.finish-indicator')?.classList.add('border-2', 'border-gray-300');
+                    });
+                    button.classList.add('active', 'border-black');
+                    button.classList.remove('border-gray-200');
+                    button.querySelector('.finish-indicator')?.classList.remove('border-2', 'border-gray-300');
+                    button.querySelector('.finish-indicator')?.classList.add('border-4', 'border-black');
+                    STATE.finish = finish;
+                    STATE.finishName = finishName;
                 }
+            }
 
-                function toggleFinish(button) {
-                    const finish = button.dataset.finish;
-                    const finishName = button.dataset.finishName;
+            function mostrarNotificacion(mensaje) {
+                const container = document.getElementById('notificacion-container');
+                const notif = document.createElement('div');
+                notif.className = 'notificacion-exito';
+                notif.textContent = mensaje;
+                container.appendChild(notif);
+                setTimeout(() => notif.remove(), 3000);
+            }
 
-                    if (STATE.finish === finish) {
-                        document.querySelectorAll('.finish-option').forEach(btn => {
-                            btn.classList.remove('active', 'border-black');
-                            btn.classList.add('border-gray-200');
-                            btn.querySelector('.finish-indicator')?.classList.remove('border-4', 'border-black');
-                            btn.querySelector('.finish-indicator')?.classList.add('border-2', 'border-gray-300');
-                        });
-                        STATE.finish = null;
-                        STATE.finishName = 'Ninguno';
-                    } else {
-                        document.querySelectorAll('.finish-option').forEach(btn => {
-                            btn.classList.remove('active', 'border-black');
-                            btn.classList.add('border-gray-200');
-                            btn.querySelector('.finish-indicator')?.classList.remove('border-4', 'border-black');
-                            btn.querySelector('.finish-indicator')?.classList.add('border-2', 'border-gray-300');
-                        });
-                        button.classList.add('active', 'border-black');
-                        button.classList.remove('border-gray-200');
-                        button.querySelector('.finish-indicator')?.classList.remove('border-2', 'border-gray-300');
-                        button.querySelector('.finish-indicator')?.classList.add('border-4', 'border-black');
-                        STATE.finish = finish;
-                        STATE.finishName = finishName;
-                    }
-                }
+            function lanzarConfeti() {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#32CD32', '#ffffff', '#000000'] });
+            }
 
-                function mostrarNotificacion(mensaje) {
-                    const container = document.getElementById('notificacion-container');
-                    const notif = document.createElement('div');
-                    notif.className = 'notificacion-exito';
-                    notif.textContent = mensaje;
-                    container.appendChild(notif);
-                    setTimeout(() => notif.remove(), 3000);
-                }
+            function agregarAlCarrito() {
+                const capellada1Display = 'PUNTERA';
+                const capellada2Display = 'LATERAL';
+                const capellada3Display = 'TALÓN';
+                const tipoDisplay = STATE.currentType === 'tennis' ? 'Tenis' : 'Botas';
 
-                function lanzarConfeti() {
-                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#32CD32', '#ffffff', '#000000'] });
-                }
+                const datos = {
+                    suela: STATE.colorNames.suela,
+                    hilo: STATE.colorNames.hilo,
+                    cordones: STATE.colorNames.cordones,
+                    forro: STATE.colorNames.forro,
+                    logo: STATE.colorNames.logo,
+                    capellada1: STATE.colorNames.capellada1,
+                    capellada2: STATE.colorNames.capellada2,
+                    capellada3: STATE.colorNames.capellada3,
+                    acabado: STATE.finishName,
+                    talla: STATE.size,
+                    tipo: tipoDisplay,
+                    capellada1_display: capellada1Display,
+                    capellada2_display: capellada2Display,
+                    capellada3_display: capellada3Display
+                };
 
-                function agregarAlCarrito() {
-                    const capellada1Display = 'PUNTERA';
-                    const capellada2Display = 'LATERAL';
-                    const capellada3Display = 'TALÓN';
-                    const tipoDisplay = STATE.currentType === 'tennis' ? 'Tenis' : 'Botas';
+                const btn = document.getElementById('comprar-personalizado');
+                const msgCarga = document.getElementById('mensaje-carga');
+                btn.style.display = 'none';
+                msgCarga.style.display = 'block';
 
-                    const datos = {
-                        suela: STATE.colorNames.suela,
-                        hilo: STATE.colorNames.hilo,
-                        cordones: STATE.colorNames.cordones,
-                        forro: STATE.colorNames.forro,
-                        logo: STATE.colorNames.logo,
-                        capellada1: STATE.colorNames.capellada1,
-                        capellada2: STATE.colorNames.capellada2,
-                        capellada3: STATE.colorNames.capellada3,
-                        acabado: STATE.finishName,
-                        talla: STATE.size,
-                        tipo: tipoDisplay,
-                        capellada1_display: capellada1Display,
-                        capellada2_display: capellada2Display,
-                        capellada3_display: capellada3Display
-                    };
-
-                    const btn = document.getElementById('comprar-personalizado');
-                    const msgCarga = document.getElementById('mensaje-carga');
-                    btn.style.display = 'none';
-                    msgCarga.style.display = 'block';
-
-                    fetch(AJAX_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: new URLSearchParams({
-                            action: 'agregar_carrito_personalizado',
-                            producto_id: PRODUCTO_ID,
-                            suela: datos.suela,
-                            hilo: datos.hilo,
-                            cordones: datos.cordones,
-                            forro: datos.forro,
-                            logo: datos.logo,
-                            capellada1: datos.capellada1,
-                            capellada2: datos.capellada2,
-                            capellada3: datos.capellada3,
-                            acabado: datos.acabado,
-                            talla: datos.talla,
-                            tipo: datos.tipo,
-                            capellada1_display: datos.capellada1_display,
-                            capellada2_display: datos.capellada2_display,
-                            capellada3_display: datos.capellada3_display
-                        })
+                fetch(AJAX_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        action: 'agregar_carrito_personalizado',
+                        producto_id: PRODUCTO_ID,
+                        suela: datos.suela,
+                        hilo: datos.hilo,
+                        cordones: datos.cordones,
+                        forro: datos.forro,
+                        logo: datos.logo,
+                        capellada1: datos.capellada1,
+                        capellada2: datos.capellada2,
+                        capellada3: datos.capellada3,
+                        acabado: datos.acabado,
+                        talla: datos.talla,
+                        tipo: datos.tipo,
+                        capellada1_display: datos.capellada1_display,
+                        capellada2_display: datos.capellada2_display,
+                        capellada3_display: datos.capellada3_display
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            mostrarNotificacion('✅ Producto agregado al carrito');
-                            lanzarConfeti();
-                            if (typeof jQuery !== 'undefined') {
-                                jQuery(document.body).trigger('wc_fragment_refresh');
-                            }
-                            btn.style.display = 'block';
-                            msgCarga.style.display = 'none';
-                        } else {
-                            alert('Error: ' + (data.data?.message || 'Error desconocido'));
-                            btn.style.display = 'block';
-                            msgCarga.style.display = 'none';
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        mostrarNotificacion('✅ Producto agregado al carrito');
+                        lanzarConfeti();
+                        if (typeof jQuery !== 'undefined') {
+                            jQuery(document.body).trigger('wc_fragment_refresh');
                         }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error de conexión. Por favor intenta nuevamente.');
                         btn.style.display = 'block';
                         msgCarga.style.display = 'none';
+                    } else {
+                        alert('Error: ' + (data.data?.message || 'Error desconocido'));
+                        btn.style.display = 'block';
+                        msgCarga.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error de conexión. Por favor intenta nuevamente.');
+                    btn.style.display = 'block';
+                    msgCarga.style.display = 'none';
+                });
+            }
+
+            // --- Inicialización ---
+            document.addEventListener('DOMContentLoaded', function() {
+                const svgElement = document.getElementById('shoe-svg');
+                if (svgElement) {
+                    svgElement.innerHTML = TENNIS_SVG; // Cargar tenis por defecto
+                }
+
+                applyAllColors();
+
+                document.getElementById('type-tennis').addEventListener('click', () => switchType('tennis'));
+                document.getElementById('type-boots').addEventListener('click', () => switchType('boots'));
+
+                document.getElementById('partSelector')?.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.part-btn');
+                    if (btn) { e.preventDefault(); setActivePart(btn.dataset.part); }
+                });
+
+                document.getElementById('colorSelector')?.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.color-option');
+                    if (btn) { e.preventDefault(); setActiveColor(btn, true); }
+                });
+
+                document.getElementById('finishSelector')?.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.finish-option');
+                    if (btn) {
+                        e.preventDefault();
+                        toggleFinish(btn);
+                    }
+                });
+
+                const sizeSelector = document.getElementById('sizeSelector');
+                if (sizeSelector) {
+                    for (let size = 28; size <= 43; size++) {
+                        const btn = document.createElement('button');
+                        btn.className = 'size-option flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-xs font-bold hover:border-gray-400 transition-all';
+                        btn.textContent = size;
+                        btn.dataset.size = size;
+                        sizeSelector.appendChild(btn);
+                    }
+
+                    const defaultSize = 39;
+                    const defaultBtn = document.querySelector(`.size-option[data-size="${defaultSize}"]`);
+                    if (defaultBtn) {
+                        defaultBtn.classList.add('active', 'border-2', 'border-[#32CD32]', 'bg-[#32CD32]', 'text-white');
+                        defaultBtn.classList.remove('border', 'border-gray-200');
+                        STATE.size = defaultSize;
+                    }
+
+                    sizeSelector.addEventListener('click', (e) => {
+                        const btn = e.target.closest('.size-option');
+                        if (btn) {
+                            e.preventDefault();
+                            document.querySelectorAll('.size-option').forEach(b => {
+                                b.classList.remove('active', 'border-2', 'border-[#32CD32]', 'bg-[#32CD32]', 'text-white');
+                                b.classList.add('border', 'border-gray-200');
+                            });
+                            btn.classList.add('active', 'border-2', 'border-[#32CD32]', 'bg-[#32CD32]', 'text-white');
+                            btn.classList.remove('border', 'border-gray-200');
+                            STATE.size = parseInt(btn.dataset.size);
+                        }
                     });
                 }
 
-                // --- Inicialización ---
-                document.addEventListener('DOMContentLoaded', function() {
-                    const svgElement = document.getElementById('shoe-svg');
-                    if (svgElement) {
-                        svgElement.innerHTML = TENNIS_SVG; // Cargar tenis por defecto
-                    }
-
-                    applyAllColors();
-
-                    document.getElementById('type-tennis').addEventListener('click', () => switchType('tennis'));
-                    document.getElementById('type-boots').addEventListener('click', () => switchType('boots'));
-
-                    document.getElementById('partSelector')?.addEventListener('click', (e) => {
-                        const btn = e.target.closest('.part-btn');
-                        if (btn) { e.preventDefault(); setActivePart(btn.dataset.part); }
-                    });
-
-                    document.getElementById('colorSelector')?.addEventListener('click', (e) => {
-                        const btn = e.target.closest('.color-option');
-                        if (btn) { e.preventDefault(); setActiveColor(btn, true); }
-                    });
-
-                    document.getElementById('finishSelector')?.addEventListener('click', (e) => {
-                        const btn = e.target.closest('.finish-option');
-                        if (btn) {
-                            e.preventDefault();
-                            toggleFinish(btn);
-                        }
-                    });
-
-                    const sizeSelector = document.getElementById('sizeSelector');
-                    if (sizeSelector) {
-                        for (let size = 28; size <= 43; size++) {
-                            const btn = document.createElement('button');
-                            btn.className = 'size-option flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-xs font-bold hover:border-gray-400 transition-all';
-                            btn.textContent = size;
-                            btn.dataset.size = size;
-                            sizeSelector.appendChild(btn);
-                        }
-
-                        const defaultSize = 39;
-                        const defaultBtn = document.querySelector(`.size-option[data-size="${defaultSize}"]`);
-                        if (defaultBtn) {
-                            defaultBtn.classList.add('active', 'border-2', 'border-[#32CD32]', 'bg-[#32CD32]', 'text-white');
-                            defaultBtn.classList.remove('border', 'border-gray-200');
-                            STATE.size = defaultSize;
-                        }
-
-                        sizeSelector.addEventListener('click', (e) => {
-                            const btn = e.target.closest('.size-option');
-                            if (btn) {
-                                e.preventDefault();
-                                document.querySelectorAll('.size-option').forEach(b => {
-                                    b.classList.remove('active', 'border-2', 'border-[#32CD32]', 'bg-[#32CD32]', 'text-white');
-                                    b.classList.add('border', 'border-gray-200');
-                                });
-                                btn.classList.add('active', 'border-2', 'border-[#32CD32]', 'bg-[#32CD32]', 'text-white');
-                                btn.classList.remove('border', 'border-gray-200');
-                                STATE.size = parseInt(btn.dataset.size);
-                            }
-                        });
-                    }
-
-                    document.getElementById('comprar-personalizado').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        agregarAlCarrito();
-                    });
-
-                    const rotateBtn = document.getElementById('rotateBtn');
-                    const rotateLabel = document.getElementById('rotateLabel');
-                    let rotation = 0;
-                    if (rotateBtn) {
-                        rotateBtn.addEventListener('click', () => {
-                            rotation = (rotation + 90) % 360;
-                            const container = document.getElementById('shoe-container');
-                            if (container) {
-                                const currentScale = container.style.transform.match(/scale\(([^)]+)\)/);
-                                const scale = currentScale ? currentScale[1] : '1';
-                                container.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
-                            }
-                            if (rotateLabel) rotateLabel.textContent = rotation === 0 ? '360°' : `${rotation}°`;
-                        });
-                    }
-
-                    const zoomBtn = document.getElementById('zoomBtn');
-                    let zoomLevel = 1;
-                    if (zoomBtn) {
-                        zoomBtn.addEventListener('click', () => {
-                            zoomLevel = zoomLevel === 1 ? 1.5 : 1;
-                            const container = document.getElementById('shoe-container');
-                            if (container) {
-                                const currentRotate = container.style.transform.match(/rotate\(([^)]+)\)/);
-                                const rotate = currentRotate ? currentRotate[1] : '0deg';
-                                container.style.transform = `scale(${zoomLevel}) rotate(${rotate})`;
-                            }
-                            const icon = zoomBtn.querySelector('.material-symbols-outlined');
-                            if (icon) icon.textContent = zoomLevel === 1 ? 'zoom_in' : 'zoom_out';
-                        });
-                    }
-
-                    setActivePart('suela');
+                document.getElementById('comprar-personalizado').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    agregarAlCarrito();
                 });
-            })();
-            </script>
-        </div>
-        <!-- ===== FIN CÓDIGO ORIGINAL ===== -->
+
+                const rotateBtn = document.getElementById('rotateBtn');
+                const rotateLabel = document.getElementById('rotateLabel');
+                let rotation = 0;
+                if (rotateBtn) {
+                    rotateBtn.addEventListener('click', () => {
+                        rotation = (rotation + 90) % 360;
+                        const container = document.getElementById('shoe-container');
+                        if (container) {
+                            const currentScale = container.style.transform.match(/scale\(([^)]+)\)/);
+                            const scale = currentScale ? currentScale[1] : '1';
+                            container.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+                        }
+                        if (rotateLabel) rotateLabel.textContent = rotation === 0 ? '360°' : `${rotation}°`;
+                    });
+                }
+
+                const zoomBtn = document.getElementById('zoomBtn');
+                let zoomLevel = 1;
+                if (zoomBtn) {
+                    zoomBtn.addEventListener('click', () => {
+                        zoomLevel = zoomLevel === 1 ? 1.5 : 1;
+                        const container = document.getElementById('shoe-container');
+                        if (container) {
+                            const currentRotate = container.style.transform.match(/rotate\(([^)]+)\)/);
+                            const rotate = currentRotate ? currentRotate[1] : '0deg';
+                            container.style.transform = `scale(${zoomLevel}) rotate(${rotate})`;
+                        }
+                        const icon = zoomBtn.querySelector('.material-symbols-outlined');
+                        if (icon) icon.textContent = zoomLevel === 1 ? 'zoom_in' : 'zoom_out';
+                    });
+                }
+
+                setActivePart('suela');
+            });
+        })();
+        </script>
     </div>
 </div>
