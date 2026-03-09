@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #000; color: white; }
+        body { font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #000; color: white; touch-action: pan-y pinch-zoom; }
         a-scene { width: 100vw; height: 100vh; display: block; }
         .marker-status {
             position: absolute; top: 12px; right: 12px;
@@ -113,14 +113,10 @@
         </div>
     </div>
 
-    <!-- Escena AR con parámetros de tracking optimizados -->
+    <!-- Escena AR con parámetros optimizados -->
     <a-scene
         id="scene"
-        mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;
-                      filterMinCF: 0.0001;
-                      filterBeta: 0.001;
-                      warmupTolerance: 0.5;
-                      missTolerance: 5;"
+        mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; filterMinCF: 0.0001; filterBeta: 0.01; warmupTolerance: 0.5; missTolerance: 5;"
         color-space="sRGB"
         renderer="colorManagement: true, physicallyCorrectLights"
         vr-mode-ui="enabled: false"
@@ -131,16 +127,16 @@
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0">
-            <!-- Tatuaje: plano justo sobre el marcador, rotado para quedar horizontal -->
-            <a-image id="tatuaje"
+            <!-- Plano horizontal, justo sobre el marcador, con doble cara y depthTest false -->
+            <a-plane id="tatuaje"
                      src=""
-                     position="0 0.05 0"   <!-- Muy cerca del marcador, pero sin hundirse -->
+                     position="0 0.05 0"
                      rotation="-90 0 0"
                      width="1.2"
                      height="1.2"
-                     material="transparent: true; depthTest: false; side: double;"
+                     material="transparent: true; side: double; depthTest: false;"
                      scale="2.0 2.0 2.0">
-            </a-image>
+            </a-plane>
         </a-entity>
     </a-scene>
 
@@ -156,7 +152,7 @@
 
             let currentIcon = 'fa-heart';
             let currentColor = '#222222';
-            let currentScale = 2.0; // Coincide con el slider
+            let currentScale = 2.0;
 
             const iconMap = {
                 'fa-heart': '\u{f004}',
