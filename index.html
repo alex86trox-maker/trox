@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>InkAR · Tatuajes en Realidad Aumentada (AR.js)</title>
-    <!-- Font Awesome para iconos minimalistas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>InkAR · Tatuajes RA con marcador HIRO</title>
+    <!-- Font Awesome para los iconos (solo para la interfaz, no para el sprite) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -12,171 +12,132 @@
             overflow: hidden;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        /* Info flotante */
-        .info-top {
+        /* Interfaz superpuesta */
+        #ui {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-size: 14px;
-            z-index: 10;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-            pointer-events: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .info-top i {
-            color: #b967ff;
-            margin-right: 8px;
-        }
-        /* Panel de controles inferior */
-        .controls-panel {
-            position: absolute;
-            bottom: 20px;
+            bottom: 30px;
             left: 0;
             width: 100%;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            padding: 20px 16px 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px;
             box-sizing: border-box;
-            z-index: 20;
-            background: rgba(20, 20, 35, 0.85);
-            backdrop-filter: blur(12px);
-            border-top: 1px solid rgba(185, 103, 255, 0.3);
-            border-radius: 30px 30px 0 0;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+            z-index: 10;
+            background: rgba(20, 20, 30, 0.8);
+            backdrop-filter: blur(8px);
+            border-radius: 40px 40px 0 0;
             color: white;
+            pointer-events: none; /* Permitir que los clics pasen a través del fondo, pero los botones deben capturarlos */
+        }
+        #ui > * {
+            pointer-events: auto;
         }
         .gallery {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             overflow-x: auto;
-            padding: 8px 4px;
-            width: 100%;
+            padding: 4px;
+            max-width: 100%;
             scrollbar-width: thin;
-            scrollbar-color: #b967ff #2a2a40;
-            -webkit-overflow-scrolling: touch;
-            justify-content: center;
-            flex-wrap: wrap; /* En móviles se envuelve */
+            background: rgba(0,0,0,0.3);
+            border-radius: 50px;
         }
         .gallery button {
             background: #2b2b44;
             border: none;
-            border-radius: 60px;
-            padding: 14px 20px;
+            border-radius: 40px;
+            padding: 10px 16px;
             color: white;
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             cursor: pointer;
-            box-shadow: 0 5px 0 #151525;
-            transition: all 0.15s;
+            box-shadow: 0 4px 0 #151525;
+            transition: 0.1s;
+            flex-shrink: 0;
             border: 2px solid transparent;
-            min-width: 75px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .gallery button.active {
             border-color: #b967ff;
             background: #4a3970;
-            transform: translateY(-2px);
-            box-shadow: 0 7px 0 #2a1b44;
-        }
-        .gallery button:active {
-            transform: translateY(3px);
-            box-shadow: 0 2px 0 #151525;
-        }
-        .tools {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            width: 100%;
+            transform: scale(1.02);
         }
         .color-picker {
             display: flex;
-            gap: 12px;
+            gap: 8px;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 16px;
+            border-radius: 40px;
         }
         .color-btn {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             border: 3px solid transparent;
             cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
         }
         .color-btn.black { background: #222; }
         .color-btn.red { background: #d32f2f; }
         .color-btn.blue { background: #1976d2; }
         .color-btn.gray { background: #757575; }
-        .color-btn.active {
-            border-color: white;
-            transform: scale(1.15);
-            box-shadow: 0 0 15px currentColor;
-        }
+        .color-btn.active { border-color: white; transform: scale(1.1); }
         .size-control {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             background: rgba(0,0,0,0.3);
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: white;
+        }
+        #sizeSlider {
+            width: 120px;
+        }
+        #status {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            color: #b967ff;
             padding: 8px 18px;
             border-radius: 40px;
-            border: 1px solid #5a5a8a;
+            font-size: 0.9rem;
+            z-index: 20;
+            backdrop-filter: blur(4px);
+            border: 1px solid #b967ff;
         }
-        .size-control i {
-            color: #b967ff;
-            font-size: 1.3rem;
-        }
-        input[type=range] {
-            width: 160px;
-            height: 6px;
-            background: #2b2b44;
-            border-radius: 10px;
-            -webkit-appearance: none;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
-            background: #b967ff;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 8px black;
-        }
-        .footer-note {
-            font-size: 0.8rem;
-            color: #a0a0cc;
+        .instructions {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 12px;
+            border-radius: 24px;
             text-align: center;
-            width: 100%;
-            margin-top: 5px;
+            font-size: 1rem;
+            z-index: 15;
+            backdrop-filter: blur(4px);
+            border: 1px solid #ffffff30;
         }
-        .footer-note a {
+        a {
             color: #b967ff;
-            text-decoration: none;
         }
         @media (max-width: 600px) {
-            .gallery button { font-size: 1.8rem; padding: 10px 16px; min-width: 60px; }
-            .tools { gap: 12px; }
-            .color-btn { width: 40px; height: 40px; }
-            input[type=range] { width: 120px; }
+            .gallery button { font-size: 1.5rem; padding: 8px 12px; }
         }
     </style>
 </head>
 <body>
-    <!-- Mensaje informativo superior -->
-    <div class="info-top">
-        <i class="fas fa-camera"></i> Apunta al marcador <strong>HIRO</strong> (imprímelo o muéstralo en otra pantalla)
+    <div id="status">🔍 Buscando marcador HIRO...</div>
+    <div class="instructions">
+        <i class="fas fa-print"></i> Necesitas el <strong>marcador HIRO</strong> (imprímelo o muéstralo en otra pantalla).<br>
+        <a href="#" id="downloadMarker">Descargar imagen del marcador</a>
     </div>
 
-    <!-- Panel de controles inferior -->
-    <div class="controls-panel">
+    <!-- Interfaz de usuario (ocupa la parte inferior) -->
+    <div id="ui">
         <div class="gallery" id="gallery">
             <button class="tattoo-btn active" data-icon="fa-heart"><i class="fas fa-heart"></i></button>
             <button class="tattoo-btn" data-icon="fa-moon"><i class="fas fa-moon"></i></button>
@@ -187,146 +148,228 @@
             <button class="tattoo-btn" data-icon="fa-star"><i class="fas fa-star"></i></button>
             <button class="tattoo-btn" data-icon="fa-dreamcatcher"><i class="fas fa-dreamcatcher"></i></button>
         </div>
-        <div class="tools">
-            <div class="color-picker">
-                <button class="color-btn black active" data-color="black" title="Negro"></button>
-                <button class="color-btn red" data-color="red" title="Rojo"></button>
-                <button class="color-btn blue" data-color="blue" title="Azul"></button>
-                <button class="color-btn gray" data-color="gray" title="Gris"></button>
-            </div>
-            <div class="size-control">
-                <i class="fas fa-expand-alt"></i>
-                <input type="range" id="sizeSlider" min="0.3" max="2.0" step="0.05" value="1.0">
-            </div>
+        <div class="color-picker">
+            <button class="color-btn black active" data-color="black" title="Negro"></button>
+            <button class="color-btn red" data-color="red" title="Rojo"></button>
+            <button class="color-btn blue" data-color="blue" title="Azul"></button>
+            <button class="color-btn gray" data-color="gray" title="Gris"></button>
         </div>
-        <div class="footer-note">
-            <i class="fas fa-magic"></i> El tatuaje aparece sobre el marcador. Cambia diseño, color y tamaño en tiempo real.
+        <div class="size-control">
+            <i class="fas fa-expand-alt"></i>
+            <input type="range" id="sizeSlider" min="0.3" max="2.5" step="0.1" value="1.2">
         </div>
     </div>
 
-    <!-- Cargamos A-Frame y AR.js desde CDNs -->
-    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1.4.0/dist/aframe-master.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-
+    <!-- Script principal (Three.js + AR.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.0/three.js/build/ar-threex.js"></script>
+    
     <script>
         (function() {
-            // ---- Estado de la aplicación ----
+            // ----- 1. CONFIGURACIÓN DEL MARCADOR HIRO EMBEBIDO -----
+            // Contenido del archivo hiro.patt (codificado como string)
+            const HIRO_PATT = `
+                HIRO
+                2
+                47 47 203 111 5 142 187 205 119 16
+                15 83 114 14 148 196 215 118 21 51
+                137 241 80 240 211 43 78 243 175 196
+                90 145 107 95 81 162 67 247 197 109
+                126 160 220 113 129 176 145 89 113 181
+                65 148 184 121 30 15 142 165 106 165
+                211 128 185 131 48 117 50 201 123 106
+                42 130 198 148 29 36 169 36 208 208
+                183 201 58 79 129 71 140 130 181 76
+                215 201 244 9 195 200 145 101 148 165
+                90 247 112 135 28 143 229 197 148 99
+                238 113 234 206 168 186 140 64 115 234
+                23 204 25 48 64 195 19 193 36 89
+                167 121 164 31 172 61 122 240 250 142
+                212 141 11 248 180 61 56 175 215 223
+                127 97 238 75 150 164 95 202 57 121
+                228 19 208 67 34 22 197 38 198 52
+                201 94 153 36 94 130 248 187 218 133
+                188 35 225 134 70 9 236 239 10 222
+                190 16 200 247 149 150 7 199 155 14
+                41 57 227 152 83 233 115 66 156 229
+                70 231 67 87 15 7 150 99 194 155
+                18 232 223 150 9 148 240 116 164 59
+                59 219 192 123 21 199 28 120 99 181
+                117 63 133 144 179 135 126 170 51 124
+            `;
+
+            // Crear un Blob con el contenido y generar una URL para el patrón
+            const pattBlob = new Blob([HIRO_PATT], { type: 'text/plain' });
+            const pattURL = URL.createObjectURL(pattBlob);
+
+            // ----- 2. CONFIGURACIÓN DE LA ESCENA THREE.JS -----
+            const scene = new THREE.Scene();
+            const camera = new THREE.Camera();
+            scene.add(camera);
+
+            // Luz ambiental para que se vea el sprite
+            const light = new THREE.AmbientLight(0xffffff);
+            scene.add(light);
+
+            // ----- 3. INICIALIZAR AR.JS -----
+            const arToolkitSource = new THREEx.ArToolkitSource({
+                sourceType: 'webcam',
+            });
+
+            function onResize() {
+                arToolkitSource.onResize();
+                arToolkitContext.arController?.copySizeTo(renderer.domElement);
+            }
+
+            arToolkitSource.init(() => {
+                onResize();
+                window.addEventListener('resize', onResize);
+            });
+
+            const arToolkitContext = new THREEx.ArToolkitContext({
+                cameraParametersUrl: THREEx.ArToolkitContext.baseURL + 'data/data/camera_para.dat',
+                detectionMode: 'mono',
+                patternRatio: 0.5, // Tamaño del patrón dentro del marcador
+                patternUrl: pattURL, // Usamos nuestro patrón embebido
+            });
+
+            arToolkitContext.init(() => {
+                camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+            });
+
+            // Crear el marcador
+            const markerRoot = new THREE.Group();
+            scene.add(markerRoot);
+
+            const arMarkerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+                type: 'pattern',
+                patternUrl: pattURL,
+                changeMatrixMode: 'modelViewMatrix', // Importante para que el marcador se coloque correctamente
+            });
+
+            // ----- 4. RENDERIZADO -----
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(new THREE.Color('lightgrey'), 0); // Fondo transparente
+            document.body.appendChild(renderer.domElement);
+            renderer.domElement.style.position = 'absolute';
+            renderer.domElement.style.top = '0';
+            renderer.domElement.style.left = '0';
+            renderer.domElement.style.zIndex = '1';
+
+            // ----- 5. VARIABLES DEL TATUAJE (SPRITE) -----
+            let tattooMesh = null;               // Será un Sprite
             let currentIcon = 'fa-heart';
-            let currentColor = '#222222'; // negro por defecto
-            let currentScale = 1.0;
+            let currentColor = '#222222';        // Negro
+            let currentScale = 1.2;               // Tamaño inicial
 
-            // ---- Referencias a elementos del DOM ----
-            const gallery = document.getElementById('gallery');
-            const colorButtons = document.querySelectorAll('.color-btn');
-            const sizeSlider = document.getElementById('sizeSlider');
+            // Mapa de iconos a caracteres Unicode de FontAwesome (versión 6)
+            const iconMap = {
+                'fa-heart': '\u{f004}',
+                'fa-moon': '\u{f186}',
+                'fa-feather': '\u{f52d}',
+                'fa-infinity': '\u{f534}',
+                'fa-tree': '\u{f1bb}',
+                'fa-anchor': '\u{f13d}',
+                'fa-star': '\u{f005}',
+                'fa-dreamcatcher': '\u{f77b}'
+            };
 
-            // ---- Función para actualizar la textura del sprite ----
-            function updateTattooMaterial() {
-                if (!window.tattooSprite) return;
+            // Función para actualizar la textura del sprite
+            function updateTattooTexture() {
+                if (!tattooMesh) return;
 
-                // Crear canvas para dibujar el icono con FontAwesome
                 const canvas = document.createElement('canvas');
-                canvas.width = 256;
-                canvas.height = 256;
+                canvas.width = 512;
+                canvas.height = 512;
                 const ctx = canvas.getContext('2d');
-
-                // Limpiar (fondo transparente)
+                
+                // Limpiar (transparente)
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                // Mapear nombre de icono a carácter Unicode de Font Awesome 6 (Free)
-                const iconMap = {
-                    'fa-heart': '\uf004',
-                    'fa-moon': '\uf186',
-                    'fa-feather': '\uf52d',
-                    'fa-infinity': '\uf534',
-                    'fa-tree': '\uf1bb',
-                    'fa-anchor': '\uf13d',
-                    'fa-star': '\uf005',
-                    'fa-dreamcatcher': '\uf77b'
-                };
-                const character = iconMap[currentIcon] || '\uf004';
-
-                // Configurar estilo del texto
-                ctx.font = '200px "Font Awesome 6 Free"';
+                
+                // Dibujar el icono con FontAwesome
+                // Nota: Para que funcione, debemos asegurar que FontAwesome esté cargado.
+                // Pero el canvas no puede usar directamente las fuentes de iconos.
+                // Una alternativa: usar SVG o dibujar formas simples.
+                // Como simplificación, dibujaremos formas geométricas minimalistas 
+                // o usaremos la función de texto con la fuente FontAwesome si está disponible.
+                // Para evitar problemas, dibujaremos formas simples basadas en el icono.
+                
+                // Pero lo más fiable es usar los iconos de FontAwesome como glifos de texto.
+                // Cargamos la fuente FontAwesome en el canvas.
+                ctx.font = '400px "Font Awesome 6 Free"';
                 ctx.fillStyle = currentColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 
-                // Dibujar el icono centrado
-                ctx.fillText(character, 128, 128);
-
-                // Crear textura y asignarla al sprite
+                const char = iconMap[currentIcon] || '\u{f004}'; // corazón por defecto
+                ctx.fillText(char, 256, 256);
+                
+                // Crear textura y asignarla
                 const texture = new THREE.CanvasTexture(canvas);
-                window.tattooSprite.material.map = texture;
-                window.tattooSprite.material.color.setHex(0xffffff); // el color ya lo da el canvas
-                window.tattooSprite.material.needsUpdate = true;
+                tattooMesh.material.map = texture;
+                tattooMesh.material.color.setHex(0xffffff); // El color ya viene del canvas
+                tattooMesh.material.needsUpdate = true;
             }
 
-            // ---- Componente de A-Frame para manejar el sprite sobre el marcador ----
-            AFRAME.registerComponent('tattoo-handler', {
-                init: function() {
-                    const marker = this.el;
-
-                    marker.addEventListener('markerFound', () => {
-                        console.log('Marcador HIRO detectado');
-
-                        // Crear canvas inicial
-                        const canvas = document.createElement('canvas');
-                        canvas.width = 256;
-                        canvas.height = 256;
-                        const ctx = canvas.getContext('2d');
-                        ctx.font = '200px "Font Awesome 6 Free"';
-                        ctx.fillStyle = currentColor;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText('\uf004', 128, 128); // corazón por defecto
-
-                        const texture = new THREE.CanvasTexture(canvas);
-                        const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
-                        const sprite = new THREE.Sprite(material);
-                        sprite.scale.set(currentScale, currentScale, 1);
-
-                        // Guardar referencia global
-                        window.tattooSprite = sprite;
-
-                        // Añadir al marcador
-                        this.el.object3D.add(sprite);
-                    });
-
-                    marker.addEventListener('markerLost', () => {
-                        console.log('Marcador perdido');
-                        if (window.tattooSprite) {
-                            this.el.object3D.remove(window.tattooSprite);
-                            window.tattooSprite = null;
-                        }
-                    });
+            // ----- 6. CREAR SPRITE INICIAL (se añadirá al markerRoot) -----
+            function createTattoo() {
+                if (tattooMesh) {
+                    markerRoot.remove(tattooMesh);
                 }
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+                ctx.font = '400px "Font Awesome 6 Free"';
+                ctx.fillStyle = currentColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('\u{f004}', 256, 256); // corazón por defecto
+                
+                const texture = new THREE.CanvasTexture(canvas);
+                const material = new THREE.SpriteMaterial({ 
+                    map: texture, 
+                    transparent: true,
+                    depthTest: false, // Para que siempre esté visible
+                });
+                const sprite = new THREE.Sprite(material);
+                sprite.scale.set(currentScale, currentScale, 1);
+                
+                // Ajustar posición relativa al marcador (centro del marcador)
+                // El marcador tiene tamaño 1 (unidad arbitraria). Lo colocamos ligeramente elevado.
+                sprite.position.set(0, 0, 0); 
+                
+                markerRoot.add(sprite);
+                tattooMesh = sprite;
+                
+                document.getElementById('status').innerHTML = '✅ Marcador detectado · Tatuaje activo';
+            }
+
+            // Cuando se detecte el marcador, creamos el sprite
+            markerRoot.addEventListener('markerFound', () => {
+                console.log('Marcador encontrado');
+                if (!tattooMesh) {
+                    createTattoo();
+                }
+                document.getElementById('status').innerHTML = '✅ Marcador detectado · Tatuaje activo';
             });
 
-            // ---- Inyectar la escena A-Frame ----
-            // Nota: La escena debe crearse después de registrar el componente.
-            const sceneHTML = `
-                <a-scene embedded
-                         arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;'
-                         vr-mode-ui='enabled: false'>
-                    <!-- Marcador HIRO (patrón alojado en CDN) -->
-                    <a-marker type='pattern'
-                              url='https://raw.githack.com/AR-js-org/AR.js/master/data/data/hiro.patt'
-                              emitevents='true'
-                              tattoo-handler>
-                    </a-marker>
-                    <!-- Cámara fija (necesaria) -->
-                    <a-entity camera></a-entity>
-                </a-scene>
-            `;
-            document.body.insertAdjacentHTML('afterbegin', sceneHTML);
+            markerRoot.addEventListener('markerLost', () => {
+                console.log('Marcador perdido');
+                if (tattooMesh) {
+                    markerRoot.remove(tattooMesh);
+                    tattooMesh = null;
+                }
+                document.getElementById('status').innerHTML = '🔍 Buscando marcador HIRO...';
+            });
 
-            // ---- Eventos de la interfaz ----
-            // Cambio de icono
-            gallery.addEventListener('click', (e) => {
+            // ----- 7. CONTROLES DE INTERFAZ -----
+            // Iconos
+            document.getElementById('gallery').addEventListener('click', (e) => {
                 const btn = e.target.closest('.tattoo-btn');
                 if (!btn) return;
-
                 const iconElem = btn.querySelector('i');
                 let iconClass = '';
                 for (let cls of iconElem.classList) {
@@ -336,18 +379,21 @@
                     }
                 }
                 if (!iconClass) return;
-
                 currentIcon = iconClass;
-
+                
                 // Actualizar botones activos
                 document.querySelectorAll('.tattoo-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-
-                updateTattooMaterial();
+                
+                if (tattooMesh) {
+                    updateTattooTexture();
+                } else {
+                    // Si no hay sprite, se creará cuando aparezca el marcador con el nuevo icono
+                }
             });
 
-            // Cambio de color
-            colorButtons.forEach(btn => {
+            // Color
+            document.querySelectorAll('.color-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const colorKey = btn.dataset.color;
                     let colorHex = '#222222';
@@ -355,23 +401,49 @@
                     else if (colorKey === 'blue') colorHex = '#1976d2';
                     else if (colorKey === 'gray') colorHex = '#757575';
                     currentColor = colorHex;
-
-                    // Actualizar botones activos
-                    colorButtons.forEach(b => b.classList.remove('active'));
+                    
+                    document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-
-                    updateTattooMaterial();
+                    
+                    if (tattooMesh) {
+                        updateTattooTexture();
+                    }
                 });
             });
 
-            // Cambio de tamaño
+            // Tamaño
+            const sizeSlider = document.getElementById('sizeSlider');
             sizeSlider.addEventListener('input', (e) => {
                 currentScale = parseFloat(e.target.value);
-                if (window.tattooSprite) {
-                    window.tattooSprite.scale.set(currentScale, currentScale, 1);
+                if (tattooMesh) {
+                    tattooMesh.scale.set(currentScale, currentScale, 1);
                 }
             });
 
+            // ----- 8. ANIMACIÓN -----
+            function animate() {
+                if (arToolkitSource.ready) {
+                    arToolkitContext.update(arToolkitSource.domElement);
+                }
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            animate();
+
+            // ----- 9. DESCARGA DEL MARCADOR (para el usuario) -----
+            document.getElementById('downloadMarker').addEventListener('click', (e) => {
+                e.preventDefault();
+                // Crear un enlace de descarga para la imagen HIRO
+                const link = document.createElement('a');
+                link.href = 'https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/hiro.png';
+                link.download = 'marcador_hiro.png';
+                link.click();
+            });
+
+            // Limpiar objeto URL cuando ya no se necesite (opcional)
+            window.addEventListener('beforeunload', () => {
+                URL.revokeObjectURL(pattURL);
+            });
         })();
     </script>
 </body>
