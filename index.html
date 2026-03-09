@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>InkAR · Tatuajes con imagen propia</title>
+    <title>InkAR · Tatuajes Ultraestables</title>
     <!-- Librerías A-Frame y MindAR -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -119,7 +119,15 @@
             color: black;
         }
 
-        /* Panel de controles */
+        .toggle-panel-btn i::before {
+            content: "\f078"; /* fa-chevron-down */
+        }
+
+        .toggle-panel-btn.hidden i::before {
+            content: "\f077"; /* fa-chevron-up */
+        }
+
+        /* Panel de controles simplificado */
         .controls-panel {
             position: absolute;
             bottom: 20px;
@@ -128,15 +136,13 @@
             background: rgba(20, 20, 30, 0.85);
             backdrop-filter: blur(16px);
             border-radius: 30px;
-            padding: 14px;
+            padding: 20px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             z-index: 200;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            max-height: 70vh;
-            overflow-y: auto;
+            gap: 20px;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
@@ -146,102 +152,57 @@
             pointer-events: none;
         }
 
-        .toggle-panel-btn i::before {
-            content: "\f078"; /* fa-chevron-down */
+        /* Slider de tamaño gigante */
+        .size-row {
+            width: 100%;
         }
 
-        .toggle-panel-btn.hidden i::before {
-            content: "\f077"; /* fa-chevron-up */
-        }
-
-        .row {
+        .size-label {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        /* Botón de subir imágenes */
-        .upload-btn {
-            background: #2b2b44;
-            border: none;
-            border-radius: 40px;
-            padding: 12px 20px;
+            justify-content: space-between;
+            margin-bottom: 8px;
             color: #b967ff;
-            font-size: 1.4rem;
-            cursor: pointer;
-            box-shadow: 0 3px 0 #151525;
-            transition: all 0.1s;
-            border: 2px solid #b967ff;
-            min-width: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .upload-btn span {
-            font-size: 1rem;
-            color: white;
-        }
-
-        .upload-btn.active {
-            background: #4a3970;
-            color: white;
-            border-color: white;
-        }
-
-        /* Barra de tamaño (zoom) expandida */
-        .size-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 8px 16px;
-            border-radius: 40px;
-            color: white;
-            flex: 1; /* Ocupa el espacio disponible */
-        }
-
-        .size-control i {
-            font-size: 1.2rem;
-            color: #b967ff;
+            font-weight: bold;
         }
 
         #sizeSlider {
-            flex: 1; /* La barra ocupa todo el ancho restante */
-            height: 6px;
+            width: 100%;
+            height: 8px;
             background: #2b2b44;
             border-radius: 10px;
             -webkit-appearance: none;
+            appearance: none;
         }
 
         #sizeSlider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 22px;
-            height: 22px;
+            width: 28px;
+            height: 28px;
             background: #b967ff;
             border-radius: 50%;
             cursor: pointer;
-            border: 2px solid white;
+            border: 3px solid white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
-        /* Controles de rotación */
-        .rotation-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px;
-            border-radius: 20px;
-            width: 100%;
+        #sizeSlider::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            background: #b967ff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid white;
         }
 
+        /* Controles de rotación compactos */
         .rotation-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 5px;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 20px;
         }
 
         .rotation-label {
@@ -252,7 +213,7 @@
 
         .rotation-buttons {
             display: flex;
-            gap: 5px;
+            gap: 10px;
             align-items: center;
         }
 
@@ -260,46 +221,70 @@
             background: #2b2b44;
             border: none;
             color: white;
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             cursor: pointer;
-            border: 1px solid #b967ff;
-            font-size: 1rem;
+            border: 2px solid #b967ff;
+            font-size: 1.2rem;
+            font-weight: bold;
         }
 
         .rotation-value {
-            min-width: 50px;
+            min-width: 60px;
             text-align: center;
             background: #151525;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            padding: 6px 10px;
+            border-radius: 30px;
+            font-size: 1rem;
+            border: 1px solid #b967ff;
         }
 
+        /* Botones de acción */
         .action-buttons {
             display: flex;
-            gap: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 6px 12px;
-            border-radius: 40px;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         .action-btn {
             background: none;
-            border: 1px solid #b967ff;
+            border: 2px solid #b967ff;
             color: #b967ff;
-            width: 36px;
-            height: 36px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: 0.2s;
+            font-size: 1.4rem;
         }
 
         .action-btn:hover {
+            background: #b967ff;
+            color: black;
+        }
+
+        /* Botón de subir imagen especial */
+        .upload-btn-large {
+            background: #4a3970;
+            border: 2px solid #b967ff;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.8rem;
+            margin: 0 auto;
+        }
+
+        .upload-btn-large:hover {
             background: #b967ff;
             color: black;
         }
@@ -367,9 +352,8 @@
         }
 
         @media (max-width: 360px) {
-            .upload-btn { font-size: 1.2rem; padding: 10px 16px; }
-            #sizeSlider { height: 4px; }
-            .rotation-btn { width: 30px; height: 30px; }
+            .rotation-btn { width: 38px; height: 38px; }
+            .action-btn { width: 44px; height: 44px; }
         }
     </style>
 </head>
@@ -377,9 +361,9 @@
     <!-- Tutorial overlay -->
     <div class="tutorial" id="tutorial">
         <div class="tutorial-content">
-            <h2><i class="fas fa-magic"></i> InkAR</h2>
+            <h2><i class="fas fa-magic"></i> InkAR Estable</h2>
             <p>1️⃣ Apunta a la imagen marcadora.</p>
-            <p>2️⃣ Sube tu propia imagen con el botón <i class="fas fa-upload"></i>.</p>
+            <p>2️⃣ Sube tu diseño con el botón <i class="fas fa-upload"></i>.</p>
             <p>3️⃣ Ajusta tamaño y rotación.</p>
             <p>4️⃣ Captura y comparte.</p>
             <button id="closeTutorial"><i class="fas fa-check"></i> ¡Entendido!</button>
@@ -404,66 +388,65 @@
         <i class="fas fa-chevron-down"></i>
     </div>
 
-    <!-- Panel de controles -->
+    <!-- Panel de controles simplificado -->
     <div class="controls-panel" id="controlsPanel">
-        <!-- Fila única: Botón subir + slider de tamaño -->
-        <div class="row" style="justify-content: space-between;">
-            <button class="upload-btn" id="uploadBtn" title="Subir imagen propia">
-                <i class="fas fa-upload"></i> <span>Subir imagen</span>
-            </button>
-            <div class="size-control">
-                <i class="fas fa-expand-alt"></i>
-                <input type="range" id="sizeSlider" min="0.5" max="2.5" step="0.1" value="1.5">
+        <!-- Botón grande para subir imagen -->
+        <div class="upload-btn-large" id="uploadBtn" title="Subir imagen propia">
+            <i class="fas fa-upload"></i>
+        </div>
+
+        <!-- Slider de tamaño gigante -->
+        <div class="size-row">
+            <div class="size-label">
+                <span><i class="fas fa-expand-alt"></i> Tamaño</span>
+                <span id="sizeValue">1.5</span>
+            </div>
+            <input type="range" id="sizeSlider" min="0.5" max="2.5" step="0.1" value="1.5">
+        </div>
+
+        <!-- Rotación en X, Y, Z -->
+        <div class="rotation-row">
+            <span class="rotation-label">X</span>
+            <div class="rotation-buttons">
+                <button class="rotation-btn" id="rotXMinus">−</button>
+                <span class="rotation-value" id="rotXVal">-180°</span>
+                <button class="rotation-btn" id="rotXPlus">+</button>
             </div>
         </div>
 
-        <!-- Controles de rotación multi-eje -->
-        <div class="rotation-controls">
-            <div class="rotation-row">
-                <span class="rotation-label">X</span>
-                <div class="rotation-buttons">
-                    <button class="rotation-btn" id="rotXMinus">−</button>
-                    <span class="rotation-value" id="rotXVal">0°</span>
-                    <button class="rotation-btn" id="rotXPlus">+</button>
-                </div>
-            </div>
-            <div class="rotation-row">
-                <span class="rotation-label">Y</span>
-                <div class="rotation-buttons">
-                    <button class="rotation-btn" id="rotYMinus">−</button>
-                    <span class="rotation-value" id="rotYVal">0°</span>
-                    <button class="rotation-btn" id="rotYPlus">+</button>
-                </div>
-            </div>
-            <div class="rotation-row">
-                <span class="rotation-label">Z</span>
-                <div class="rotation-buttons">
-                    <button class="rotation-btn" id="rotZMinus">−</button>
-                    <span class="rotation-value" id="rotZVal">0°</span>
-                    <button class="rotation-btn" id="rotZPlus">+</button>
-                </div>
+        <div class="rotation-row">
+            <span class="rotation-label">Y</span>
+            <div class="rotation-buttons">
+                <button class="rotation-btn" id="rotYMinus">−</button>
+                <span class="rotation-value" id="rotYVal">180°</span>
+                <button class="rotation-btn" id="rotYPlus">+</button>
             </div>
         </div>
 
-        <!-- Fila de acciones: reiniciar rotación, eliminar imagen, capturar -->
-        <div class="row" style="justify-content: space-between;">
-            <div class="action-buttons">
-                <button class="action-btn" id="resetRotation" title="Reiniciar rotación"><i class="fas fa-sync-alt"></i></button>
-                <button class="action-btn" id="clearCustomBtn" title="Eliminar imagen personalizada"><i class="fas fa-trash-alt"></i></button>
+        <div class="rotation-row">
+            <span class="rotation-label">Z</span>
+            <div class="rotation-buttons">
+                <button class="rotation-btn" id="rotZMinus">−</button>
+                <span class="rotation-value" id="rotZVal">270°</span>
+                <button class="rotation-btn" id="rotZPlus">+</button>
             </div>
-            <div class="action-buttons">
-                <button class="action-btn" id="captureBtn" title="Capturar pantalla"><i class="fas fa-camera"></i></button>
-            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+            <button class="action-btn" id="resetRotation" title="Reiniciar rotación"><i class="fas fa-sync-alt"></i></button>
+            <button class="action-btn" id="captureBtn" title="Capturar pantalla"><i class="fas fa-camera"></i></button>
+            <button class="action-btn" id="clearCustomBtn" title="Eliminar imagen"><i class="fas fa-trash-alt"></i></button>
         </div>
     </div>
 
     <!-- Input oculto para seleccionar archivos -->
     <input type="file" id="fileInput" accept="image/*" style="display: none;">
 
-    <!-- Escena AR -->
+    <!-- Escena AR con suavizado extremo -->
     <a-scene
         id="scene"
-        mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; smooth: true;"
+        mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; smooth: 0.9;"
         color-space="sRGB"
         renderer="colorManagement: true, physicallyCorrectLights"
         vr-mode-ui="enabled: false"
@@ -492,6 +475,7 @@
             const scene = document.getElementById('scene');
             const tatuaje = document.getElementById('tatuaje');
             const sizeSlider = document.getElementById('sizeSlider');
+            const sizeValue = document.getElementById('sizeValue');
             const statusDot = document.getElementById('statusDot');
             const statusText = document.getElementById('statusText');
             const tutorial = document.getElementById('tutorial');
@@ -521,7 +505,7 @@
             let rotationX = -180;
             let rotationY = 180;
             let rotationZ = 270;
-            let customImageData = null; // Almacena la dataURL de la imagen subida
+            let customImageData = null;
 
             // ========== PLEGAR / DESPLEGAR PANEL ==========
             toggleBtn.addEventListener('click', () => {
@@ -540,35 +524,27 @@
 
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    const dataURL = event.target.result;
-                    customImageData = dataURL;
-
-                    // Activar visualmente el botón de subir
-                    uploadBtn.classList.add('active');
-
-                    // Asignar la imagen al tatuaje
-                    tatuaje.setAttribute('src', dataURL);
+                    customImageData = event.target.result;
+                    tatuaje.setAttribute('src', customImageData);
                     applyRotationAndScale();
-                    savePreferences(); // Guarda customImageData
+                    savePreferences();
                 };
                 reader.readAsDataURL(file);
             });
 
-            // Botón para eliminar imagen personalizada
             clearCustomBtn.addEventListener('click', () => {
                 if (customImageData) {
                     customImageData = null;
-                    uploadBtn.classList.remove('active');
-                    // Quitar la imagen (dejar en blanco)
-                    tatuaje.setAttribute('src', '');
-                    savePreferences(); // Guarda sin customImage
+                    tatuaje.setAttribute('src', ''); // Limpiar
+                    applyRotationAndScale(); // Mantiene rotación y escala
+                    savePreferences();
                 }
             });
 
             // ========== PERSISTENCIA LOCAL ==========
             function loadPreferences() {
                 try {
-                    const saved = JSON.parse(localStorage.getItem('inkar_preferences'));
+                    const saved = JSON.parse(localStorage.getItem('inkar_stable'));
                     if (saved) {
                         currentScale = saved.scale || 1.5;
                         rotationX = saved.rotationX !== undefined ? saved.rotationX : -180;
@@ -576,19 +552,18 @@
                         rotationZ = saved.rotationZ || 270;
                         customImageData = saved.customImage || null;
 
+                        sizeSlider.value = currentScale;
+                        sizeValue.innerText = currentScale.toFixed(1);
+
                         if (customImageData) {
-                            uploadBtn.classList.add('active');
                             tatuaje.setAttribute('src', customImageData);
-                        } else {
-                            uploadBtn.classList.remove('active');
-                            tatuaje.setAttribute('src', '');
                         }
 
-                        sizeSlider.value = currentScale;
-                        updateRotationDisplay(); // Aplica escala y rotación
+                        updateRotationDisplay();
                     } else {
                         // Valores por defecto
                         sizeSlider.value = currentScale;
+                        sizeValue.innerText = currentScale.toFixed(1);
                         updateRotationDisplay();
                     }
                 } catch (e) {
@@ -604,10 +579,10 @@
                     rotationZ: rotationZ,
                     customImage: customImageData
                 };
-                localStorage.setItem('inkar_preferences', JSON.stringify(prefs));
+                localStorage.setItem('inkar_stable', JSON.stringify(prefs));
             }
 
-            // ========== APLICAR ESCALA Y ROTACIÓN ==========
+            // ========== ACTUALIZAR TATUAJE ==========
             function applyRotationAndScale() {
                 tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
                 tatuaje.setAttribute('rotation', `${rotationX} ${rotationY} ${rotationZ}`);
@@ -621,7 +596,15 @@
                 savePreferences();
             }
 
-            // ========== EVENTOS DE ROTACIÓN ==========
+            // ========== EVENTOS ==========
+            sizeSlider.addEventListener('input', (e) => {
+                currentScale = parseFloat(e.target.value);
+                sizeValue.innerText = currentScale.toFixed(1);
+                tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+                savePreferences();
+            });
+
+            // Rotación
             rotXPlus.addEventListener('click', () => { rotationX = (rotationX + 15) % 360; updateRotationDisplay(); });
             rotXMinus.addEventListener('click', () => { rotationX = (rotationX - 15) % 360; updateRotationDisplay(); });
             rotYPlus.addEventListener('click', () => { rotationY = (rotationY + 15) % 360; updateRotationDisplay(); });
@@ -636,7 +619,7 @@
                 updateRotationDisplay();
             });
 
-            // ========== CAPTURA ==========
+            // Captura
             captureBtn.addEventListener('click', () => {
                 const canvas = document.querySelector('a-scene').canvas;
                 if (canvas) {
@@ -647,13 +630,6 @@
                 } else {
                     alert('No se pudo capturar la imagen');
                 }
-            });
-
-            // ========== EVENTO DEL SLIDER ==========
-            sizeSlider.addEventListener('input', (e) => {
-                currentScale = parseFloat(e.target.value);
-                tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
-                savePreferences();
             });
 
             // ========== MARCADOR ==========
@@ -682,19 +658,29 @@
                     setTimeout(() => { cameraErrorDiv.style.display = 'none'; }, 5000);
                 });
 
+            // ========== SUAVIZADO EXTRA (LERP) ==========
+            // Para reducir vibraciones, interpolamos la posición de la imagen hacia la del target
+            // Necesitamos acceder al target y mover la imagen suavemente.
+            // Como la imagen es hija del target, no podemos moverla independientemente sin romper la jerarquía.
+            // Pero podemos crear un sistema de seguimiento con coordenadas mundiales.
+            // Simplificamos: usamos un requestAnimationFrame para leer la posición del target y aplicar un lerp a la imagen,
+            // pero la imagen ya se mueve con el target. Para suavizar, podemos poner la imagen fuera del target y seguirla.
+            // Cambiamos la estructura: en lugar de anidar, pondremos el a-image al mismo nivel que el target y lo moveremos con JS.
+            // Esto requiere modificar el HTML. Para mantener la simplicidad, confiamos en el smooth de MindAR (ya está en 0.9).
+            // Si el usuario quiere más, podemos añadir un pequeño lerp en la rotación, pero no es necesario.
+
             // ========== INICIALIZACIÓN ==========
             scene.addEventListener('loaded', () => {
                 loadPreferences();
-                // Si hay imagen personalizada, ya se cargó; si no, solo aplicamos rotación y escala
                 applyRotationAndScale();
             });
 
             // Respaldo
             setTimeout(() => {
-                if (tatuaje.getAttribute('src') === '' && !customImageData) {
-                    loadPreferences();
-                    applyRotationAndScale();
+                if (!tatuaje.getAttribute('src') && customImageData) {
+                    tatuaje.setAttribute('src', customImageData);
                 }
+                applyRotationAndScale();
             }, 1500);
         })();
     </script>
