@@ -30,7 +30,6 @@
             display: block;
         }
 
-        /* Indicador de estado compacto (sin animación) */
         .marker-status {
             position: absolute;
             top: 12px;
@@ -61,7 +60,6 @@
             box-shadow: 0 0 8px #4caf50;
         }
 
-        /* Miniatura del marcador (pequeña y discreta) */
         .marker-thumb {
             position: absolute;
             bottom: 90px;
@@ -80,7 +78,6 @@
             display: block;
         }
 
-        /* Panel inferior compacto y adaptado a vertical */
         .controls-panel {
             position: absolute;
             bottom: 12px;
@@ -104,7 +101,6 @@
             gap: 8px;
         }
 
-        /* Galería de iconos muy compacta */
         .icon-gallery {
             display: flex;
             gap: 4px;
@@ -141,7 +137,6 @@
             box-shadow: 0 1px 0 #151525;
         }
 
-        /* Selector de color ultra compacto */
         .color-picker {
             display: flex;
             gap: 4px;
@@ -165,7 +160,6 @@
         .color-btn.gray { background: #757575; }
         .color-btn.active { border-color: white; transform: scale(1.1); }
 
-        /* Control de tamaño compacto */
         .size-control {
             display: flex;
             align-items: center;
@@ -199,7 +193,6 @@
             border: 2px solid white;
         }
 
-        /* Ajuste para pantallas muy pequeñas */
         @media (max-width: 360px) {
             .icon-gallery button { font-size: 1rem; padding: 5px 8px; min-width: 36px; }
             .color-btn { width: 24px; height: 24px; }
@@ -209,18 +202,15 @@
     </style>
 </head>
 <body>
-    <!-- Estado del marcador (sin animación) -->
     <div class="marker-status" id="markerStatus">
         <span class="dot" id="statusDot"></span>
         <span id="statusText">Buscando...</span>
     </div>
 
-    <!-- Miniatura del marcador (opcional, para referencia) -->
     <div class="marker-thumb">
         <img src="https://github.com/hiukim/mind-ar-js/raw/master/examples/image-tracking/assets/card-example/card.png" alt="Marcador">
     </div>
 
-    <!-- Panel de controles compacto -->
     <div class="controls-panel">
         <div class="row">
             <div class="icon-gallery" id="iconGallery">
@@ -243,12 +233,11 @@
             </div>
             <div class="size-control">
                 <i class="fas fa-expand-alt"></i>
-                <input type="range" id="sizeSlider" min="0.3" max="2.0" step="0.1" value="1.0">
+                <input type="range" id="sizeSlider" min="0.5" max="2.5" step="0.1" value="1.5">
             </div>
         </div>
     </div>
 
-    <!-- Escena AR -->
     <a-scene
         id="scene"
         mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;"
@@ -261,15 +250,22 @@
     >
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-        <!-- Target con el tatuaje (plano con textura de canvas dinámico) -->
+        <!-- Usamos a-image en lugar de a-plane para mayor fiabilidad -->
         <a-entity mindar-image-target="targetIndex: 0">
-            <a-plane id="tatuaje" position="0 0.1 0" rotation="-90 0 0" width="1.2" height="1.2" material="shader: flat; transparent: true;"></a-plane>
+            <a-image id="tatuaje"
+                     src=""  <!-- Se llenará con canvas -->
+                     position="0 0.1 0"
+                     rotation="-90 0 0"
+                     width="1.2"
+                     height="1.2"
+                     material="transparent: true;"
+                     scale="1.5 1.5 1.5">
+            </a-image>
         </a-entity>
     </a-scene>
 
     <script>
         (function() {
-            // Elementos del DOM
             const scene = document.getElementById('scene');
             const tatuaje = document.getElementById('tatuaje');
             const iconGallery = document.getElementById('iconGallery');
@@ -278,12 +274,10 @@
             const statusDot = document.getElementById('statusDot');
             const statusText = document.getElementById('statusText');
 
-            // Variables de estado
             let currentIcon = 'fa-heart';
-            let currentColor = '#222222'; // negro
-            let currentScale = 1.0;
+            let currentColor = '#222222';
+            let currentScale = 1.5; // Coincide con el valor inicial del slider
 
-            // Mapa de iconos a caracteres Unicode de FontAwesome
             const iconMap = {
                 'fa-heart': '\u{f004}',
                 'fa-moon': '\u{f186}',
@@ -295,45 +289,32 @@
                 'fa-dreamcatcher': '\u{f77b}'
             };
 
-            // Función para generar un canvas con el icono y color actual
-            function generateTattooTexture() {
+            function generateTattooDataURL() {
                 const canvas = document.createElement('canvas');
                 canvas.width = 512;
                 canvas.height = 512;
                 const ctx = canvas.getContext('2d');
 
-                // Limpiar con fondo transparente
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                // Configurar estilo de texto
                 ctx.font = '400px "Font Awesome 6 Free"';
                 ctx.fillStyle = currentColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
-                // Obtener carácter
                 const char = iconMap[currentIcon] || '\u{f004}';
                 ctx.fillText(char, 256, 256);
 
-                return canvas;
+                return canvas.toDataURL(); // Devuelve una dataURL base64
             }
 
-            // Función para actualizar la textura del tatuaje
             function updateTattoo() {
-                const canvas = generateTattooTexture();
-                // Crear textura a partir del canvas
-                const texture = new THREE.CanvasTexture(canvas);
-                // Aplicar al material del plano
-                if (tatuaje && tatuaje.components && tatuaje.components.material) {
-                    tatuaje.components.material.material.map = texture;
-                    tatuaje.components.material.material.needsUpdate = true;
-                } else {
-                    // Si el componente no está listo, usar setAttribute
-                    tatuaje.setAttribute('material', 'src', canvas.toDataURL());
-                }
+                const dataURL = generateTattooDataURL();
+                // Forzar la actualización de la imagen
+                tatuaje.setAttribute('src', dataURL);
+                console.log('Tatuaje actualizado con color', currentColor);
             }
 
-            // Eventos de la galería de iconos
+            // Eventos de iconos
             iconGallery.addEventListener('click', (e) => {
                 const btn = e.target.closest('.tattoo-btn');
                 if (!btn) return;
@@ -348,7 +329,6 @@
                 if (!iconClass) return;
 
                 currentIcon = iconClass;
-                // Actualizar botón activo
                 document.querySelectorAll('.tattoo-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
 
@@ -385,6 +365,8 @@
                     console.log('Marcador detectado');
                     statusDot.classList.add('active');
                     statusText.innerText = 'Detectado';
+                    // Asegurar que el tatuaje tenga la textura actual
+                    updateTattoo();
                 });
                 targetEntity.addEventListener('targetLost', () => {
                     console.log('Marcador perdido');
@@ -393,15 +375,17 @@
                 });
             }
 
-            // Inicializar la textura cuando la escena esté lista
+            // Inicializar cuando la escena cargue
             scene.addEventListener('loaded', () => {
                 updateTattoo();
+                tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
             });
 
-            // Fallback por si el evento 'loaded' no se dispara
+            // Fallback
             setTimeout(() => {
                 updateTattoo();
-            }, 1000);
+                tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+            }, 1500);
         })();
     </script>
 </body>
