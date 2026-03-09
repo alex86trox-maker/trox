@@ -4,199 +4,212 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>InkAR · Tatuajes Virtuales</title>
-    <!-- Librerías A-Frame y MindAR -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <!-- Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             overflow: hidden;
-            background: #000;
+            background: black;
             color: white;
-            touch-action: pan-y pinch-zoom; /* mejor manejo táctil */
         }
 
-        /* Escena AR ocupa toda la pantalla */
         a-scene {
             width: 100vw;
             height: 100vh;
             display: block;
         }
 
-        /* Recuadro guía animado (overlay) */
+        /* Overlay guía - más sutil */
         .guide-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 70vw;
-            height: 70vw;
-            max-width: 350px;
-            max-height: 350px;
-            border: 3px solid rgba(255, 255, 255, 0.7);
-            border-radius: 24px;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            width: 60vw;
+            height: 60vw;
+            max-width: 280px;
+            max-height: 280px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 20px;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
             pointer-events: none;
             z-index: 50;
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0% { border-color: rgba(255, 255, 255, 0.7); box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); }
-            50% { border-color: rgba(185, 103, 255, 0.9); box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3); }
-            100% { border-color: rgba(255, 255, 255, 0.7); box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); }
+            0% { border-color: rgba(255,255,255,0.5); }
+            50% { border-color: #b967ff; box-shadow: 0 0 0 9999px rgba(0,0,0,0.3); }
+            100% { border-color: rgba(255,255,255,0.5); }
         }
 
-        /* Texto de instrucciones */
-        .instruction-text {
+        /* Estado del marcador compacto */
+        .marker-status {
             position: absolute;
-            top: 15px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            color: white;
-            font-size: 1rem;
-            text-shadow: 0 2px 5px black;
-            z-index: 60;
-            padding: 0 20px;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(5px);
-            width: auto;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 40px;
-            padding: 10px 20px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        /* Panel inferior de controles */
-        .controls-panel {
-            position: absolute;
-            bottom: 20px;
-            left: 10px;
-            right: 10px;
-            background: rgba(20, 20, 30, 0.85);
-            backdrop-filter: blur(10px);
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            padding: 6px 12px;
             border-radius: 30px;
-            padding: 15px;
-            border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            z-index: 100;
-            transition: transform 0.3s;
-        }
-
-        /* Cuando se detecta el marcador, podemos ocultar el recuadro? (opcional) */
-        .controls-panel.hidden {
-            transform: translateY(100%);
-        }
-
-        .panel-section {
-            margin-bottom: 15px;
-        }
-
-        .panel-section h4 {
-            color: #b0b0d0;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            margin-left: 5px;
-        }
-
-        /* Galería de iconos horizontal */
-        .icon-gallery {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 5px 0;
-            scrollbar-width: thin;
-            scrollbar-color: #b967ff #2b2b44;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .icon-gallery button {
-            background: #2b2b44;
-            border: none;
-            border-radius: 50px;
-            padding: 12px 18px;
-            color: white;
-            font-size: 2rem;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #151525;
-            transition: all 0.1s;
-            flex: 0 0 auto;
-            border: 2px solid transparent;
-        }
-
-        .icon-gallery button.active {
-            border-color: #b967ff;
-            background: #4a3970;
-            transform: scale(1.02);
-        }
-
-        .icon-gallery button:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #151525;
-        }
-
-        /* Controles de color y tamaño en fila */
-        .row-controls {
+            font-size: 0.8rem;
+            border: 1px solid #b967ff;
+            color: #b967ff;
+            z-index: 70;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 5px;
+        }
+
+        .marker-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #f44336;
+        }
+
+        .marker-status .dot.active {
+            background: #4caf50;
+            box-shadow: 0 0 8px #4caf50;
+        }
+
+        /* Miniatura del marcador más pequeña */
+        .marker-thumb {
+            position: absolute;
+            bottom: 100px;
+            left: 12px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid #b967ff;
+            z-index: 70;
+        }
+
+        .marker-thumb img {
+            width: 45px;
+            border-radius: 6px;
+            display: block;
+        }
+
+        /* Panel de controles compacto y rediseñado */
+        .controls-panel {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            background: rgba(20,20,30,0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Fila superior: galería de iconos más pequeños */
+        .icon-row {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 4px 0;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+        .icon-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .icon-row button {
+            background: #2b2b44;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 14px;
+            color: white;
+            font-size: 1.5rem; /* más pequeño */
+            cursor: pointer;
+            box-shadow: 0 3px 0 #151525;
+            transition: 0.1s;
+            flex: 0 0 auto;
+            border: 2px solid transparent;
+            min-width: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .icon-row button.active {
+            border-color: #b967ff;
+            background: #4a3970;
+        }
+
+        .icon-row button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #151525;
+        }
+
+        /* Fila inferior: color y tamaño en horizontal */
+        .tools-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
-        .color-picker {
+        .color-group {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             background: rgba(0,0,0,0.3);
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 40px;
         }
 
         .color-btn {
-            width: 45px;
-            height: 45px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            border: 3px solid transparent;
+            border: 2px solid transparent;
             cursor: pointer;
             transition: 0.1s;
         }
-
         .color-btn.black { background: #222; }
         .color-btn.red { background: #d32f2f; }
         .color-btn.blue { background: #1976d2; }
         .color-btn.gray { background: #757575; }
-        .color-btn.active { border-color: white; transform: scale(1.15); }
+        .color-btn.active { border-color: white; transform: scale(1.1); }
 
         .size-control {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             background: rgba(0,0,0,0.3);
-            padding: 5px 15px;
+            padding: 4px 12px;
             border-radius: 40px;
-            color: white;
             flex: 1;
+            min-width: 120px;
         }
 
         .size-control i {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #b967ff;
         }
 
         #sizeSlider {
             flex: 1;
-            height: 5px;
+            height: 4px;
             background: #2b2b44;
             border-radius: 10px;
             -webkit-appearance: none;
@@ -204,120 +217,57 @@
 
         #sizeSlider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 22px;
-            height: 22px;
+            width: 18px;
+            height: 18px;
             background: #b967ff;
             border-radius: 50%;
-            cursor: pointer;
             border: 2px solid white;
         }
 
-        /* Estado del marcador */
-        .marker-status {
-            position: absolute;
-            top: 80px;
-            right: 15px;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            border: 1px solid #b967ff;
-            color: #b967ff;
-            z-index: 70;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .marker-status .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #f44336;
-            display: inline-block;
-        }
-
-        .marker-status .dot.active {
-            background: #4caf50;
-            box-shadow: 0 0 10px #4caf50;
-        }
-
-        /* Miniatura del marcador (para referencia) */
-        .marker-thumb {
-            position: absolute;
-            bottom: 100px;
-            left: 15px;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-            border-radius: 16px;
-            padding: 5px;
-            border: 1px solid #b967ff;
-            z-index: 70;
-        }
-
-        .marker-thumb img {
-            width: 60px;
-            border-radius: 8px;
-            display: block;
-        }
-
-        /* Responsive para pantallas muy pequeñas */
+        /* Ocultar panel con swipe? Podríamos añadir un botón flotante, pero por ahora lo dejamos fijo */
         @media (max-width: 400px) {
-            .icon-gallery button { font-size: 1.5rem; padding: 10px 14px; }
-            .color-btn { width: 35px; height: 35px; }
+            .icon-row button { font-size: 1.3rem; padding: 6px 10px; }
+            .color-btn { width: 30px; height: 30px; }
         }
     </style>
 </head>
 <body>
-    <!-- Estado del marcador -->
     <div class="marker-status" id="markerStatus">
         <span class="dot" id="statusDot"></span>
-        <span id="statusText">Buscando marcador...</span>
+        <span id="statusText">Buscando...</span>
     </div>
 
-    <!-- Recuadro guía animado -->
     <div class="guide-overlay" id="guideOverlay"></div>
 
-    <!-- Miniatura del marcador (opcional) -->
     <div class="marker-thumb">
-        <img src="https://github.com/hiukim/mind-ar-js/raw/master/examples/image-tracking/assets/card-example/card.png" alt="Marcador">
+        <img src="https://github.com/hiukim/mind-ar-js/raw/master/examples/image-tracking/assets/card-example/card.png" alt="marcador">
     </div>
 
-    <!-- Panel de controles inferior -->
-    <div class="controls-panel" id="controlsPanel">
-        <div class="panel-section">
-            <h4><i class="fas fa-icons"></i> Diseño</h4>
-            <div class="icon-gallery" id="iconGallery">
-                <button class="tattoo-btn active" data-icon="fa-heart"><i class="fas fa-heart"></i></button>
-                <button class="tattoo-btn" data-icon="fa-moon"><i class="fas fa-moon"></i></button>
-                <button class="tattoo-btn" data-icon="fa-feather"><i class="fas fa-feather"></i></button>
-                <button class="tattoo-btn" data-icon="fa-infinity"><i class="fas fa-infinity"></i></button>
-                <button class="tattoo-btn" data-icon="fa-tree"><i class="fas fa-tree"></i></button>
-                <button class="tattoo-btn" data-icon="fa-anchor"><i class="fas fa-anchor"></i></button>
-                <button class="tattoo-btn" data-icon="fa-star"><i class="fas fa-star"></i></button>
-                <button class="tattoo-btn" data-icon="fa-dreamcatcher"><i class="fas fa-dreamcatcher"></i></button>
-            </div>
+    <div class="controls-panel">
+        <div class="icon-row" id="iconGallery">
+            <button class="tattoo-btn active" data-icon="fa-heart"><i class="fas fa-heart"></i></button>
+            <button class="tattoo-btn" data-icon="fa-moon"><i class="fas fa-moon"></i></button>
+            <button class="tattoo-btn" data-icon="fa-feather"><i class="fas fa-feather"></i></button>
+            <button class="tattoo-btn" data-icon="fa-infinity"><i class="fas fa-infinity"></i></button>
+            <button class="tattoo-btn" data-icon="fa-tree"><i class="fas fa-tree"></i></button>
+            <button class="tattoo-btn" data-icon="fa-anchor"><i class="fas fa-anchor"></i></button>
+            <button class="tattoo-btn" data-icon="fa-star"><i class="fas fa-star"></i></button>
+            <button class="tattoo-btn" data-icon="fa-dreamcatcher"><i class="fas fa-dreamcatcher"></i></button>
         </div>
-
-        <div class="panel-section">
-            <h4><i class="fas fa-palette"></i> Color y tamaño</h4>
-            <div class="row-controls">
-                <div class="color-picker">
-                    <button class="color-btn black active" data-color="black" title="Negro"></button>
-                    <button class="color-btn red" data-color="red" title="Rojo"></button>
-                    <button class="color-btn blue" data-color="blue" title="Azul"></button>
-                    <button class="color-btn gray" data-color="gray" title="Gris"></button>
-                </div>
-                <div class="size-control">
-                    <i class="fas fa-expand-alt"></i>
-                    <input type="range" id="sizeSlider" min="0.3" max="2.5" step="0.1" value="1.0">
-                </div>
+        <div class="tools-row">
+            <div class="color-group">
+                <button class="color-btn black active" data-color="black"></button>
+                <button class="color-btn red" data-color="red"></button>
+                <button class="color-btn blue" data-color="blue"></button>
+                <button class="color-btn gray" data-color="gray"></button>
+            </div>
+            <div class="size-control">
+                <i class="fas fa-expand-alt"></i>
+                <input type="range" id="sizeSlider" min="0.3" max="2.5" step="0.1" value="1.0">
             </div>
         </div>
     </div>
 
-    <!-- Escena AR -->
     <a-scene
         id="scene"
         mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;"
@@ -326,11 +276,8 @@
         vr-mode-ui="enabled: false"
         device-orientation-permission-ui="enabled: false"
         embedded
-        style="width: 100%; height: 100%;"
     >
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-        <!-- Assets: imágenes SVG de los iconos -->
         <a-assets>
             <img id="heart" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='black' d='M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z'%3E%3C/path%3E%3C/svg%3E">
             <img id="moon" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='black' d='M283.211 512c78.962 0 151.079-35.925 198.857-94.792 7.068-8.708-.639-21.43-11.562-19.35-124.203 23.654-233.186-78.884-233.186-200.066 0-68.954 35.018-129.708 89.09-167.132 8.903-6.156 6.682-19.57-3.488-23.395C290.326 2.467 270.528 0 250.626 0 116.393 0 8 108.299 8 242.5c0 134.098 108.388 242.5 242.5 242.5 10.528 0 20.837-1.179 30.711-3.297 6.258-1.345 7.655-9.318 2.096-13.547-16.31-12.401-30.097-28.011-40.074-45.395-1.921-3.352-6.185-4.09-9.346-1.567-20.337 16.16-45.237 24.612-71.387 24.612-72.363 0-130.222-57.859-130.222-130.222 0-71.922 58.108-129.93 130.222-129.93 26.179 0 51.136 8.756 71.372 24.807 3.144 2.494 7.422 1.745 9.337-1.6 9.946-17.439 23.701-32.19 40.112-44.25 5.68-4.175 4.26-12.738-2.105-14.146C284.926 76.964 268.029 72 250.626 72 138.566 72 48 162.566 48 274.5c0 111.93 90.566 202.5 202.5 202.5 21.795 0 42.771-3.858 62.711-10.178 7.614-2.405 7.415-13.086-.727-15.978-14.553-5.164-27.85-13.766-39.119-25.148-3.153-3.186-8.341-2.889-11.337.599-12.932 15.036-30.74 23.205-50.528 23.205-40.305 0-72.5-32.195-72.5-72.5 0-39.789 31.739-71.5 72.5-71.5 19.864 0 38.589 8.167 51.512 22.684 3.087 3.472 8.386 3.697 11.546.645 14.604-14.127 34.045-22.329 55.362-22.329 46.385 0 84 37.615 84 84 0 30.672-16.295 57.565-40.444 72.639-7.696 4.797-5.613 16.271 3.06 19.133 25.406 8.391 44.384 31.896 44.384 58.228 0 38.145-31.215 69.36-69.36 69.36-13.095 0-25.677-3.651-36.582-10.475-6.018-3.764-13.667-1.756-17.77 3.794C336.816 505.016 311.102 512 283.211 512z'%3E%3C/path%3E%3C/svg%3E">
@@ -341,8 +288,6 @@
             <img id="anchor" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'%3E%3Cpath fill='black' d='M320 96a32 32 0 1 1-64 0 32 32 0 1 1 64 0zm21.1 80C367 158.8 384 117 384 80c0-53-43-96-96-96s-96 43-96 96c0 37 17 78.8 42.9 96H160c-17.7 0-32 14.3-32 32s14.3 32 32 32h128v176c-76.3 0-139.9-48.9-163.8-117.5c6.7-3.1 11.8-9.4 11.8-16.9c0-9.5-8.4-17.2-18.5-19.3C62.5 266.8 32 300.9 32 342c0 35.2 21 65.6 51.9 79.8C115.5 481.8 176 512 245.3 512H288h42.7c69.3 0 129.8-30.2 170.1-78.8C531 407.6 552 377.2 552 342c0-41.1-30.5-75.2-71.5-79.3c-10.1 2.1-18.5 9.8-18.5 19.3c0 7.5 5.1 13.8 11.8 16.9C449.9 367.1 386.3 416 310 416V240h128c17.7 0 32-14.3 32-32s-14.3-32-32-32H341.1z'%3E%3C/path%3E%3C/svg%3E">
             <img id="dreamcatcher" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='black' d='M256 0c-35.3 0-64 28.7-64 64v192c0 35.3 28.7 64 64 64s64-28.7 64-64V64c0-35.3-28.7-64-64-64zm0 416c-61.9 0-112-50.1-112-112c0-8.8-7.2-16-16-16s-16 7.2-16 16c0 79.5 64.5 144 144 144s144-64.5 144-144c0-8.8-7.2-16-16-16s-16 7.2-16 16c0 61.9-50.1 112-112 112z'%3E%3C/path%3E%3C/svg%3E">
         </a-assets>
-
-        <!-- Target con el modelo (plano) -->
         <a-entity mindar-image-target="targetIndex: 0">
             <a-plane id="tatuaje" src="#heart" width="1.2" height="1.2" position="0 0.1 0" rotation="-90 0 0" material="transparent: true; alphaTest: 0.1;"></a-plane>
         </a-entity>
@@ -350,35 +295,26 @@
 
     <script>
         (function() {
-            // Elementos del DOM
-            const scene = document.getElementById('scene');
             const tatuaje = document.getElementById('tatuaje');
             const iconGallery = document.getElementById('iconGallery');
-            const colorButtons = document.querySelectorAll('.color-btn');
             const sizeSlider = document.getElementById('sizeSlider');
             const statusDot = document.getElementById('statusDot');
             const statusText = document.getElementById('statusText');
             const guideOverlay = document.getElementById('guideOverlay');
+            const colorButtons = document.querySelectorAll('.color-btn');
 
-            // Variables de estado
-            let currentIcon = '#heart';
-            let currentColor = '#222222';
-            let currentScale = 1.0;
+            // Mapa de iconos
+            const iconMap = {
+                'fa-heart': '#heart',
+                'fa-moon': '#moon',
+                'fa-feather': '#feather',
+                'fa-infinity': '#infinity',
+                'fa-tree': '#tree',
+                'fa-anchor': '#anchor',
+                'fa-star': '#star',
+                'fa-dreamcatcher': '#dreamcatcher'
+            };
 
-            // Función para actualizar el color del tatuaje
-            function updateColor(colorHex) {
-                currentColor = colorHex;
-                // Cambiamos el color del SVG mediante un filtro de tinte (no es directo)
-                // Como es un sprite con textura, necesitamos recrear la textura con el color.
-                // Por simplicidad, usaremos un material con color, pero como es una imagen, no funcionará.
-                // Mejor: reasignar la imagen con el color modificado (no es trivial).
-                // Para este demo, usaremos un truco: cambiar el color del material a blanco y aplicar un tinte con luz.
-                // Pero lo más fácil es que el usuario vea el color del icono definido en el SVG (negro por defecto).
-                // En una versión real, deberías generar un canvas coloreado. Lo dejamos como placeholder.
-                // Aquí solo mostramos el cambio en el borde del botón activo.
-            }
-
-            // Eventos de la galería de iconos
             iconGallery.addEventListener('click', (e) => {
                 const btn = e.target.closest('.tattoo-btn');
                 if (!btn) return;
@@ -390,66 +326,40 @@
                         break;
                     }
                 }
-                if (!iconClass) return;
-
-                // Mapear clase de FontAwesome a ID del asset
-                const map = {
-                    'fa-heart': '#heart',
-                    'fa-moon': '#moon',
-                    'fa-feather': '#feather',
-                    'fa-infinity': '#infinity',
-                    'fa-tree': '#tree',
-                    'fa-anchor': '#anchor',
-                    'fa-star': '#star',
-                    'fa-dreamcatcher': '#dreamcatcher'
-                };
-                const assetId = map[iconClass];
-                if (assetId) {
-                    tatuaje.setAttribute('src', assetId);
+                if (iconClass && iconMap[iconClass]) {
+                    tatuaje.setAttribute('src', iconMap[iconClass]);
                 }
-
-                // Actualizar botón activo
                 document.querySelectorAll('.tattoo-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
             });
 
-            // Eventos de color (solo estético, el color no cambia realmente en el SVG)
+            sizeSlider.addEventListener('input', (e) => {
+                const scale = parseFloat(e.target.value);
+                tatuaje.setAttribute('scale', `${scale} ${scale} ${scale}`);
+            });
+
+            // Color (solo visual, no aplicado)
             colorButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
                     colorButtons.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    // Aquí podrías aplicar un filtro de color, pero lo omitimos por simplicidad.
                 });
             });
 
-            // Evento de tamaño
-            sizeSlider.addEventListener('input', (e) => {
-                currentScale = parseFloat(e.target.value);
-                tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
-            });
-
-            // Detección del marcador (eventos de MindAR)
-            // MindAR emite eventos en el elemento <a-scene> o en el target
-            const targetEntity = document.querySelector('[mindar-image-target]');
-            if (targetEntity) {
-                targetEntity.addEventListener('targetFound', () => {
-                    console.log('Marcador detectado');
+            // Detección del marcador
+            const target = document.querySelector('[mindar-image-target]');
+            if (target) {
+                target.addEventListener('targetFound', () => {
                     statusDot.classList.add('active');
-                    statusText.innerText = 'Marcador detectado';
-                    guideOverlay.style.opacity = '0.3'; // atenuar guía cuando se detecta
+                    statusText.innerText = 'Detectado';
+                    guideOverlay.style.opacity = '0.3';
                 });
-                targetEntity.addEventListener('targetLost', () => {
-                    console.log('Marcador perdido');
+                target.addEventListener('targetLost', () => {
                     statusDot.classList.remove('active');
-                    statusText.innerText = 'Buscando marcador...';
+                    statusText.innerText = 'Buscando...';
                     guideOverlay.style.opacity = '1';
                 });
             }
-
-            // Si la escena carga, mostramos mensaje
-            scene.addEventListener('loaded', () => {
-                console.log('Escena AR cargada');
-            });
         })();
     </script>
 </body>
