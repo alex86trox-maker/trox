@@ -1,49 +1,325 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindAR con depuración</title>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InkAR · Tatuajes Virtuales</title>
+    <!-- Librerías A-Frame y MindAR -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
-        #status {
-            position: absolute; top: 10px; left: 10px; 
-            background: rgba(0,0,0,0.8); color: white; 
-            padding: 8px 16px; border-radius: 20px; 
-            z-index: 100; font-size: 14px;
-            border: 1px solid #00ff00;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        #marker-guide {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: white; padding: 10px; border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            z-index: 200;
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #000;
+            color: white;
+            touch-action: pan-y pinch-zoom; /* mejor manejo táctil */
+        }
+
+        /* Escena AR ocupa toda la pantalla */
+        a-scene {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+
+        /* Recuadro guía animado (overlay) */
+        .guide-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70vw;
+            height: 70vw;
+            max-width: 350px;
+            max-height: 350px;
+            border: 3px solid rgba(255, 255, 255, 0.7);
+            border-radius: 24px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: 50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { border-color: rgba(255, 255, 255, 0.7); box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); }
+            50% { border-color: rgba(185, 103, 255, 0.9); box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3); }
+            100% { border-color: rgba(255, 255, 255, 0.7); box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); }
+        }
+
+        /* Texto de instrucciones */
+        .instruction-text {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            width: 100%;
             text-align: center;
+            color: white;
+            font-size: 1rem;
+            text-shadow: 0 2px 5px black;
+            z-index: 60;
+            padding: 0 20px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+            width: auto;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 40px;
+            padding: 10px 20px;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        #marker-guide img {
-            width: 200px;
-            border: 2px solid #333;
+
+        /* Panel inferior de controles */
+        .controls-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 10px;
+            right: 10px;
+            background: rgba(20, 20, 30, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 100;
+            transition: transform 0.3s;
         }
-        .debug-overlay {
-            position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
-            color: yellow; background: rgba(0,0,0,0.5); padding: 5px 10px;
-            border-radius: 5px; z-index: 300;
+
+        /* Cuando se detecta el marcador, podemos ocultar el recuadro? (opcional) */
+        .controls-panel.hidden {
+            transform: translateY(100%);
+        }
+
+        .panel-section {
+            margin-bottom: 15px;
+        }
+
+        .panel-section h4 {
+            color: #b0b0d0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            margin-left: 5px;
+        }
+
+        /* Galería de iconos horizontal */
+        .icon-gallery {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px 0;
+            scrollbar-width: thin;
+            scrollbar-color: #b967ff #2b2b44;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .icon-gallery button {
+            background: #2b2b44;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 18px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #151525;
+            transition: all 0.1s;
+            flex: 0 0 auto;
+            border: 2px solid transparent;
+        }
+
+        .icon-gallery button.active {
+            border-color: #b967ff;
+            background: #4a3970;
+            transform: scale(1.02);
+        }
+
+        .icon-gallery button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #151525;
+        }
+
+        /* Controles de color y tamaño en fila */
+        .row-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 8px;
+            background: rgba(0,0,0,0.3);
+            padding: 5px 10px;
+            border-radius: 40px;
+        }
+
+        .color-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .color-btn.black { background: #222; }
+        .color-btn.red { background: #d32f2f; }
+        .color-btn.blue { background: #1976d2; }
+        .color-btn.gray { background: #757575; }
+        .color-btn.active { border-color: white; transform: scale(1.15); }
+
+        .size-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.3);
+            padding: 5px 15px;
+            border-radius: 40px;
+            color: white;
+            flex: 1;
+        }
+
+        .size-control i {
+            font-size: 1.2rem;
+            color: #b967ff;
+        }
+
+        #sizeSlider {
+            flex: 1;
+            height: 5px;
+            background: #2b2b44;
+            border-radius: 10px;
+            -webkit-appearance: none;
+        }
+
+        #sizeSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            background: #b967ff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+
+        /* Estado del marcador */
+        .marker-status {
+            position: absolute;
+            top: 80px;
+            right: 15px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            border: 1px solid #b967ff;
+            color: #b967ff;
+            z-index: 70;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .marker-status .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #f44336;
+            display: inline-block;
+        }
+
+        .marker-status .dot.active {
+            background: #4caf50;
+            box-shadow: 0 0 10px #4caf50;
+        }
+
+        /* Miniatura del marcador (para referencia) */
+        .marker-thumb {
+            position: absolute;
+            bottom: 100px;
+            left: 15px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            border-radius: 16px;
+            padding: 5px;
+            border: 1px solid #b967ff;
+            z-index: 70;
+        }
+
+        .marker-thumb img {
+            width: 60px;
+            border-radius: 8px;
+            display: block;
+        }
+
+        /* Responsive para pantallas muy pequeñas */
+        @media (max-width: 400px) {
+            .icon-gallery button { font-size: 1.5rem; padding: 10px 14px; }
+            .color-btn { width: 35px; height: 35px; }
         }
     </style>
 </head>
 <body>
-    <div id="status">🔍 Iniciando cámara...</div>
-    <div id="marker-guide">
-        <p>🔽 Apunta a esta imagen (o a una impresión)</p>
-        <img src="https://github.com/hiukim/mind-ar-js/raw/master/examples/image-tracking/assets/card-example/card.png" 
-             alt="Marcador tarjeta">
+    <!-- Estado del marcador -->
+    <div class="marker-status" id="markerStatus">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">Buscando marcador...</span>
     </div>
-    <div class="debug-overlay" id="debug">Esperando detección...</div>
 
+    <!-- Recuadro guía animado -->
+    <div class="guide-overlay" id="guideOverlay"></div>
+
+    <!-- Miniatura del marcador (opcional) -->
+    <div class="marker-thumb">
+        <img src="https://github.com/hiukim/mind-ar-js/raw/master/examples/image-tracking/assets/card-example/card.png" alt="Marcador">
+    </div>
+
+    <!-- Panel de controles inferior -->
+    <div class="controls-panel" id="controlsPanel">
+        <div class="panel-section">
+            <h4><i class="fas fa-icons"></i> Diseño</h4>
+            <div class="icon-gallery" id="iconGallery">
+                <button class="tattoo-btn active" data-icon="fa-heart"><i class="fas fa-heart"></i></button>
+                <button class="tattoo-btn" data-icon="fa-moon"><i class="fas fa-moon"></i></button>
+                <button class="tattoo-btn" data-icon="fa-feather"><i class="fas fa-feather"></i></button>
+                <button class="tattoo-btn" data-icon="fa-infinity"><i class="fas fa-infinity"></i></button>
+                <button class="tattoo-btn" data-icon="fa-tree"><i class="fas fa-tree"></i></button>
+                <button class="tattoo-btn" data-icon="fa-anchor"><i class="fas fa-anchor"></i></button>
+                <button class="tattoo-btn" data-icon="fa-star"><i class="fas fa-star"></i></button>
+                <button class="tattoo-btn" data-icon="fa-dreamcatcher"><i class="fas fa-dreamcatcher"></i></button>
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <h4><i class="fas fa-palette"></i> Color y tamaño</h4>
+            <div class="row-controls">
+                <div class="color-picker">
+                    <button class="color-btn black active" data-color="black" title="Negro"></button>
+                    <button class="color-btn red" data-color="red" title="Rojo"></button>
+                    <button class="color-btn blue" data-color="blue" title="Azul"></button>
+                    <button class="color-btn gray" data-color="gray" title="Gris"></button>
+                </div>
+                <div class="size-control">
+                    <i class="fas fa-expand-alt"></i>
+                    <input type="range" id="sizeSlider" min="0.3" max="2.5" step="0.1" value="1.0">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Escena AR -->
     <a-scene
+        id="scene"
         mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;"
         color-space="sRGB"
         renderer="colorManagement: true, physicallyCorrectLights"
@@ -53,43 +329,128 @@
         style="width: 100%; height: 100%;"
     >
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-        
+
+        <!-- Assets: imágenes SVG de los iconos -->
+        <a-assets>
+            <img id="heart" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='black' d='M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z'%3E%3C/path%3E%3C/svg%3E">
+            <img id="moon" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='black' d='M283.211 512c78.962 0 151.079-35.925 198.857-94.792 7.068-8.708-.639-21.43-11.562-19.35-124.203 23.654-233.186-78.884-233.186-200.066 0-68.954 35.018-129.708 89.09-167.132 8.903-6.156 6.682-19.57-3.488-23.395C290.326 2.467 270.528 0 250.626 0 116.393 0 8 108.299 8 242.5c0 134.098 108.388 242.5 242.5 242.5 10.528 0 20.837-1.179 30.711-3.297 6.258-1.345 7.655-9.318 2.096-13.547-16.31-12.401-30.097-28.011-40.074-45.395-1.921-3.352-6.185-4.09-9.346-1.567-20.337 16.16-45.237 24.612-71.387 24.612-72.363 0-130.222-57.859-130.222-130.222 0-71.922 58.108-129.93 130.222-129.93 26.179 0 51.136 8.756 71.372 24.807 3.144 2.494 7.422 1.745 9.337-1.6 9.946-17.439 23.701-32.19 40.112-44.25 5.68-4.175 4.26-12.738-2.105-14.146C284.926 76.964 268.029 72 250.626 72 138.566 72 48 162.566 48 274.5c0 111.93 90.566 202.5 202.5 202.5 21.795 0 42.771-3.858 62.711-10.178 7.614-2.405 7.415-13.086-.727-15.978-14.553-5.164-27.85-13.766-39.119-25.148-3.153-3.186-8.341-2.889-11.337.599-12.932 15.036-30.74 23.205-50.528 23.205-40.305 0-72.5-32.195-72.5-72.5 0-39.789 31.739-71.5 72.5-71.5 19.864 0 38.589 8.167 51.512 22.684 3.087 3.472 8.386 3.697 11.546.645 14.604-14.127 34.045-22.329 55.362-22.329 46.385 0 84 37.615 84 84 0 30.672-16.295 57.565-40.444 72.639-7.696 4.797-5.613 16.271 3.06 19.133 25.406 8.391 44.384 31.896 44.384 58.228 0 38.145-31.215 69.36-69.36 69.36-13.095 0-25.677-3.651-36.582-10.475-6.018-3.764-13.667-1.756-17.77 3.794C336.816 505.016 311.102 512 283.211 512z'%3E%3C/path%3E%3C/svg%3E">
+            <img id="star" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'%3E%3Cpath fill='black' d='M528.1 171.5L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6zM388.6 312.3l23.7 138.4L288 385.4l-124.3 65.3 23.7-138.4-100.6-98 139-20.2 62.2-126 62.2 126 139 20.2-100.6 98z'%3E%3C/path%3E%3C/svg%3E">
+            <img id="feather" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='black' d='M512 32c0 113.6-84.6 207.2-194.2 222c-7.1-53.4-30.6-101.6-65.3-139.3C290.8 46.3 364 0 448 0h32c17.7 0 32 14.3 32 32zM0 96c0-17.7 14.3-32 32-32c66.3 0 128.4 18.9 181.6 51.6c-3.7 9.8-6.4 20.2-7.8 31.1C129.5 194.1 70.5 254.6 27.9 325.6C9.6 356.8 0 392.7 0 430.7c0 44.9 36.5 81.3 81.3 81.3c23.5 0 45.5-9.3 61.8-24.5c16.1-15 27.5-35.5 32.8-58.2c18.2-78.3 70.3-144.3 140.2-183.8c16.1 48.6 41.6 92.6 74.7 129.3c-48.2 33.5-86.6 79.2-110 132.9c-12.8 29.4-3.4 64.5 21.5 84.3c22.7 18 54.2 19.7 79.6 4.7c79.4-46.9 142.6-120.7 181.1-208.3C500.7 285.3 512 236.2 512 185.3V96z'%3E%3C/path%3E%3C/svg%3E">
+            <img id="infinity" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512'%3E%3Cpath fill='black' d='M320 192l-9.5-9.5c-28.5-28.5-67-44.5-107.5-44.5c-84 0-152 68-152 152c0 84 68 152 152 152c40.5 0 79-16 107.5-44.5L320 320l9.5 9.5c28.5 28.5 67 44.5 107.5 44.5c84 0 152-68 152-152c0-84-68-152-152-152c-40.5 0-79 16-107.5 44.5L320 192zM213.5 277.5L256 320l-42.5 42.5c-11.3 11.3-26.7 17.5-42.5 17.5c-33.1 0-60-26.9-60-60c0-33.1 26.9-60 60-60c15.8 0 31.2 6.2 42.5 17.5zM469.5 234.5L384 320l42.5 42.5c11.3 11.3 26.7 17.5 42.5 17.5c33.1 0 60-26.9 60-60c0-33.1-26.9-60-60-60c-15.8 0-31.2 6.2-42.5 17.5z'%3E%3C/path%3E%3C/svg%3E">
+            <img id="tree" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'%3E%3Cpath fill='black' d='M378.8 405.4l-96-144C272 245.3 244.3 232 214.3 232H169.7c-30 0-57.7 13.3-76.5 36.9l-96 144c-8.5 12.8-9.6 29.6-2.8 43.6c6.8 14 20.5 22.5 35.8 22.5h288c15.3 0 29-8.5 35.8-22.5c6.8-14 5.7-30.8-2.8-43.6zM224 56c0-13.3-10.7-24-24-24h-16c-13.3 0-24 10.7-24 24v80h64V56z'%3E%3C/path%3E%3C/svg%3E">
+            <img id="anchor" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'%3E%3Cpath fill='black' d='M320 96a32 32 0 1 1-64 0 32 32 0 1 1 64 0zm21.1 80C367 158.8 384 117 384 80c0-53-43-96-96-96s-96 43-96 96c0 37 17 78.8 42.9 96H160c-17.7 0-32 14.3-32 32s14.3 32 32 32h128v176c-76.3 0-139.9-48.9-163.8-117.5c6.7-3.1 11.8-9.4 11.8-16.9c0-9.5-8.4-17.2-18.5-19.3C62.5 266.8 32 300.9 32 342c0 35.2 21 65.6 51.9 79.8C115.5 481.8 176 512 245.3 512H288h42.7c69.3 0 129.8-30.2 170.1-78.8C531 407.6 552 377.2 552 342c0-41.1-30.5-75.2-71.5-79.3c-10.1 2.1-18.5 9.8-18.5 19.3c0 7.5 5.1 13.8 11.8 16.9C449.9 367.1 386.3 416 310 416V240h128c17.7 0 32-14.3 32-32s-14.3-32-32-32H341.1z'%3E%3C/path%3E%3C/svg%3E">
+            <img id="dreamcatcher" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='black' d='M256 0c-35.3 0-64 28.7-64 64v192c0 35.3 28.7 64 64 64s64-28.7 64-64V64c0-35.3-28.7-64-64-64zm0 416c-61.9 0-112-50.1-112-112c0-8.8-7.2-16-16-16s-16 7.2-16 16c0 79.5 64.5 144 144 144s144-64.5 144-144c0-8.8-7.2-16-16-16s-16 7.2-16 16c0 61.9-50.1 112-112 112z'%3E%3C/path%3E%3C/svg%3E">
+        </a-assets>
+
+        <!-- Target con el modelo (plano) -->
         <a-entity mindar-image-target="targetIndex: 0">
-            <!-- Objeto visible cuando se detecta el marcador -->
-            <a-box position="0 0 0" material="color: red;" scale="0.5 0.5 0.5"></a-box>
-            <a-text value="Detectado!" position="0 1 0" scale="0.5 0.5 0.5" color="white"></a-text>
+            <a-plane id="tatuaje" src="#heart" width="1.2" height="1.2" position="0 0.1 0" rotation="-90 0 0" material="transparent: true; alphaTest: 0.1;"></a-plane>
         </a-entity>
     </a-scene>
 
     <script>
-        // Esperar a que la escena esté lista y obtener referencia al componente mindar-image
-        const scene = document.querySelector('a-scene');
-        scene.addEventListener('loaded', function () {
-            const mindar = scene.components['mindar-image'];
-            if (mindar) {
-                // Acceder al controller de MindAR
-                const controller = mindar.system.controller;
-                // Habilitar el modo de depuración (muestra puntos de características)
-                controller.setDebug(true);
-                document.getElementById('status').innerText = '✅ Cámara activa. Buscando marcador...';
+        (function() {
+            // Elementos del DOM
+            const scene = document.getElementById('scene');
+            const tatuaje = document.getElementById('tatuaje');
+            const iconGallery = document.getElementById('iconGallery');
+            const colorButtons = document.querySelectorAll('.color-btn');
+            const sizeSlider = document.getElementById('sizeSlider');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const guideOverlay = document.getElementById('guideOverlay');
+
+            // Variables de estado
+            let currentIcon = '#heart';
+            let currentColor = '#222222';
+            let currentScale = 1.0;
+
+            // Función para actualizar el color del tatuaje
+            function updateColor(colorHex) {
+                currentColor = colorHex;
+                // Cambiamos el color del SVG mediante un filtro de tinte (no es directo)
+                // Como es un sprite con textura, necesitamos recrear la textura con el color.
+                // Por simplicidad, usaremos un material con color, pero como es una imagen, no funcionará.
+                // Mejor: reasignar la imagen con el color modificado (no es trivial).
+                // Para este demo, usaremos un truco: cambiar el color del material a blanco y aplicar un tinte con luz.
+                // Pero lo más fácil es que el usuario vea el color del icono definido en el SVG (negro por defecto).
+                // En una versión real, deberías generar un canvas coloreado. Lo dejamos como placeholder.
+                // Aquí solo mostramos el cambio en el borde del botón activo.
             }
-        });
 
-        // Detectar eventos del marcador
-        const target = document.querySelector('[mindar-image-target]');
-        target.addEventListener('targetFound', () => {
-            document.getElementById('status').innerText = '🎯 Marcador ENCONTRADO';
-            document.getElementById('debug').innerText = '✅ Detectado!';
-        });
-        target.addEventListener('targetLost', () => {
-            document.getElementById('status').innerText = '🔍 Buscando marcador...';
-            document.getElementById('debug').innerText = '❌ Marcador perdido';
-        });
+            // Eventos de la galería de iconos
+            iconGallery.addEventListener('click', (e) => {
+                const btn = e.target.closest('.tattoo-btn');
+                if (!btn) return;
+                const iconElem = btn.querySelector('i');
+                let iconClass = '';
+                for (let cls of iconElem.classList) {
+                    if (cls.startsWith('fa-')) {
+                        iconClass = cls;
+                        break;
+                    }
+                }
+                if (!iconClass) return;
 
-        // Si hay errores en la consola, mostrarlos
-        window.addEventListener('error', (e) => {
-            document.getElementById('debug').innerText = 'Error: ' + e.message;
-        });
+                // Mapear clase de FontAwesome a ID del asset
+                const map = {
+                    'fa-heart': '#heart',
+                    'fa-moon': '#moon',
+                    'fa-feather': '#feather',
+                    'fa-infinity': '#infinity',
+                    'fa-tree': '#tree',
+                    'fa-anchor': '#anchor',
+                    'fa-star': '#star',
+                    'fa-dreamcatcher': '#dreamcatcher'
+                };
+                const assetId = map[iconClass];
+                if (assetId) {
+                    tatuaje.setAttribute('src', assetId);
+                }
+
+                // Actualizar botón activo
+                document.querySelectorAll('.tattoo-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+
+            // Eventos de color (solo estético, el color no cambia realmente en el SVG)
+            colorButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    colorButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    // Aquí podrías aplicar un filtro de color, pero lo omitimos por simplicidad.
+                });
+            });
+
+            // Evento de tamaño
+            sizeSlider.addEventListener('input', (e) => {
+                currentScale = parseFloat(e.target.value);
+                tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+            });
+
+            // Detección del marcador (eventos de MindAR)
+            // MindAR emite eventos en el elemento <a-scene> o en el target
+            const targetEntity = document.querySelector('[mindar-image-target]');
+            if (targetEntity) {
+                targetEntity.addEventListener('targetFound', () => {
+                    console.log('Marcador detectado');
+                    statusDot.classList.add('active');
+                    statusText.innerText = 'Marcador detectado';
+                    guideOverlay.style.opacity = '0.3'; // atenuar guía cuando se detecta
+                });
+                targetEntity.addEventListener('targetLost', () => {
+                    console.log('Marcador perdido');
+                    statusDot.classList.remove('active');
+                    statusText.innerText = 'Buscando marcador...';
+                    guideOverlay.style.opacity = '1';
+                });
+            }
+
+            // Si la escena carga, mostramos mensaje
+            scene.addEventListener('loaded', () => {
+                console.log('Escena AR cargada');
+            });
+        })();
     </script>
 </body>
 </html>
