@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>GuerrTattooAR · Tatuajes Virtuales</title>
+    <title>GuerrTattooAR · Tatuajes Ultraestables</title>
     <!-- Librerías A-Frame y MindAR -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -91,10 +91,10 @@
             display: block;
         }
 
-        /* Botón para plegar/desplegar panel - reposicionado para no solaparse */
+        /* Botón para plegar/desplegar panel - AHORA POSICIONADO CORRECTAMENTE */
         .toggle-panel-btn {
             position: absolute;
-            bottom: 80px;  /* Separado del panel para que no tape */
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             width: 50px;
@@ -352,7 +352,6 @@
         }
 
         @media (max-width: 360px) {
-            .toggle-panel-btn { bottom: 70px; }
             .rotation-btn { width: 38px; height: 38px; }
             .action-btn { width: 44px; height: 44px; }
         }
@@ -444,10 +443,10 @@
     <!-- Input oculto para seleccionar archivos -->
     <input type="file" id="fileInput" accept="image/*" style="display: none;">
 
-    <!-- Escena AR con suavizado extremo -->
+    <!-- Escena AR con parámetros de tracking ajustados -->
     <a-scene
         id="scene"
-        mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; smooth: 0.9;"
+        mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; filterMinCF: 0.005; filterBeta: 2000;"
         color-space="sRGB"
         renderer="colorManagement: true, physicallyCorrectLights"
         vr-mode-ui="enabled: false"
@@ -537,7 +536,7 @@
                 if (customImageData) {
                     customImageData = null;
                     tatuaje.setAttribute('src', ''); // Limpiar
-                    applyRotationAndScale(); // Mantiene rotación y escala
+                    applyRotationAndScale();
                     savePreferences();
                 }
             });
@@ -545,7 +544,7 @@
             // ========== PERSISTENCIA LOCAL ==========
             function loadPreferences() {
                 try {
-                    const saved = JSON.parse(localStorage.getItem('guerrTattooAR'));
+                    const saved = JSON.parse(localStorage.getItem('guerrtattoo_prefs'));
                     if (saved) {
                         currentScale = saved.scale || 1.5;
                         rotationX = saved.rotationX !== undefined ? saved.rotationX : -180;
@@ -580,7 +579,7 @@
                     rotationZ: rotationZ,
                     customImage: customImageData
                 };
-                localStorage.setItem('guerrTattooAR', JSON.stringify(prefs));
+                localStorage.setItem('guerrtattoo_prefs', JSON.stringify(prefs));
             }
 
             // ========== ACTUALIZAR TATUAJE ==========
@@ -620,15 +619,13 @@
                 updateRotationDisplay();
             });
 
-            // Captura en JPG
+            // Captura
             captureBtn.addEventListener('click', () => {
                 const canvas = document.querySelector('a-scene').canvas;
                 if (canvas) {
-                    // Convertir a JPG con calidad 0.9
-                    const jpgData = canvas.toDataURL('image/jpeg', 0.9);
                     const link = document.createElement('a');
-                    link.download = 'guerrtattoo-captura.jpg';
-                    link.href = jpgData;
+                    link.download = 'GuerrTattooAR.png'; // Nombre actualizado
+                    link.href = canvas.toDataURL('image/png');
                     link.click();
                 } else {
                     alert('No se pudo capturar la imagen');
