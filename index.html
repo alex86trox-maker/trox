@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>InkAR Pro · Tatuajes 3D + Imágenes</title>
+    <title>InkAR · Tatuajes con imagen propia</title>
     <!-- Librerías A-Frame y MindAR -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -161,89 +161,56 @@
             flex-wrap: wrap;
         }
 
-        .icon-gallery {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 4px 0;
-            scrollbar-width: thin;
-            scrollbar-color: #b967ff #2b2b44;
-            -webkit-overflow-scrolling: touch;
-            flex: 1;
-        }
-
-        .icon-gallery button {
+        /* Botón de subir imágenes */
+        .upload-btn {
             background: #2b2b44;
             border: none;
             border-radius: 40px;
-            padding: 8px 14px;
-            color: white;
+            padding: 12px 20px;
+            color: #b967ff;
             font-size: 1.4rem;
             cursor: pointer;
             box-shadow: 0 3px 0 #151525;
             transition: all 0.1s;
-            flex: 0 0 auto;
-            border: 2px solid transparent;
-            min-width: 48px;
+            border: 2px solid #b967ff;
+            min-width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .icon-gallery button.active {
-            border-color: #b967ff;
-            background: #4a3970;
-            transform: scale(1.02);
-        }
-
-        /* Botón de subir imágenes personalizado */
-        .icon-gallery .upload-btn {
-            background: #2b2b44;
-            color: #b967ff;
-            border-color: #b967ff;
-        }
-        .icon-gallery .upload-btn.active {
-            background: #4a3970;
+        .upload-btn span {
+            font-size: 1rem;
             color: white;
         }
 
-        .color-picker {
-            display: flex;
-            gap: 6px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 6px 12px;
-            border-radius: 40px;
+        .upload-btn.active {
+            background: #4a3970;
+            color: white;
+            border-color: white;
         }
 
-        .color-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-        }
-
-        .color-btn.black { background: #222; }
-        .color-btn.red { background: #d32f2f; }
-        .color-btn.blue { background: #1976d2; }
-        .color-btn.gray { background: #757575; }
-        .color-btn.active { border-color: white; transform: scale(1.15); }
-
+        /* Barra de tamaño (zoom) expandida */
         .size-control {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
             background: rgba(0, 0, 0, 0.3);
-            padding: 6px 14px;
+            padding: 8px 16px;
             border-radius: 40px;
             color: white;
+            flex: 1; /* Ocupa el espacio disponible */
         }
 
         .size-control i {
-            font-size: 1rem;
+            font-size: 1.2rem;
             color: #b967ff;
         }
 
         #sizeSlider {
-            width: 90px;
-            height: 4px;
+            flex: 1; /* La barra ocupa todo el ancho restante */
+            height: 6px;
             background: #2b2b44;
             border-radius: 10px;
             -webkit-appearance: none;
@@ -251,14 +218,15 @@
 
         #sizeSlider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 22px;
+            height: 22px;
             background: #b967ff;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid white;
         }
 
+        /* Controles de rotación */
         .rotation-controls {
             display: flex;
             flex-direction: column;
@@ -399,10 +367,8 @@
         }
 
         @media (max-width: 360px) {
-            .icon-gallery button { font-size: 1.2rem; padding: 6px 10px; min-width: 40px; }
-            .color-btn { width: 28px; height: 28px; }
-            #sizeSlider { width: 70px; }
-            .marker-thumb { bottom: 100px; }
+            .upload-btn { font-size: 1.2rem; padding: 10px 16px; }
+            #sizeSlider { height: 4px; }
             .rotation-btn { width: 30px; height: 30px; }
         }
     </style>
@@ -411,12 +377,11 @@
     <!-- Tutorial overlay -->
     <div class="tutorial" id="tutorial">
         <div class="tutorial-content">
-            <h2><i class="fas fa-magic"></i> InkAR Pro</h2>
+            <h2><i class="fas fa-magic"></i> InkAR</h2>
             <p>1️⃣ Apunta a la imagen marcadora.</p>
-            <p>2️⃣ Elige icono, color y tamaño.</p>
-            <p>3️⃣ Rota en X, Y, Z con los botones.</p>
-            <p>4️⃣ Sube tu propia imagen con el botón <i class="fas fa-upload"></i>.</p>
-            <p>5️⃣ Captura y comparte.</p>
+            <p>2️⃣ Sube tu propia imagen con el botón <i class="fas fa-upload"></i>.</p>
+            <p>3️⃣ Ajusta tamaño y rotación.</p>
+            <p>4️⃣ Captura y comparte.</p>
             <button id="closeTutorial"><i class="fas fa-check"></i> ¡Entendido!</button>
         </div>
     </div>
@@ -441,37 +406,18 @@
 
     <!-- Panel de controles -->
     <div class="controls-panel" id="controlsPanel">
-        <!-- Fila 1: Iconos + botón subir -->
-        <div class="row">
-            <div class="icon-gallery" id="iconGallery">
-                <button class="tattoo-btn" data-icon="fa-heart"><i class="fas fa-heart"></i></button>
-                <button class="tattoo-btn" data-icon="fa-moon"><i class="fas fa-moon"></i></button>
-                <button class="tattoo-btn" data-icon="fa-feather"><i class="fas fa-feather"></i></button>
-                <button class="tattoo-btn" data-icon="fa-infinity"><i class="fas fa-infinity"></i></button>
-                <button class="tattoo-btn" data-icon="fa-tree"><i class="fas fa-tree"></i></button>
-                <button class="tattoo-btn" data-icon="fa-anchor"><i class="fas fa-anchor"></i></button>
-                <button class="tattoo-btn" data-icon="fa-star"><i class="fas fa-star"></i></button>
-                <button class="tattoo-btn" data-icon="fa-dreamcatcher"><i class="fas fa-dreamcatcher"></i></button>
-                <!-- Botón para subir imagen personalizada -->
-                <button class="upload-btn" id="uploadBtn" title="Subir imagen propia"><i class="fas fa-upload"></i></button>
-            </div>
-        </div>
-
-        <!-- Fila 2: Color y tamaño -->
+        <!-- Fila única: Botón subir + slider de tamaño -->
         <div class="row" style="justify-content: space-between;">
-            <div class="color-picker">
-                <button class="color-btn black" data-color="black" title="Negro"></button>
-                <button class="color-btn red" data-color="red" title="Rojo"></button>
-                <button class="color-btn blue" data-color="blue" title="Azul"></button>
-                <button class="color-btn gray" data-color="gray" title="Gris"></button>
-            </div>
+            <button class="upload-btn" id="uploadBtn" title="Subir imagen propia">
+                <i class="fas fa-upload"></i> <span>Subir imagen</span>
+            </button>
             <div class="size-control">
                 <i class="fas fa-expand-alt"></i>
                 <input type="range" id="sizeSlider" min="0.5" max="2.5" step="0.1" value="1.5">
             </div>
         </div>
 
-        <!-- Fila 3: Rotación multi-eje -->
+        <!-- Controles de rotación multi-eje -->
         <div class="rotation-controls">
             <div class="rotation-row">
                 <span class="rotation-label">X</span>
@@ -499,7 +445,7 @@
             </div>
         </div>
 
-        <!-- Fila 4: Acciones adicionales -->
+        <!-- Fila de acciones: reiniciar rotación, eliminar imagen, capturar -->
         <div class="row" style="justify-content: space-between;">
             <div class="action-buttons">
                 <button class="action-btn" id="resetRotation" title="Reiniciar rotación"><i class="fas fa-sync-alt"></i></button>
@@ -545,8 +491,6 @@
             // Elementos del DOM
             const scene = document.getElementById('scene');
             const tatuaje = document.getElementById('tatuaje');
-            const iconGallery = document.getElementById('iconGallery');
-            const colorButtons = document.querySelectorAll('.color-btn');
             const sizeSlider = document.getElementById('sizeSlider');
             const statusDot = document.getElementById('statusDot');
             const statusText = document.getElementById('statusText');
@@ -573,26 +517,11 @@
             const rotZMinus = document.getElementById('rotZMinus');
 
             // Estado de la app
-            let currentIcon = 'fa-heart';
-            let currentColor = '#222222';
             let currentScale = 1.5;
             let rotationX = -180;
             let rotationY = 180;
             let rotationZ = 270;
             let customImageData = null; // Almacena la dataURL de la imagen subida
-            let usingCustomImage = false; // Indica si estamos mostrando imagen personalizada
-
-            // Mapa de iconos
-            const iconMap = {
-                'fa-heart': '\u{f004}',
-                'fa-moon': '\u{f186}',
-                'fa-feather': '\u{f52d}',
-                'fa-infinity': '\u{f534}',
-                'fa-tree': '\u{f1bb}',
-                'fa-anchor': '\u{f13d}',
-                'fa-star': '\u{f005}',
-                'fa-dreamcatcher': '\u{f77b}'
-            };
 
             // ========== PLEGAR / DESPLEGAR PANEL ==========
             toggleBtn.addEventListener('click', () => {
@@ -613,32 +542,25 @@
                 reader.onload = (event) => {
                     const dataURL = event.target.result;
                     customImageData = dataURL;
-                    usingCustomImage = true;
 
-                    // Desactivar iconos predefinidos
-                    document.querySelectorAll('.tattoo-btn').forEach(btn => btn.classList.remove('active'));
                     // Activar visualmente el botón de subir
                     uploadBtn.classList.add('active');
 
                     // Asignar la imagen al tatuaje
                     tatuaje.setAttribute('src', dataURL);
                     applyRotationAndScale();
-                    savePreferences(); // Guarda también customImageData
+                    savePreferences(); // Guarda customImageData
                 };
                 reader.readAsDataURL(file);
             });
 
-            // Botón para eliminar imagen personalizada y volver a icono por defecto
+            // Botón para eliminar imagen personalizada
             clearCustomBtn.addEventListener('click', () => {
-                if (usingCustomImage) {
-                    usingCustomImage = false;
+                if (customImageData) {
                     customImageData = null;
                     uploadBtn.classList.remove('active');
-                    // Restaurar icono activo (corazón por defecto)
-                    document.querySelector('.tattoo-btn[data-icon="fa-heart"]').classList.add('active');
-                    currentIcon = 'fa-heart';
-                    // Regenerar con canvas
-                    updateTattoo();
+                    // Quitar la imagen (dejar en blanco)
+                    tatuaje.setAttribute('src', '');
                     savePreferences(); // Guarda sin customImage
                 }
             });
@@ -648,55 +570,25 @@
                 try {
                     const saved = JSON.parse(localStorage.getItem('inkar_preferences'));
                     if (saved) {
-                        // Cargar valores básicos
-                        currentIcon = saved.icon || 'fa-heart';
-                        currentColor = saved.color || '#222222';
                         currentScale = saved.scale || 1.5;
                         rotationX = saved.rotationX !== undefined ? saved.rotationX : -180;
                         rotationY = saved.rotationY || 180;
                         rotationZ = saved.rotationZ || 270;
                         customImageData = saved.customImage || null;
-                        usingCustomImage = saved.usingCustomImage || false;
 
-                        // Aplicar icono activo o imagen personalizada
-                        if (usingCustomImage && customImageData) {
+                        if (customImageData) {
                             uploadBtn.classList.add('active');
-                            document.querySelectorAll('.tattoo-btn').forEach(btn => btn.classList.remove('active'));
                             tatuaje.setAttribute('src', customImageData);
                         } else {
                             uploadBtn.classList.remove('active');
-                            // Activar icono correspondiente
-                            document.querySelectorAll('.tattoo-btn').forEach(btn => {
-                                const iconElem = btn.querySelector('i');
-                                let iconClass = '';
-                                for (let cls of iconElem.classList) {
-                                    if (cls.startsWith('fa-')) {
-                                        iconClass = cls;
-                                        break;
-                                    }
-                                }
-                                if (iconClass === currentIcon) btn.classList.add('active');
-                                else btn.classList.remove('active');
-                            });
+                            tatuaje.setAttribute('src', '');
                         }
 
-                        // Aplicar color activo
-                        colorButtons.forEach(btn => {
-                            const colorKey = btn.dataset.color;
-                            let colorHex = '#222222';
-                            if (colorKey === 'red') colorHex = '#d32f2f';
-                            else if (colorKey === 'blue') colorHex = '#1976d2';
-                            else if (colorKey === 'gray') colorHex = '#757575';
-                            if (colorHex === currentColor) btn.classList.add('active');
-                            else btn.classList.remove('active');
-                        });
-
                         sizeSlider.value = currentScale;
-                        updateRotationDisplay(); // Esto aplica escala y rotación
+                        updateRotationDisplay(); // Aplica escala y rotación
                     } else {
                         // Valores por defecto
-                        document.querySelector('.tattoo-btn[data-icon="fa-heart"]').classList.add('active');
-                        document.querySelector('.color-btn.black').classList.add('active');
+                        sizeSlider.value = currentScale;
                         updateRotationDisplay();
                     }
                 } catch (e) {
@@ -706,45 +598,16 @@
 
             function savePreferences() {
                 const prefs = {
-                    icon: currentIcon,
-                    color: currentColor,
                     scale: currentScale,
                     rotationX: rotationX,
                     rotationY: rotationY,
                     rotationZ: rotationZ,
-                    customImage: customImageData,
-                    usingCustomImage: usingCustomImage
+                    customImage: customImageData
                 };
-                // No guardar si customImage es demasiado grande (opcional)
                 localStorage.setItem('inkar_preferences', JSON.stringify(prefs));
             }
 
-            // ========== GENERAR TATUAJE (canvas) ==========
-            function generateTattooDataURL() {
-                const canvas = document.createElement('canvas');
-                canvas.width = 512;
-                canvas.height = 512;
-                const ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.font = '400px "Font Awesome 6 Free"';
-                ctx.fillStyle = currentColor;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(iconMap[currentIcon] || '\u{f004}', 256, 256);
-                return canvas.toDataURL();
-            }
-
-            function updateTattoo() {
-                if (usingCustomImage && customImageData) {
-                    tatuaje.setAttribute('src', customImageData);
-                } else {
-                    const dataURL = generateTattooDataURL();
-                    tatuaje.setAttribute('src', dataURL);
-                }
-                applyRotationAndScale();
-                savePreferences();
-            }
-
+            // ========== APLICAR ESCALA Y ROTACIÓN ==========
             function applyRotationAndScale() {
                 tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
                 tatuaje.setAttribute('rotation', `${rotationX} ${rotationY} ${rotationZ}`);
@@ -786,53 +649,7 @@
                 }
             });
 
-            // ========== EVENTOS DE INTERFAZ ==========
-            iconGallery.addEventListener('click', (e) => {
-                const btn = e.target.closest('.tattoo-btn');
-                if (!btn) return; // Si es el botón de subir, no entra aquí
-
-                // Si estábamos usando imagen personalizada, desactivarla
-                if (usingCustomImage) {
-                    usingCustomImage = false;
-                    customImageData = null;
-                    uploadBtn.classList.remove('active');
-                }
-
-                const iconElem = btn.querySelector('i');
-                let iconClass = '';
-                for (let cls of iconElem.classList) {
-                    if (cls.startsWith('fa-')) {
-                        iconClass = cls;
-                        break;
-                    }
-                }
-                if (!iconClass) return;
-                currentIcon = iconClass;
-                document.querySelectorAll('.tattoo-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                updateTattoo(); // Esto regenera con canvas
-            });
-
-            colorButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const colorKey = btn.dataset.color;
-                    let colorHex = '#222222';
-                    if (colorKey === 'red') colorHex = '#d32f2f';
-                    else if (colorKey === 'blue') colorHex = '#1976d2';
-                    else if (colorKey === 'gray') colorHex = '#757575';
-                    currentColor = colorHex;
-                    colorButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    // Si estamos usando imagen personalizada, el color no afecta, pero lo guardamos por si luego se cambia a icono
-                    if (!usingCustomImage) {
-                        updateTattoo();
-                    } else {
-                        // Solo guardamos preferencia de color para cuando se vuelva a iconos
-                        savePreferences();
-                    }
-                });
-            });
-
+            // ========== EVENTO DEL SLIDER ==========
             sizeSlider.addEventListener('input', (e) => {
                 currentScale = parseFloat(e.target.value);
                 tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
@@ -868,20 +685,15 @@
             // ========== INICIALIZACIÓN ==========
             scene.addEventListener('loaded', () => {
                 loadPreferences();
-                // Si hay imagen personalizada, ya se cargó; si no, updateTattoo se llamará según sea necesario
-                if (!usingCustomImage) {
-                    updateTattoo();
-                } else {
-                    applyRotationAndScale(); // Asegurar rotación y escala
-                }
+                // Si hay imagen personalizada, ya se cargó; si no, solo aplicamos rotación y escala
+                applyRotationAndScale();
             });
 
             // Respaldo
             setTimeout(() => {
-                if (!tatuaje.getAttribute('src')) {
+                if (tatuaje.getAttribute('src') === '' && !customImageData) {
                     loadPreferences();
-                    if (!usingCustomImage) updateTattoo();
-                    else applyRotationAndScale();
+                    applyRotationAndScale();
                 }
             }, 1500);
         })();
