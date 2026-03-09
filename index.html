@@ -42,7 +42,6 @@
             height: 100% !important;
         }
 
-        /* Estado del marcador */
         .marker-status {
             position: absolute;
             top: 16px;
@@ -92,7 +91,6 @@
             display: block;
         }
 
-        /* Panel de controles compacto pero con más opciones */
         .controls-panel {
             position: absolute;
             bottom: 20px;
@@ -206,7 +204,6 @@
             border: 2px solid white;
         }
 
-        /* Controles de rotación multi-eje */
         .rotation-controls {
             display: flex;
             flex-direction: column;
@@ -449,10 +446,10 @@
         </div>
     </div>
 
-    <!-- Escena AR -->
+    <!-- Escena AR con suavizado activado -->
     <a-scene
         id="scene"
-        mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;"
+        mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; smooth: true;"
         color-space="sRGB"
         renderer="colorManagement: true, physicallyCorrectLights"
         vr-mode-ui="enabled: false"
@@ -463,11 +460,11 @@
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0">
-            <!-- El tatuaje se colocará aquí; aplicaremos suavizado vía JS -->
+            <!-- El tatuaje ahora tiene rotación base 0; JS aplicará la orientación deseada -->
             <a-image id="tatuaje"
                      src=""
                      position="0 0.2 0"
-                     rotation="-90 0 0"
+                     rotation="0 0 0"
                      width="1.2"
                      height="1.2"
                      material="transparent: true; depthTest: false; side: double;"
@@ -503,16 +500,15 @@
             const rotZPlus = document.getElementById('rotZPlus');
             const rotZMinus = document.getElementById('rotZMinus');
 
-            // Estado de la app
+            // Estado de la app: orientación por defecto ajustada según solicitud del usuario
             let currentIcon = 'fa-heart';
             let currentColor = '#222222';
             let currentScale = 1.5;
-            // Rotación en grados para cada eje (recordar que la base es -90 en X para que quede horizontal)
-            let rotationX = -90;  // base para que quede acostado
-            let rotationY = 0;
-            let rotationZ = 0;
+            let rotationX = -180;   // Base corregida
+            let rotationY = 180;
+            let rotationZ = 270;
 
-            // Mapa de iconos
+            // Mapa de iconos a Unicode (versión sólida)
             const iconMap = {
                 'fa-heart': '\u{f004}',
                 'fa-moon': '\u{f186}',
@@ -524,53 +520,6 @@
                 'fa-dreamcatcher': '\u{f77b}'
             };
 
-            // ========== SUAVIZADO DE TRACKING ==========
-            // Almacenamos la última posición/rotación del target para hacer lerp
-            let targetPosition = new THREE.Vector3(0, 0.2, 0);
-            let targetQuaternion = new THREE.Quaternion();
-            const lerpFactor = 0.2; // Suavizado: más bajo = más lento
-
-            function smoothTracking() {
-                if (!tatuaje) return;
-                // Obtenemos la entidad padre (el target)
-                const targetEntity = tatuaje.parentNode;
-                if (!targetEntity) return;
-
-                // La entidad target tiene la posición y rotación que MindAR actualiza
-                // Leemos su transformación actual
-                const worldPos = new THREE.Vector3();
-                const worldQuat = new THREE.Quaternion();
-                targetEntity.object3D.getWorldPosition(worldPos);
-                targetEntity.object3D.getWorldQuaternion(worldQuat);
-
-                // Interpolamos linealmente
-                targetPosition.lerp(worldPos, lerpFactor);
-                targetQuaternion.slerp(worldQuat, lerpFactor);
-
-                // Aplicamos al tatuaje (que es hijo, así que necesitamos la transformación relativa al target)
-                // Pero como queremos que el tatuaje herede la pose suavizada, lo más fácil es ponerlo directamente en el target
-                // pero con un offset. Mejor: creamos un objeto intermedio. Para simplificar, aplicamos al tatuaje la diferencia suavizada.
-                // Sin embargo, dado que el tatuaje es hijo, su posición/rotación son relativas al target.
-                // Así que podemos dejar que el target se mueva, y el tatuaje mantiene su offset local.
-                // El suavizado aplicado al target haría que la cámara se retrase, no es ideal.
-                // En lugar de eso, haremos que el tatuaje siga al target con lerp en coordenadas mundiales.
-                // Pero como es hijo, necesitamos desacoplarlo. Mejor: mover el tatuaje al mismo nivel que el target y seguir su posición suavizada.
-                // Pero el target es quien tiene el tracking. Podríamos crear un sistema que mueva una entidad independiente.
-                // Por simplicidad, aplicaremos el suavizado directamente a la entidad del tatuaje en cada frame usando las coordenadas del target.
-                // Vamos a hacer un pequeño truco: en cada frame, ajustamos la posición del tatuaje para que siga suavemente al target.
-                // Pero si el tatuaje es hijo, no podemos cambiar su posición global sin romper la jerarquía.
-                // Solución: hacemos que el tatuaje no sea hijo del target, sino que esté en la escena y lo movemos manualmente.
-                // Cambiemos la estructura: en lugar de anidar, pondremos el a-image fuera del target y lo controlamos con JS.
-                // Esto es más complejo y requeriría reescribir. Para mantener la simplicidad, usaremos un componente de A-Frame para lerp.
-                // A-Frame tiene un componente `tracking-controls` pero no viene por defecto.
-                // Optamos por una solución más simple: usar el parámetro `smooth` de MindAR si existe.
-                // En la documentación de MindAR, hay un atributo `smooth` (booleano) que suaviza el tracking.
-                // Lo añadiremos en el componente mindar-image: smooth: true
-                // Eso debería reducir las vibraciones.
-            }
-
-            // Aplicamos smooth en la declaración de mindar-image más abajo (en el HTML)
-
             // ========== PERSISTENCIA LOCAL ==========
             function loadPreferences() {
                 try {
@@ -579,9 +528,9 @@
                         currentIcon = saved.icon || 'fa-heart';
                         currentColor = saved.color || '#222222';
                         currentScale = saved.scale || 1.5;
-                        rotationX = saved.rotationX !== undefined ? saved.rotationX : -90;
-                        rotationY = saved.rotationY || 0;
-                        rotationZ = saved.rotationZ || 0;
+                        rotationX = saved.rotationX !== undefined ? saved.rotationX : -180;
+                        rotationY = saved.rotationY || 180;
+                        rotationZ = saved.rotationZ || 270;
 
                         // Aplicar icono activo
                         document.querySelectorAll('.tattoo-btn').forEach(btn => {
@@ -611,9 +560,11 @@
                         sizeSlider.value = currentScale;
                         updateRotationDisplay();
                     } else {
-                        // Valores por defecto: corazón, negro, rotación base
+                        // Valores por defecto: corazón, negro y rotación personalizada
                         document.querySelector('.tattoo-btn[data-icon="fa-heart"]').classList.add('active');
                         document.querySelector('.color-btn.black').classList.add('active');
+                        // Aseguramos que la rotación base se muestre
+                        updateRotationDisplay();
                     }
                 } catch (e) {
                     console.warn('Error cargando preferencias', e);
@@ -676,9 +627,9 @@
             rotZMinus.addEventListener('click', () => { rotationZ = (rotationZ - 15) % 360; updateRotationDisplay(); });
 
             resetRotationBtn.addEventListener('click', () => {
-                rotationX = -90;
-                rotationY = 0;
-                rotationZ = 0;
+                rotationX = -180;
+                rotationY = 180;
+                rotationZ = 270;
                 updateRotationDisplay();
             });
 
@@ -763,10 +714,10 @@
             // ========== INICIALIZACIÓN ==========
             scene.addEventListener('loaded', () => {
                 loadPreferences();
-                updateTattoo();  // Esto también aplica rotación y escala
+                updateTattoo();  // Aplica rotación y escala base
             });
 
-            // Respaldo
+            // Respaldo por si loaded no se dispara
             setTimeout(() => {
                 if (!tatuaje.getAttribute('src')) {
                     loadPreferences();
