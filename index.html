@@ -1,67 +1,50 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>InkAR · Tatuajes con MindAR</title>
-    <!-- Librerías: A-Frame + MindAR -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindAR con depuración</title>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js"></script>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
-        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        #info {
-            position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7);
-            color: white; padding: 8px 18px; border-radius: 40px; z-index: 100;
-            backdrop-filter: blur(4px); border: 1px solid #b967ff;
+        body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
+        #status {
+            position: absolute; top: 10px; left: 10px; 
+            background: rgba(0,0,0,0.8); color: white; 
+            padding: 8px 16px; border-radius: 20px; 
+            z-index: 100; font-size: 14px;
+            border: 1px solid #00ff00;
         }
-        #marker-container {
-            position: absolute; bottom: 20px; left: 20px; right: 20px;
-            background: rgba(20,20,30,0.85); backdrop-filter: blur(8px);
-            border-radius: 30px; padding: 15px; color: white; text-align: center;
-            z-index: 100; border: 1px solid #ffffff30;
+        #marker-guide {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: white; padding: 10px; border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            z-index: 200;
+            text-align: center;
         }
-        #marker-container img {
-            width: 100%; max-width: 280px; border-radius: 16px;
-            margin-top: 10px; border: 3px solid #b967ff; box-shadow: 0 0 20px #b967ff80;
+        #marker-guide img {
+            width: 200px;
+            border: 2px solid #333;
         }
-        .controls {
-            position: absolute; bottom: 240px; left: 0; width: 100%;
-            display: flex; justify-content: center; gap: 12px; padding: 10px;
-            z-index: 200; pointer-events: none;
-        }
-        .controls button {
-            pointer-events: auto; background: #b967ff; border: none;
-            color: white; padding: 14px 24px; border-radius: 60px;
-            font-size: 1.3rem; font-weight: bold; box-shadow: 0 5px 0 #6b2e9e;
-            cursor: pointer; transition: 0.1s; border: 1px solid #ffffff50;
-        }
-        .controls button:active { transform: translateY(5px); box-shadow: none; }
-        .credits {
-            position: absolute; bottom: 5px; right: 10px; color: #aaa;
-            font-size: 0.8rem; z-index: 300; text-shadow: 0 0 5px black;
+        .debug-overlay {
+            position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
+            color: yellow; background: rgba(0,0,0,0.5); padding: 5px 10px;
+            border-radius: 5px; z-index: 300;
         }
     </style>
 </head>
 <body>
-    <div id="info">🔍 Apunta al marcador (imagen inferior)</div>
-    
-    <div id="marker-container">
-        <div>📸 <strong>Marcador oficial</strong> (muéstralo en otra pantalla o imprímelo)</div>
-        <img src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/examples/image-tracking/assets/card-example/card.png" 
-             alt="Marcador de tarjeta">
+    <div id="status">🔍 Iniciando cámara...</div>
+    <div id="marker-guide">
+        <p>🔽 Apunta a esta imagen (o a una impresión)</p>
+        <img src="https://github.com/hiukim/mind-ar-js/raw/master/examples/image-tracking/assets/card-example/card.png" 
+             alt="Marcador tarjeta">
     </div>
+    <div class="debug-overlay" id="debug">Esperando detección...</div>
 
-    <div class="controls">
-        <button id="btn-corazon">❤️ Corazón</button>
-        <button id="btn-luna">🌙 Luna</button>
-        <button id="btn-estrella">⭐ Estrella</button>
-    </div>
-
-    <div class="credits">Tatuajes virtuales con MindAR · 2026</div>
-
-    <!-- Escena AR (MindAR + A-Frame) -->
-    <a-scene 
-        mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/examples/image-tracking/assets/card-example/card.mind;"
+    <a-scene
+        mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;"
         color-space="sRGB"
         renderer="colorManagement: true, physicallyCorrectLights"
         vr-mode-ui="enabled: false"
@@ -70,27 +53,43 @@
         style="width: 100%; height: 100%;"
     >
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-        <!-- Assets: iconos vectoriales (SVG incrustados) -->
-        <a-assets>
-            <img id="heart" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='black' d='M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z'%3E%3C/path%3E%3C/svg%3E">
-            <img id="moon" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='black' d='M283.211 512c78.962 0 151.079-35.925 198.857-94.792 7.068-8.708-.639-21.43-11.562-19.35-124.203 23.654-233.186-78.884-233.186-200.066 0-68.954 35.018-129.708 89.09-167.132 8.903-6.156 6.682-19.57-3.488-23.395C290.326 2.467 270.528 0 250.626 0 116.393 0 8 108.299 8 242.5c0 134.098 108.388 242.5 242.5 242.5 10.528 0 20.837-1.179 30.711-3.297 6.258-1.345 7.655-9.318 2.096-13.547-16.31-12.401-30.097-28.011-40.074-45.395-1.921-3.352-6.185-4.09-9.346-1.567-20.337 16.16-45.237 24.612-71.387 24.612-72.363 0-130.222-57.859-130.222-130.222 0-71.922 58.108-129.93 130.222-129.93 26.179 0 51.136 8.756 71.372 24.807 3.144 2.494 7.422 1.745 9.337-1.6 9.946-17.439 23.701-32.19 40.112-44.25 5.68-4.175 4.26-12.738-2.105-14.146C284.926 76.964 268.029 72 250.626 72 138.566 72 48 162.566 48 274.5c0 111.93 90.566 202.5 202.5 202.5 21.795 0 42.771-3.858 62.711-10.178 7.614-2.405 7.415-13.086-.727-15.978-14.553-5.164-27.85-13.766-39.119-25.148-3.153-3.186-8.341-2.889-11.337.599-12.932 15.036-30.74 23.205-50.528 23.205-40.305 0-72.5-32.195-72.5-72.5 0-39.789 31.739-71.5 72.5-71.5 19.864 0 38.589 8.167 51.512 22.684 3.087 3.472 8.386 3.697 11.546.645 14.604-14.127 34.045-22.329 55.362-22.329 46.385 0 84 37.615 84 84 0 30.672-16.295 57.565-40.444 72.639-7.696 4.797-5.613 16.271 3.06 19.133 25.406 8.391 44.384 31.896 44.384 58.228 0 38.145-31.215 69.36-69.36 69.36-13.095 0-25.677-3.651-36.582-10.475-6.018-3.764-13.667-1.756-17.77 3.794C336.816 505.016 311.102 512 283.211 512z'%3E%3C/path%3E%3C/svg%3E">
-            <img id="star" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'%3E%3Cpath fill='black' d='M528.1 171.5L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6zM388.6 312.3l23.7 138.4L288 385.4l-124.3 65.3 23.7-138.4-100.6-98 139-20.2 62.2-126 62.2 126 139 20.2-100.6 98z'%3E%3C/path%3E%3C/svg%3E">
-        </a-assets>
-
-        <!-- Target (el índice 0 corresponde al marcador card.mind) -->
+        
         <a-entity mindar-image-target="targetIndex: 0">
-            <!-- Plano con el tatuaje: rotado para quedar horizontal sobre el marcador -->
-            <a-plane id="tatuaje" src="#heart" width="1.2" height="1.2" position="0 0.1 0" rotation="-90 0 0" material="transparent: true; alphaTest: 0.1;"></a-plane>
+            <!-- Objeto visible cuando se detecta el marcador -->
+            <a-box position="0 0 0" material="color: red;" scale="0.5 0.5 0.5"></a-box>
+            <a-text value="Detectado!" position="0 1 0" scale="0.5 0.5 0.5" color="white"></a-text>
         </a-entity>
     </a-scene>
 
     <script>
-        // Botones para cambiar el diseño del tatuaje
-        const tatuaje = document.getElementById('tatuaje');
-        document.getElementById('btn-corazon').addEventListener('click', () => tatuaje.setAttribute('src', '#heart'));
-        document.getElementById('btn-luna').addEventListener('click', () => tatuaje.setAttribute('src', '#moon'));
-        document.getElementById('btn-estrella').addEventListener('click', () => tatuaje.setAttribute('src', '#star'));
+        // Esperar a que la escena esté lista y obtener referencia al componente mindar-image
+        const scene = document.querySelector('a-scene');
+        scene.addEventListener('loaded', function () {
+            const mindar = scene.components['mindar-image'];
+            if (mindar) {
+                // Acceder al controller de MindAR
+                const controller = mindar.system.controller;
+                // Habilitar el modo de depuración (muestra puntos de características)
+                controller.setDebug(true);
+                document.getElementById('status').innerText = '✅ Cámara activa. Buscando marcador...';
+            }
+        });
+
+        // Detectar eventos del marcador
+        const target = document.querySelector('[mindar-image-target]');
+        target.addEventListener('targetFound', () => {
+            document.getElementById('status').innerText = '🎯 Marcador ENCONTRADO';
+            document.getElementById('debug').innerText = '✅ Detectado!';
+        });
+        target.addEventListener('targetLost', () => {
+            document.getElementById('status').innerText = '🔍 Buscando marcador...';
+            document.getElementById('debug').innerText = '❌ Marcador perdido';
+        });
+
+        // Si hay errores en la consola, mostrarlos
+        window.addEventListener('error', (e) => {
+            document.getElementById('debug').innerText = 'Error: ' + e.message;
+        });
     </script>
 </body>
 </html>
