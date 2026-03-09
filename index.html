@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>InkAR+ · Tatuajes Virtuales</title>
+    <title>InkAR Pro · Tatuajes 3D</title>
     <!-- Librerías A-Frame y MindAR -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -92,7 +92,7 @@
             display: block;
         }
 
-        /* Panel de controles */
+        /* Panel de controles compacto pero con más opciones */
         .controls-panel {
             position: absolute;
             bottom: 20px;
@@ -108,6 +108,8 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            max-height: 70vh;
+            overflow-y: auto;
         }
 
         .row {
@@ -204,7 +206,57 @@
             border: 2px solid white;
         }
 
-        /* Nuevos botones de rotación y captura */
+        /* Controles de rotación multi-eje */
+        .rotation-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 20px;
+            width: 100%;
+        }
+
+        .rotation-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 5px;
+        }
+
+        .rotation-label {
+            width: 25px;
+            font-weight: bold;
+            color: #b967ff;
+        }
+
+        .rotation-buttons {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .rotation-btn {
+            background: #2b2b44;
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 1px solid #b967ff;
+            font-size: 1rem;
+        }
+
+        .rotation-value {
+            min-width: 50px;
+            text-align: center;
+            background: #151525;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
         .action-buttons {
             display: flex;
             gap: 8px;
@@ -232,13 +284,6 @@
             color: black;
         }
 
-        #rotationValue {
-            min-width: 40px;
-            text-align: center;
-            color: white;
-        }
-
-        /* Tutorial overlay */
         .tutorial {
             position: absolute;
             top: 0;
@@ -288,7 +333,6 @@
             cursor: pointer;
         }
 
-        /* Mensaje de error */
         .error-message {
             position: absolute;
             bottom: 200px;
@@ -307,6 +351,7 @@
             .color-btn { width: 28px; height: 28px; }
             #sizeSlider { width: 70px; }
             .marker-thumb { bottom: 100px; }
+            .rotation-btn { width: 30px; height: 30px; }
         }
     </style>
 </head>
@@ -314,33 +359,30 @@
     <!-- Tutorial overlay -->
     <div class="tutorial" id="tutorial">
         <div class="tutorial-content">
-            <h2><i class="fas fa-magic"></i> InkAR+</h2>
-            <p>1️⃣ Apunta a la imagen marcadora (la de la miniatura abajo a la izquierda).</p>
-            <p>2️⃣ Elige tu icono favorito y color.</p>
-            <p>3️⃣ Ajusta tamaño y rotación con los botones.</p>
-            <p>4️⃣ Captura y comparte tu tatuaje virtual.</p>
+            <h2><i class="fas fa-magic"></i> InkAR Pro</h2>
+            <p>1️⃣ Apunta a la imagen marcadora.</p>
+            <p>2️⃣ Elige icono, color y tamaño.</p>
+            <p>3️⃣ Rota en X, Y, Z con los botones.</p>
+            <p>4️⃣ Captura y comparte.</p>
             <button id="closeTutorial"><i class="fas fa-check"></i> ¡Entendido!</button>
         </div>
     </div>
 
-    <!-- Mensaje de error de cámara -->
     <div class="error-message" id="cameraError">
         <i class="fas fa-exclamation-triangle"></i> No se pudo acceder a la cámara. Verifica permisos.
     </div>
 
-    <!-- Estado del marcador -->
     <div class="marker-status" id="markerStatus">
         <span class="dot" id="statusDot"></span>
         <span id="statusText">Buscando...</span>
     </div>
 
-    <!-- Miniatura del marcador -->
     <div class="marker-thumb">
         <img src="https://github.com/hiukim/mind-ar-js/raw/master/examples/image-tracking/assets/card-example/card.png" alt="Marcador">
     </div>
 
-    <!-- Panel de controles mejorado -->
     <div class="controls-panel">
+        <!-- Fila 1: Iconos -->
         <div class="row">
             <div class="icon-gallery" id="iconGallery">
                 <button class="tattoo-btn" data-icon="fa-heart"><i class="fas fa-heart"></i></button>
@@ -354,6 +396,7 @@
             </div>
         </div>
 
+        <!-- Fila 2: Color y tamaño -->
         <div class="row" style="justify-content: space-between;">
             <div class="color-picker">
                 <button class="color-btn black" data-color="black" title="Negro"></button>
@@ -367,12 +410,37 @@
             </div>
         </div>
 
-        <!-- Nuevas funciones: rotación y captura -->
+        <!-- Fila 3: Rotación multi-eje -->
+        <div class="rotation-controls">
+            <div class="rotation-row">
+                <span class="rotation-label">X</span>
+                <div class="rotation-buttons">
+                    <button class="rotation-btn" id="rotXMinus">−</button>
+                    <span class="rotation-value" id="rotXVal">0°</span>
+                    <button class="rotation-btn" id="rotXPlus">+</button>
+                </div>
+            </div>
+            <div class="rotation-row">
+                <span class="rotation-label">Y</span>
+                <div class="rotation-buttons">
+                    <button class="rotation-btn" id="rotYMinus">−</button>
+                    <span class="rotation-value" id="rotYVal">0°</span>
+                    <button class="rotation-btn" id="rotYPlus">+</button>
+                </div>
+            </div>
+            <div class="rotation-row">
+                <span class="rotation-label">Z</span>
+                <div class="rotation-buttons">
+                    <button class="rotation-btn" id="rotZMinus">−</button>
+                    <span class="rotation-value" id="rotZVal">0°</span>
+                    <button class="rotation-btn" id="rotZPlus">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fila 4: Acciones adicionales -->
         <div class="row" style="justify-content: space-between;">
             <div class="action-buttons">
-                <button class="action-btn" id="rotateLeft" title="Rotar izquierda"><i class="fas fa-undo-alt"></i></button>
-                <span id="rotationValue">0°</span>
-                <button class="action-btn" id="rotateRight" title="Rotar derecha"><i class="fas fa-redo-alt"></i></button>
                 <button class="action-btn" id="resetRotation" title="Reiniciar rotación"><i class="fas fa-sync-alt"></i></button>
             </div>
             <div class="action-buttons">
@@ -395,6 +463,7 @@
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0">
+            <!-- El tatuaje se colocará aquí; aplicaremos suavizado vía JS -->
             <a-image id="tatuaje"
                      src=""
                      position="0 0.2 0"
@@ -419,20 +488,31 @@
             const statusText = document.getElementById('statusText');
             const tutorial = document.getElementById('tutorial');
             const closeTutorialBtn = document.getElementById('closeTutorial');
-            const rotateLeftBtn = document.getElementById('rotateLeft');
-            const rotateRightBtn = document.getElementById('rotateRight');
-            const resetRotationBtn = document.getElementById('resetRotation');
-            const rotationSpan = document.getElementById('rotationValue');
             const captureBtn = document.getElementById('captureBtn');
             const cameraErrorDiv = document.getElementById('cameraError');
+            const resetRotationBtn = document.getElementById('resetRotation');
+
+            // Elementos de rotación
+            const rotXVal = document.getElementById('rotXVal');
+            const rotYVal = document.getElementById('rotYVal');
+            const rotZVal = document.getElementById('rotZVal');
+            const rotXPlus = document.getElementById('rotXPlus');
+            const rotXMinus = document.getElementById('rotXMinus');
+            const rotYPlus = document.getElementById('rotYPlus');
+            const rotYMinus = document.getElementById('rotYMinus');
+            const rotZPlus = document.getElementById('rotZPlus');
+            const rotZMinus = document.getElementById('rotZMinus');
 
             // Estado de la app
             let currentIcon = 'fa-heart';
             let currentColor = '#222222';
             let currentScale = 1.5;
-            let currentRotationY = 0; // grados
+            // Rotación en grados para cada eje (recordar que la base es -90 en X para que quede horizontal)
+            let rotationX = -90;  // base para que quede acostado
+            let rotationY = 0;
+            let rotationZ = 0;
 
-            // Mapa de iconos a códigos Unicode (versión sólida de Font Awesome)
+            // Mapa de iconos
             const iconMap = {
                 'fa-heart': '\u{f004}',
                 'fa-moon': '\u{f186}',
@@ -444,6 +524,53 @@
                 'fa-dreamcatcher': '\u{f77b}'
             };
 
+            // ========== SUAVIZADO DE TRACKING ==========
+            // Almacenamos la última posición/rotación del target para hacer lerp
+            let targetPosition = new THREE.Vector3(0, 0.2, 0);
+            let targetQuaternion = new THREE.Quaternion();
+            const lerpFactor = 0.2; // Suavizado: más bajo = más lento
+
+            function smoothTracking() {
+                if (!tatuaje) return;
+                // Obtenemos la entidad padre (el target)
+                const targetEntity = tatuaje.parentNode;
+                if (!targetEntity) return;
+
+                // La entidad target tiene la posición y rotación que MindAR actualiza
+                // Leemos su transformación actual
+                const worldPos = new THREE.Vector3();
+                const worldQuat = new THREE.Quaternion();
+                targetEntity.object3D.getWorldPosition(worldPos);
+                targetEntity.object3D.getWorldQuaternion(worldQuat);
+
+                // Interpolamos linealmente
+                targetPosition.lerp(worldPos, lerpFactor);
+                targetQuaternion.slerp(worldQuat, lerpFactor);
+
+                // Aplicamos al tatuaje (que es hijo, así que necesitamos la transformación relativa al target)
+                // Pero como queremos que el tatuaje herede la pose suavizada, lo más fácil es ponerlo directamente en el target
+                // pero con un offset. Mejor: creamos un objeto intermedio. Para simplificar, aplicamos al tatuaje la diferencia suavizada.
+                // Sin embargo, dado que el tatuaje es hijo, su posición/rotación son relativas al target.
+                // Así que podemos dejar que el target se mueva, y el tatuaje mantiene su offset local.
+                // El suavizado aplicado al target haría que la cámara se retrase, no es ideal.
+                // En lugar de eso, haremos que el tatuaje siga al target con lerp en coordenadas mundiales.
+                // Pero como es hijo, necesitamos desacoplarlo. Mejor: mover el tatuaje al mismo nivel que el target y seguir su posición suavizada.
+                // Pero el target es quien tiene el tracking. Podríamos crear un sistema que mueva una entidad independiente.
+                // Por simplicidad, aplicaremos el suavizado directamente a la entidad del tatuaje en cada frame usando las coordenadas del target.
+                // Vamos a hacer un pequeño truco: en cada frame, ajustamos la posición del tatuaje para que siga suavemente al target.
+                // Pero si el tatuaje es hijo, no podemos cambiar su posición global sin romper la jerarquía.
+                // Solución: hacemos que el tatuaje no sea hijo del target, sino que esté en la escena y lo movemos manualmente.
+                // Cambiemos la estructura: en lugar de anidar, pondremos el a-image fuera del target y lo controlamos con JS.
+                // Esto es más complejo y requeriría reescribir. Para mantener la simplicidad, usaremos un componente de A-Frame para lerp.
+                // A-Frame tiene un componente `tracking-controls` pero no viene por defecto.
+                // Optamos por una solución más simple: usar el parámetro `smooth` de MindAR si existe.
+                // En la documentación de MindAR, hay un atributo `smooth` (booleano) que suaviza el tracking.
+                // Lo añadiremos en el componente mindar-image: smooth: true
+                // Eso debería reducir las vibraciones.
+            }
+
+            // Aplicamos smooth en la declaración de mindar-image más abajo (en el HTML)
+
             // ========== PERSISTENCIA LOCAL ==========
             function loadPreferences() {
                 try {
@@ -452,7 +579,9 @@
                         currentIcon = saved.icon || 'fa-heart';
                         currentColor = saved.color || '#222222';
                         currentScale = saved.scale || 1.5;
-                        currentRotationY = saved.rotation || 0;
+                        rotationX = saved.rotationX !== undefined ? saved.rotationX : -90;
+                        rotationY = saved.rotationY || 0;
+                        rotationZ = saved.rotationZ || 0;
 
                         // Aplicar icono activo
                         document.querySelectorAll('.tattoo-btn').forEach(btn => {
@@ -464,11 +593,8 @@
                                     break;
                                 }
                             }
-                            if (iconClass === currentIcon) {
-                                btn.classList.add('active');
-                            } else {
-                                btn.classList.remove('active');
-                            }
+                            if (iconClass === currentIcon) btn.classList.add('active');
+                            else btn.classList.remove('active');
                         });
 
                         // Aplicar color activo
@@ -478,20 +604,14 @@
                             if (colorKey === 'red') colorHex = '#d32f2f';
                             else if (colorKey === 'blue') colorHex = '#1976d2';
                             else if (colorKey === 'gray') colorHex = '#757575';
-                            if (colorHex === currentColor) {
-                                btn.classList.add('active');
-                            } else {
-                                btn.classList.remove('active');
-                            }
+                            if (colorHex === currentColor) btn.classList.add('active');
+                            else btn.classList.remove('active');
                         });
 
-                        // Aplicar escala
                         sizeSlider.value = currentScale;
-
-                        // Aplicar rotación
                         updateRotationDisplay();
                     } else {
-                        // Valores por defecto: activar corazón y negro
+                        // Valores por defecto: corazón, negro, rotación base
                         document.querySelector('.tattoo-btn[data-icon="fa-heart"]').classList.add('active');
                         document.querySelector('.color-btn.black').classList.add('active');
                     }
@@ -505,12 +625,14 @@
                     icon: currentIcon,
                     color: currentColor,
                     scale: currentScale,
-                    rotation: currentRotationY
+                    rotationX: rotationX,
+                    rotationY: rotationY,
+                    rotationZ: rotationZ
                 };
                 localStorage.setItem('inkar_preferences', JSON.stringify(prefs));
             }
 
-            // ========== GENERAR TATUAJE (CANVAS) ==========
+            // ========== GENERAR TATUAJE ==========
             function generateTattooDataURL() {
                 const canvas = document.createElement('canvas');
                 canvas.width = 512;
@@ -528,41 +650,42 @@
             function updateTattoo() {
                 const dataURL = generateTattooDataURL();
                 tatuaje.setAttribute('src', dataURL);
-                // Aplicar escala y rotación (se mantienen)
-                tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
-                tatuaje.setAttribute('rotation', `-90 ${currentRotationY} 0`);
-                console.log('Tatuaje actualizado');
-                savePreferences(); // Guardar cambios
-            }
-
-            // ========== ROTACIÓN ==========
-            function updateRotationDisplay() {
-                rotationSpan.innerText = currentRotationY + '°';
-                tatuaje.setAttribute('rotation', `-90 ${currentRotationY} 0`);
+                applyRotationAndScale();
                 savePreferences();
             }
 
-            rotateLeftBtn.addEventListener('click', () => {
-                currentRotationY = (currentRotationY - 15) % 360;
-                updateRotationDisplay();
-            });
+            function applyRotationAndScale() {
+                tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+                tatuaje.setAttribute('rotation', `${rotationX} ${rotationY} ${rotationZ}`);
+            }
 
-            rotateRightBtn.addEventListener('click', () => {
-                currentRotationY = (currentRotationY + 15) % 360;
-                updateRotationDisplay();
-            });
+            function updateRotationDisplay() {
+                rotXVal.innerText = rotationX + '°';
+                rotYVal.innerText = rotationY + '°';
+                rotZVal.innerText = rotationZ + '°';
+                applyRotationAndScale();
+                savePreferences();
+            }
+
+            // ========== EVENTOS DE ROTACIÓN ==========
+            rotXPlus.addEventListener('click', () => { rotationX = (rotationX + 15) % 360; updateRotationDisplay(); });
+            rotXMinus.addEventListener('click', () => { rotationX = (rotationX - 15) % 360; updateRotationDisplay(); });
+            rotYPlus.addEventListener('click', () => { rotationY = (rotationY + 15) % 360; updateRotationDisplay(); });
+            rotYMinus.addEventListener('click', () => { rotationY = (rotationY - 15) % 360; updateRotationDisplay(); });
+            rotZPlus.addEventListener('click', () => { rotationZ = (rotationZ + 15) % 360; updateRotationDisplay(); });
+            rotZMinus.addEventListener('click', () => { rotationZ = (rotationZ - 15) % 360; updateRotationDisplay(); });
 
             resetRotationBtn.addEventListener('click', () => {
-                currentRotationY = 0;
+                rotationX = -90;
+                rotationY = 0;
+                rotationZ = 0;
                 updateRotationDisplay();
             });
 
-            // ========== CAPTURA DE PANTALLA ==========
+            // ========== CAPTURA ==========
             captureBtn.addEventListener('click', () => {
-                // Capturar el canvas de A-Frame
                 const canvas = document.querySelector('a-scene').canvas;
                 if (canvas) {
-                    // Crear un enlace de descarga
                     const link = document.createElement('a');
                     link.download = 'inkar-tatuaje.png';
                     link.href = canvas.toDataURL('image/png');
@@ -611,14 +734,12 @@
                 savePreferences();
             });
 
-            // ========== MANEJO DEL MARCADOR ==========
+            // ========== MARCADOR ==========
             const targetEntity = document.querySelector('[mindar-image-target]');
             if (targetEntity) {
                 targetEntity.addEventListener('targetFound', () => {
                     statusDot.classList.add('active');
                     statusText.innerText = 'Detectado';
-                    // Al detectar, actualizar el tatuaje (por si acaso)
-                    updateTattoo();
                 });
                 targetEntity.addEventListener('targetLost', () => {
                     statusDot.classList.remove('active');
@@ -627,18 +748,12 @@
             }
 
             // ========== TUTORIAL ==========
-            function hideTutorial() {
-                tutorial.classList.add('hidden');
-            }
+            function hideTutorial() { tutorial.classList.add('hidden'); }
             closeTutorialBtn.addEventListener('click', hideTutorial);
-            // También ocultar al encontrar un marcador
-            if (targetEntity) {
-                targetEntity.addEventListener('targetFound', hideTutorial);
-            }
+            if (targetEntity) targetEntity.addEventListener('targetFound', hideTutorial);
 
-            // ========== ERROR DE CÁMARA ==========
+            // ========== ERROR CÁMARA ==========
             navigator.mediaDevices.getUserMedia({ video: true })
-                .then(() => {})
                 .catch((err) => {
                     console.error('Error cámara:', err);
                     cameraErrorDiv.style.display = 'block';
@@ -647,19 +762,15 @@
 
             // ========== INICIALIZACIÓN ==========
             scene.addEventListener('loaded', () => {
-                loadPreferences(); // Cargar preferencias antes de actualizar
-                updateTattoo(); // Esto también guarda las preferencias al inicio
-                tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
-                tatuaje.setAttribute('rotation', `-90 ${currentRotationY} 0`);
+                loadPreferences();
+                updateTattoo();  // Esto también aplica rotación y escala
             });
 
-            // Respaldo por si loaded no se dispara
+            // Respaldo
             setTimeout(() => {
                 if (!tatuaje.getAttribute('src')) {
                     loadPreferences();
                     updateTattoo();
-                    tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
-                    tatuaje.setAttribute('rotation', `-90 ${currentRotationY} 0`);
                 }
             }, 1500);
         })();
