@@ -91,6 +91,35 @@
             display: block;
         }
 
+        /* Botón para plegar/desplegar panel */
+        .toggle-panel-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(20, 20, 30, 0.85);
+            backdrop-filter: blur(8px);
+            border: 2px solid #b967ff;
+            color: #b967ff;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 300;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: all 0.2s;
+        }
+
+        .toggle-panel-btn:hover {
+            background: #b967ff;
+            color: black;
+        }
+
+        /* Panel de controles (inicialmente visible) */
         .controls-panel {
             position: absolute;
             bottom: 20px;
@@ -108,8 +137,26 @@
             gap: 12px;
             max-height: 70vh;
             overflow-y: auto;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
+        /* Clase para ocultar el panel (desplazado hacia abajo) */
+        .controls-panel.hidden {
+            transform: translateY(calc(100% + 30px));
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Ajuste del botón cuando el panel está oculto */
+        .toggle-panel-btn.hidden i::before {
+            content: "\f077"; /* fa-chevron-up */
+        }
+
+        .toggle-panel-btn i::before {
+            content: "\f078"; /* fa-chevron-down */
+        }
+
+        /* Resto de estilos igual que antes */
         .row {
             display: flex;
             align-items: center;
@@ -361,6 +408,7 @@
             <p>2️⃣ Elige icono, color y tamaño.</p>
             <p>3️⃣ Rota en X, Y, Z con los botones.</p>
             <p>4️⃣ Captura y comparte.</p>
+            <p>💡 Puedes ocultar el menú con el botón inferior.</p>
             <button id="closeTutorial"><i class="fas fa-check"></i> ¡Entendido!</button>
         </div>
     </div>
@@ -378,7 +426,13 @@
         <img src="https://github.com/hiukim/mind-ar-js/raw/master/examples/image-tracking/assets/card-example/card.png" alt="Marcador">
     </div>
 
-    <div class="controls-panel">
+    <!-- Botón para plegar/desplegar el panel -->
+    <div class="toggle-panel-btn" id="togglePanelBtn">
+        <i class="fas fa-chevron-down"></i>
+    </div>
+
+    <!-- Panel de controles (inicialmente visible) -->
+    <div class="controls-panel" id="controlsPanel">
         <!-- Fila 1: Iconos -->
         <div class="row">
             <div class="icon-gallery" id="iconGallery">
@@ -500,15 +554,19 @@
             const rotZPlus = document.getElementById('rotZPlus');
             const rotZMinus = document.getElementById('rotZMinus');
 
-            // Estado de la app: orientación por defecto ajustada según solicitud del usuario
+            // Elementos para plegar panel
+            const toggleBtn = document.getElementById('togglePanelBtn');
+            const controlsPanel = document.getElementById('controlsPanel');
+
+            // Estado de la app: orientación por defecto ajustada
             let currentIcon = 'fa-heart';
             let currentColor = '#222222';
             let currentScale = 1.5;
-            let rotationX = -180;   // Base corregida
+            let rotationX = -180;
             let rotationY = 180;
             let rotationZ = 270;
 
-            // Mapa de iconos a Unicode (versión sólida)
+            // Mapa de iconos
             const iconMap = {
                 'fa-heart': '\u{f004}',
                 'fa-moon': '\u{f186}',
@@ -519,6 +577,12 @@
                 'fa-star': '\u{f005}',
                 'fa-dreamcatcher': '\u{f77b}'
             };
+
+            // ========== PLEGAR / DESPLEGAR PANEL ==========
+            toggleBtn.addEventListener('click', () => {
+                controlsPanel.classList.toggle('hidden');
+                // Cambiar el icono del botón (se maneja con CSS)
+            });
 
             // ========== PERSISTENCIA LOCAL ==========
             function loadPreferences() {
@@ -560,10 +624,9 @@
                         sizeSlider.value = currentScale;
                         updateRotationDisplay();
                     } else {
-                        // Valores por defecto: corazón, negro y rotación personalizada
+                        // Valores por defecto
                         document.querySelector('.tattoo-btn[data-icon="fa-heart"]').classList.add('active');
                         document.querySelector('.color-btn.black').classList.add('active');
-                        // Aseguramos que la rotación base se muestre
                         updateRotationDisplay();
                     }
                 } catch (e) {
@@ -714,10 +777,9 @@
             // ========== INICIALIZACIÓN ==========
             scene.addEventListener('loaded', () => {
                 loadPreferences();
-                updateTattoo();  // Aplica rotación y escala base
+                updateTattoo();
             });
 
-            // Respaldo por si loaded no se dispara
             setTimeout(() => {
                 if (!tatuaje.getAttribute('src')) {
                     loadPreferences();
