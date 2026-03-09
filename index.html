@@ -2,245 +2,90 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>InkAR · Tatuajes Virtuales</title>
-    <!-- Librerías A-Frame y MindAR -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <!-- Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Reset total */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            position: fixed;
-            background: #000;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
-            touch-action: pan-y pinch-zoom;
-        }
-
-        /* La escena debe ocupar toda la pantalla */
-        a-scene {
-            width: 100vw !important;
-            height: 100vh !important;
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-
-        /* Asegurar que el canvas de A-Frame también ocupe todo */
-        .a-canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        /* Indicador de estado compacto */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #000; color: white; touch-action: pan-y pinch-zoom; }
+        a-scene { width: 100vw; height: 100vh; display: block; }
         .marker-status {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            border: 1px solid #b967ff;
-            color: #b967ff;
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: absolute; top: 12px; right: 12px;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+            padding: 6px 12px; border-radius: 30px; font-size: 0.8rem;
+            border: 1px solid #b967ff; color: #b967ff; z-index: 70;
+            display: flex; align-items: center; gap: 6px;
         }
-
-        .marker-status .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #f44336;
-            display: inline-block;
-        }
-
-        .marker-status .dot.active {
-            background: #4caf50;
-            box-shadow: 0 0 12px #4caf50;
-        }
-
-        /* Miniatura del marcador (opcional) */
+        .marker-status .dot { width: 8px; height: 8px; border-radius: 50%; background: #f44336; }
+        .marker-status .dot.active { background: #4caf50; box-shadow: 0 0 8px #4caf50; }
         .marker-thumb {
-            position: absolute;
-            bottom: 100px;
-            left: 16px;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
-            border-radius: 16px;
-            padding: 6px;
-            border: 1px solid #b967ff;
-            z-index: 200;
+            position: absolute; bottom: 90px; left: 12px;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
+            border-radius: 12px; padding: 4px; border: 1px solid #b967ff; z-index: 70;
         }
-
-        .marker-thumb img {
-            width: 50px;
-            border-radius: 8px;
-            display: block;
-        }
-
-        /* Panel inferior compacto */
+        .marker-thumb img { width: 40px; border-radius: 6px; display: block; }
         .controls-panel {
-            position: absolute;
-            bottom: 20px;
-            left: 12px;
-            right: 12px;
-            background: rgba(20, 20, 30, 0.85);
-            backdrop-filter: blur(16px);
-            border-radius: 30px;
-            padding: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            z-index: 200;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            position: absolute; bottom: 12px; left: 10px; right: 10px;
+            background: rgba(20,20,30,0.8); backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 10px; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 100;
+            display: flex; flex-direction: column; gap: 8px;
         }
-
-        .row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Galería de iconos horizontal */
+        .row { display: flex; align-items: center; gap: 8px; }
         .icon-gallery {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 4px 0;
-            scrollbar-width: thin;
-            scrollbar-color: #b967ff #2b2b44;
-            -webkit-overflow-scrolling: touch;
-            flex: 1;
+            display: flex; gap: 4px; overflow-x: auto; padding: 4px 0;
+            scrollbar-width: thin; scrollbar-color: #b967ff #2b2b44;
+            -webkit-overflow-scrolling: touch; flex: 1;
         }
-
         .icon-gallery button {
-            background: #2b2b44;
-            border: none;
-            border-radius: 40px;
-            padding: 8px 14px;
-            color: white;
-            font-size: 1.4rem;
-            cursor: pointer;
-            box-shadow: 0 3px 0 #151525;
-            transition: all 0.1s;
-            flex: 0 0 auto;
-            border: 2px solid transparent;
-            min-width: 48px;
+            background: #2b2b44; border: none; border-radius: 40px;
+            padding: 6px 10px; color: white; font-size: 1.2rem;
+            cursor: pointer; box-shadow: 0 2px 0 #151525; transition: all 0.1s;
+            flex: 0 0 auto; border: 1px solid transparent; min-width: 40px;
         }
-
-        .icon-gallery button.active {
-            border-color: #b967ff;
-            background: #4a3970;
-            transform: scale(1.02);
-        }
-
-        .icon-gallery button:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #151525;
-        }
-
-        /* Selector de color */
+        .icon-gallery button.active { border-color: #b967ff; background: #4a3970; }
         .color-picker {
-            display: flex;
-            gap: 6px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 6px 12px;
-            border-radius: 40px;
+            display: flex; gap: 4px; background: rgba(0,0,0,0.3);
+            padding: 4px 6px; border-radius: 30px;
         }
-
         .color-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: 0.1s;
+            width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent;
+            cursor: pointer; transition: 0.1s;
         }
-
         .color-btn.black { background: #222; }
         .color-btn.red { background: #d32f2f; }
         .color-btn.blue { background: #1976d2; }
         .color-btn.gray { background: #757575; }
-        .color-btn.active { border-color: white; transform: scale(1.15); }
-
-        /* Control de tamaño */
+        .color-btn.active { border-color: white; transform: scale(1.1); }
         .size-control {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 6px 14px;
-            border-radius: 40px;
+            display: flex; align-items: center; gap: 4px;
+            background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 30px;
             color: white;
         }
-
-        .size-control i {
-            font-size: 1rem;
-            color: #b967ff;
-        }
-
-        #sizeSlider {
-            width: 90px;
-            height: 4px;
-            background: #2b2b44;
-            border-radius: 10px;
-            -webkit-appearance: none;
-        }
-
+        .size-control i { font-size: 0.9rem; color: #b967ff; }
+        #sizeSlider { width: 70px; height: 4px; background: #2b2b44; border-radius: 10px; -webkit-appearance: none; }
         #sizeSlider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            background: #b967ff;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid white;
+            -webkit-appearance: none; width: 14px; height: 14px;
+            background: #b967ff; border-radius: 50%; cursor: pointer; border: 2px solid white;
         }
-
-        /* Ajuste para pantallas muy pequeñas */
         @media (max-width: 360px) {
-            .icon-gallery button { font-size: 1.2rem; padding: 6px 10px; min-width: 40px; }
-            .color-btn { width: 28px; height: 28px; }
-            #sizeSlider { width: 70px; }
-            .marker-thumb { bottom: 90px; }
+            .icon-gallery button { font-size: 1rem; padding: 5px 8px; min-width: 36px; }
+            .color-btn { width: 24px; height: 24px; }
+            #sizeSlider { width: 50px; }
+            .marker-thumb { bottom: 80px; }
         }
     </style>
 </head>
 <body>
-    <!-- Estado del marcador -->
     <div class="marker-status" id="markerStatus">
         <span class="dot" id="statusDot"></span>
         <span id="statusText">Buscando...</span>
     </div>
-
-    <!-- Miniatura del marcador (para referencia) -->
     <div class="marker-thumb">
         <img src="https://github.com/hiukim/mind-ar-js/raw/master/examples/image-tracking/assets/card-example/card.png" alt="Marcador">
     </div>
-
-    <!-- Panel de controles compacto -->
     <div class="controls-panel">
         <div class="row">
             <div class="icon-gallery" id="iconGallery">
@@ -263,15 +108,14 @@
             </div>
             <div class="size-control">
                 <i class="fas fa-expand-alt"></i>
-                <input type="range" id="sizeSlider" min="0.5" max="2.5" step="0.1" value="1.5">
+                <input type="range" id="sizeSlider" min="0.5" max="3.0" step="0.1" value="2.0">
             </div>
         </div>
     </div>
 
-    <!-- Escena AR (debe estar al final para que el CSS la controle bien) -->
     <a-scene
         id="scene"
-        mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;"
+        mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; filterMinCF:0.01; filterBeta: 100;"
         color-space="sRGB"
         renderer="colorManagement: true, physicallyCorrectLights"
         vr-mode-ui="enabled: false"
@@ -281,17 +125,14 @@
     >
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-        <!-- Target con el tatuaje (a-image) -->
         <a-entity mindar-image-target="targetIndex: 0">
-            <a-image id="tatuaje"
-                     src=""
-                     position="0 0.2 0"
-                     rotation="-90 0 0"
-                     width="1.2"
-                     height="1.2"
-                     material="transparent: true; depthTest: false; side: double;"
-                     scale="1.5 1.5 1.5">
-            </a-image>
+            <!-- Usamos a-sprite: siempre mira a la cámara y es estable -->
+            <a-sprite id="tatuaje"
+                      src=""
+                      position="0 0.1 0"
+                      material="transparent: true; depthTest: false;"
+                      scale="2.0 2.0 2.0">
+            </a-sprite>
         </a-entity>
     </a-scene>
 
@@ -307,7 +148,7 @@
 
             let currentIcon = 'fa-heart';
             let currentColor = '#222222';
-            let currentScale = 1.5;
+            let currentScale = 2.0;
 
             const iconMap = {
                 'fa-heart': '\u{f004}',
