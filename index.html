@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>InkAR · Tatuajes Virtuales</title>
+    <title>InkAR+ · Tatuajes Virtuales</title>
     <!-- Librerías A-Frame y MindAR -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <!-- Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Reset total */
         * {
             margin: 0;
             padding: 0;
@@ -23,15 +22,11 @@
             overflow: hidden;
             position: fixed;
             background: #000;
-        }
-
-        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: white;
             touch-action: pan-y pinch-zoom;
         }
 
-        /* La escena debe ocupar toda la pantalla */
         a-scene {
             width: 100vw !important;
             height: 100vh !important;
@@ -42,13 +37,12 @@
             z-index: 1;
         }
 
-        /* Asegurar que el canvas de A-Frame también ocupe todo */
         .a-canvas {
             width: 100% !important;
             height: 100% !important;
         }
 
-        /* Indicador de estado compacto */
+        /* Estado del marcador */
         .marker-status {
             position: absolute;
             top: 16px;
@@ -80,10 +74,9 @@
             box-shadow: 0 0 12px #4caf50;
         }
 
-        /* Miniatura del marcador (opcional) */
         .marker-thumb {
             position: absolute;
-            bottom: 100px;
+            bottom: 120px;
             left: 16px;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(8px);
@@ -99,7 +92,7 @@
             display: block;
         }
 
-        /* Panel inferior compacto */
+        /* Panel de controles */
         .controls-panel {
             position: absolute;
             bottom: 20px;
@@ -121,9 +114,9 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
-        /* Galería de iconos horizontal */
         .icon-gallery {
             display: flex;
             gap: 8px;
@@ -156,12 +149,6 @@
             transform: scale(1.02);
         }
 
-        .icon-gallery button:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #151525;
-        }
-
-        /* Selector de color */
         .color-picker {
             display: flex;
             gap: 6px;
@@ -176,7 +163,6 @@
             border-radius: 50%;
             border: 2px solid transparent;
             cursor: pointer;
-            transition: 0.1s;
         }
 
         .color-btn.black { background: #222; }
@@ -185,7 +171,6 @@
         .color-btn.gray { background: #757575; }
         .color-btn.active { border-color: white; transform: scale(1.15); }
 
-        /* Control de tamaño */
         .size-control {
             display: flex;
             align-items: center;
@@ -219,32 +204,146 @@
             border: 2px solid white;
         }
 
-        /* Ajuste para pantallas muy pequeñas */
+        /* Nuevos botones de rotación y captura */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px 12px;
+            border-radius: 40px;
+        }
+
+        .action-btn {
+            background: none;
+            border: 1px solid #b967ff;
+            color: #b967ff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #b967ff;
+            color: black;
+        }
+
+        #rotationValue {
+            min-width: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        /* Tutorial overlay */
+        .tutorial {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s;
+        }
+
+        .tutorial.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .tutorial-content {
+            background: #1e1e2f;
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 300px;
+            text-align: center;
+            border: 2px solid #b967ff;
+        }
+
+        .tutorial-content h2 {
+            color: #b967ff;
+            margin-bottom: 15px;
+        }
+
+        .tutorial-content p {
+            margin: 10px 0;
+        }
+
+        .tutorial-content button {
+            background: #b967ff;
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        /* Mensaje de error */
+        .error-message {
+            position: absolute;
+            bottom: 200px;
+            left: 20px;
+            right: 20px;
+            background: #d32f2f;
+            padding: 15px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+        }
+
         @media (max-width: 360px) {
             .icon-gallery button { font-size: 1.2rem; padding: 6px 10px; min-width: 40px; }
             .color-btn { width: 28px; height: 28px; }
             #sizeSlider { width: 70px; }
-            .marker-thumb { bottom: 90px; }
+            .marker-thumb { bottom: 100px; }
         }
     </style>
 </head>
 <body>
+    <!-- Tutorial overlay -->
+    <div class="tutorial" id="tutorial">
+        <div class="tutorial-content">
+            <h2><i class="fas fa-magic"></i> InkAR+</h2>
+            <p>1️⃣ Apunta a la imagen marcadora (la de la miniatura abajo a la izquierda).</p>
+            <p>2️⃣ Elige tu icono favorito y color.</p>
+            <p>3️⃣ Ajusta tamaño y rotación con los botones.</p>
+            <p>4️⃣ Captura y comparte tu tatuaje virtual.</p>
+            <button id="closeTutorial"><i class="fas fa-check"></i> ¡Entendido!</button>
+        </div>
+    </div>
+
+    <!-- Mensaje de error de cámara -->
+    <div class="error-message" id="cameraError">
+        <i class="fas fa-exclamation-triangle"></i> No se pudo acceder a la cámara. Verifica permisos.
+    </div>
+
     <!-- Estado del marcador -->
     <div class="marker-status" id="markerStatus">
         <span class="dot" id="statusDot"></span>
         <span id="statusText">Buscando...</span>
     </div>
 
-    <!-- Miniatura del marcador (para referencia) -->
+    <!-- Miniatura del marcador -->
     <div class="marker-thumb">
         <img src="https://github.com/hiukim/mind-ar-js/raw/master/examples/image-tracking/assets/card-example/card.png" alt="Marcador">
     </div>
 
-    <!-- Panel de controles compacto -->
+    <!-- Panel de controles mejorado -->
     <div class="controls-panel">
         <div class="row">
             <div class="icon-gallery" id="iconGallery">
-                <button class="tattoo-btn active" data-icon="fa-heart"><i class="fas fa-heart"></i></button>
+                <button class="tattoo-btn" data-icon="fa-heart"><i class="fas fa-heart"></i></button>
                 <button class="tattoo-btn" data-icon="fa-moon"><i class="fas fa-moon"></i></button>
                 <button class="tattoo-btn" data-icon="fa-feather"><i class="fas fa-feather"></i></button>
                 <button class="tattoo-btn" data-icon="fa-infinity"><i class="fas fa-infinity"></i></button>
@@ -254,9 +353,10 @@
                 <button class="tattoo-btn" data-icon="fa-dreamcatcher"><i class="fas fa-dreamcatcher"></i></button>
             </div>
         </div>
+
         <div class="row" style="justify-content: space-between;">
             <div class="color-picker">
-                <button class="color-btn black active" data-color="black" title="Negro"></button>
+                <button class="color-btn black" data-color="black" title="Negro"></button>
                 <button class="color-btn red" data-color="red" title="Rojo"></button>
                 <button class="color-btn blue" data-color="blue" title="Azul"></button>
                 <button class="color-btn gray" data-color="gray" title="Gris"></button>
@@ -266,9 +366,22 @@
                 <input type="range" id="sizeSlider" min="0.5" max="2.5" step="0.1" value="1.5">
             </div>
         </div>
+
+        <!-- Nuevas funciones: rotación y captura -->
+        <div class="row" style="justify-content: space-between;">
+            <div class="action-buttons">
+                <button class="action-btn" id="rotateLeft" title="Rotar izquierda"><i class="fas fa-undo-alt"></i></button>
+                <span id="rotationValue">0°</span>
+                <button class="action-btn" id="rotateRight" title="Rotar derecha"><i class="fas fa-redo-alt"></i></button>
+                <button class="action-btn" id="resetRotation" title="Reiniciar rotación"><i class="fas fa-sync-alt"></i></button>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" id="captureBtn" title="Capturar pantalla"><i class="fas fa-camera"></i></button>
+            </div>
+        </div>
     </div>
 
-    <!-- Escena AR (debe estar al final para que el CSS la controle bien) -->
+    <!-- Escena AR -->
     <a-scene
         id="scene"
         mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;"
@@ -281,7 +394,6 @@
     >
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-        <!-- Target con el tatuaje (a-image) -->
         <a-entity mindar-image-target="targetIndex: 0">
             <a-image id="tatuaje"
                      src=""
@@ -297,6 +409,7 @@
 
     <script>
         (function() {
+            // Elementos del DOM
             const scene = document.getElementById('scene');
             const tatuaje = document.getElementById('tatuaje');
             const iconGallery = document.getElementById('iconGallery');
@@ -304,11 +417,22 @@
             const sizeSlider = document.getElementById('sizeSlider');
             const statusDot = document.getElementById('statusDot');
             const statusText = document.getElementById('statusText');
+            const tutorial = document.getElementById('tutorial');
+            const closeTutorialBtn = document.getElementById('closeTutorial');
+            const rotateLeftBtn = document.getElementById('rotateLeft');
+            const rotateRightBtn = document.getElementById('rotateRight');
+            const resetRotationBtn = document.getElementById('resetRotation');
+            const rotationSpan = document.getElementById('rotationValue');
+            const captureBtn = document.getElementById('captureBtn');
+            const cameraErrorDiv = document.getElementById('cameraError');
 
+            // Estado de la app
             let currentIcon = 'fa-heart';
             let currentColor = '#222222';
             let currentScale = 1.5;
+            let currentRotationY = 0; // grados
 
+            // Mapa de iconos a códigos Unicode (versión sólida de Font Awesome)
             const iconMap = {
                 'fa-heart': '\u{f004}',
                 'fa-moon': '\u{f186}',
@@ -320,6 +444,73 @@
                 'fa-dreamcatcher': '\u{f77b}'
             };
 
+            // ========== PERSISTENCIA LOCAL ==========
+            function loadPreferences() {
+                try {
+                    const saved = JSON.parse(localStorage.getItem('inkar_preferences'));
+                    if (saved) {
+                        currentIcon = saved.icon || 'fa-heart';
+                        currentColor = saved.color || '#222222';
+                        currentScale = saved.scale || 1.5;
+                        currentRotationY = saved.rotation || 0;
+
+                        // Aplicar icono activo
+                        document.querySelectorAll('.tattoo-btn').forEach(btn => {
+                            const iconElem = btn.querySelector('i');
+                            let iconClass = '';
+                            for (let cls of iconElem.classList) {
+                                if (cls.startsWith('fa-')) {
+                                    iconClass = cls;
+                                    break;
+                                }
+                            }
+                            if (iconClass === currentIcon) {
+                                btn.classList.add('active');
+                            } else {
+                                btn.classList.remove('active');
+                            }
+                        });
+
+                        // Aplicar color activo
+                        colorButtons.forEach(btn => {
+                            const colorKey = btn.dataset.color;
+                            let colorHex = '#222222';
+                            if (colorKey === 'red') colorHex = '#d32f2f';
+                            else if (colorKey === 'blue') colorHex = '#1976d2';
+                            else if (colorKey === 'gray') colorHex = '#757575';
+                            if (colorHex === currentColor) {
+                                btn.classList.add('active');
+                            } else {
+                                btn.classList.remove('active');
+                            }
+                        });
+
+                        // Aplicar escala
+                        sizeSlider.value = currentScale;
+
+                        // Aplicar rotación
+                        updateRotationDisplay();
+                    } else {
+                        // Valores por defecto: activar corazón y negro
+                        document.querySelector('.tattoo-btn[data-icon="fa-heart"]').classList.add('active');
+                        document.querySelector('.color-btn.black').classList.add('active');
+                    }
+                } catch (e) {
+                    console.warn('Error cargando preferencias', e);
+                }
+            }
+
+            function savePreferences() {
+                const prefs = {
+                    icon: currentIcon,
+                    color: currentColor,
+                    scale: currentScale,
+                    rotation: currentRotationY
+                };
+                localStorage.setItem('inkar_preferences', JSON.stringify(prefs));
+            }
+
+            // ========== GENERAR TATUAJE (CANVAS) ==========
             function generateTattooDataURL() {
                 const canvas = document.createElement('canvas');
                 canvas.width = 512;
@@ -337,9 +528,51 @@
             function updateTattoo() {
                 const dataURL = generateTattooDataURL();
                 tatuaje.setAttribute('src', dataURL);
+                // Aplicar escala y rotación (se mantienen)
+                tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+                tatuaje.setAttribute('rotation', `-90 ${currentRotationY} 0`);
                 console.log('Tatuaje actualizado');
+                savePreferences(); // Guardar cambios
             }
 
+            // ========== ROTACIÓN ==========
+            function updateRotationDisplay() {
+                rotationSpan.innerText = currentRotationY + '°';
+                tatuaje.setAttribute('rotation', `-90 ${currentRotationY} 0`);
+                savePreferences();
+            }
+
+            rotateLeftBtn.addEventListener('click', () => {
+                currentRotationY = (currentRotationY - 15) % 360;
+                updateRotationDisplay();
+            });
+
+            rotateRightBtn.addEventListener('click', () => {
+                currentRotationY = (currentRotationY + 15) % 360;
+                updateRotationDisplay();
+            });
+
+            resetRotationBtn.addEventListener('click', () => {
+                currentRotationY = 0;
+                updateRotationDisplay();
+            });
+
+            // ========== CAPTURA DE PANTALLA ==========
+            captureBtn.addEventListener('click', () => {
+                // Capturar el canvas de A-Frame
+                const canvas = document.querySelector('a-scene').canvas;
+                if (canvas) {
+                    // Crear un enlace de descarga
+                    const link = document.createElement('a');
+                    link.download = 'inkar-tatuaje.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                } else {
+                    alert('No se pudo capturar la imagen');
+                }
+            });
+
+            // ========== EVENTOS DE INTERFAZ ==========
             iconGallery.addEventListener('click', (e) => {
                 const btn = e.target.closest('.tattoo-btn');
                 if (!btn) return;
@@ -375,13 +608,16 @@
             sizeSlider.addEventListener('input', (e) => {
                 currentScale = parseFloat(e.target.value);
                 tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+                savePreferences();
             });
 
+            // ========== MANEJO DEL MARCADOR ==========
             const targetEntity = document.querySelector('[mindar-image-target]');
             if (targetEntity) {
                 targetEntity.addEventListener('targetFound', () => {
                     statusDot.classList.add('active');
                     statusText.innerText = 'Detectado';
+                    // Al detectar, actualizar el tatuaje (por si acaso)
                     updateTattoo();
                 });
                 targetEntity.addEventListener('targetLost', () => {
@@ -390,14 +626,41 @@
                 });
             }
 
+            // ========== TUTORIAL ==========
+            function hideTutorial() {
+                tutorial.classList.add('hidden');
+            }
+            closeTutorialBtn.addEventListener('click', hideTutorial);
+            // También ocultar al encontrar un marcador
+            if (targetEntity) {
+                targetEntity.addEventListener('targetFound', hideTutorial);
+            }
+
+            // ========== ERROR DE CÁMARA ==========
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(() => {})
+                .catch((err) => {
+                    console.error('Error cámara:', err);
+                    cameraErrorDiv.style.display = 'block';
+                    setTimeout(() => { cameraErrorDiv.style.display = 'none'; }, 5000);
+                });
+
+            // ========== INICIALIZACIÓN ==========
             scene.addEventListener('loaded', () => {
-                updateTattoo();
+                loadPreferences(); // Cargar preferencias antes de actualizar
+                updateTattoo(); // Esto también guarda las preferencias al inicio
                 tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+                tatuaje.setAttribute('rotation', `-90 ${currentRotationY} 0`);
             });
 
+            // Respaldo por si loaded no se dispara
             setTimeout(() => {
-                updateTattoo();
-                tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+                if (!tatuaje.getAttribute('src')) {
+                    loadPreferences();
+                    updateTattoo();
+                    tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+                    tatuaje.setAttribute('rotation', `-90 ${currentRotationY} 0`);
+                }
             }, 1500);
         })();
     </script>
