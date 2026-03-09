@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>InkAR · Tatuajes Ultraestables</title>
+    <title>GuerrTattooAR · Tatuajes Virtuales</title>
     <!-- Librerías A-Frame y MindAR -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -91,10 +91,10 @@
             display: block;
         }
 
-        /* Botón para plegar/desplegar panel */
+        /* Botón para plegar/desplegar panel - reposicionado para no solaparse */
         .toggle-panel-btn {
             position: absolute;
-            bottom: 20px;
+            bottom: 80px;  /* Separado del panel para que no tape */
             left: 50%;
             transform: translateX(-50%);
             width: 50px;
@@ -352,6 +352,7 @@
         }
 
         @media (max-width: 360px) {
+            .toggle-panel-btn { bottom: 70px; }
             .rotation-btn { width: 38px; height: 38px; }
             .action-btn { width: 44px; height: 44px; }
         }
@@ -361,7 +362,7 @@
     <!-- Tutorial overlay -->
     <div class="tutorial" id="tutorial">
         <div class="tutorial-content">
-            <h2><i class="fas fa-magic"></i> InkAR Estable</h2>
+            <h2><i class="fas fa-magic"></i> GuerrTattooAR</h2>
             <p>1️⃣ Apunta a la imagen marcadora.</p>
             <p>2️⃣ Sube tu diseño con el botón <i class="fas fa-upload"></i>.</p>
             <p>3️⃣ Ajusta tamaño y rotación.</p>
@@ -544,7 +545,7 @@
             // ========== PERSISTENCIA LOCAL ==========
             function loadPreferences() {
                 try {
-                    const saved = JSON.parse(localStorage.getItem('inkar_stable'));
+                    const saved = JSON.parse(localStorage.getItem('guerrTattooAR'));
                     if (saved) {
                         currentScale = saved.scale || 1.5;
                         rotationX = saved.rotationX !== undefined ? saved.rotationX : -180;
@@ -579,7 +580,7 @@
                     rotationZ: rotationZ,
                     customImage: customImageData
                 };
-                localStorage.setItem('inkar_stable', JSON.stringify(prefs));
+                localStorage.setItem('guerrTattooAR', JSON.stringify(prefs));
             }
 
             // ========== ACTUALIZAR TATUAJE ==========
@@ -619,13 +620,15 @@
                 updateRotationDisplay();
             });
 
-            // Captura
+            // Captura en JPG
             captureBtn.addEventListener('click', () => {
                 const canvas = document.querySelector('a-scene').canvas;
                 if (canvas) {
+                    // Convertir a JPG con calidad 0.9
+                    const jpgData = canvas.toDataURL('image/jpeg', 0.9);
                     const link = document.createElement('a');
-                    link.download = 'inkar-tatuaje.png';
-                    link.href = canvas.toDataURL('image/png');
+                    link.download = 'guerrtattoo-captura.jpg';
+                    link.href = jpgData;
                     link.click();
                 } else {
                     alert('No se pudo capturar la imagen');
@@ -657,17 +660,6 @@
                     cameraErrorDiv.style.display = 'block';
                     setTimeout(() => { cameraErrorDiv.style.display = 'none'; }, 5000);
                 });
-
-            // ========== SUAVIZADO EXTRA (LERP) ==========
-            // Para reducir vibraciones, interpolamos la posición de la imagen hacia la del target
-            // Necesitamos acceder al target y mover la imagen suavemente.
-            // Como la imagen es hija del target, no podemos moverla independientemente sin romper la jerarquía.
-            // Pero podemos crear un sistema de seguimiento con coordenadas mundiales.
-            // Simplificamos: usamos un requestAnimationFrame para leer la posición del target y aplicar un lerp a la imagen,
-            // pero la imagen ya se mueve con el target. Para suavizar, podemos poner la imagen fuera del target y seguirla.
-            // Cambiamos la estructura: en lugar de anidar, pondremos el a-image al mismo nivel que el target y lo moveremos con JS.
-            // Esto requiere modificar el HTML. Para mantener la simplicidad, confiamos en el smooth de MindAR (ya está en 0.9).
-            // Si el usuario quiere más, podemos añadir un pequeño lerp en la rotación, pero no es necesario.
 
             // ========== INICIALIZACIÓN ==========
             scene.addEventListener('loaded', () => {
