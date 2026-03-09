@@ -30,25 +30,7 @@
             display: block;
         }
 
-        /* Recuadro guía estático (sin animación) */
-        .guide-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60vw;
-            height: 60vw;
-            max-width: 280px;
-            max-height: 280px;
-            border: 2px solid rgba(185, 103, 255, 0.4);
-            border-radius: 16px;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
-            pointer-events: none;
-            z-index: 50;
-            /* Sin animación */
-        }
-
-        /* Indicador de estado compacto */
+        /* Indicador de estado compacto (sin animación) */
         .marker-status {
             position: absolute;
             top: 12px;
@@ -72,14 +54,14 @@
             border-radius: 50%;
             background: #f44336;
             display: inline-block;
-            transition: background 0.2s;
         }
 
         .marker-status .dot.active {
             background: #4caf50;
+            box-shadow: 0 0 8px #4caf50;
         }
 
-        /* Miniatura del marcador (pequeña) */
+        /* Miniatura del marcador (pequeña y discreta) */
         .marker-thumb {
             position: absolute;
             bottom: 90px;
@@ -93,12 +75,12 @@
         }
 
         .marker-thumb img {
-            width: 45px;
+            width: 40px;
             border-radius: 6px;
             display: block;
         }
 
-        /* Panel inferior compacto */
+        /* Panel inferior compacto y adaptado a vertical */
         .controls-panel {
             position: absolute;
             bottom: 12px;
@@ -107,7 +89,7 @@
             background: rgba(20, 20, 30, 0.8);
             backdrop-filter: blur(12px);
             border-radius: 24px;
-            padding: 12px;
+            padding: 10px;
             border: 1px solid rgba(255,255,255,0.1);
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             z-index: 100;
@@ -122,10 +104,10 @@
             gap: 8px;
         }
 
-        /* Galería de iconos más pequeña */
+        /* Galería de iconos muy compacta */
         .icon-gallery {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             overflow-x: auto;
             padding: 4px 0;
             scrollbar-width: thin;
@@ -138,21 +120,20 @@
             background: #2b2b44;
             border: none;
             border-radius: 40px;
-            padding: 8px 12px;
+            padding: 6px 10px;
             color: white;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             cursor: pointer;
             box-shadow: 0 2px 0 #151525;
             transition: all 0.1s;
             flex: 0 0 auto;
             border: 1px solid transparent;
-            min-width: 44px;
+            min-width: 40px;
         }
 
         .icon-gallery button.active {
             border-color: #b967ff;
             background: #4a3970;
-            transform: scale(1.02);
         }
 
         .icon-gallery button:active {
@@ -160,18 +141,18 @@
             box-shadow: 0 1px 0 #151525;
         }
 
-        /* Selector de color compacto */
+        /* Selector de color ultra compacto */
         .color-picker {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             background: rgba(0,0,0,0.3);
-            padding: 4px 8px;
+            padding: 4px 6px;
             border-radius: 30px;
         }
 
         .color-btn {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             border: 2px solid transparent;
             cursor: pointer;
@@ -188,20 +169,20 @@
         .size-control {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             background: rgba(0,0,0,0.3);
-            padding: 4px 10px;
+            padding: 4px 8px;
             border-radius: 30px;
             color: white;
         }
 
         .size-control i {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #b967ff;
         }
 
         #sizeSlider {
-            width: 80px;
+            width: 70px;
             height: 4px;
             background: #2b2b44;
             border-radius: 10px;
@@ -210,32 +191,31 @@
 
         #sizeSlider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             background: #b967ff;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid white;
         }
 
-        @media (max-width: 380px) {
-            .icon-gallery button { font-size: 1.1rem; padding: 6px 10px; }
-            .color-btn { width: 28px; height: 28px; }
-            #sizeSlider { width: 60px; }
+        /* Ajuste para pantallas muy pequeñas */
+        @media (max-width: 360px) {
+            .icon-gallery button { font-size: 1rem; padding: 5px 8px; min-width: 36px; }
+            .color-btn { width: 24px; height: 24px; }
+            #sizeSlider { width: 50px; }
+            .marker-thumb { bottom: 80px; }
         }
     </style>
 </head>
 <body>
-    <!-- Estado del marcador -->
+    <!-- Estado del marcador (sin animación) -->
     <div class="marker-status" id="markerStatus">
         <span class="dot" id="statusDot"></span>
         <span id="statusText">Buscando...</span>
     </div>
 
-    <!-- Recuadro guía estático (sin animación) -->
-    <div class="guide-overlay" id="guideOverlay"></div>
-
-    <!-- Miniatura del marcador -->
+    <!-- Miniatura del marcador (opcional, para referencia) -->
     <div class="marker-thumb">
         <img src="https://github.com/hiukim/mind-ar-js/raw/master/examples/image-tracking/assets/card-example/card.png" alt="Marcador">
     </div>
@@ -297,7 +277,6 @@
             const sizeSlider = document.getElementById('sizeSlider');
             const statusDot = document.getElementById('statusDot');
             const statusText = document.getElementById('statusText');
-            const guideOverlay = document.getElementById('guideOverlay');
 
             // Variables de estado
             let currentIcon = 'fa-heart';
@@ -406,13 +385,11 @@
                     console.log('Marcador detectado');
                     statusDot.classList.add('active');
                     statusText.innerText = 'Detectado';
-                    guideOverlay.style.opacity = '0.3';
                 });
                 targetEntity.addEventListener('targetLost', () => {
                     console.log('Marcador perdido');
                     statusDot.classList.remove('active');
                     statusText.innerText = 'Buscando...';
-                    guideOverlay.style.opacity = '1';
                 });
             }
 
@@ -421,7 +398,7 @@
                 updateTattoo();
             });
 
-            // Si el plano ya existe pero el material no está inicializado, intentar de nuevo
+            // Fallback por si el evento 'loaded' no se dispara
             setTimeout(() => {
                 updateTattoo();
             }, 1000);
