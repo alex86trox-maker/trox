@@ -10,7 +10,7 @@
     <!-- Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ========== ESTILOS GENERALES ========== */
+        /* ========== ESTILOS GENERALES (basados en la versión que funciona) ========== */
         * {
             margin: 0;
             padding: 0;
@@ -521,9 +521,9 @@
             <div class="size-row">
                 <div class="size-label">
                     <span><i class="fas fa-expand-alt"></i> Tamaño</span>
-                    <span id="sizeValue">0.8</span>
+                    <span id="sizeValue">1.5</span>
                 </div>
-                <input type="range" id="sizeSlider" min="0.3" max="2.0" step="0.1" value="0.8">
+                <input type="range" id="sizeSlider" min="0.5" max="2.5" step="0.1" value="1.5">
             </div>
 
             <div class="rotation-row">
@@ -577,14 +577,15 @@
             <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
             <a-entity mindar-image-target="targetIndex: 0">
+                <!-- Usamos la posición original que funcionaba: 0 0.2 0 -->
                 <a-image id="tatuaje"
                          src=""
-                         position="0 0 0"
+                         position="0 0.2 0"
                          rotation="0 0 0"
                          width="1.2"
                          height="1.2"
-                         material="transparent: true; depthTest: false; side: double; alphaTest: 0.1"
-                         scale="0.8 0.8 0.8">
+                         material="transparent: true; depthTest: false; side: double;"
+                         scale="1.5 1.5 1.5">
                 </a-image>
             </a-entity>
         </a-scene>
@@ -621,15 +622,15 @@
             const rotZPlus = document.getElementById('rotZPlus');
             const rotZMinus = document.getElementById('rotZMinus');
 
-            let currentScale = 0.8;
+            let currentScale = 1.5;
             let rotationX = -180;
             let rotationY = 180;
             let rotationZ = 270;
             let customImageData = null;
-            let currentImageUrl = null;
 
-            // ========== GENERAR SVG POR DEFECTO (con bordes morados) ==========
-            function getDefaultSVGBlob() {
+            // ========== GENERAR SVG POR DEFECTO (como dataURL) ==========
+            function getDefaultSVGDataURL() {
+                // SVG con todos los paths y borde morado
                 const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21590 27940">
                     <defs>
                         <style type="text/css">
@@ -655,34 +656,20 @@
                         <path d="M14256 9345c-34,-145 -58,-87 -156,-135 -46,-237 139,-225 157,-332 12,-68 -12,-145 -4,-238 8,-92 0,-140 -52,-184 -86,37 -24,74 -107,141 -160,131 -273,-106 -139,-132 86,-16 88,41 99,-114 -39,-20 -96,-38 -140,-61 7,-183 91,-109 134,-135 149,-90 106,-712 -289,-562l7 145c58,-9 68,-107 85,9 23,156 -23,347 -167,423 -84,45 -217,-20 -221,-126 -6,-145 73,-65 -36,-293 -79,2 -104,33 -145,80 26,142 72,301 -47,431 -2,1 -64,51 -65,51 -99,45 -114,5 -128,-60 42,-27 72,-4 153,-62 -4,-46 -21,-101 -18,-123 11,-59 36,-35 49,-106 -19,-204 -423,-119 -334,148 -83,44 -126,-5 -205,31l-43 -83c-56,-178 53,-478 243,-506 72,-11 154,-6 195,-49l23 -42c36,-59 117,-108 184,-130 151,-50 115,-19 218,-140l-43 -85c-97,19 -124,76 -206,25 -64,-40 -91,-101 -47,-171 121,-193 232,-90 369,-61 19,-89 51,-158 -23,-215 -257,-196 -447,182 -523,242 -145,-44 -198,-152 -125,-286 117,-217 37,-146 -5,-241 -21,-48 51,-14 -35,-66 -57,89 -38,136 -61,241 -181,61 -113,39 -251,-23l26 -70c-42,-41 -94,-48 -120,-83 -46,-62 -2,-71 -25,-155 -127,-71 -93,16 -193,-2 -176,-32 -225,-251 -32,-263 140,-8 121,45 151,143 115,-47 144,-142 31,-229 -171,-133 -370,-229 -583,-284 -494,-128 -1214,-238 -1687,-164 -114,17 -200,40 -327,49 -126,9 -278,43 -404,74 -132,33 -239,40 -351,112 -63,41 -91,48 -167,78 -114,46 -207,128 -310,182 -149,78 -245,155 -376,250l-192 167c-43,34 -104,68 -138,109l-226 266c-206,261 -509,845 -578,1212l-62 315c-49,310 46,723 119,1033 95,409 165,725 332,1109 175,404 102,357 175,566 29,86 61,66 26,176 -56,176 3,401 -80,593 -91,212 -158,322 -116,562 32,177 109,375 262,478 74,50 475,198 529,184 16,-33 -1,-60 -12,-102 81,37 138,130 233,152 -51,70 -34,1 -85,90 61,75 204,84 304,105l373 31c88,-140 48,-86 145,-152 -1,-64 -39,3 -12,-85 169,-56 215,224 36,280 -97,31 -43,-12 -135,11 -5,66 5,60 26,119 79,3 143,-24 183,-16 66,14 132,47 159,101 4,37 -20,36 -38,60 -2,2 -5,6 -7,8l-41 63c22,34 49,97 92,109 147,42 77,-126 181,-152 53,-13 107,3 144,24 87,49 129,150 59,245 -87,116 -201,40 -261,82 -63,44 -2,111 0,137 5,58 -14,30 -33,93 -19,65 -2,15 9,85 11,69 8,466 164,397 11,-48 -3,-27 -2,-42 7,-55 -15,-10 16,-50 25,115 28,271 43,380 22,159 76,213 164,267 -38,54 -97,47 -105,136 -4,42 169,416 190,487l131 527c1,6 4,23 5,28l17 66c4,19 5,31 10,51l7 26c0,-2 2,9 4,13 33,44 29,20 43,26 15,7 35,11 50,16l425 69c176,-86 166,-208 300,-484 65,-132 51,-119 133,-162 26,-13 35,-18 65,-34 91,-49 164,-114 258,-142 -5,51 32,443 60,478 17,20 125,91 178,-55 29,-80 54,-148 87,-222 47,45 37,175 33,242 -8,128 10,236 1,359 -7,-85 105,-111 111,-181 7,-79 -15,-71 -11,-156 3,-49 6,-114 14,-165 35,-211 -88,-289 139,-363 -19,45 -50,144 -67,188l58 41 32 -116c82,-309 377,-366 424,-494 -104,32 -338,220 -414,301l-28 -102 38 -12c55,-15 101,-34 138,-77 45,-52 66,-80 65,-160 -1,-73 -20,-118 -81,-156 -89,-54 -97,-35 -191,-18 -49,-47 -63,-87 -164,-86 -106,2 -95,35 -164,90 -47,-33 -96,-57 -158,-81 -53,-20 -100,-52 -158,-60 -62,187 -41,91 -7,296 14,85 -63,145 -136,102 -6,-4 -20,-17 -28,-24l-11 -47c2,-2 6,-6 9,-9 89,-88 81,-146 103,-275 14,-77 -2,-134 32,-183 36,-52 78,-72 143,-77 33,46 39,57 51,134 6,42 19,86 36,126 89,37 196,21 241,-72 33,-66 49,-232 39,-316 42,29 114,124 168,-5 32,-78 12,-176 -1,-255 -43,-257 -87,-290 -19,-419 173,-323 -48,-402 202,-585 33,-24 41,-31 65,-66 56,-81 -12,-35 60,-67 29,20 -2,16 65,10 2,242 -69,138 -169,275 -118,165 -36,268 94,395 263,262 41,777 111,1116 10,45 38,107 38,129 -1,93 -48,5 -26,125 129,14 60,-69 81,-143l12 -31c47,-137 23,-579 30,-757 6,-160 -37,-340 28,-484 40,-90 42,-124 -10,-202 -68,-103 -39,-103 -14,-194l119 17c26,-49 85,-104 60,-169 -27,-73 -80,-78 -122,-132l59 -66c143,-83 114,33 145,75 118,11 121,-55 92,-168 -27,-105 -79,-63 -120,-136 -28,-117 64,-254 185,-174 122,81 63,173 -3,258l93 101c133,-36 192,-12 320,-79 128,-68 -12,-45 304,-187 559,-251 212,-679 169,-1121 -14,-138 11,-257 22,-380 12,-124 74,-205 -88,-249 -54,59 -51,129 -67,195 -60,248 -35,233 -232,489 -113,148 -125,147 -324,200 -71,19 -128,45 -208,56 -69,9 -74,-23 -97,28 -19,41 1,10 4,37l1 30c0,-2 0,8 -2,11 -85,19 3,-43 -135,-26 -78,9 -137,-2 -180,6l-29 79c-51,-55 -76,-69 -143,-117 -144,-103 -165,-121 -322,-170 -5,-1 -17,-7 -22,-8 -24,-6 -60,2 -80,23 -37,37 -10,34 -40,73 -36,-96 -59,-202 -133,-255 -72,-52 -50,-22 -102,-95 -143,-200 -210,-481 -161,-746 18,-97 26,-188 76,-285 144,-279 263,-259 351,-420 76,-139 42,-155 63,-316 37,-18 49,-27 97,-8 48,21 27,36 29,66 11,169 128,39 241,16 363,-74 864,75 1145,311 61,51 168,84 198,165 1,4 2,9 3,13 1,1 8,33 10,39 35,126 51,226 30,357 -19,120 154,188 227,86l70 -159c133,-329 124,-353 58,-703 -75,-403 157,-428 87,-731z" stroke="#b967ff" stroke-width="60" fill="black"/>
                     </g>
                 </svg>`;
-                return new Blob([svgString], { type: 'image/svg+xml' });
+                return 'data:image/svg+xml;base64,' + btoa(svgString);
             }
 
-            const defaultSVGBlob = getDefaultSVGBlob();
-            const defaultSVGUrl = URL.createObjectURL(defaultSVGBlob);
-            currentImageUrl = defaultSVGUrl;
-            tatuaje.setAttribute('src', defaultSVGUrl);
+            const defaultSVGDataURL = getDefaultSVGDataURL();
+            tatuaje.setAttribute('src', defaultSVGDataURL);
+            customImageData = defaultSVGDataURL; // Para que no se considere "vacío"
 
-            // ========== FUNCIÓN PARA CAMBIAR IMAGEN (MEJORADA) ==========
-            function setNewImageUrl(newUrl) {
-                if (currentImageUrl && currentImageUrl !== defaultSVGUrl) {
-                    URL.revokeObjectURL(currentImageUrl);
-                }
-                currentImageUrl = newUrl;
-                
-                // Asignar al src de a-image (funciona para SVG y PNG)
-                tatuaje.setAttribute('src', newUrl);
-                
-                // Forzar actualización del material (útil para PNG)
-                // A veces es necesario reasignar el material
-                setTimeout(() => {
-                    // Asegurar que el material tenga transparencia
-                    tatuaje.setAttribute('material', 'transparent', 'true');
-                    tatuaje.setAttribute('material', 'alphaTest', '0.1');
-                }, 50);
-            }
+            // ========== PLEGAR / DESPLEGAR PANEL ==========
+            toggleBtn.addEventListener('click', () => {
+                controlsPanel.classList.toggle('hidden');
+                toggleBtn.classList.toggle('hidden');
+            });
 
-            // ========== MANEJO DE IMAGEN PERSONALIZADA ==========
+            // ========== MANEJO DE IMAGEN PERSONALIZADA (con FileReader) ==========
             uploadBtn.addEventListener('click', () => {
                 fileInput.click();
             });
@@ -691,57 +678,29 @@
                 const file = e.target.files[0];
                 if (!file) return;
 
-                console.log('Archivo seleccionado:', file.name, file.type, file.size);
-
+                // Verificar que sea imagen
                 if (!file.type.startsWith('image/')) {
                     alert('Por favor selecciona un archivo de imagen válido.');
                     fileInput.value = '';
                     return;
                 }
 
-                const imageUrl = URL.createObjectURL(file);
-                customImageData = imageUrl;
-                setNewImageUrl(imageUrl);
-
-                // Esperar a que la imagen se cargue en la textura
-                const checkTexture = () => {
-                    // Opcional: podríamos escuchar el evento 'materialtextureloaded' pero no siempre es fiable
-                    // Aplicamos rotación y escala después de un tiempo
-                    setTimeout(() => {
-                        applyRotationAndScale();
-                    }, 200);
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    customImageData = event.target.result; // dataURL
+                    tatuaje.setAttribute('src', customImageData);
+                    applyRotationAndScale();
+                    savePreferences();
                 };
-                checkTexture();
-
-                savePreferences();
-                fileInput.value = ''; // Reiniciar input
-            });
-
-            // Manejar error de carga de imagen
-            tatuaje.addEventListener('error', () => {
-                console.error('Error al cargar la imagen. Restaurando SVG por defecto.');
-                if (customImageData) {
-                    URL.revokeObjectURL(customImageData);
-                    customImageData = null;
-                }
-                setNewImageUrl(defaultSVGUrl);
-                applyRotationAndScale();
+                reader.readAsDataURL(file);
             });
 
             clearCustomBtn.addEventListener('click', () => {
-                if (customImageData) {
-                    URL.revokeObjectURL(customImageData);
-                    customImageData = null;
-                    setNewImageUrl(defaultSVGUrl);
-                    applyRotationAndScale();
-                    savePreferences();
-                }
-            });
-
-            // ========== PLEGAR / DESPLEGAR PANEL ==========
-            toggleBtn.addEventListener('click', () => {
-                controlsPanel.classList.toggle('hidden');
-                toggleBtn.classList.toggle('hidden');
+                // Restaurar SVG por defecto
+                customImageData = defaultSVGDataURL;
+                tatuaje.setAttribute('src', defaultSVGDataURL);
+                applyRotationAndScale();
+                savePreferences();
             });
 
             // ========== PERSISTENCIA LOCAL ==========
@@ -749,14 +708,15 @@
                 try {
                     const saved = JSON.parse(localStorage.getItem('guerrtattoo_prefs'));
                     if (saved) {
-                        currentScale = saved.scale || 0.8;
+                        currentScale = saved.scale || 1.5;
                         rotationX = saved.rotationX !== undefined ? saved.rotationX : -180;
                         rotationY = saved.rotationY || 180;
                         rotationZ = saved.rotationZ || 270;
-
+                        // No guardamos la imagen personalizada por espacio, pero si queremos podemos:
+                        // customImageData se mantiene como el SVG por defecto inicialmente.
+                        // Si el usuario subió una imagen, se guarda en el flujo normal.
                         sizeSlider.value = currentScale;
                         sizeValue.innerText = currentScale.toFixed(1);
-
                         updateRotationDisplay();
                     } else {
                         sizeSlider.value = currentScale;
@@ -774,6 +734,7 @@
                     rotationX: rotationX,
                     rotationY: rotationY,
                     rotationZ: rotationZ,
+                    // No guardamos la imagen para no saturar localStorage
                 };
                 localStorage.setItem('guerrtattoo_prefs', JSON.stringify(prefs));
             }
@@ -859,7 +820,7 @@
 
             setTimeout(() => {
                 if (!tatuaje.getAttribute('src')) {
-                    setNewImageUrl(defaultSVGUrl);
+                    tatuaje.setAttribute('src', defaultSVGDataURL);
                 }
                 applyRotationAndScale();
             }, 1500);
