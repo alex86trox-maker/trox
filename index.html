@@ -299,7 +299,7 @@
             display: none;
         }
 
-        /* ========== MENÚ DE INICIO ========== */
+        /* ========== MENÚ DE INICIO (ajustado para móviles) ========== */
         .start-menu {
             position: fixed;
             top: 0;
@@ -328,13 +328,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 0;
+            padding: 15px 0;
         }
 
         .svg-container {
             width: 100%;
-            max-width: 350px;
-            margin-bottom: 20px;
+            max-width: 280px; /* Reducido para móviles */
+            margin-bottom: 15px;
             filter: drop-shadow(0 10px 20px rgba(185, 103, 255, 0.25));
         }
 
@@ -356,14 +356,14 @@
             width: 100%;
             text-align: center;
             color: white;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .info h1 {
-            font-size: 2rem;
+            font-size: 1.8rem; /* Reducido */
             font-weight: 600;
             letter-spacing: 2px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: #b967ff;
             text-transform: uppercase;
             text-shadow: 0 0 10px rgba(185, 103, 255, 0.3);
@@ -374,25 +374,25 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 8px; /* Reducido */
         }
 
         .info li {
-            font-size: 1.1rem;
+            font-size: 1rem; /* Reducido */
             font-weight: 400;
             color: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .info li span {
             color: #b967ff;
             font-weight: 600;
-            font-size: 1.2rem;
-            width: 28px;
-            height: 28px;
+            font-size: 1.1rem;
+            width: 26px;
+            height: 26px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -405,28 +405,28 @@
             background: #b967ff;
             color: white;
             border: none;
-            padding: 16px 40px;
-            font-size: 1.3rem;
+            padding: 12px 30px; /* Reducido */
+            font-size: 1.2rem; /* Reducido */
             font-weight: 600;
             letter-spacing: 1px;
             border-radius: 60px;
             cursor: pointer;
-            box-shadow: 0 8px 0 #4a2a6b, 0 10px 20px rgba(185, 103, 255, 0.3);
+            box-shadow: 0 6px 0 #4a2a6b, 0 8px 15px rgba(185, 103, 255, 0.3);
             transition: all 0.1s ease;
             text-transform: uppercase;
             width: fit-content;
-            margin-top: 10px;
+            margin-top: 5px;
             border: 1px solid #ffffff30;
         }
 
         .btn:active {
-            transform: translateY(6px);
-            box-shadow: 0 2px 0 #4a2a6b, 0 5px 15px rgba(185, 103, 255, 0.4);
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #4a2a6b, 0 5px 10px rgba(185, 103, 255, 0.4);
         }
 
         .btn:hover {
             background: #a34dff;
-            box-shadow: 0 8px 0 #3f2360, 0 12px 25px rgba(185, 103, 255, 0.5);
+            box-shadow: 0 6px 0 #3f2360, 0 10px 20px rgba(185, 103, 255, 0.5);
         }
 
         .ar-interface {
@@ -438,6 +438,23 @@
         .ar-interface.visible {
             opacity: 1;
             pointer-events: auto;
+        }
+
+        /* Ajustes extra para pantallas muy pequeñas */
+        @media (max-width: 360px) {
+            .svg-container {
+                max-width: 220px;
+            }
+            .info h1 {
+                font-size: 1.5rem;
+            }
+            .info li {
+                font-size: 0.9rem;
+            }
+            .btn {
+                padding: 10px 25px;
+                font-size: 1.1rem;
+            }
         }
     </style>
 </head>
@@ -609,12 +626,11 @@
             let rotationX = -180;
             let rotationY = 180;
             let rotationZ = 270;
-            let customImageData = null; // Para almacenar la imagen subida (como blob URL)
-            let currentImageUrl = null;  // URL actual (para liberar memoria)
+            let customImageData = null;
+            let currentImageUrl = null;
 
-            // ========== GENERAR SVG POR DEFECTO (con todos los paths) ==========
+            // ========== GENERAR SVG POR DEFECTO ==========
             function getDefaultSVGBlob() {
-                // SVG completo con todos los paths del original y borde morado
                 const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21590 27940">
                     <defs>
                         <style type="text/css">
@@ -643,16 +659,15 @@
                 return new Blob([svgString], { type: 'image/svg+xml' });
             }
 
-            // Crear URL del SVG por defecto
             const defaultSVGBlob = getDefaultSVGBlob();
             const defaultSVGUrl = URL.createObjectURL(defaultSVGBlob);
             currentImageUrl = defaultSVGUrl;
             tatuaje.setAttribute('src', defaultSVGUrl);
 
-            // ========== FUNCIÓN PARA LIBERAR MEMORIA ==========
+            // ========== FUNCIÓN PARA CAMBIAR IMAGEN ==========
             function setNewImageUrl(newUrl) {
                 if (currentImageUrl && currentImageUrl !== defaultSVGUrl) {
-                    URL.revokeObjectURL(currentImageUrl); // Liberar la URL anterior (excepto la del SVG por defecto)
+                    URL.revokeObjectURL(currentImageUrl);
                 }
                 currentImageUrl = newUrl;
                 tatuaje.setAttribute('src', newUrl);
@@ -667,9 +682,8 @@
                 const file = e.target.files[0];
                 if (!file) return;
 
-                // Crear una URL de objeto para el archivo
                 const imageUrl = URL.createObjectURL(file);
-                customImageData = imageUrl; // Guardamos la URL
+                customImageData = imageUrl;
                 setNewImageUrl(imageUrl);
                 applyRotationAndScale();
                 savePreferences();
@@ -677,12 +691,18 @@
 
             clearCustomBtn.addEventListener('click', () => {
                 if (customImageData) {
-                    URL.revokeObjectURL(customImageData); // Liberar la URL de la imagen personalizada
+                    URL.revokeObjectURL(customImageData);
                     customImageData = null;
                     setNewImageUrl(defaultSVGUrl);
                     applyRotationAndScale();
                     savePreferences();
                 }
+            });
+
+            // ========== PLEGAR / DESPLEGAR PANEL (corregido) ==========
+            toggleBtn.addEventListener('click', () => {
+                controlsPanel.classList.toggle('hidden');
+                toggleBtn.classList.toggle('hidden');
             });
 
             // ========== PERSISTENCIA LOCAL ==========
@@ -694,17 +714,9 @@
                         rotationX = saved.rotationX !== undefined ? saved.rotationX : -180;
                         rotationY = saved.rotationY || 180;
                         rotationZ = saved.rotationZ || 270;
-                        // La imagen personalizada no se puede guardar como blob URL, solo como dataURL
-                        // Por simplicidad, no guardamos la imagen personalizada entre sesiones.
-                        // Si se quiere persistir, habría que usar localStorage con dataURL, pero ocupa mucho espacio.
-                        // Mejor no persistir la imagen personalizada.
-                        customImageData = null;
 
                         sizeSlider.value = currentScale;
                         sizeValue.innerText = currentScale.toFixed(1);
-
-                        // Asegurar que el SVG por defecto esté cargado
-                        setNewImageUrl(defaultSVGUrl);
 
                         updateRotationDisplay();
                     } else {
@@ -723,12 +735,10 @@
                     rotationX: rotationX,
                     rotationY: rotationY,
                     rotationZ: rotationZ,
-                    // No guardamos la imagen personalizada
                 };
                 localStorage.setItem('guerrtattoo_prefs', JSON.stringify(prefs));
             }
 
-            // ========== ACTUALIZAR TATUAJE ==========
             function applyRotationAndScale() {
                 tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
                 tatuaje.setAttribute('rotation', `${rotationX} ${rotationY} ${rotationZ}`);
@@ -803,13 +813,11 @@
                 applyRotationAndScale();
             });
 
-            // Al hacer clic en "Comenzar", ocultamos el menú y mostramos la interfaz AR
             startBtn.addEventListener('click', () => {
                 startMenu.classList.add('hidden');
                 arInterfaces.forEach(el => el.classList.add('visible'));
             });
 
-            // Respaldo
             setTimeout(() => {
                 if (!tatuaje.getAttribute('src')) {
                     setNewImageUrl(defaultSVGUrl);
