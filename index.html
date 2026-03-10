@@ -583,7 +583,7 @@
                          rotation="0 0 0"
                          width="1.2"
                          height="1.2"
-                         material="transparent: true; depthTest: false; side: double;"
+                         material="transparent: true; depthTest: false; side: double; alphaTest: 0.1"
                          scale="0.8 0.8 0.8">
                 </a-image>
             </a-entity>
@@ -663,16 +663,26 @@
             currentImageUrl = defaultSVGUrl;
             tatuaje.setAttribute('src', defaultSVGUrl);
 
-            // ========== FUNCIÓN PARA CAMBIAR IMAGEN ==========
+            // ========== FUNCIÓN PARA CAMBIAR IMAGEN (MEJORADA) ==========
             function setNewImageUrl(newUrl) {
                 if (currentImageUrl && currentImageUrl !== defaultSVGUrl) {
                     URL.revokeObjectURL(currentImageUrl);
                 }
                 currentImageUrl = newUrl;
+                
+                // Asignar al src de a-image (funciona para SVG y PNG)
                 tatuaje.setAttribute('src', newUrl);
+                
+                // Forzar actualización del material (útil para PNG)
+                // A veces es necesario reasignar el material
+                setTimeout(() => {
+                    // Asegurar que el material tenga transparencia
+                    tatuaje.setAttribute('material', 'transparent', 'true');
+                    tatuaje.setAttribute('material', 'alphaTest', '0.1');
+                }, 50);
             }
 
-            // ========== MANEJO DE IMAGEN PERSONALIZADA (MEJORADO) ==========
+            // ========== MANEJO DE IMAGEN PERSONALIZADA ==========
             uploadBtn.addEventListener('click', () => {
                 fileInput.click();
             });
@@ -683,28 +693,28 @@
 
                 console.log('Archivo seleccionado:', file.name, file.type, file.size);
 
-                // Verificar que sea una imagen
                 if (!file.type.startsWith('image/')) {
                     alert('Por favor selecciona un archivo de imagen válido.');
-                    fileInput.value = ''; // Reiniciar input
+                    fileInput.value = '';
                     return;
                 }
 
                 const imageUrl = URL.createObjectURL(file);
                 customImageData = imageUrl;
-
-                // Asignar la imagen y esperar a que cargue
                 setNewImageUrl(imageUrl);
 
-                // Aplicar rotación y escala después de un pequeño retraso para asegurar carga
-                setTimeout(() => {
-                    applyRotationAndScale();
-                }, 100);
+                // Esperar a que la imagen se cargue en la textura
+                const checkTexture = () => {
+                    // Opcional: podríamos escuchar el evento 'materialtextureloaded' pero no siempre es fiable
+                    // Aplicamos rotación y escala después de un tiempo
+                    setTimeout(() => {
+                        applyRotationAndScale();
+                    }, 200);
+                };
+                checkTexture();
 
                 savePreferences();
-
-                // Reiniciar el input para permitir seleccionar la misma imagen de nuevo
-                fileInput.value = '';
+                fileInput.value = ''; // Reiniciar input
             });
 
             // Manejar error de carga de imagen
