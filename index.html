@@ -2,829 +2,712 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>GuerrTattooAR · Tatuajes Ultraestables</title>
-    <!-- Librerías A-Frame y MindAR -->
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <!-- Font Awesome para iconos -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Guerr Tattoo · Julian Guerrero · Bogotá</title>
+    <!-- Fuentes e iconos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,500;14..32,700;14..32,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ========== ESTILOS GENERALES (basados en la versión que funciona) ========== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        html, body {
-            width: 100%;
-            height: 100%;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c6a43f;
+            border-radius: 8px;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: #121212;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            min-height: 100vh;
+            position: relative;
+            border-radius: 24px 24px 0 0;
             overflow: hidden;
-            position: fixed;
-            background: #000;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
-            touch-action: pan-y pinch-zoom;
         }
 
-        a-scene {
-            width: 100vw !important;
-            height: 100vh !important;
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
+        .header {
+            padding: 24px 20px 16px;
+            border-bottom: 1px solid #2c2c2c;
         }
-
-        .a-canvas {
-            width: 100% !important;
-            height: 100% !important;
+        .header h1 {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: #fff;
         }
-
-        .marker-status {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            border: 1px solid #b967ff;
-            color: #b967ff;
-            z-index: 200;
+        .header h1 span {
+            color: #c6a43f;
+            font-weight: 300;
+        }
+        .header p {
+            color: #b0b0b0;
+            font-size: 14px;
+            margin-top: 6px;
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .marker-status .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #f44336;
-            display: inline-block;
-        }
-
-        .marker-status .dot.active {
-            background: #4caf50;
-            box-shadow: 0 0 12px #4caf50;
-        }
-
-        .marker-thumb {
-            position: absolute;
-            bottom: 120px;
-            left: 16px;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
-            border-radius: 16px;
-            padding: 6px;
-            border: 1px solid #b967ff;
-            z-index: 200;
-        }
-
-        .marker-thumb img {
-            width: 50px;
-            border-radius: 8px;
-            display: block;
-        }
-
-        /* Botón para plegar/desplegar panel */
-        .toggle-panel-btn {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(20, 20, 30, 0.85);
-            backdrop-filter: blur(8px);
-            border: 2px solid #b967ff;
-            color: #b967ff;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 300;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            transition: all 0.2s;
-        }
-
-        .toggle-panel-btn:hover {
-            background: #b967ff;
-            color: black;
-        }
-
-        .toggle-panel-btn i::before {
-            content: "\f078"; /* fa-chevron-down */
-        }
-
-        .toggle-panel-btn.hidden i::before {
-            content: "\f077"; /* fa-chevron-up */
-        }
-
-        /* Panel de controles */
-        .controls-panel {
-            position: absolute;
-            bottom: 20px;
-            left: 12px;
-            right: 12px;
-            background: rgba(20, 20, 30, 0.85);
-            backdrop-filter: blur(16px);
-            border-radius: 30px;
-            padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            z-index: 200;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-
-        .controls-panel.hidden {
-            transform: translateY(calc(100% + 30px));
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .size-row {
-            width: 100%;
-        }
-
-        .size-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            color: #b967ff;
-            font-weight: bold;
-        }
-
-        #sizeSlider {
-            width: 100%;
-            height: 8px;
-            background: #2b2b44;
-            border-radius: 10px;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        #sizeSlider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 28px;
-            height: 28px;
-            background: #b967ff;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 3px solid white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-
-        #sizeSlider::-moz-range-thumb {
-            width: 28px;
-            height: 28px;
-            background: #b967ff;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 3px solid white;
-        }
-
-        .rotation-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px;
-            border-radius: 20px;
-        }
-
-        .rotation-label {
-            width: 25px;
-            font-weight: bold;
-            color: #b967ff;
-        }
-
-        .rotation-buttons {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .rotation-btn {
-            background: #2b2b44;
-            border: none;
-            color: white;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid #b967ff;
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        .rotation-value {
-            min-width: 60px;
-            text-align: center;
-            background: #151525;
-            padding: 6px 10px;
-            border-radius: 30px;
-            font-size: 1rem;
-            border: 1px solid #b967ff;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
             flex-wrap: wrap;
         }
-
-        .action-btn {
-            background: none;
-            border: 2px solid #b967ff;
-            color: #b967ff;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 1.4rem;
+        .header p i {
+            color: #c6a43f;
+            font-size: 12px;
         }
 
-        .action-btn:hover {
-            background: #b967ff;
-            color: black;
-        }
-
-        .upload-btn-large {
-            background: #4a3970;
-            border: 2px solid #b967ff;
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1.8rem;
-            margin: 0 auto;
-        }
-
-        .upload-btn-large:hover {
-            background: #b967ff;
-            color: black;
-        }
-
-        .error-message {
-            position: absolute;
-            bottom: 200px;
-            left: 20px;
-            right: 20px;
-            background: #d32f2f;
-            padding: 15px;
-            border-radius: 20px;
-            text-align: center;
-            z-index: 2000;
-            display: none;
-        }
-
-        /* ========== MENÚ DE INICIO ========== */
-        .start-menu {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .bottom-nav {
+            position: sticky;
+            bottom: 0;
             width: 100%;
-            height: 100%;
-            background: #0a0a0a;
-            z-index: 10000;
+            background-color: #1a1a1a;
+            border-top: 1px solid #2c2c2c;
             display: flex;
-            justify-content: center;
+            justify-content: space-around;
+            padding: 10px 0 14px;
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            padding: 20px;
-            transition: opacity 0.5s ease;
-        }
-
-        .start-menu.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .card {
-            max-width: 500px;
-            width: 100%;
+            color: #b0b0b0;
+            font-size: 12px;
+            transition: color 0.2s;
+            cursor: pointer;
+            text-decoration: none;
             background: transparent;
+            border: none;
+        }
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .nav-item.active {
+            color: #c6a43f;
+        }
+        .nav-item:hover {
+            color: #ffffff;
+        }
+
+        section {
+            padding: 24px 20px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title i {
+            color: #c6a43f;
+            font-size: 20px;
+        }
+
+        .featured-scroll {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scrollbar-width: thin;
+        }
+        .featured-card {
+            min-width: 140px;
+            height: 180px;
+            background: #1e1e1e;
+            border-radius: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 15px 0;
+            justify-content: flex-end;
+            padding: 16px;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid #333;
+            box-shadow: 0 8px 0 #0a0a0a;
         }
-
-        .svg-container {
-            width: 100%;
-            max-width: 280px;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 10px 20px rgba(185, 103, 255, 0.25));
+        .featured-card.blackwork {
+            background-image: linear-gradient(180deg, transparent 30%, #0a0a0a), url('https://placehold.co/400x600/1e1e1e/white?text=Blackwork');
         }
-
-        .warrior-svg {
-            width: 100%;
-            height: auto;
-            display: block;
+        .featured-card.realism {
+            background-image: linear-gradient(180deg, transparent 30%, #0a0a0a), url('https://placehold.co/400x600/2a2a2a/white?text=Realismo');
         }
-
-        .warrior-svg path {
-            stroke: #b967ff;
-            stroke-width: 60;
-            fill: black;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+        .featured-card.minimal {
+            background-image: linear-gradient(180deg, transparent 30%, #0a0a0a), url('https://placehold.co/400x600/232323/white?text=Minimal');
         }
-
-        .info {
-            width: 100%;
-            text-align: center;
+        .featured-card h3 {
+            font-weight: 700;
+            font-size: 18px;
             color: white;
-            margin-bottom: 15px;
+            text-shadow: 0 2px 4px black;
         }
-
-        .info h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            color: #b967ff;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(185, 103, 255, 0.3);
-        }
-
-        .info ul {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .info li {
-            font-size: 1rem;
-            font-weight: 400;
-            color: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .info li span {
-            color: #b967ff;
-            font-weight: 600;
-            font-size: 1.1rem;
-            width: 26px;
-            height: 26px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(185, 103, 255, 0.1);
-            border-radius: 50%;
-            border: 1px solid #b967ff33;
+        .featured-card p {
+            font-size: 12px;
+            color: #c6a43f;
         }
 
         .btn {
-            background: #b967ff;
-            color: white;
+            background-color: #c6a43f;
+            color: #0a0a0a;
             border: none;
-            padding: 12px 30px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            border-radius: 60px;
+            padding: 14px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
             cursor: pointer;
-            box-shadow: 0 6px 0 #4a2a6b, 0 8px 15px rgba(185, 103, 255, 0.3);
-            transition: all 0.1s ease;
-            text-transform: uppercase;
-            width: fit-content;
-            margin-top: 5px;
-            border: 1px solid #ffffff30;
+            transition: all 0.2s;
+            border: 1px solid transparent;
         }
-
-        .btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #4a2a6b, 0 5px 10px rgba(185, 103, 255, 0.4);
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #c6a43f;
+            color: #c6a43f;
         }
-
         .btn:hover {
-            background: #a34dff;
-            box-shadow: 0 6px 0 #3f2360, 0 10px 20px rgba(185, 103, 255, 0.5);
+            background-color: #dab554;
+            transform: scale(1.02);
         }
 
-        .ar-interface {
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
+        .profile-header {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: #2c2c2c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #c6a43f;
+        }
+        .profile-avatar i {
+            font-size: 48px;
+            color: #b0b0b0;
+        }
+        .profile-info h2 {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .profile-info .insta {
+            color: #c6a43f;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .rating {
+            display: flex;
+            gap: 4px;
+            color: #c6a43f;
+            margin: 8px 0;
+            flex-wrap: wrap;
+        }
+        .review-card {
+            background: #1e1e1e;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+        }
+        .review-card p {
+            color: #d0d0d0;
+            font-size: 14px;
         }
 
-        .ar-interface.visible {
-            opacity: 1;
-            pointer-events: auto;
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        .category-btn {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .category-btn.active {
+            background: #c6a43f;
+            color: #0a0a0a;
+            border-color: #c6a43f;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .gallery-item {
+            aspect-ratio: 1/1;
+            background: #2a2a2a;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 12px;
+            border: 1px solid #3a3a3a;
         }
 
-        @media (max-width: 360px) {
-            .svg-container {
-                max-width: 220px;
-            }
-            .info h1 {
-                font-size: 1.5rem;
-            }
-            .info li {
-                font-size: 0.9rem;
-            }
-            .btn {
-                padding: 10px 25px;
-                font-size: 1.1rem;
-            }
+        .pricing-cards {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .price-card {
+            flex: 1 1 120px;
+            background: #1e1e1e;
+            border-radius: 24px;
+            padding: 20px 12px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        .price-card h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .price-card .price {
+            font-size: 22px;
+            font-weight: 800;
+            color: #c6a43f;
+        }
+        .price-card small {
+            color: #aaa;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #ccc;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 16px 18px;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 30px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #c6a43f;
+        }
+        .file-upload {
+            background: #1e1e1e;
+            border: 1px dashed #c6a43f;
+            border-radius: 30px;
+            padding: 20px;
+            text-align: center;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .chat-box {
+            background: #1a1a1a;
+            border-radius: 24px;
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 24px;
+            font-size: 14px;
+        }
+        .message.artist {
+            background: #2c2c2c;
+            align-self: flex-start;
+            border-bottom-left-radius: 6px;
+        }
+        .message.client {
+            background: #c6a43f;
+            color: #0a0a0a;
+            align-self: flex-end;
+            border-bottom-right-radius: 6px;
+        }
+        .chat-input {
+            display: flex;
+            gap: 8px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 14px 18px;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 200px;
+            background: #2a2a2a;
+            border-radius: 30px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            border: 1px solid #333;
+        }
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            filter: grayscale(1) invert(0.9) hue-rotate(15deg);
+        }
+        .directions {
+            background: #1e1e1e;
+            padding: 16px;
+            border-radius: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .footer-note {
+            text-align: center;
+            padding: 20px;
+            color: #5a5a5a;
+            font-size: 12px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        .gold {
+            color: #c6a43f;
         }
     </style>
 </head>
 <body>
-    <!-- MENÚ DE INICIO -->
-    <div class="start-menu" id="startMenu">
-        <div class="card">
-            <div class="svg-container">
-                <svg class="warrior-svg" viewBox="0 0 21590 27940" xmlns="http://www.w3.org/2000/svg">
-                    <g>
-                        <path d="M8550 19311c13,-22 11,-34 -6,-36 -159,65 -267,34 -324,-93 -48,-120 -19,-258 86,-414 78,-81 174,-131 289,-150 -5,-770 7,-1204 35,-1302 -387,167 -631,240 -730,216 -11,204 -313,508 -905,913 -91,89 -200,177 -327,266 -393,565 -529,1195 -408,1890 143,672 557,1064 1242,1176 153,-329 246,-516 278,-562 -455,-56 -802,-290 -1039,-703 -271,-674 -222,-1301 148,-1881 143,-148 211,-165 206,-50 -30,513 -89,1193 -176,2040 20,219 157,317 412,295 125,-37 196,-120 213,-250 -109,-91 -115,-188 -17,-290 345,-35 710,-65 1094,-90 114,-131 211,-265 291,-401 -64,33 -300,52 -708,55 -136,6 -303,12 -503,20 -157,121 -249,272 -274,451 -7,91 9,172 46,243 19,116 -31,190 -151,222 -190,19 -294,-67 -313,-260 1,-239 136,-446 407,-620 48,-547 100,-1164 157,-1849 152,-67 347,-149 586,-246 -45,522 -51,948 -19,1278 122,190 259,234 410,132z"/>
-                        <path d="M8874 20999c-157,-498 -294,-721 -413,-669 71,73 109,294 115,662 17,81 -12,62 -86,-58 -47,-66 -71,-98 -71,-98 -31,-29 -58,-26 -81,9 -234,223 -530,580 -888,1070 -142,708 -5,1129 412,1262 94,10 105,1 31,-27 -325,-123 -372,-399 -141,-829 425,-596 799,-1037 1122,-1322z"/>
-                        <path d="M9603 18829c49,-39 45,-48 -11,-26 -167,101 -349,227 -545,378 -18,19 -34,18 -47,-2 -20,473 -44,950 -73,1430 109,-113 238,-225 387,-336 41,-24 64,-80 69,-171 -7,-554 16,-924 69,-1109 12,-58 62,-113 151,-164z"/>
-                        <path d="M9582 21209c-114,-19 -272,-290 -473,-814 -165,165 -292,271 -383,319 189,562 397,933 624,1113 36,29 32,3 -13,-76 0,-115 81,-296 245,-542z"/>
-                        <path d="M10434 18154c52,-38 51,-46 -4,-24 -161,69 -329,179 -506,330 -44,25 -63,84 -59,176 -8,760 -13,1495 -16,2204 170,-155 327,-284 470,-388 -24,-101 -27,-833 -9,-2196 -6,-21 35,-55 124,-102z"/>
-                        <path d="M10101 20821c-64,-48 -89,-125 -75,-232 -179,202 -331,394 -455,575 62,7 276,113 642,319 52,35 89,28 111,-20 84,-120 157,-258 219,-413 -73,19 -220,-57 -442,-229z"/>
-                        <path d="M11839 18042c-235,130 -382,188 -442,175 -370,448 -592,669 -665,663 -15,0 -23,-10 -25,-29 -8,-39 -16,-38 -23,2 -1,796 -24,1641 -67,2533 -2,31 -6,53 -14,65 37,-12 289,98 757,331 -20,-105 19,-267 118,-486 -135,-68 -279,-128 -432,-179 8,-633 16,-1400 24,-2300 146,-78 267,-129 363,-153 24,319 26,605 6,857 -54,111 -198,243 -431,395 -80,61 -77,74 9,40 332,-185 615,-460 848,-824 -1,-230 -9,-593 -26,-1090z"/>
-                        <path d="M11953 19683c29,-49 21,-60 -25,-34 -209,182 -362,309 -458,383 9,160 1,542 -23,1146 24,65 59,68 103,9 181,-196 289,-294 324,-293 -36,-694 -29,-1076 22,-1146 18,-26 37,-48 57,-65z"/>
-                        <path d="M13288 18419c-128,-132 -264,-257 -406,-373 -70,217 -160,373 -272,467 -236,217 -385,321 -448,310 24,487 16,1025 -22,1615 -113,193 -211,337 -293,432 216,84 431,241 644,473 161,199 226,396 196,590 -34,133 -106,250 -215,352 -92,69 -187,95 -286,78 -36,3 -37,12 -1,30 104,23 213,-6 329,-87 87,-59 181,-191 283,-396 33,-133 27,-373 -21,-720 -14,-250 13,-401 81,-454 -215,-94 -322,-167 -321,-220 36,-524 56,-1155 61,-1893 10,-29 24,-53 44,-73 17,-18 39,-20 68,-8 68,36 131,72 187,106 25,21 39,54 41,102 9,159 2,340 -20,542 -112,211 -236,377 -372,499 135,131 325,309 571,533 23,25 37,60 40,104 13,349 26,747 38,1193 56,254 174,424 356,510 177,52 301,17 373,-103 10,-30 12,-64 7,-101 -15,-32 -28,-19 -39,40 -45,101 -128,118 -251,51 -24,-16 -38,-60 -41,-133 -26,-432 -61,-995 -107,-1689 0,-67 -56,-154 -168,-260 -74,-70 -207,-191 -397,-362 -10,-23 -8,-42 8,-56 98,-145 228,-302 389,-472 -26,-69 -38,-278 -36,-627z"/>
-                        <path d="M14623 18264c-143,-125 -282,-231 -418,-321 -54,187 -143,337 -269,449 -220,208 -368,313 -445,313 21,568 35,1437 41,2608 127,-180 250,-313 371,-399 -18,-45 -30,-124 -37,-238 1,-529 20,-1244 56,-2144 0,-37 13,-67 37,-89 18,-21 42,-20 71,3 65,38 128,75 189,111 21,20 33,57 36,109 8,177 5,341 -9,493 -169,287 -303,464 -400,529 212,195 414,378 608,549 21,16 35,48 41,94 14,364 32,803 54,1318 13,184 122,342 326,472 161,58 290,26 388,-95 35,-114 28,-135 -22,-61 -55,69 -128,91 -217,64 -43,-24 -67,-65 -73,-123 -60,-913 -84,-1506 -72,-1778 4,-51 -10,-92 -42,-123 -117,-101 -311,-281 -582,-540 -16,-11 -17,-30 -2,-56 121,-155 253,-314 395,-479 -39,-372 -47,-594 -25,-666z"/>
-                        <path d="M11042 19965c-46,32 -96,43 -150,31 45,-47 94,-91 148,-131 25,27 26,61 2,100z"/>
-                        <path d="M14256 9345c-34,-145 -58,-87 -156,-135 -46,-237 139,-225 157,-332 12,-68 -12,-145 -4,-238 8,-92 0,-140 -52,-184 -86,37 -24,74 -107,141 -160,131 -273,-106 -139,-132 86,-16 88,41 99,-114 -39,-20 -96,-38 -140,-61 7,-183 91,-109 134,-135 149,-90 106,-712 -289,-562l7 145c58,-9 68,-107 85,9 23,156 -23,347 -167,423 -84,45 -217,-20 -221,-126 -6,-145 73,-65 -36,-293 -79,2 -104,33 -145,80 26,142 72,301 -47,431 -2,1 -64,51 -65,51 -99,45 -114,5 -128,-60 42,-27 72,-4 153,-62 -4,-46 -21,-101 -18,-123 11,-59 36,-35 49,-106 -19,-204 -423,-119 -334,148 -83,44 -126,-5 -205,31l-43 -83c-56,-178 53,-478 243,-506 72,-11 154,-6 195,-49l23 -42c36,-59 117,-108 184,-130 151,-50 115,-19 218,-140l-43 -85c-97,19 -124,76 -206,25 -64,-40 -91,-101 -47,-171 121,-193 232,-90 369,-61 19,-89 51,-158 -23,-215 -257,-196 -447,182 -523,242 -145,-44 -198,-152 -125,-286 117,-217 37,-146 -5,-241 -21,-48 51,-14 -35,-66 -57,89 -38,136 -61,241 -181,61 -113,39 -251,-23l26 -70c-42,-41 -94,-48 -120,-83 -46,-62 -2,-71 -25,-155 -127,-71 -93,16 -193,-2 -176,-32 -225,-251 -32,-263 140,-8 121,45 151,143 115,-47 144,-142 31,-229 -171,-133 -370,-229 -583,-284 -494,-128 -1214,-238 -1687,-164 -114,17 -200,40 -327,49 -126,9 -278,43 -404,74 -132,33 -239,40 -351,112 -63,41 -91,48 -167,78 -114,46 -207,128 -310,182 -149,78 -245,155 -376,250l-192 167c-43,34 -104,68 -138,109l-226 266c-206,261 -509,845 -578,1212l-62 315c-49,310 46,723 119,1033 95,409 165,725 332,1109 175,404 102,357 175,566 29,86 61,66 26,176 -56,176 3,401 -80,593 -91,212 -158,322 -116,562 32,177 109,375 262,478 74,50 475,198 529,184 16,-33 -1,-60 -12,-102 81,37 138,130 233,152 -51,70 -34,1 -85,90 61,75 204,84 304,105l373 31c88,-140 48,-86 145,-152 -1,-64 -39,3 -12,-85 169,-56 215,224 36,280 -97,31 -43,-12 -135,11 -5,66 5,60 26,119 79,3 143,-24 183,-16 66,14 132,47 159,101 4,37 -20,36 -38,60 -2,2 -5,6 -7,8l-41 63c22,34 49,97 92,109 147,42 77,-126 181,-152 53,-13 107,3 144,24 87,49 129,150 59,245 -87,116 -201,40 -261,82 -63,44 -2,111 0,137 5,58 -14,30 -33,93 -19,65 -2,15 9,85 11,69 8,466 164,397 11,-48 -3,-27 -2,-42 7,-55 -15,-10 16,-50 25,115 28,271 43,380 22,159 76,213 164,267 -38,54 -97,47 -105,136 -4,42 169,416 190,487l131 527c1,6 4,23 5,28l17 66c4,19 5,31 10,51l7 26c0,-2 2,9 4,13 33,44 29,20 43,26 15,7 35,11 50,16l425 69c176,-86 166,-208 300,-484 65,-132 51,-119 133,-162 26,-13 35,-18 65,-34 91,-49 164,-114 258,-142 -5,51 32,443 60,478 17,20 125,91 178,-55 29,-80 54,-148 87,-222 47,45 37,175 33,242 -8,128 10,236 1,359 -7,-85 105,-111 111,-181 7,-79 -15,-71 -11,-156 3,-49 6,-114 14,-165 35,-211 -88,-289 139,-363 -19,45 -50,144 -67,188l58 41 32 -116c82,-309 377,-366 424,-494 -104,32 -338,220 -414,301l-28 -102 38 -12c55,-15 101,-34 138,-77 45,-52 66,-80 65,-160 -1,-73 -20,-118 -81,-156 -89,-54 -97,-35 -191,-18 -49,-47 -63,-87 -164,-86 -106,2 -95,35 -164,90 -47,-33 -96,-57 -158,-81 -53,-20 -100,-52 -158,-60 -62,187 -41,91 -7,296 14,85 -63,145 -136,102 -6,-4 -20,-17 -28,-24l-11 -47c2,-2 6,-6 9,-9 89,-88 81,-146 103,-275 14,-77 -2,-134 32,-183 36,-52 78,-72 143,-77 33,46 39,57 51,134 6,42 19,86 36,126 89,37 196,21 241,-72 33,-66 49,-232 39,-316 42,29 114,124 168,-5 32,-78 12,-176 -1,-255 -43,-257 -87,-290 -19,-419 173,-323 -48,-402 202,-585 33,-24 41,-31 65,-66 56,-81 -12,-35 60,-67 29,20 -2,16 65,10 2,242 -69,138 -169,275 -118,165 -36,268 94,395 263,262 41,777 111,1116 10,45 38,107 38,129 -1,93 -48,5 -26,125 129,14 60,-69 81,-143l12 -31c47,-137 23,-579 30,-757 6,-160 -37,-340 28,-484 40,-90 42,-124 -10,-202 -68,-103 -39,-103 -14,-194l119 17c26,-49 85,-104 60,-169 -27,-73 -80,-78 -122,-132l59 -66c143,-83 114,33 145,75 118,11 121,-55 92,-168 -27,-105 -79,-63 -120,-136 -28,-117 64,-254 185,-174 122,81 63,173 -3,258l93 101c133,-36 192,-12 320,-79 128,-68 -12,-45 304,-187 559,-251 212,-679 169,-1121 -14,-138 11,-257 22,-380 12,-124 74,-205 -88,-249 -54,59 -51,129 -67,195 -60,248 -35,233 -232,489 -113,148 -125,147 -324,200 -71,19 -128,45 -208,56 -69,9 -74,-23 -97,28 -19,41 1,10 4,37l1 30c0,-2 0,8 -2,11 -85,19 3,-43 -135,-26 -78,9 -137,-2 -180,6l-29 79c-51,-55 -76,-69 -143,-117 -144,-103 -165,-121 -322,-170 -5,-1 -17,-7 -22,-8 -24,-6 -60,2 -80,23 -37,37 -10,34 -40,73 -36,-96 -59,-202 -133,-255 -72,-52 -50,-22 -102,-95 -143,-200 -210,-481 -161,-746 18,-97 26,-188 76,-285 144,-279 263,-259 351,-420 76,-139 42,-155 63,-316 37,-18 49,-27 97,-8 48,21 27,36 29,66 11,169 128,39 241,16 363,-74 864,75 1145,311 61,51 168,84 198,165 1,4 2,9 3,13 1,1 8,33 10,39 35,126 51,226 30,357 -19,120 154,188 227,86l70 -159c133,-329 124,-353 58,-703 -75,-403 157,-428 87,-731zm-1222 -2231l0 0c27,24 47,33 62,77l-138 92c-38,-109 -53,-155 76,-169zm-477 5741l0 0c119,8 116,47 99,149l-61 19c-4,1 -8,2 -12,4 -48,16 -1,8 -57,20 -18,-118 -57,-115 31,-192zm-2865 513l0 0c-3,34 5,4 -10,33l-84 1c-27,-109 24,-148 132,-154 -29,81 -25,-14 -38,120zm404 -1462l0 0c-62,-22 -48,-57 -89,-76l-92 -42 -167 159c-133,128 -350,125 -466,189 -69,38 -17,44 -101,53 -28,4 -12,-49 -86,54 -3,-2 -8,-4 -10,-6l-84 -45c-95,-60 -64,-60 -169,-58 -171,3 -45,-30 -295,-94 -77,51 -7,67 -103,46 -36,-88 67,-53 -65,-164 -205,-174 -47,-97 -275,-252 -67,-46 -170,-282 -179,-347 -10,-72 9,-76 9,-113 0,-76 -65,-61 -33,-327 9,-83 56,-101 93,-164 -20,-80 -43,-72 -9,-167 46,-126 89,-170 159,-253 59,-71 57,-72 153,-109 190,-74 278,-147 370,-188l68 -27c4,-1 9,-2 13,-3 85,-26 25,15 72,-48 21,-29 11,-23 39,-51 72,68 -27,76 122,98 68,10 150,3 218,15 71,12 101,41 186,46 164,10 32,-44 161,-42 133,3 209,177 303,263l177 150c-17,79 -58,94 -3,186 16,26 28,32 49,65 19,29 28,50 41,73 59,102 136,172 152,308 3,32 -14,408 -21,429 -14,43 -69,141 -119,176 -179,121 35,144 -19,266zm411 4001l0 0 -10 144c0,4 -1,10 -2,14 0,3 -2,15 -2,13 -1,-2 -2,9 -3,13 -68,-109 -218,-682 -276,-763 -32,-45 -11,-17 -43,-38 -3,-3 -16,-10 -19,-11 -2,-2 -9,-2 -10,-6 -1,-5 -7,-3 -10,-6 54,-34 44,-10 32,-98 -25,-169 -41,-211 50,-307 50,26 27,19 100,21 -11,215 30,93 80,197 23,48 27,166 37,211l61 433 80 49c2,2 8,11 9,9 1,-3 6,5 8,8 -45,45 -68,54 -82,117zm399 -540l0 0c-1,-89 -29,-167 1,-276 129,-19 93,66 121,227l9 233c-92,-38 -129,-81 -131,-184zm550 -1725l0 0c-56,-43 -105,-61 -191,-35 -92,28 -98,66 -96,205 -47,-61 -33,-133 -33,-162 -1,-48 -143,-391 -155,-417 -160,-16 -62,23 -278,144 -105,59 -118,128 -180,237 -85,-17 -74,-59 -193,-141 -2,-1 -8,-2 -10,-7 -1,-5 -6,-4 -9,-6l24 -121c1,-5 2,-9 4,-14l68 -279c42,-148 49,-211 82,-360 51,-234 56,-167 196,-311l199 -178c21,-22 35,-37 65,-58 95,63 -14,30 167,121 83,43 177,263 199,360 37,167 117,508 114,632 -5,151 51,286 74,420 -59,-17 -6,1 -47,-30zm169 -6352l0 0c-66,-14 -107,-72 -145,-117 13,-32 34,-50 40,-65 17,-44 -29,-143 117,-113 57,11 43,14 46,46 10,89 -36,49 64,105 31,18 32,24 51,46 -22,65 -69,121 -173,98zm290 -758l0 0c-31,61 -95,137 -155,173 -271,165 -245,-122 -432,-137 9,54 99,147 -37,205 -204,88 -281,-4 -300,-9 -24,-7 -46,11 -104,9 -6,-79 20,-21 -5,-92 -73,-210 -12,-340 158,-532 165,-187 428,-241 679,-109 9,138 -12,140 -111,119 5,71 47,99 84,140 103,-27 62,-51 202,-21 34,106 77,146 21,254zm539 408l0 0c-94,135 -301,174 -341,28l109 -40c-9,-27 -6,-26 -25,-50 -2,-3 -6,-6 -8,-9l-98 -98c-110,-154 121,-321 199,-313 151,15 71,99 75,141 11,108 115,-30 137,148 8,63 0,124 -48,193zm905 1643l0 0c-107,-137 -6,-186 36,-228 2,4 2,9 3,12l29 80c50,-38 22,-39 74,-31l6 118c-47,37 -66,52 -148,49z"/>
-                    </g>
-                </svg>
-            </div>
-
-            <div class="info">
-                <h1>GuerrTattooAR</h1>
-                <ul>
-                    <li><span>1</span> Apunta a la imagen</li>
-                    <li><span>2</span> Sube tu diseño</li>
-                    <li><span>3</span> Ajusta tamaño/rotación</li>
-                    <li><span>4</span> Captura y comparte</li>
-                </ul>
-            </div>
-
-            <button class="btn" id="startBtn">Comenzar</button>
-        </div>
-    </div>
-
-    <!-- INTERFAZ AR (inicialmente oculta) -->
-    <div class="ar-interface" id="arInterface">
-        <div class="error-message" id="cameraError">
-            <i class="fas fa-exclamation-triangle"></i> No se pudo acceder a la cámara. Verifica permisos.
+    <div class="app-container">
+        <!-- Header con nombre del estudio y artista -->
+        <div class="header">
+            <h1>Guerr <span>Tattoo</span></h1>
+            <p><i class="fas fa-map-pin"></i> Suba, Bogotá · Julián Guerrero</p>
         </div>
 
-        <div class="marker-status" id="markerStatus">
-            <span class="dot" id="statusDot"></span>
-            <span id="statusText">Buscando...</span>
-        </div>
-
-        <div class="marker-thumb">
-            <img src="https://github.com/hiukim/mind-ar-js/raw/master/examples/image-tracking/assets/card-example/card.png" alt="Marcador">
-        </div>
-
-        <div class="toggle-panel-btn" id="togglePanelBtn">
-            <i class="fas fa-chevron-down"></i>
-        </div>
-
-        <div class="controls-panel" id="controlsPanel">
-            <div class="upload-btn-large" id="uploadBtn" title="Subir imagen propia">
-                <i class="fas fa-upload"></i>
-            </div>
-
-            <div class="size-row">
-                <div class="size-label">
-                    <span><i class="fas fa-expand-alt"></i> Tamaño</span>
-                    <span id="sizeValue">1.5</span>
+        <!-- Sección Inicio -->
+        <section id="inicio">
+            <div class="section-title"><i class="fas fa-home"></i> Inicio</div>
+            <div class="featured-scroll">
+                <div class="featured-card blackwork">
+                    <h3>Blackwork</h3>
+                    <p>12 diseños</p>
                 </div>
-                <input type="range" id="sizeSlider" min="0.5" max="2.5" step="0.1" value="1.5">
-            </div>
-
-            <div class="rotation-row">
-                <span class="rotation-label">X</span>
-                <div class="rotation-buttons">
-                    <button class="rotation-btn" id="rotXMinus">−</button>
-                    <span class="rotation-value" id="rotXVal">-180°</span>
-                    <button class="rotation-btn" id="rotXPlus">+</button>
+                <div class="featured-card realism">
+                    <h3>Realismo</h3>
+                    <p>8 diseños</p>
+                </div>
+                <div class="featured-card minimal">
+                    <h3>Minimal</h3>
+                    <p>15 diseños</p>
                 </div>
             </div>
-
-            <div class="rotation-row">
-                <span class="rotation-label">Y</span>
-                <div class="rotation-buttons">
-                    <button class="rotation-btn" id="rotYMinus">−</button>
-                    <span class="rotation-value" id="rotYVal">180°</span>
-                    <button class="rotation-btn" id="rotYPlus">+</button>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn" onclick="alert('Simulación: ir a reservas')"><i class="fas fa-calendar-check"></i> Reservar cita</button>
+                <button class="btn-outline btn" onclick="document.getElementById('solicitud').scrollIntoView({behavior:'smooth'})"><i class="fas fa-pen"></i> Pedir diseño</button>
+            </div>
+            <!-- Instagram preview -->
+            <div style="margin-top: 24px; background: #1a1a1a; border-radius: 20px; padding: 16px;">
+                <p style="display: flex; gap: 8px; align-items: center;"><i class="fab fa-instagram gold"></i> Último post</p>
+                <div style="display: flex; gap: 8px; margin-top: 12px;">
+                    <div style="width: 70px; height: 70px; background: #2c2c2c; border-radius: 16px;"></div>
+                    <div style="width: 70px; height: 70px; background: #2c2c2c; border-radius: 16px;"></div>
+                    <div style="width: 70px; height: 70px; background: #2c2c2c; border-radius: 16px;"></div>
                 </div>
             </div>
+        </section>
 
-            <div class="rotation-row">
-                <span class="rotation-label">Z</span>
-                <div class="rotation-buttons">
-                    <button class="rotation-btn" id="rotZMinus">−</button>
-                    <span class="rotation-value" id="rotZVal">270°</span>
-                    <button class="rotation-btn" id="rotZPlus">+</button>
+        <!-- Perfil del artista -->
+        <section id="perfil">
+            <div class="section-title"><i class="fas fa-user"></i> Artista</div>
+            <div class="profile-header">
+                <div class="profile-avatar"><i class="fas fa-user"></i></div>
+                <div class="profile-info">
+                    <h2>Julián Guerrero</h2>
+                    <a href="https://www.instagram.com/julianguerrerotattoo/" target="_blank" class="insta"><i class="fab fa-instagram"></i> @julianguerrerotattoo</a>
+                    <div class="rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                        <span style="color:#b0b0b0; margin-left:6px;">4.9 (127 reseñas)</span>
+                    </div>
                 </div>
             </div>
-
-            <div class="action-buttons">
-                <button class="action-btn" id="resetRotation" title="Reiniciar rotación"><i class="fas fa-sync-alt"></i></button>
-                <button class="action-btn" id="captureBtn" title="Capturar pantalla"><i class="fas fa-camera"></i></button>
-                <button class="action-btn" id="clearCustomBtn" title="Eliminar imagen"><i class="fas fa-trash-alt"></i></button>
+            <p style="margin-bottom: 20px; color:#ccc;">Especialista en blackwork, realismo y minimalismo. Más de 8 años de experiencia creando arte sobre la piel en Bogotá.</p>
+            <div class="review-card">
+                <i class="fas fa-quote-left gold"></i>
+                <p>Excelente trato, muy profesional y el estudio impecable. Mi realismo quedó perfecto.</p>
+                <p style="margin-top: 8px; color: #c6a43f;">— Camila, 28</p>
             </div>
+            <div class="review-card">
+                <p>Julián es un crack, me hizo un blackwork enorme y quedó brutal. Puntual y amable.</p>
+                <p style="margin-top: 8px; color: #c6a43f;">— Santiago, 31</p>
+            </div>
+        </section>
+
+        <!-- Galería -->
+        <section id="galeria">
+            <div class="section-title"><i class="fas fa-images"></i> Galería</div>
+            <div class="category-tabs">
+                <button class="category-btn active" data-filter="all">Todos</button>
+                <button class="category-btn" data-filter="blackwork">Blackwork</button>
+                <button class="category-btn" data-filter="realismo">Realismo</button>
+                <button class="category-btn" data-filter="minimal">Minimal</button>
+            </div>
+            <div class="gallery-grid" id="gallery-grid">
+                <div class="gallery-item" data-category="blackwork">Black 1</div>
+                <div class="gallery-item" data-category="blackwork">Black 2</div>
+                <div class="gallery-item" data-category="realismo">Real 1</div>
+                <div class="gallery-item" data-category="minimal">Min 1</div>
+                <div class="gallery-item" data-category="realismo">Real 2</div>
+                <div class="gallery-item" data-category="blackwork">Black 3</div>
+                <div class="gallery-item" data-category="minimal">Min 2</div>
+                <div class="gallery-item" data-category="minimal">Min 3</div>
+                <div class="gallery-item" data-category="realismo">Real 3</div>
+            </div>
+        </section>
+
+        <!-- Precios -->
+        <section id="precios">
+            <div class="section-title"><i class="fas fa-tag"></i> Guía de precios</div>
+            <div class="pricing-cards">
+                <div class="price-card">
+                    <h3>Pequeño</h3>
+                    <div class="price">$200k</div>
+                    <small>hasta 10cm · 1-2h</small>
+                </div>
+                <div class="price-card">
+                    <h3>Mediano</h3>
+                    <div class="price">$400k</div>
+                    <small>10-20cm · 2-4h</small>
+                </div>
+                <div class="price-card">
+                    <h3>Grande</h3>
+                    <div class="price">$800k+</div>
+                    <small>+20cm · sesiones</small>
+                </div>
+            </div>
+            <p style="margin-top: 16px; font-size:13px; color:#aaa;">*Precios en pesos colombianos, incluye asesoría. El precio final se confirma en consulta.</p>
+        </section>
+
+        <!-- Reservas con depósito -->
+        <section id="reservas">
+            <div class="section-title"><i class="fas fa-calendar-alt"></i> Reserva tu cita</div>
+            <div class="form-group">
+                <label>Fecha</label>
+                <input type="date" id="fecha-cita" min="2025-04-01">
+            </div>
+            <div class="form-group">
+                <label>Hora</label>
+                <select id="hora-cita">
+                    <option>10:00 AM (2h)</option>
+                    <option>12:00 PM (2h)</option>
+                    <option>2:00 PM (3h)</option>
+                    <option>4:00 PM (2h)</option>
+                </select>
+            </div>
+            <button class="btn" onclick="simularPago()"><i class="fas fa-lock"></i> Pagar depósito (20% · $40k)</button>
+            <p style="margin-top:12px; font-size:12px; color:#aaa;">Depósito no reembolsable, se descuenta del total.</p>
+        </section>
+
+        <!-- Solicitud de diseño personalizado -->
+        <section id="solicitud">
+            <div class="section-title"><i class="fas fa-pencil-alt"></i> Solicita tu diseño</div>
+            <form id="tattooForm" onsubmit="event.preventDefault(); enviarSolicitud()">
+                <div class="form-group">
+                    <label>Estilo</label>
+                    <select required>
+                        <option>Blackwork</option>
+                        <option>Realismo</option>
+                        <option>Minimal</option>
+                        <option>Geométrico</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ubicación en el cuerpo</label>
+                    <input type="text" placeholder="ej. antebrazo, costilla..." required>
+                </div>
+                <div class="form-group">
+                    <label>Tamaño aproximado</label>
+                    <select>
+                        <option>Pequeño (hasta 10cm)</option>
+                        <option>Mediano (10-20cm)</option>
+                        <option>Grande (+20cm)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Descripción de la idea</label>
+                    <textarea rows="3" placeholder="Cuéntame tu idea..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Imágenes de referencia (hasta 5)</label>
+                    <div class="file-upload" onclick="alert('Simulación: seleccionar archivos')">
+                        <i class="fas fa-cloud-upload-alt"></i> Toca para subir
+                    </div>
+                </div>
+                <button type="submit" class="btn">Enviar solicitud</button>
+            </form>
+        </section>
+
+        <!-- Chat / Mensajes -->
+        <section id="chat">
+            <div class="section-title"><i class="fas fa-comment-dots"></i> Mensajes</div>
+            <div class="chat-box" id="chatBox">
+                <div class="message artist">Hola, soy Julián. ¿En qué puedo ayudarte?</div>
+                <div class="message client">Me gustaría consultar disponibilidad para un realismo</div>
+            </div>
+            <div class="chat-input">
+                <input type="text" placeholder="Escribe un mensaje..." id="chatInput">
+                <button class="btn" style="width: auto; padding: 14px 20px;" onclick="enviarMensaje()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </section>
+
+        <!-- Ubicación con mapa y dirección exacta -->
+        <section id="ubicacion">
+            <div class="section-title"><i class="fas fa-map-marker-alt"></i> Estudio en Suba</div>
+            <div class="map-container">
+                <!-- OpenStreetMap con coordenadas aproximadas de Cra. 107 #143-22, Suba -->
+                <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=-74.1130%2C4.7600%2C-74.0930%2C4.7800&layer=mapnik&marker=4.7700%2C-74.1030" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+            <div class="directions">
+                <i class="fas fa-location-dot gold fa-2x"></i>
+                <div>
+                    <p><strong>Cra. 107 #143-22, piso 2</strong> · Suba, Bogotá</p>
+                    <p style="color:#aaa; font-size:13px;"><i class="fas fa-phone-alt"></i> 301 280 2733</p>
+                    <a href="https://maps.google.com/?q=Cra.+107+%23143-22+Bogot%C3%A1" target="_blank" style="color:#c6a43f; text-decoration:none;" onclick="event.preventDefault(); window.open('https://maps.google.com/?q=Cra.+107+%23143-22+Bogot%C3%A1', '_blank');">Cómo llegar <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navegación inferior -->
+        <nav class="bottom-nav">
+            <a href="#inicio" class="nav-item active"><i class="fas fa-home"></i><span>Inicio</span></a>
+            <a href="#galeria" class="nav-item"><i class="fas fa-images"></i><span>Galería</span></a>
+            <a href="#reservas" class="nav-item"><i class="fas fa-calendar"></i><span>Reservas</span></a>
+            <a href="#perfil" class="nav-item"><i class="fas fa-user"></i><span>Perfil</span></a>
+            <a href="#chat" class="nav-item"><i class="fas fa-comment"></i><span>Chat</span></a>
+        </nav>
+
+        <div class="footer-note">
+            Guerr Tattoo · Tatuajes con estilo en Bogotá
         </div>
-
-        <input type="file" id="fileInput" accept="image/*" style="display: none;">
-    </div>
-
-    <div class="ar-interface" id="arInterfaceScene" style="position: absolute; top:0; left:0; width:100%; height:100%;">
-        <a-scene
-            id="scene"
-            mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; filterMinCF: 0.005; filterBeta: 2000;"
-            color-space="sRGB"
-            renderer="colorManagement: true, physicallyCorrectLights"
-            vr-mode-ui="enabled: false"
-            device-orientation-permission-ui="enabled: false"
-            embedded
-            style="width: 100%; height: 100%;"
-        >
-            <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-            <a-entity mindar-image-target="targetIndex: 0">
-                <!-- Usamos la posición original que funcionaba: 0 0.2 0 -->
-                <a-image id="tatuaje"
-                         src=""
-                         position="0 0.2 0"
-                         rotation="0 0 0"
-                         width="1.2"
-                         height="1.2"
-                         material="transparent: true; depthTest: false; side: double;"
-                         scale="1.5 1.5 1.5">
-                </a-image>
-            </a-entity>
-        </a-scene>
     </div>
 
     <script>
-        (function() {
-            // Elementos del DOM
-            const startMenu = document.getElementById('startMenu');
-            const startBtn = document.getElementById('startBtn');
-            const arInterfaces = document.querySelectorAll('.ar-interface');
-            const scene = document.getElementById('scene');
-            const tatuaje = document.getElementById('tatuaje');
-            const sizeSlider = document.getElementById('sizeSlider');
-            const sizeValue = document.getElementById('sizeValue');
-            const statusDot = document.getElementById('statusDot');
-            const statusText = document.getElementById('statusText');
-            const captureBtn = document.getElementById('captureBtn');
-            const cameraErrorDiv = document.getElementById('cameraError');
-            const resetRotationBtn = document.getElementById('resetRotation');
-            const toggleBtn = document.getElementById('togglePanelBtn');
-            const controlsPanel = document.getElementById('controlsPanel');
-            const uploadBtn = document.getElementById('uploadBtn');
-            const fileInput = document.getElementById('fileInput');
-            const clearCustomBtn = document.getElementById('clearCustomBtn');
+        // 1. Navegación activa y scroll suave
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('section');
 
-            const rotXVal = document.getElementById('rotXVal');
-            const rotYVal = document.getElementById('rotYVal');
-            const rotZVal = document.getElementById('rotZVal');
-            const rotXPlus = document.getElementById('rotXPlus');
-            const rotXMinus = document.getElementById('rotXMinus');
-            const rotYPlus = document.getElementById('rotYPlus');
-            const rotYMinus = document.getElementById('rotYMinus');
-            const rotZPlus = document.getElementById('rotZPlus');
-            const rotZMinus = document.getElementById('rotZMinus');
-
-            let currentScale = 1.5;
-            let rotationX = -180;
-            let rotationY = 180;
-            let rotationZ = 270;
-            let customImageData = null;
-
-            // ========== GENERAR SVG POR DEFECTO (como dataURL) ==========
-            function getDefaultSVGDataURL() {
-                // SVG con todos los paths y borde morado
-                const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21590 27940">
-                    <defs>
-                        <style type="text/css">
-                            .fil0 {fill:white}
-                            .fil1 {fill:black}
-                            .fil2 {fill:#FEFEFE}
-                            .str0 {stroke:white;stroke-width:20}
-                            .str1 {stroke:black;stroke-width:20}
-                        </style>
-                    </defs>
-                    <g>
-                        <path d="M8550 19311c13,-22 11,-34 -6,-36 -159,65 -267,34 -324,-93 -48,-120 -19,-258 86,-414 78,-81 174,-131 289,-150 -5,-770 7,-1204 35,-1302 -387,167 -631,240 -730,216 -11,204 -313,508 -905,913 -91,89 -200,177 -327,266 -393,565 -529,1195 -408,1890 143,672 557,1064 1242,1176 153,-329 246,-516 278,-562 -455,-56 -802,-290 -1039,-703 -271,-674 -222,-1301 148,-1881 143,-148 211,-165 206,-50 -30,513 -89,1193 -176,2040 20,219 157,317 412,295 125,-37 196,-120 213,-250 -109,-91 -115,-188 -17,-290 345,-35 710,-65 1094,-90 114,-131 211,-265 291,-401 -64,33 -300,52 -708,55 -136,6 -303,12 -503,20 -157,121 -249,272 -274,451 -7,91 9,172 46,243 19,116 -31,190 -151,222 -190,19 -294,-67 -313,-260 1,-239 136,-446 407,-620 48,-547 100,-1164 157,-1849 152,-67 347,-149 586,-246 -45,522 -51,948 -19,1278 122,190 259,234 410,132z" stroke="#b967ff" stroke-width="60" fill="black"/>
-                        <path d="M8874 20999c-157,-498 -294,-721 -413,-669 71,73 109,294 115,662 17,81 -12,62 -86,-58 -47,-66 -71,-98 -71,-98 -31,-29 -58,-26 -81,9 -234,223 -530,580 -888,1070 -142,708 -5,1129 412,1262 94,10 105,1 31,-27 -325,-123 -372,-399 -141,-829 425,-596 799,-1037 1122,-1322z" stroke="#b967ff" stroke-width="60" fill="black"/>
-                        <path d="M9603 18829c49,-39 45,-48 -11,-26 -167,101 -349,227 -545,378 -18,19 -34,18 -47,-2 -20,473 -44,950 -73,1430 109,-113 238,-225 387,-336 41,-24 64,-80 69,-171 -7,-554 16,-924 69,-1109 12,-58 62,-113 151,-164z" stroke="#b967ff" stroke-width="60" fill="black"/>
-                        <path d="M9582 21209c-114,-19 -272,-290 -473,-814 -165,165 -292,271 -383,319 189,562 397,933 624,1113 36,29 32,3 -13,-76 0,-115 81,-296 245,-542z" stroke="#b967ff" stroke-width="60" fill="black"/>
-                        <path d="M10434 18154c52,-38 51,-46 -4,-24 -161,69 -329,179 -506,330 -44,25 -63,84 -59,176 -8,760 -13,1495 -16,2204 170,-155 327,-284 470,-388 -24,-101 -27,-833 -9,-2196 -6,-21 35,-55 124,-102z" stroke="#b967ff" stroke-width="60" fill="black"/>
-                        <path d="M10101 20821c-64,-48 -89,-125 -75,-232 -179,202 -331,394 -455,575 62,7 276,113 642,319 52,35 89,28 111,-20 84,-120 157,-258 219,-413 -73,19 -220,-57 -442,-229z" stroke="#b967ff" stroke-width="60" fill="black"/>
-                        <path d="M11839 18042c-235,130 -382,188 -442,175 -370,448 -592,669 -665,663 -15,0 -23,-10 -25,-29 -8,-39 -16,-38 -23,2 -1,796 -24,1641 -67,2533 -2,31 -6,53 -14,65 37,-12 289,98 757,331 -20,-105 19,-267 118,-486 -135,-68 -279,-128 -432,-179 8,-633 16,-1400 24,-2300 146,-78 267,-129 363,-153 24,319 26,605 6,857 -54,111 -198,243 -431,395 -80,61 -77,74 9,40 332,-185 615,-460 848,-824 -1,-230 -9,-593 -26,-1090z" stroke="#b967ff" stroke-width="60" fill="black"/>
-                        <path d="M11953 19683c29,-49 21,-60 -25,-34 -209,182 -362,309 -458,383 9,160 1,542 -23,1146 24,65 59,68 103,9 181,-196 289,-294 324,-293 -36,-694 -29,-1076 22,-1146 18,-26 37,-48 57,-65z" stroke="#b967ff" stroke-width="60" fill="black"/>
-                        <path d="M13288 18419c-128,-132 -264,-257 -406,-373 -70,217 -160,373 -272,467 -236,217 -385,321 -448,310 24,487 16,1025 -22,1615 -113,193 -211,337 -293,432 216,84 431,241 644,473 161,199 226,396 196,590 -34,133 -106,250 -215,352 -92,69 -187,95 -286,78 -36,3 -37,12 -1,30 104,23 213,-6 329,-87 87,-59 181,-191 283,-396 33,-133 27,-373 -21,-720 -14,-250 13,-401 81,-454 -215,-94 -322,-167 -321,-220 36,-524 56,-1155 61,-1893 10,-29 24,-53 44,-73 17,-18 39,-20 68,-8 68,36 131,72 187,106 25,21 39,54 41,102 9,159 2,340 -20,542 -112,211 -236,377 -372,499 135,131 325,309 571,533 23,25 37,60 40,104 13,349 26,747 38,1193 56,254 174,424 356,510 177,52 301,17 373,-103 10,-30 12,-64 7,-101 -15,-32 -28,-19 -39,40 -45,101 -128,118 -251,51 -24,-16 -38,-60 -41,-133 -26,-432 -61,-995 -107,-1689 0,-67 -56,-154 -168,-260 -74,-70 -207,-191 -397,-362 -10,-23 -8,-42 8,-56 98,-145 228,-302 389,-472 -26,-69 -38,-278 -36,-627z" stroke="#b967ff" stroke-width="60" fill="black"/>
-                        <path d="M14623 18264c-143,-125 -282,-231 -418,-321 -54,187 -143,337 -269,449 -220,208 -368,313 -445,313 21,568 35,1437 41,2608 127,-180 250,-313 371,-399 -18,-45 -30,-124 -37,-238 1,-529 20,-1244 56,-2144 0,-37 13,-67 37,-89 18,-21 42,-20 71,3 65,38 128,75 189,111 21,20 33,57 36,109 8,177 5,341 -9,493 -169,287 -303,464 -400,529 212,195 414,378 608,549 21,16 35,48 41,94 14,364 32,803 54,1318 13,184 122,342 326,472 161,58 290,26 388,-95 35,-114 28,-135 -22,-61 -55,69 -128,91 -217,64 -43,-24 -67,-65 -73,-123 -60,-913 -84,-1506 -72,-1778 4,-51 -10,-92 -42,-123 -117,-101 -311,-281 -582,-540 -16,-11 -17,-30 -2,-56 121,-155 253,-314 395,-479 -39,-372 -47,-594 -25,-666z" stroke="#b967ff" stroke-width="60" fill="black"/>
-                        <path d="M11042 19965c-46,32 -96,43 -150,31 45,-47 94,-91 148,-131 25,27 26,61 2,100z" stroke="#b967ff" stroke-width="60" fill="black"/>
-                        <path d="M14256 9345c-34,-145 -58,-87 -156,-135 -46,-237 139,-225 157,-332 12,-68 -12,-145 -4,-238 8,-92 0,-140 -52,-184 -86,37 -24,74 -107,141 -160,131 -273,-106 -139,-132 86,-16 88,41 99,-114 -39,-20 -96,-38 -140,-61 7,-183 91,-109 134,-135 149,-90 106,-712 -289,-562l7 145c58,-9 68,-107 85,9 23,156 -23,347 -167,423 -84,45 -217,-20 -221,-126 -6,-145 73,-65 -36,-293 -79,2 -104,33 -145,80 26,142 72,301 -47,431 -2,1 -64,51 -65,51 -99,45 -114,5 -128,-60 42,-27 72,-4 153,-62 -4,-46 -21,-101 -18,-123 11,-59 36,-35 49,-106 -19,-204 -423,-119 -334,148 -83,44 -126,-5 -205,31l-43 -83c-56,-178 53,-478 243,-506 72,-11 154,-6 195,-49l23 -42c36,-59 117,-108 184,-130 151,-50 115,-19 218,-140l-43 -85c-97,19 -124,76 -206,25 -64,-40 -91,-101 -47,-171 121,-193 232,-90 369,-61 19,-89 51,-158 -23,-215 -257,-196 -447,182 -523,242 -145,-44 -198,-152 -125,-286 117,-217 37,-146 -5,-241 -21,-48 51,-14 -35,-66 -57,89 -38,136 -61,241 -181,61 -113,39 -251,-23l26 -70c-42,-41 -94,-48 -120,-83 -46,-62 -2,-71 -25,-155 -127,-71 -93,16 -193,-2 -176,-32 -225,-251 -32,-263 140,-8 121,45 151,143 115,-47 144,-142 31,-229 -171,-133 -370,-229 -583,-284 -494,-128 -1214,-238 -1687,-164 -114,17 -200,40 -327,49 -126,9 -278,43 -404,74 -132,33 -239,40 -351,112 -63,41 -91,48 -167,78 -114,46 -207,128 -310,182 -149,78 -245,155 -376,250l-192 167c-43,34 -104,68 -138,109l-226 266c-206,261 -509,845 -578,1212l-62 315c-49,310 46,723 119,1033 95,409 165,725 332,1109 175,404 102,357 175,566 29,86 61,66 26,176 -56,176 3,401 -80,593 -91,212 -158,322 -116,562 32,177 109,375 262,478 74,50 475,198 529,184 16,-33 -1,-60 -12,-102 81,37 138,130 233,152 -51,70 -34,1 -85,90 61,75 204,84 304,105l373 31c88,-140 48,-86 145,-152 -1,-64 -39,3 -12,-85 169,-56 215,224 36,280 -97,31 -43,-12 -135,11 -5,66 5,60 26,119 79,3 143,-24 183,-16 66,14 132,47 159,101 4,37 -20,36 -38,60 -2,2 -5,6 -7,8l-41 63c22,34 49,97 92,109 147,42 77,-126 181,-152 53,-13 107,3 144,24 87,49 129,150 59,245 -87,116 -201,40 -261,82 -63,44 -2,111 0,137 5,58 -14,30 -33,93 -19,65 -2,15 9,85 11,69 8,466 164,397 11,-48 -3,-27 -2,-42 7,-55 -15,-10 16,-50 25,115 28,271 43,380 22,159 76,213 164,267 -38,54 -97,47 -105,136 -4,42 169,416 190,487l131 527c1,6 4,23 5,28l17 66c4,19 5,31 10,51l7 26c0,-2 2,9 4,13 33,44 29,20 43,26 15,7 35,11 50,16l425 69c176,-86 166,-208 300,-484 65,-132 51,-119 133,-162 26,-13 35,-18 65,-34 91,-49 164,-114 258,-142 -5,51 32,443 60,478 17,20 125,91 178,-55 29,-80 54,-148 87,-222 47,45 37,175 33,242 -8,128 10,236 1,359 -7,-85 105,-111 111,-181 7,-79 -15,-71 -11,-156 3,-49 6,-114 14,-165 35,-211 -88,-289 139,-363 -19,45 -50,144 -67,188l58 41 32 -116c82,-309 377,-366 424,-494 -104,32 -338,220 -414,301l-28 -102 38 -12c55,-15 101,-34 138,-77 45,-52 66,-80 65,-160 -1,-73 -20,-118 -81,-156 -89,-54 -97,-35 -191,-18 -49,-47 -63,-87 -164,-86 -106,2 -95,35 -164,90 -47,-33 -96,-57 -158,-81 -53,-20 -100,-52 -158,-60 -62,187 -41,91 -7,296 14,85 -63,145 -136,102 -6,-4 -20,-17 -28,-24l-11 -47c2,-2 6,-6 9,-9 89,-88 81,-146 103,-275 14,-77 -2,-134 32,-183 36,-52 78,-72 143,-77 33,46 39,57 51,134 6,42 19,86 36,126 89,37 196,21 241,-72 33,-66 49,-232 39,-316 42,29 114,124 168,-5 32,-78 12,-176 -1,-255 -43,-257 -87,-290 -19,-419 173,-323 -48,-402 202,-585 33,-24 41,-31 65,-66 56,-81 -12,-35 60,-67 29,20 -2,16 65,10 2,242 -69,138 -169,275 -118,165 -36,268 94,395 263,262 41,777 111,1116 10,45 38,107 38,129 -1,93 -48,5 -26,125 129,14 60,-69 81,-143l12 -31c47,-137 23,-579 30,-757 6,-160 -37,-340 28,-484 40,-90 42,-124 -10,-202 -68,-103 -39,-103 -14,-194l119 17c26,-49 85,-104 60,-169 -27,-73 -80,-78 -122,-132l59 -66c143,-83 114,33 145,75 118,11 121,-55 92,-168 -27,-105 -79,-63 -120,-136 -28,-117 64,-254 185,-174 122,81 63,173 -3,258l93 101c133,-36 192,-12 320,-79 128,-68 -12,-45 304,-187 559,-251 212,-679 169,-1121 -14,-138 11,-257 22,-380 12,-124 74,-205 -88,-249 -54,59 -51,129 -67,195 -60,248 -35,233 -232,489 -113,148 -125,147 -324,200 -71,19 -128,45 -208,56 -69,9 -74,-23 -97,28 -19,41 1,10 4,37l1 30c0,-2 0,8 -2,11 -85,19 3,-43 -135,-26 -78,9 -137,-2 -180,6l-29 79c-51,-55 -76,-69 -143,-117 -144,-103 -165,-121 -322,-170 -5,-1 -17,-7 -22,-8 -24,-6 -60,2 -80,23 -37,37 -10,34 -40,73 -36,-96 -59,-202 -133,-255 -72,-52 -50,-22 -102,-95 -143,-200 -210,-481 -161,-746 18,-97 26,-188 76,-285 144,-279 263,-259 351,-420 76,-139 42,-155 63,-316 37,-18 49,-27 97,-8 48,21 27,36 29,66 11,169 128,39 241,16 363,-74 864,75 1145,311 61,51 168,84 198,165 1,4 2,9 3,13 1,1 8,33 10,39 35,126 51,226 30,357 -19,120 154,188 227,86l70 -159c133,-329 124,-353 58,-703 -75,-403 157,-428 87,-731z" stroke="#b967ff" stroke-width="60" fill="black"/>
-                    </g>
-                </svg>`;
-                return 'data:image/svg+xml;base64,' + btoa(svgString);
-            }
-
-            const defaultSVGDataURL = getDefaultSVGDataURL();
-            tatuaje.setAttribute('src', defaultSVGDataURL);
-            customImageData = defaultSVGDataURL; // Para que no se considere "vacío"
-
-            // ========== PLEGAR / DESPLEGAR PANEL ==========
-            toggleBtn.addEventListener('click', () => {
-                controlsPanel.classList.toggle('hidden');
-                toggleBtn.classList.toggle('hidden');
+        function setActiveNav() {
+            let index = sections.length;
+            while (--index && window.scrollY + 50 < sections[index].offsetTop) {}
+            navItems.forEach((item, i) => {
+                if (i === index) item.classList.add('active');
+                else item.classList.remove('active');
             });
+        }
+        window.addEventListener('scroll', setActiveNav);
+        window.addEventListener('load', setActiveNav);
 
-            // ========== MANEJO DE IMAGEN PERSONALIZADA (con FileReader) ==========
-            uploadBtn.addEventListener('click', () => {
-                fileInput.click();
-            });
-
-            fileInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                // Verificar que sea imagen
-                if (!file.type.startsWith('image/')) {
-                    alert('Por favor selecciona un archivo de imagen válido.');
-                    fileInput.value = '';
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    customImageData = event.target.result; // dataURL
-                    tatuaje.setAttribute('src', customImageData);
-                    applyRotationAndScale();
-                    savePreferences();
-                };
-                reader.readAsDataURL(file);
-            });
-
-            clearCustomBtn.addEventListener('click', () => {
-                // Restaurar SVG por defecto
-                customImageData = defaultSVGDataURL;
-                tatuaje.setAttribute('src', defaultSVGDataURL);
-                applyRotationAndScale();
-                savePreferences();
-            });
-
-            // ========== PERSISTENCIA LOCAL ==========
-            function loadPreferences() {
-                try {
-                    const saved = JSON.parse(localStorage.getItem('guerrtattoo_prefs'));
-                    if (saved) {
-                        currentScale = saved.scale || 1.5;
-                        rotationX = saved.rotationX !== undefined ? saved.rotationX : -180;
-                        rotationY = saved.rotationY || 180;
-                        rotationZ = saved.rotationZ || 270;
-                        // No guardamos la imagen personalizada por espacio, pero si queremos podemos:
-                        // customImageData se mantiene como el SVG por defecto inicialmente.
-                        // Si el usuario subió una imagen, se guarda en el flujo normal.
-                        sizeSlider.value = currentScale;
-                        sizeValue.innerText = currentScale.toFixed(1);
-                        updateRotationDisplay();
+        // 2. Filtro de galería
+        const filterButtons = document.querySelectorAll('.category-btn');
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filter = btn.getAttribute('data-filter');
+                galleryItems.forEach(item => {
+                    if (filter === 'all' || item.getAttribute('data-category') === filter) {
+                        item.style.display = 'flex';
                     } else {
-                        sizeSlider.value = currentScale;
-                        sizeValue.innerText = currentScale.toFixed(1);
-                        updateRotationDisplay();
+                        item.style.display = 'none';
                     }
-                } catch (e) {
-                    console.warn('Error cargando preferencias', e);
-                }
-            }
-
-            function savePreferences() {
-                const prefs = {
-                    scale: currentScale,
-                    rotationX: rotationX,
-                    rotationY: rotationY,
-                    rotationZ: rotationZ,
-                    // No guardamos la imagen para no saturar localStorage
-                };
-                localStorage.setItem('guerrtattoo_prefs', JSON.stringify(prefs));
-            }
-
-            function applyRotationAndScale() {
-                tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
-                tatuaje.setAttribute('rotation', `${rotationX} ${rotationY} ${rotationZ}`);
-            }
-
-            function updateRotationDisplay() {
-                rotXVal.innerText = rotationX + '°';
-                rotYVal.innerText = rotationY + '°';
-                rotZVal.innerText = rotationZ + '°';
-                applyRotationAndScale();
-                savePreferences();
-            }
-
-            // ========== EVENTOS ==========
-            sizeSlider.addEventListener('input', (e) => {
-                currentScale = parseFloat(e.target.value);
-                sizeValue.innerText = currentScale.toFixed(1);
-                tatuaje.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
-                savePreferences();
-            });
-
-            rotXPlus.addEventListener('click', () => { rotationX = (rotationX + 15) % 360; updateRotationDisplay(); });
-            rotXMinus.addEventListener('click', () => { rotationX = (rotationX - 15) % 360; updateRotationDisplay(); });
-            rotYPlus.addEventListener('click', () => { rotationY = (rotationY + 15) % 360; updateRotationDisplay(); });
-            rotYMinus.addEventListener('click', () => { rotationY = (rotationY - 15) % 360; updateRotationDisplay(); });
-            rotZPlus.addEventListener('click', () => { rotationZ = (rotationZ + 15) % 360; updateRotationDisplay(); });
-            rotZMinus.addEventListener('click', () => { rotationZ = (rotationZ - 15) % 360; updateRotationDisplay(); });
-
-            resetRotationBtn.addEventListener('click', () => {
-                rotationX = -180;
-                rotationY = 180;
-                rotationZ = 270;
-                updateRotationDisplay();
-            });
-
-            captureBtn.addEventListener('click', () => {
-                const canvas = document.querySelector('a-scene').canvas;
-                if (canvas) {
-                    const link = document.createElement('a');
-                    link.download = 'GuerrTattooAR.png';
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                } else {
-                    alert('No se pudo capturar la imagen');
-                }
-            });
-
-            // ========== MARCADOR ==========
-            const targetEntity = document.querySelector('[mindar-image-target]');
-            if (targetEntity) {
-                targetEntity.addEventListener('targetFound', () => {
-                    statusDot.classList.add('active');
-                    statusText.innerText = 'Detectado';
                 });
-                targetEntity.addEventListener('targetLost', () => {
-                    statusDot.classList.remove('active');
-                    statusText.innerText = 'Buscando...';
-                });
+            });
+        });
+
+        // 3. Simulación pago depósito
+        function simularPago() {
+            const fecha = document.getElementById('fecha-cita').value;
+            const hora = document.getElementById('hora-cita').value;
+            if (!fecha) {
+                alert('Selecciona una fecha');
+                return;
             }
+            alert(`Depósito de $40.000 COP simulado para el ${fecha} a las ${hora}. (Demostración)`);
+        }
 
-            // ========== ERROR CÁMARA ==========
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .catch((err) => {
-                    console.error('Error cámara:', err);
-                    cameraErrorDiv.style.display = 'block';
-                    setTimeout(() => { cameraErrorDiv.style.display = 'none'; }, 5000);
-                });
+        // 4. Enviar solicitud de diseño
+        window.enviarSolicitud = function() {
+            alert('Solicitud enviada (simulación). El artista te responderá por chat en 24h.');
+            document.getElementById('tattooForm').reset();
+        };
 
-            // ========== INICIALIZACIÓN ==========
-            scene.addEventListener('loaded', () => {
-                loadPreferences();
-                applyRotationAndScale();
-            });
-
-            startBtn.addEventListener('click', () => {
-                startMenu.classList.add('hidden');
-                arInterfaces.forEach(el => el.classList.add('visible'));
-            });
-
+        // 5. Chat simple
+        window.enviarMensaje = function() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (msg === '') return;
+            const chatBox = document.getElementById('chatBox');
+            const newMsg = document.createElement('div');
+            newMsg.classList.add('message', 'client');
+            newMsg.innerText = msg;
+            chatBox.appendChild(newMsg);
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+            // respuesta automática del artista (simulada)
             setTimeout(() => {
-                if (!tatuaje.getAttribute('src')) {
-                    tatuaje.setAttribute('src', defaultSVGDataURL);
-                }
-                applyRotationAndScale();
-            }, 1500);
-        })();
+                const reply = document.createElement('div');
+                reply.classList.add('message', 'artist');
+                reply.innerText = 'Gracias por tu mensaje, te responderé en breve.';
+                chatBox.appendChild(reply);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 1000);
+        };
+
+        // 6. Permitir enviar con Enter
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                enviarMensaje();
+            }
+        });
     </script>
 </body>
 </html>
