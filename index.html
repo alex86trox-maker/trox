@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Guerr Tattoo · Julián Guerrero · Bogotá</title>
+    <title>Guerr Tattoo Studio · Julián Guerrero · Bogotá</title>
     <!-- Fuentes e iconos -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,17 +50,16 @@
             min-height: 100vh;
             position: relative;
             border-radius: 24px 24px 0 0;
-            /* eliminamos overflow: hidden para permitir sticky */
             overflow-x: hidden;
-            /* evitamos overflow-y hidden para que el sticky funcione */
-            overflow-y: visible;
+            /* padding inferior para evitar que el contenido quede oculto detrás del menú fijo */
+            padding-bottom: 70px;
         }
 
         /* header con perfil básico */
         .header {
             padding: 24px 20px 16px;
             border-bottom: 1px solid #2c2c2c;
-            background-color: #121212; /* para que no sea transparente al hacer scroll */
+            background-color: #121212;
         }
         .header h1 {
             font-size: 28px;
@@ -86,19 +85,21 @@
             font-size: 12px;
         }
 
-        /* navegación inferior fija (sticky) */
+        /* navegación inferior fija (siempre visible) */
         .bottom-nav {
-            position: sticky;
+            position: fixed;
             bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 100%;
+            max-width: 480px;
             background-color: #1a1a1a;
             border-top: 1px solid #2c2c2c;
             display: flex;
             justify-content: space-around;
             padding: 10px 0 14px;
-            z-index: 100;
-            /* asegurar que no se solape con contenido */
-            margin-top: 0;
+            z-index: 1000;
+            border-radius: 0 0 0 0;
         }
         .nav-item {
             display: flex;
@@ -438,11 +439,6 @@
         .gold {
             color: #c6a43f;
         }
-
-        /* asegurar que el contenido no quede oculto detrás del sticky nav */
-        .last-section {
-            margin-bottom: 0;
-        }
     </style>
 </head>
 <body>
@@ -645,19 +641,19 @@
             </div>
         </section>
 
-        <!-- Navegación inferior (ahora sticky) -->
-        <nav class="bottom-nav">
-            <a href="#inicio" class="nav-item active"><i class="fas fa-home"></i><span>Inicio</span></a>
-            <a href="#galeria" class="nav-item"><i class="fas fa-images"></i><span>Galería</span></a>
-            <a href="#reservas" class="nav-item"><i class="fas fa-calendar"></i><span>Reservas</span></a>
-            <a href="#perfil" class="nav-item"><i class="fas fa-user"></i><span>Perfil</span></a>
-            <a href="#chat" class="nav-item"><i class="fas fa-comment"></i><span>Chat</span></a>
-        </nav>
-
         <div class="footer-note">
             Guerr Tattoo · Tatuajes con estilo en Bogotá
         </div>
     </div>
+
+    <!-- Menú inferior fijo (fuera del contenedor para que sea fijo respecto a la ventana) -->
+    <nav class="bottom-nav">
+        <a href="#inicio" class="nav-item active"><i class="fas fa-home"></i><span>Inicio</span></a>
+        <a href="#galeria" class="nav-item"><i class="fas fa-images"></i><span>Galería</span></a>
+        <a href="#reservas" class="nav-item"><i class="fas fa-calendar"></i><span>Reservas</span></a>
+        <a href="#perfil" class="nav-item"><i class="fas fa-user"></i><span>Perfil</span></a>
+        <a href="#chat" class="nav-item"><i class="fas fa-comment"></i><span>Chat</span></a>
+    </nav>
 
     <script>
         // 1. Navegación activa y scroll suave
@@ -665,17 +661,38 @@
         const sections = document.querySelectorAll('section');
 
         function setActiveNav() {
-            let index = sections.length;
-            while (--index && window.scrollY + 50 < sections[index].offsetTop) {}
-            navItems.forEach((item, i) => {
-                if (i === index) item.classList.add('active');
-                else item.classList.remove('active');
+            let current = '';
+            const scrollPos = window.scrollY + 100;
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionBottom = sectionTop + section.offsetHeight;
+                if (scrollPos >= sectionTop && scrollPos < sectionBottom) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navItems.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
             });
         }
         window.addEventListener('scroll', setActiveNav);
         window.addEventListener('load', setActiveNav);
 
-        // 2. Filtro de galería
+        // 2. Scroll suave al hacer clic en los enlaces del menú
+        navItems.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // 3. Filtro de galería
         const filterButtons = document.querySelectorAll('.category-btn');
         const galleryItems = document.querySelectorAll('.gallery-item');
         filterButtons.forEach(btn => {
@@ -693,7 +710,7 @@
             });
         });
 
-        // 3. Simulación pago depósito
+        // 4. Simulación pago depósito
         function simularPago() {
             const fecha = document.getElementById('fecha-cita').value;
             const hora = document.getElementById('hora-cita').value;
@@ -704,13 +721,13 @@
             alert(`Depósito de $40.000 COP simulado para el ${fecha} a las ${hora}. (Demostración)`);
         }
 
-        // 4. Enviar solicitud de diseño
+        // 5. Enviar solicitud de diseño
         window.enviarSolicitud = function() {
             alert('Solicitud enviada (simulación). El artista te responderá por chat en 24h.');
             document.getElementById('tattooForm').reset();
         };
 
-        // 5. Chat simple
+        // 6. Chat simple
         window.enviarMensaje = function() {
             const input = document.getElementById('chatInput');
             const msg = input.value.trim();
@@ -722,7 +739,6 @@
             chatBox.appendChild(newMsg);
             input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
-            // respuesta automática del artista (simulada)
             setTimeout(() => {
                 const reply = document.createElement('div');
                 reply.classList.add('message', 'artist');
@@ -732,7 +748,6 @@
             }, 1000);
         };
 
-        // 6. Permitir enviar con Enter
         document.getElementById('chatInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 enviarMensaje();
