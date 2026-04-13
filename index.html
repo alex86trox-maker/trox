@@ -1,759 +1,393 @@
-<!-- VELVETT 3D Experience - WordPress Gutenberg Compatible -->
-<!-- Copia TODO este código en un bloque "HTML Personalizado" de Gutenberg -->
+<!-- VELVETT Lite - WordPress Gutenberg Compatible -->
+<!-- Copia TODO en un bloque "HTML Personalizado" de Gutenberg -->
 
-<div id="velvett-root" class="velvett-wrapper" data-velvett-init>
+<div id="velvett-app" class="velvett" data-velvett>
   
-  <!-- Critical CSS Scoped -->
   <style>
-    /* Scope: Todo el CSS está prefijado con .velvett-wrapper para evitar conflictos con WordPress */
-    .velvett-wrapper{--velvett-primary:#803655;--velvett-secondary:#641C40;--velvett-accent:#D5B1B8;--velvett-dark:#2C001D;--velvett-light:#F5EBED;--velvett-white:#fff;--velvett-grad-primary:linear-gradient(135deg,#803655,#480A2E);--velvett-grad-soft:linear-gradient(135deg,#D5B1B8,#9D576F);--velvett-ease:cubic-bezier(0.16,1,0.3,1);--velvett-ease-bounce:cubic-bezier(0.68,-0.55,0.265,1.55);position:relative;width:100%;overflow-x:hidden;font-family:Inter,sans-serif;background:var(--velvett-white);color:var(--velvett-dark);line-height:1.6}
-    .velvett-wrapper *,.velvett-wrapper *::before,.velvett-wrapper *::after{box-sizing:border-box;margin:0;padding:0}
-    .velvett-wrapper h1,.velvett-wrapper h2,.velvett-wrapper h3,.velvett-wrapper h4{font-family:'Playfair Display',serif;font-weight:600;line-height:1.1}
-    .velvett-wrapper .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    /* === CORE VARIABLES === */
+    .velvett{--p:#803655;--s:#641C40;--a:#D5B1B8;--d:#2C001D;--l:#F5EBED;--w:#fff;--e: cubic-bezier(.16,1,.3,1);--eb:cubic-bezier(.68,-.55,.265,1.55);font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--w);color:var(--d);line-height:1.6;overflow-x:hidden}
+    .velvett *{box-sizing:border-box;margin:0;padding:0}
+    .velvett h1,.velvett h2,.velvett h3{font-family:'Playfair Display',serif;font-weight:600;line-height:1.1}
     
-    /* Preloader */
-    .velvett-wrapper .velvett-preloader{position:absolute;inset:0;background:var(--velvett-dark);display:grid;place-items:center;z-index:999;transition:opacity .6s var(--velvett-ease),visibility .6s}
-    .velvett-wrapper .velvett-preloader.hidden{opacity:0;visibility:hidden;pointer-events:none}
-    .velvett-wrapper .velvett-loader-logo{width:80px;height:80px;animation:velvett-pulse 1.5s infinite}
-    @keyframes velvett-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.05);opacity:.8}}
+    /* === UTILITIES === */
+    .velvett .vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .velvett .container{max-width:1200px;margin:0 auto;padding:0 20px}
+    .velvett .section{padding:clamp(50px,10vw,100px) 0}
+    .velvett .title{font-size:clamp(1.8rem,4vw,3rem);text-align:center;margin-bottom:1rem}
+    .velvett .subtitle{font-size:1.1rem;color:var(--p);text-align:center;max-width:600px;margin:0 auto 2.5rem}
     
-    /* Canvas Container */
-    .velvett-wrapper .velvett-canvas{position:absolute;inset:0;z-index:0;pointer-events:none}
-    .velvett-wrapper .velvett-canvas canvas{width:100%!important;height:100%!important;display:block}
+    /* === ANIMATIONS === */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .velvett .animate{animation:fadeUp .6s var(--e) forwards;opacity:0}
+    .velvett .animate:nth-child(1){animation-delay:.1s}.velvett .animate:nth-child(2){animation-delay:.2s}
+    .velvett .animate:nth-child(3){animation-delay:.3s}.velvett .animate:nth-child(4){animation-delay:.4s}
     
-    /* Layout */
-    .velvett-wrapper .velvett-container{max-width:1280px;margin:0 auto;padding:0 24px}
-    .velvett-wrapper .velvett-section{padding:clamp(60px,12vw,120px) 0;position:relative}
-    .velvett-wrapper .velvett-title{font-size:clamp(2rem,5vw,3.5rem);text-align:center;margin-bottom:1rem;opacity:0;transform:translateY(24px)}
-    .velvett-wrapper .velvett-subtitle{font-size:1.125rem;color:var(--velvett-primary);text-align:center;max-width:700px;margin:0 auto 3rem;opacity:0;transform:translateY(16px)}
+    /* === BUTTONS === */
+    .velvett .btn{display:inline-block;background:linear-gradient(135deg,var(--p),var(--s));color:var(--w);padding:14px 32px;font-weight:500;text-decoration:none;border-radius:50px;transition:transform .3s var(--e),box-shadow .3s var(--e);border:none;cursor:pointer}
+    .velvett .btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(128,54,85,.3)}
+    .velvett .btn-outline{background:transparent;border:2px solid var(--p);color:var(--p)}
+    .velvett .btn-outline:hover{background:var(--p);color:var(--w)}
     
-    /* Buttons */
-    .velvett-wrapper .velvett-btn{display:inline-block;background:var(--velvett-grad-primary);color:white;padding:clamp(12px,2vw,16px) clamp(24px,4vw,40px);font-weight:500;text-decoration:none;border-radius:50px;transition:transform .3s var(--velvett-ease),box-shadow .3s var(--velvett-ease);border:none;cursor:pointer;font-size:1rem;position:relative;overflow:hidden;box-shadow:0 4px 15px rgba(128,54,85,.3)}
-    .velvett-wrapper .velvett-btn:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(128,54,85,.4)}
-    .velvett-wrapper .velvett-btn-outline{background:transparent;border:2px solid var(--velvett-primary);color:var(--velvett-primary)}
-    .velvett-wrapper .velvett-btn-outline:hover{background:var(--velvett-primary);color:white}
+    /* === HEADER === */
+    .velvett header{position:sticky;top:0;background:rgba(255,255,255,.98);backdrop-filter:blur(10px);z-index:100;border-bottom:1px solid rgba(128,54,85,.1);padding:12px 0;transition:padding .3s var(--e)}
+    .velvett header.scrolled{padding:8px 0;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+    .velvett .nav{display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto;padding:0 20px}
+    .velvett .logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--d);text-decoration:none}
+    .velvett .logo span{color:var(--p)}
+    .velvett .nav-links{display:flex;gap:1.5rem;list-style:none}
+    .velvett .nav-links a{text-decoration:none;font-weight:500;color:var(--d);font-size:.95rem;position:relative;transition:color .3s}
+    .velvett .nav-links a::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:2px;background:var(--p);transition:width .3s}
+    .velvett .nav-links a:hover{color:var(--p)}.velvett .nav-links a:hover::after{width:100%}
+    .velvett .nav-cta{background:var(--a);color:var(--d);padding:8px 20px;border-radius:25px;text-decoration:none;font-weight:600;transition:all .3s}
+    .velvett .nav-cta:hover{background:var(--p);color:var(--w);transform:translateY(-1px)}
+    .velvett .menu-btn{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:5px}
+    .velvett .menu-btn span{width:22px;height:2px;background:var(--d);transition:all .3s}
+    .velvett .menu-btn.active span:nth-child(1){transform:rotate(45deg) translate(4px,4px)}
+    .velvett .menu-btn.active span:nth-child(2){opacity:0}
+    .velvett .menu-btn.active span:nth-child(3){transform:rotate(-45deg) translate(4px,-4px)}
     
-    /* Header */
-    .velvett-wrapper .velvett-header{position:sticky;top:0;width:100%;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);z-index:100;border-bottom:1px solid rgba(128,54,85,.1);padding:16px 0;transition:padding .3s var(--velvett-ease)}
-    .velvett-wrapper .velvett-header.scrolled{padding:12px 0;box-shadow:0 2px 20px rgba(0,0,0,.05)}
-    .velvett-wrapper .velvett-nav{display:flex;justify-content:space-between;align-items:center;max-width:1280px;margin:0 auto;padding:0 24px}
-    .velvett-wrapper .velvett-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-    .velvett-wrapper .velvett-logo-text{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--velvett-dark)}
-    .velvett-wrapper .velvett-logo-text span{color:var(--velvett-primary)}
-    .velvett-wrapper .velvett-nav-links{display:flex;gap:2rem;list-style:none}
-    .velvett-wrapper .velvett-nav-links a{text-decoration:none;font-weight:500;color:var(--velvett-dark);position:relative;font-size:.95rem;transition:color .3s}
-    .velvett-wrapper .velvett-nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--velvett-grad-soft);transition:width .3s}
-    .velvett-wrapper .velvett-nav-links a:hover{color:var(--velvett-primary)}
-    .velvett-wrapper .velvett-nav-links a:hover::after{width:100%}
-    .velvett-wrapper .velvett-cta{background:var(--velvett-accent);color:var(--velvett-dark);padding:10px 24px;border-radius:25px;text-decoration:none;font-weight:600;transition:all .3s;border:2px solid var(--velvett-accent)}
-    .velvett-wrapper .velvett-cta:hover{background:transparent;color:var(--velvett-primary);transform:translateY(-2px)}
-    .velvett-wrapper .velvett-menu-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;z-index:101}
-    .velvett-wrapper .velvett-menu-toggle span{display:block;width:24px;height:2px;background:var(--velvett-dark);transition:all .3s}
-    .velvett-wrapper .velvett-menu-toggle.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
-    .velvett-wrapper .velvett-menu-toggle.active span:nth-child(2){opacity:0}
-    .velvett-wrapper .velvett-menu-toggle.active span:nth-child(3){transform:rotate(-45deg) translate(7px,-6px)}
+    /* === MOBILE MENU === */
+    .velvett .mobile-menu{position:fixed;top:0;right:-100%;width:100%;max-width:320px;height:100vh;background:var(--w);z-index:200;transition:right .4s var(--e);padding:80px 30px 30px;box-shadow:-5px 0 20px rgba(0,0,0,.1)}
+    .velvett .mobile-menu.active{right:0}
+    .velvett .mobile-overlay{position:fixed;inset:0;background:rgba(44,0,29,.5);z-index:199;opacity:0;visibility:hidden;transition:all .4s}
+    .velvett .mobile-overlay.active{opacity:1;visibility:visible}
+    .velvett .mobile-links{list-style:none;margin-top:2rem}
+    .velvett .mobile-links li{margin-bottom:1.2rem}
+    .velvett .mobile-links a{text-decoration:none;color:var(--d);font-size:1.3rem;font-family:'Playfair Display',serif;display:block;transition:color .3s}
+    .velvett .mobile-links a:hover{color:var(--p)}
     
-    /* Drawer Menu */
-    .velvett-wrapper .velvett-drawer{position:fixed;top:0;right:-100%;width:100%;max-width:400px;height:100vh;background:white;z-index:200;transition:right .4s var(--velvett-ease);padding:100px 40px 40px;box-shadow:-10px 0 30px rgba(0,0,0,.1)}
-    .velvett-wrapper .velvett-drawer.active{right:0}
-    .velvett-wrapper .velvett-drawer-overlay{position:fixed;inset:0;background:rgba(44,0,29,.6);backdrop-filter:blur(4px);z-index:199;opacity:0;visibility:hidden;transition:all .4s}
-    .velvett-wrapper .velvett-drawer-overlay.active{opacity:1;visibility:visible}
-    .velvett-wrapper .velvett-drawer-links{list-style:none;margin-top:2rem}
-    .velvett-wrapper .velvett-drawer-links li{margin-bottom:1.5rem;opacity:0;transform:translateX(20px);transition:all .4s}
-    .velvett-wrapper .velvett-drawer.active .velvett-drawer-links li{opacity:1;transform:translateX(0)}
-    .velvett-wrapper .velvett-drawer.active .velvett-drawer-links li:nth-child(1){transition-delay:.1s}
-    .velvett-wrapper .velvett-drawer.active .velvett-drawer-links li:nth-child(2){transition-delay:.15s}
-    .velvett-wrapper .velvett-drawer.active .velvett-drawer-links li:nth-child(3){transition-delay:.2s}
-    .velvett-wrapper .velvett-drawer.active .velvett-drawer-links li:nth-child(4){transition-delay:.25s}
-    .velvett-wrapper .velvett-drawer-links a{text-decoration:none;color:var(--velvett-dark);font-size:1.5rem;font-family:'Playfair Display',serif;font-weight:500;display:block;transition:color .3s}
-    .velvett-wrapper .velvett-drawer-links a:hover{color:var(--velvett-primary)}
+    /* === HERO === */
+    .velvett .hero{position:relative;height:100vh;min-height:600px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,var(--d),var(--p))}
+    .velvett .hero::before{content:'';position:absolute;inset:0;background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%23D5B1B8" opacity=".3"/><circle cx="80" cy="40" r="1.5" fill="%23D5B1B8" opacity=".4"/><circle cx="40" cy="80" r="2.5" fill="%23D5B1B8" opacity=".2"/></svg>') repeat;background-size:300px 300px;animation:float 20s linear infinite}
+    @keyframes float{0%{background-position:0 0}100%{background-position:300px 300px}}
+    .velvett .hero-content{text-align:center;color:var(--w);padding:0 20px;max-width:800px;z-index:2}
+    .velvett .hero-badge{display:inline-block;background:rgba(213,177,184,.2);padding:6px 20px;border-radius:25px;font-size:.85rem;margin-bottom:20px;border:1px solid rgba(213,177,184,.4)}
+    .velvett .hero h1{font-size:clamp(2rem,5vw,3.5rem);margin-bottom:20px}
+    .velvett .hero p{font-size:clamp(1rem,2vw,1.2rem);margin-bottom:25px;opacity:.95;max-width:500px;margin-left:auto;margin-right:auto}
+    .velvett .hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
     
-    /* Hero */
-    .velvett-wrapper .velvett-hero{position:relative;height:100vh;min-height:700px;display:grid;place-items:center;overflow:hidden}
-    .velvett-wrapper .velvett-hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
-    .velvett-wrapper .velvett-hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(44,0,29,.7),rgba(128,54,85,.5));z-index:1}
-    .velvett-wrapper .velvett-hero-content{position:relative;z-index:2;text-align:center;color:white;padding:0 20px;max-width:900px}
-    .velvett-wrapper .velvett-hero-badge{display:inline-block;background:rgba(213,177,184,.2);backdrop-filter:blur(10px);padding:8px 24px;border-radius:30px;font-size:.9rem;margin-bottom:24px;border:1px solid rgba(213,177,184,.3)}
-    .velvett-wrapper .velvett-hero-content h1{font-size:clamp(2.5rem,6vw,4.5rem);margin-bottom:24px;text-shadow:0 2px 20px rgba(0,0,0,.2)}
-    .velvett-wrapper .velvett-hero-content p{font-size:clamp(1rem,2vw,1.3rem);margin-bottom:32px;max-width:600px;margin-left:auto;margin-right:auto;opacity:.95}
-    .velvett-wrapper .velvett-hero-buttons{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+    /* === SERVICES GRID === */
+    .velvett .services{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin-top:2rem}
+    .velvett .service{border-radius:20px;overflow:hidden;position:relative;aspect-ratio:4/5;background-size:cover;background-position:center;cursor:pointer;transition:transform .4s var(--e)}
+    .velvett .service::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(44,0,29,.9),rgba(128,54,85,.5) 60%,transparent);transition:opacity .3s}
+    .velvett .service:hover{transform:translateY(-6px)}
+    .velvett .service-content{position:absolute;bottom:0;left:0;right:0;padding:1.5rem;color:var(--w);z-index:2}
+    .velvett .service-content h3{font-size:1.3rem;margin-bottom:6px}
+    .velvett .service-content p{font-size:.9rem;opacity:.9;margin-bottom:10px}
+    .velvett .service-link{color:var(--a);font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:4px;font-size:.9rem}
+    .velvett .service-link:hover{gap:8px;color:var(--w)}
     
-    /* Services Grid */
-    .velvett-wrapper .velvett-services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;margin-top:3rem}
-    .velvett-wrapper .velvett-service-card{border-radius:24px;overflow:hidden;position:relative;aspect-ratio:4/5;background-size:cover;background-position:center;cursor:pointer;transition:transform .4s var(--velvett-ease),box-shadow .4s var(--velvett-ease)}
-    .velvett-wrapper .velvett-service-card::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(44,0,29,.9),rgba(128,54,85,.4) 50%,transparent);opacity:.85;transition:opacity .3s}
-    .velvett-wrapper .velvett-service-card:hover{transform:translateY(-8px);box-shadow:0 20px 40px rgba(128,54,85,.3)}
-    .velvett-wrapper .velvett-service-card:hover::before{opacity:1}
-    .velvett-wrapper .velvett-card-overlay{position:relative;z-index:2;padding:2rem;color:white;transform:translateY(16px);transition:transform .4s var(--velvett-ease)}
-    .velvett-wrapper .velvett-service-card:hover .velvett-card-overlay{transform:translateY(0)}
-    .velvett-wrapper .velvett-card-overlay h3{font-size:1.5rem;margin-bottom:8px}
-    .velvett-wrapper .velvett-card-overlay p{margin-bottom:16px;opacity:.9;font-size:.95rem}
-    .velvett-wrapper .velvett-card-btn{color:var(--velvett-accent);font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:gap .3s}
-    .velvett-wrapper .velvett-card-btn:hover{gap:12px;color:white}
+    /* === CAROUSEL SIMPLE (CSS-only fallback) === */
+    .velvett .carousel{position:relative;overflow:hidden}
+    .velvett .carousel-track{display:flex;transition:transform .5s var(--e);will-change:transform}
+    .velvett .carousel-slide{min-width:100%;padding:0 10px}
+    .velvett .carousel-card{background:var(--w);border-radius:16px;padding:1.5rem;text-align:center;border:1px solid rgba(128,54,85,.1);height:100%}
+    .velvett .carousel-card i{font-size:2rem;color:var(--p);margin-bottom:.8rem;display:block}
+    .velvett .carousel-card h4{font-size:1rem;margin-bottom:.3rem}
+    .velvett .carousel-card p{font-size:.85rem;color:var(--p);opacity:.8}
+    .velvett .carousel-nav{display:flex;justify-content:center;gap:8px;margin-top:1.5rem}
+    .velvett .carousel-dot{width:10px;height:10px;border-radius:50%;background:var(--a);opacity:.5;cursor:pointer;transition:all .3s;border:none}
+    .velvett .carousel-dot.active{background:var(--p);opacity:1;width:24px;border-radius:5px}
     
-    /* Benefits Slider */
-    .velvett-wrapper .velvett-benefits{background:var(--velvett-light);padding:clamp(60px,12vw,120px) 0;position:relative;overflow:hidden}
-    .velvett-wrapper .velvett-benefit-slide{background-size:cover;background-position:center;border-radius:24px;overflow:hidden;position:relative;aspect-ratio:3/4;height:clamp(300px,60vw,500px)}
-    .velvett-wrapper .velvett-benefit-slide::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(44,0,29,.95),rgba(100,28,64,.6) 50%,transparent)}
-    .velvett-wrapper .velvett-benefit-text{position:relative;z-index:2;padding:2rem;color:white}
-    .velvett-wrapper .velvett-benefit-text h3{font-size:1.4rem;margin-bottom:8px}
-    .velvett-wrapper .velvett-benefit-text p{opacity:.9;font-size:1rem}
+    /* === ABOUT === */
+    .velvett .about{display:flex;flex-wrap:wrap;gap:2rem;background:var(--l);border-radius:24px;overflow:hidden}
+    .velvett .about-text{flex:1;min-width:300px;padding:2rem}
+    .velvett .about-img{flex:1;min-width:300px;min-height:300px;background:url('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80') center/cover;position:relative}
+    .velvett .about-img::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(128,54,85,.7),rgba(44,0,29,.5))}
+    .velvett .about-text h2{font-size:clamp(1.5rem,3vw,2rem);margin-bottom:.8rem}
+    .velvett .about-text p{color:var(--p);margin-bottom:1rem;line-height:1.7}
     
-    /* Carousels */
-    .velvett-wrapper .velvett-offers,.velvett-wrapper .velvett-finance{padding:clamp(60px,12vw,120px) 0}
-    .velvett-wrapper .velvett-offers{background:white}.velvett-wrapper .velvett-finance{background:var(--velvett-light)}
-    .velvett-wrapper .velvett-offer-card{background:white;border-radius:20px;padding:2rem;text-align:center;border:1px solid rgba(128,54,85,.1);transition:transform .4s var(--velvett-ease-bounce),box-shadow .4s;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
-    .velvett-wrapper .velvett-offer-card:hover{transform:translateY(-8px);box-shadow:0 15px 30px rgba(128,54,85,.15);border-color:var(--velvett-accent)}
-    .velvett-wrapper .velvett-offer-card i{font-size:2.5rem;background:var(--velvett-grad-soft);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
-    .velvett-wrapper .velvett-offer-card h4{font-size:1.1rem;margin-bottom:.5rem;color:var(--velvett-dark)}
-    .velvett-wrapper .velvett-offer-card p{font-size:.9rem;color:var(--velvett-primary);opacity:.8}
+    /* === FAQ === */
+    .velvett .faq-item{background:var(--w);border:1px solid rgba(128,54,85,.15);border-radius:12px;margin-bottom:.8rem;overflow:hidden}
+    .velvett .faq-q{width:100%;padding:1rem 1.2rem;font-weight:600;text-align:left;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:1rem;transition:background .3s}
+    .velvett .faq-q:hover{background:var(--l)}
+    .velvett .faq-q i{transition:transform .3s;color:var(--p)}
+    .velvett .faq-item.active .faq-q i{transform:rotate(180deg)}
+    .velvett .faq-a{max-height:0;overflow:hidden;transition:max-height .4s var(--e),padding .4s}
+    .velvett .faq-item.active .faq-a{max-height:200px;padding:0 1.2rem 1rem}
     
-    /* About */
-    .velvett-wrapper .velvett-about{background:var(--velvett-light);display:flex;flex-wrap:wrap;overflow:hidden}
-    .velvett-wrapper .velvett-about-text{flex:1;min-width:320px;padding:clamp(2rem,5vw,4rem)}
-    .velvett-wrapper .velvett-about-image{flex:1;min-width:320px;min-height:400px;background:url('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80') center/cover;position:relative}
-    .velvett-wrapper .velvett-about-image::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(128,54,85,.8),rgba(44,0,29,.6))}
-    .velvett-wrapper .velvett-about-text h2{font-size:clamp(1.8rem,4vw,2.5rem);margin-bottom:1rem}
-    .velvett-wrapper .velvett-about-text p{color:var(--velvett-primary);line-height:1.8;margin-bottom:1.5rem}
+    /* === GALLERY === */
+    .velvett .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem}
+    .velvett .gallery-item{aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative}
+    .velvett .gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .4s var(--e)}
+    .velvett .gallery-item:hover img{transform:scale(1.05)}
     
-    /* FAQ Accordion */
-    .velvett-wrapper .velvett-accordion-item{background:white;border:1px solid rgba(128,54,85,.2);margin-bottom:1rem;border-radius:16px;overflow:hidden;transition:all .3s}
-    .velvett-wrapper .velvett-accordion-item:hover{border-color:var(--velvett-primary);box-shadow:0 5px 20px rgba(128,54,85,.1)}
-    .velvett-wrapper .velvett-accordion-header{padding:1.25rem 1.5rem;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:'Playfair Display',serif;font-size:1.1rem;border:none;background:none;width:100%;text-align:left}
-    .velvett-wrapper .velvett-accordion-header i{color:var(--velvett-primary);transition:transform .3s}
-    .velvett-wrapper .velvett-accordion-item.active .velvett-accordion-header i{transform:rotate(180deg)}
-    .velvett-wrapper .velvett-accordion-content{padding:0 1.5rem;max-height:0;overflow:hidden;transition:max-height .4s var(--velvett-ease),padding .4s}
-    .velvett-wrapper .velvett-accordion-item.active .velvett-accordion-content{padding:0 1.5rem 1.25rem;max-height:300px}
+    /* === FOOTER === */
+    .velvett footer{background:var(--d);color:var(--a);padding:40px 20px;text-align:center}
+    .velvett .social{display:flex;justify-content:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+    .velvett .social a{width:45px;height:45px;border-radius:50%;background:rgba(213,177,184,.15);display:grid;place-items:center;color:var(--a);font-size:1.2rem;text-decoration:none;transition:all .3s;border:1px solid rgba(213,177,184,.3)}
+    .velvett .social a:hover{background:var(--p);color:var(--w);transform:translateY(-3px)}
+    .velvett .copyright{opacity:.7;font-size:.9rem}
     
-    /* Gallery */
-    .velvett-wrapper .velvett-gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem}
-    .velvett-wrapper .velvett-gallery-item{aspect-ratio:1;border-radius:16px;overflow:hidden;position:relative;cursor:pointer}
-    .velvett-wrapper .velvett-gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--velvett-ease)}
-    .velvett-wrapper .velvett-gallery-item:hover img{transform:scale(1.05)}
-    .velvett-wrapper .velvett-gallery-item::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(44,0,29,.6),transparent 60%);opacity:0;transition:opacity .3s}
-    .velvett-wrapper .velvett-gallery-item:hover::after{opacity:1}
+    /* === WHATSAPP FLOAT === */
+    .velvett .wpp{position:fixed;bottom:20px;right:20px;background:#25D366;color:var(--w);width:55px;height:55px;border-radius:50%;display:grid;place-items:center;font-size:1.6rem;text-decoration:none;box-shadow:0 4px 15px rgba(37,211,102,.4);transition:transform .3s var(--eb);z-index:100;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{box-shadow:0 4px 15px rgba(37,211,102,.4)}50%{box-shadow:0 4px 25px rgba(37,211,102,.6)}}
+    .velvett .wpp:hover{transform:scale(1.1)}
     
-    /* Footer */
-    .velvett-wrapper .velvett-social-footer{background:var(--velvett-dark);padding:clamp(40px,8vw,60px) 20px;text-align:center}
-    .velvett-wrapper .velvett-social-icons{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap}
-    .velvett-wrapper .velvett-social-icons a{width:clamp(50px,8vw,65px);height:clamp(50px,8vw,65px);border-radius:50%;background:rgba(213,177,184,.15);display:grid;place-items:center;transition:all .4s var(--velvett-ease-bounce);border:1px solid rgba(213,177,184,.4);color:var(--velvett-accent);font-size:clamp(1.2rem,3vw,1.8rem);text-decoration:none}
-    .velvett-wrapper .velvett-social-icons a:hover{background:var(--velvett-primary);transform:translateY(-4px) scale(1.05);color:white;border-color:var(--velvett-primary)}
-    .velvett-wrapper .velvett-copyright{margin-top:2rem;padding-top:1.5rem;border-top:1px solid rgba(213,177,184,.2);opacity:.6;font-size:.9rem}
-    
-    /* WhatsApp Float */
-    .velvett-wrapper .velvett-wpp{position:fixed;bottom:24px;right:24px;background:#25D366;color:white;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font-size:1.8rem;box-shadow:0 4px 15px rgba(37,211,102,.4);z-index:100;text-decoration:none;transition:transform .3s var(--velvett-ease-bounce);animation:velvett-pulse-wpp 2s infinite}
-    @keyframes velvett-pulse-wpp{0%,100%{box-shadow:0 4px 15px rgba(37,211,102,.4)}50%{box-shadow:0 4px 25px rgba(37,211,102,.6)}}
-    .velvett-wrapper .velvett-wpp:hover{transform:scale(1.1) rotate(8deg)}
-    
-    /* Animations */
-    .velvett-wrapper .velvett-reveal{opacity:0;transform:translateY(24px);transition:opacity .8s var(--velvett-ease),transform .8s var(--velvett-ease)}
-    .velvett-wrapper .velvett-reveal.active{opacity:1;transform:translateY(0)}
-    
-    /* Swiper Scoped */
-    .velvett-wrapper .swiper-pagination-bullet{background:var(--velvett-accent)!important;opacity:.6!important;width:10px!important;height:10px!important;transition:all .3s!important}
-    .velvett-wrapper .swiper-pagination-bullet-active{background:var(--velvett-primary)!important;opacity:1!important;width:28px!important;border-radius:5px!important}
-    .velvett-wrapper .swiper-button-next,.velvett-wrapper .swiper-button-prev{color:var(--velvett-accent)!important;background:rgba(255,255,255,.9)!important;border-radius:50%!important;width:44px!important;height:44px!important;box-shadow:0 4px 15px rgba(128,54,85,.2)!important;transition:all .3s!important}
-    .velvett-wrapper .swiper-button-next:hover,.velvett-wrapper .swiper-button-prev:hover{color:var(--velvett-primary)!important;transform:scale(1.1)!important;box-shadow:0 6px 20px rgba(128,54,85,.35)!important}
-    
-    /* Responsive */
-    @media(max-width:992px){
-      .velvett-wrapper .velvett-nav-links,.velvett-wrapper .velvett-cta{display:none}
-      .velvett-wrapper .velvett-menu-toggle{display:flex}
-      .velvett-wrapper .velvett-drawer{max-width:350px;padding:90px 30px 30px}
-      .velvett-wrapper .velvett-drawer-links a{font-size:1.3rem}
-      .velvett-wrapper .velvett-hero-buttons{flex-direction:column;width:100%}
-      .velvett-wrapper .velvett-btn{width:100%;text-align:center}
-      .velvett-wrapper .swiper-button-next,.velvett-wrapper .swiper-button-prev{display:none!important}
-    }
-    @media(max-width:480px){
-      .velvett-wrapper .velvett-section{padding:clamp(40px,10vw,80px) 0}
-      .velvett-wrapper .velvett-container{padding:0 20px}
+    /* === RESPONSIVE === */
+    @media(max-width:768px){
+      .velvett .nav-links,.velvett .nav-cta{display:none}
+      .velvett .menu-btn{display:flex}
+      .velvett .hero-btns{flex-direction:column;width:100%}
+      .velvett .btn{width:100%;text-align:center}
+      .velvett .section{padding:clamp(40px,8vw,80px) 0}
     }
     
-    /* WordPress Admin Bar Compatibility */
-    @media screen and (max-width:782px){
-      .velvett-wrapper .velvett-header{top:46px}
-      .velvett-wrapper .velvett-hero{padding-top:46px}
+    /* === REDUCED MOTION === */
+    @media(prefers-reduced-motion:reduce){
+      .velvett *{animation:none!important;transition:none!important}
+      .velvett .animate{opacity:1!important;transform:none!important}
     }
-    @media screen and (min-width:783px){
-      .velvett-wrapper .velvett-header{top:32px}
-      .velvett-wrapper .velvett-hero{padding-top:32px}
-    }
+    
+    /* === WORDPRESS ADMIN BAR === */
+    @media screen and (max-width:782px){.velvett header{top:46px}}
+    @media screen and (min-width:783px){.velvett header{top:32px}}
   </style>
 
-  <!-- Preloader -->
-  <div class="velvett-preloader" role="status" aria-live="polite">
-    <svg class="velvett-loader-logo" viewBox="0 0 100 100" aria-hidden="true">
-      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Playfair Display" font-size="60" fill="#D5B1B8" font-weight="600">V</text>
-    </svg>
-    <span class="visually-hidden">Cargando experiencia VELVETT...</span>
-  </div>
-
-  <!-- Canvas para partículas 3D -->
-  <div class="velvett-canvas" aria-hidden="true"></div>
-
-  <!-- Drawer Menu -->
-  <div class="velvett-drawer-overlay"></div>
-  <nav class="velvett-drawer" aria-label="Menú principal">
-    <ul class="velvett-drawer-links">
-      <li><a href="#velvett-inicio">Inicio</a></li>
-      <li><a href="#velvett-servicios">Servicios</a></li>
-      <li><a href="#velvett-nosotros">Nosotros</a></li>
-      <li><a href="#velvett-faq">FAQ</a></li>
-      <li><a href="#velvett-galeria">Galería</a></li>
+  <!-- Mobile Menu -->
+  <div class="mobile-overlay"></div>
+  <nav class="mobile-menu" aria-label="Menú">
+    <ul class="mobile-links">
+      <li><a href="#inicio">Inicio</a></li>
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#nosotros">Nosotros</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#contacto">Contacto</a></li>
     </ul>
-    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid rgba(128,54,85,.2)">
-      <a href="#velvett-contacto" class="velvett-btn" style="width:100%;text-align:center">Contáctanos</a>
-    </div>
   </nav>
 
   <!-- Header -->
-  <header class="velvett-header">
-    <div class="velvett-nav">
-      <a href="#" class="velvett-logo" aria-label="VELVETT - Inicio">
-        <span class="velvett-logo-text">VELV<span style="color:var(--velvett-primary)">ETT</span></span>
-      </a>
-      <ul class="velvett-nav-links" role="menubar">
-        <li role="none"><a href="#velvett-inicio" role="menuitem">Inicio</a></li>
-        <li role="none"><a href="#velvett-servicios" role="menuitem">Servicios</a></li>
-        <li role="none"><a href="#velvett-nosotros" role="menuitem">Nosotros</a></li>
-        <li role="none"><a href="#velvett-faq" role="menuitem">FAQ</a></li>
-        <li role="none"><a href="#velvett-galeria" role="menuitem">Galería</a></li>
-        <li role="none"><a href="#velvett-contacto" class="velvett-cta" role="menuitem">Escríbenos</a></li>
+  <header>
+    <div class="nav">
+      <a href="#" class="logo">VELV<span style="color:var(--p)">ETT</span></a>
+      <ul class="nav-links">
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#servicios">Servicios</a></li>
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#contacto" class="nav-cta">Escríbenos</a></li>
       </ul>
-      <button class="velvett-menu-toggle" aria-label="Abrir menú" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+      <button class="menu-btn" aria-label="Menú"><span></span><span></span><span></span></button>
     </div>
   </header>
 
-  <!-- Contenido Principal -->
+  <!-- Main Content -->
   <main>
     <!-- Hero -->
-    <section id="velvett-inicio" class="velvett-hero" aria-labelledby="velvett-hero-title">
-      <video class="velvett-hero-video" autoplay loop muted playsinline poster="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" aria-hidden="true">
-        <source src="https://videos.pexels.com/video-files/3629603/3629603-hd_1920_1080_25fps.mp4" type="video/mp4">
-      </video>
-      <div class="velvett-hero-overlay"></div>
-      <div class="velvett-hero-content">
-        <div class="velvett-hero-badge">Agencia Exclusiva de Modelos</div>
-        <h1 id="velvett-hero-title">Descubre el Éxito con VELVETT</h1>
-        <p>Vive una experiencia única. Conecta con una audiencia global y alcanza tu máximo potencial con el respaldo de VELVETT.</p>
-        <div class="velvett-hero-buttons">
-          <a href="#velvett-contacto" class="velvett-btn">Trabaja con nosotros</a>
-          <a href="#velvett-servicios" class="velvett-btn velvett-btn-outline" style="border-color:white;color:white">Conoce más</a>
+    <section id="inicio" class="hero">
+      <div class="hero-content">
+        <div class="hero-badge animate">Agencia Exclusiva</div>
+        <h1 class="animate">Descubre el Éxito con VELVETT</h1>
+        <p class="animate">Conecta con una audiencia global y alcanza tu máximo potencial con respaldo profesional.</p>
+        <div class="hero-btns animate">
+          <a href="#contacto" class="btn">Trabaja con nosotros</a>
+          <a href="#servicios" class="btn btn-outline" style="border-color:var(--w);color:var(--w)">Conoce más</a>
         </div>
       </div>
     </section>
 
-    <!-- Servicios -->
-    <div class="velvett-container velvett-section" id="velvett-servicios">
-      <h2 class="velvett-title velvett-reveal" id="velvett-services-title">Nuestros Servicios</h2>
-      <p class="velvett-subtitle velvett-reveal">Descubre las oportunidades que tenemos para ti</p>
-      <div class="velvett-services-grid" role="list">
-        <article class="velvett-service-card velvett-reveal" style="background-image:url('https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')" role="listitem">
-          <div class="velvett-card-overlay">
+    <!-- Services -->
+    <div class="container section" id="servicios">
+      <h2 class="title animate">Nuestros Servicios</h2>
+      <p class="subtitle animate">Oportunidades diseñadas para tu crecimiento</p>
+      <div class="services">
+        <article class="service animate" style="background-image:url('https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&q=80')">
+          <div class="service-content">
             <h3>Modelos de Estudio</h3>
-            <p>Inicia tu carrera con nosotros. Te brindamos todo el apoyo y las mejores instalaciones.</p>
-            <a href="#" class="velvett-card-btn">Conoce más <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <p>Instalaciones premium y apoyo integral para tu carrera.</p>
+            <a href="#" class="service-link">Más info →</a>
           </div>
         </article>
-        <article class="velvett-service-card velvett-reveal" style="background-image:url('https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')" role="listitem">
-          <div class="velvett-card-overlay">
+        <article class="service animate" style="background-image:url('https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600&q=80')">
+          <div class="service-content">
             <h3>Modelos Satélite</h3>
-            <p>Trabaja desde casa con nuestro financiamiento y acompañamiento total.</p>
-            <a href="#" class="velvett-card-btn">Conoce más <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <p>Trabaja desde casa con financiamiento y acompañamiento.</p>
+            <a href="#" class="service-link">Más info →</a>
           </div>
         </article>
-        <article class="velvett-service-card velvett-reveal" style="background-image:url('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')" role="listitem">
-          <div class="velvett-card-overlay">
+        <article class="service animate" style="background-image:url('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80')">
+          <div class="service-content">
             <h3>Estudios Aliados</h3>
-            <p>Capacitación profesional y tecnología de punta para los mejores resultados.</p>
-            <a href="#" class="velvett-card-btn">Conoce más <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <p>Capacitación profesional y tecnología de punta.</p>
+            <a href="#" class="service-link">Más info →</a>
           </div>
         </article>
       </div>
     </div>
 
-    <!-- Beneficios -->
-    <div class="velvett-benefits">
-      <div class="velvett-container">
-        <h2 class="velvett-title velvett-reveal">EXPERIENCIA <span style="color:var(--velvett-primary)">VELVETT</span></h2>
-        <div class="swiper velvett-benefits-swiper" aria-label="Beneficios destacados">
-          <div class="swiper-wrapper">
-            <div class="swiper-slide velvett-benefit-slide" style="background-image:url('https://images.unsplash.com/photo-1556760544-74068565f05c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
-              <div class="velvett-benefit-text"><h3>AGENCIA #1 EN COLOMBIA</h3><p>Líderes con los mejores resultados</p></div>
+    <!-- Benefits Carousel (CSS-only, lightweight) -->
+    <section class="section" style="background:var(--l)">
+      <div class="container">
+        <h2 class="title animate">EXPERIENCIA <span style="color:var(--p)">VELVETT</span></h2>
+        <div class="carousel">
+          <div class="carousel-track" id="benefitsTrack">
+            <div class="carousel-slide">
+              <div class="carousel-card">
+                <i class="fas fa-crown"></i>
+                <h4>Agencia #1 en Colombia</h4>
+                <p>Líderes con resultados comprobados</p>
+              </div>
             </div>
-            <div class="swiper-slide velvett-benefit-slide" style="background-image:url('https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
-              <div class="velvett-benefit-text"><h3>¡INGRESOS EXTRAORDINARIOS!</h3><p>Financiamos vivienda, carro y más</p></div>
+            <div class="carousel-slide">
+              <div class="carousel-card">
+                <i class="fas fa-chart-line"></i>
+                <h4>Ingresos Extraordinarios</h4>
+                <p>Financiamos vivienda, carro y más</p>
+              </div>
             </div>
-            <div class="swiper-slide velvett-benefit-slide" style="background-image:url('https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
-              <div class="velvett-benefit-text"><h3>SIN EXPERIENCIA</h3><p>Te capacitamos profesionalmente desde cero</p></div>
+            <div class="carousel-slide">
+              <div class="carousel-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h4>Sin Experiencia</h4>
+                <p>Te capacitamos desde cero</p>
+              </div>
             </div>
-            <div class="swiper-slide velvett-benefit-slide" style="background-image:url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
-              <div class="velvett-benefit-text"><h3>COMUNIDAD EXCLUSIVA</h3><p>Únete a una red de modelos exitosas</p></div>
+            <div class="carousel-slide">
+              <div class="carousel-card">
+                <i class="fas fa-users"></i>
+                <h4>Comunidad Exclusiva</h4>
+                <p>Red de modelos exitosas</p>
+              </div>
             </div>
           </div>
-          <div class="swiper-pagination"></div>
-          <div class="swiper-button-next" aria-label="Siguiente"></div>
-          <div class="swiper-button-prev" aria-label="Anterior"></div>
+          <div class="carousel-nav" id="benefitsNav"></div>
         </div>
       </div>
-    </div>
-
-    <!-- Ofertas -->
-    <div class="velvett-offers">
-      <div class="velvett-container">
-        <h2 class="velvett-title velvett-reveal">¿QUÉ TE <span style="color:var(--velvett-primary)">OFRECEMOS?</span></h2>
-        <div class="swiper velvett-offers-swiper" aria-label="Beneficios exclusivos">
-          <div class="swiper-wrapper">
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-chart-line" aria-hidden="true"></i><h4>Tráfico y Posicionamiento</h4><p>Las mejores estrategias digitales</p></div></div>
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-dollar-sign" aria-hidden="true"></i><h4>Ventas Garantizadas</h4><p>Desde la primera semana</p></div></div>
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-building" aria-hidden="true"></i><h4>Instalaciones de Lujo</h4><p>Ambientes exclusivos</p></div></div>
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-globe-americas" aria-hidden="true"></i><h4>Reconocimiento Mundial</h4><p>Proyección internacional</p></div></div>
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-plane" aria-hidden="true"></i><h4>Viajes</h4><p>Nacionales e internacionales</p></div></div>
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-coins" aria-hidden="true"></i><h4>Asesoría Financiera</h4><p>Manejo inteligente de ingresos</p></div></div>
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-headset" aria-hidden="true"></i><h4>Soporte 24/7</h4><p>Siempre disponibles</p></div></div>
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-clock" aria-hidden="true"></i><h4>Horarios Flexibles</h4><p>Tú decides tu tiempo</p></div></div>
-          </div>
-          <div class="swiper-pagination"></div>
-          <div class="swiper-button-next" aria-label="Siguiente"></div>
-          <div class="swiper-button-prev" aria-label="Anterior"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Nosotros -->
-    <section class="velvett-about" id="velvett-nosotros" aria-labelledby="velvett-about-title">
-      <div class="velvett-about-text velvett-reveal">
-        <h2 id="velvett-about-title">NOSOTROS</h2>
-        <p>Somos VELVETT, un estudio exclusivo ubicado en Bogotá. Nos especializamos en el asesoramiento y desarrollo profesional para modelos en la industria del entretenimiento.</p>
-        <p>Ofrecemos tecnología avanzada y apoyo integral para que trabajes de manera profesional y eficiente. Priorizamos tu privacidad, seguridad y un ambiente de trabajo profesional, asegurando tu éxito.</p>
-        <a href="#" class="velvett-btn">Conoce más sobre nosotros</a>
-      </div>
-      <div class="velvett-about-image" role="img" aria-label="Instalaciones exclusivas VELVETT"></div>
     </section>
+
+    <!-- Offers Grid -->
+    <div class="container section">
+      <h2 class="title animate">¿QUÉ TE <span style="color:var(--p)">OFRECEMOS?</span></h2>
+      <div class="services">
+        <div class="carousel-card animate"><i class="fas fa-bullseye"></i><h4>Posicionamiento</h4><p>Estrategias digitales premium</p></div>
+        <div class="carousel-card animate"><i class="fas fa-hand-holding-usd"></i><h4>Ventas Garantizadas</h4><p>Desde la primera semana</p></div>
+        <div class="carousel-card animate"><i class="fas fa-building"></i><h4>Instalaciones de Lujo</h4><p>Ambientes exclusivos</p></div>
+        <div class="carousel-card animate"><i class="fas fa-globe"></i><h4>Proyección Global</h4><p>Reconocimiento internacional</p></div>
+        <div class="carousel-card animate"><i class="fas fa-plane"></i><h4>Viajes</h4><p>Nacionales e internacionales</p></div>
+        <div class="carousel-card animate"><i class="fas fa-headset"></i><h4>Soporte 24/7</h4><p>Siempre disponibles</p></div>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="container section" id="nosotros">
+      <div class="about">
+        <div class="about-text animate">
+          <h2>NOSOTROS</h2>
+          <p>Somos VELVETT, estudio exclusivo en Bogotá especializado en desarrollo profesional para modelos.</p>
+          <p>Tecnología avanzada, privacidad garantizada y ambiente profesional para asegurar tu éxito.</p>
+          <a href="#" class="btn" style="margin-top:1rem">Conoce más</a>
+        </div>
+        <div class="about-img animate"></div>
+      </div>
+    </div>
 
     <!-- FAQ -->
-    <div class="velvett-container velvett-section" id="velvett-faq">
-      <h2 class="velvett-title velvett-reveal">PREGUNTAS FRECUENTES</h2>
-      <div style="max-width:800px;margin:0 auto">
-        <div class="velvett-accordion-item velvett-reveal">
-          <button class="velvett-accordion-header" aria-expanded="false">
-            ¿Cuál es el proceso para unirme a VELVETT?
-            <i class="fas fa-chevron-down" aria-hidden="true"></i>
-          </button>
-          <div class="velvett-accordion-content">
-            <p>El proceso es sencillo: contáctanos, agenda una entrevista personalizada, conoce nuestras instalaciones y, si decides unirte, comenzamos tu capacitación inmediata con todo el apoyo que necesitas.</p>
-          </div>
+    <div class="container section" id="faq">
+      <h2 class="title animate">PREGUNTAS FRECUENTES</h2>
+      <div style="max-width:700px;margin:0 auto">
+        <div class="faq-item animate">
+          <button class="faq-q">¿Cuál es el proceso para unirme? <i class="fas fa-chevron-down"></i></button>
+          <div class="faq-a"><p>Contáctanos, agenda entrevista, conoce instalaciones y comienza tu capacitación inmediata.</p></div>
         </div>
-        <div class="velvett-accordion-item velvett-reveal">
-          <button class="velvett-accordion-header" aria-expanded="false">
-            ¿Entregan juguetes, dotaciones y mucho más?
-            <i class="fas fa-chevron-down" aria-hidden="true"></i>
-          </button>
-          <div class="velvett-accordion-content">
-            <p>Sí, en VELVETT no tienes que preocuparte por nada. Brindamos juguetes, lubricantes, maquillaje, vestuario y todos los implementos de apoyo que necesites.</p>
-          </div>
+        <div class="faq-item animate">
+          <button class="faq-q">¿Entregan dotación y apoyos? <i class="fas fa-chevron-down"></i></button>
+          <div class="faq-a"><p>Sí, brindamos todo lo necesario: vestuario, maquillaje, equipos y más.</p></div>
         </div>
-        <div class="velvett-accordion-item velvett-reveal">
-          <button class="velvett-accordion-header" aria-expanded="false">
-            ¿El físico importa en la industria?
-            <i class="fas fa-chevron-down" aria-hidden="true"></i>
-          </button>
-          <div class="velvett-accordion-content">
-            <p>No, el físico y la experiencia es lo de menos. Tu actitud, espontaneidad y las ganas de aprender son las que harán que generes ingresos altos.</p>
-          </div>
+        <div class="faq-item animate">
+          <button class="faq-q">¿Importa el físico o experiencia? <i class="fas fa-chevron-down"></i></button>
+          <div class="faq-a"><p>No. Tu actitud y ganas de aprender son lo que genera resultados.</p></div>
         </div>
       </div>
     </div>
 
-    <!-- Financiamiento -->
-    <div class="velvett-finance">
-      <div class="velvett-container">
-        <h2 class="velvett-title velvett-reveal">FINANCIAMIENTO <span style="color:var(--velvett-primary)">VELVETT</span></h2>
-        <div class="swiper velvett-finance-swiper" aria-label="Opciones de financiamiento">
-          <div class="swiper-wrapper">
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-car" aria-hidden="true"></i><h4>Carro o Moto</h4><p>De tus sueños</p></div></div>
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-home" aria-hidden="true"></i><h4>Vivienda</h4><p>Compra o mejora</p></div></div>
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-syringe" aria-hidden="true"></i><h4>Cirugías</h4><p>Plásticas y estéticas</p></div></div>
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-passport" aria-hidden="true"></i><h4>Viajes</h4><p>Nacionales e internacionales</p></div></div>
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-couch" aria-hidden="true"></i><h4>Hogar</h4><p>Equipamiento completo</p></div></div>
-            <div class="swiper-slide"><div class="velvett-offer-card"><i class="fas fa-graduation-cap" aria-hidden="true"></i><h4>Estudios</h4><p>Formación profesional</p></div></div>
+    <!-- Financing Carousel -->
+    <section class="section" style="background:var(--l)">
+      <div class="container">
+        <h2 class="title animate">FINANCIAMIENTO <span style="color:var(--p)">VELVETT</span></h2>
+        <div class="carousel">
+          <div class="carousel-track" id="financeTrack">
+            <div class="carousel-slide"><div class="carousel-card"><i class="fas fa-car"></i><h4>Carro/Moto</h4><p>De tus sueños</p></div></div>
+            <div class="carousel-slide"><div class="carousel-card"><i class="fas fa-home"></i><h4>Vivienda</h4><p>Compra o mejora</p></div></div>
+            <div class="carousel-slide"><div class="carousel-card"><i class="fas fa-syringe"></i><h4>Cirugías</h4><p>Estéticas</p></div></div>
+            <div class="carousel-slide"><div class="carousel-card"><i class="fas fa-passport"></i><h4>Viajes</h4><p>Internacionales</p></div></div>
+            <div class="carousel-slide"><div class="carousel-card"><i class="fas fa-graduation-cap"></i><h4>Estudios</h4><p>Formación profesional</p></div></div>
           </div>
-          <div class="swiper-pagination"></div>
-          <div class="swiper-button-next" aria-label="Siguiente"></div>
-          <div class="swiper-button-prev" aria-label="Anterior"></div>
+          <div class="carousel-nav" id="financeNav"></div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Galería -->
-    <div class="velvett-container velvett-section" id="velvett-galeria">
-      <h2 class="velvett-title velvett-reveal">GALERÍA <span style="color:var(--velvett-primary)">VELVETT</span></h2>
-      <div class="velvett-gallery-grid">
-        <figure class="velvett-gallery-item velvett-reveal"><img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Sesión de fotos exclusiva" loading="lazy" width="400" height="400"></figure>
-        <figure class="velvett-gallery-item velvett-reveal"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Modelo en estudio" loading="lazy" width="400" height="400"></figure>
-        <figure class="velvett-gallery-item velvett-reveal"><img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Ambiente profesional" loading="lazy" width="400" height="400"></figure>
-        <figure class="velvett-gallery-item velvett-reveal"><img src="https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Instalaciones de lujo" loading="lazy" width="400" height="400"></figure>
-      </div>
-    </div>
-
-    <!-- Banners finales -->
-    <div class="velvett-container velvett-section">
-      <div class="velvett-services-grid">
-        <article class="velvett-service-card velvett-reveal" style="background-image:url('https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
-          <div class="velvett-card-overlay"><h3>NUESTRAS MODELOS</h3><a href="#" class="velvett-card-btn">CONOCE MÁS <i class="fas fa-arrow-right" aria-hidden="true"></i></a></div>
-        </article>
-        <article class="velvett-service-card velvett-reveal" style="background-image:url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
-          <div class="velvett-card-overlay"><h3>NUESTRAS INSTALACIONES</h3><a href="#" class="velvett-card-btn">CONOCE MÁS <i class="fas fa-arrow-right" aria-hidden="true"></i></a></div>
-        </article>
-        <article class="velvett-service-card velvett-reveal" style="background-image:url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
-          <div class="velvett-card-overlay"><h3>NUESTROS VIAJES</h3><a href="#" class="velvett-card-btn">CONOCE MÁS <i class="fas fa-arrow-right" aria-hidden="true"></i></a></div>
-        </article>
+    <!-- Gallery -->
+    <div class="container section" id="galeria">
+      <h2 class="title animate">GALERÍA</h2>
+      <div class="gallery">
+        <figure class="gallery-item animate"><img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80" alt="Sesión" loading="lazy"></figure>
+        <figure class="gallery-item animate"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=80" alt="Modelo" loading="lazy"></figure>
+        <figure class="gallery-item animate"><img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&q=80" alt="Estudio" loading="lazy"></figure>
+        <figure class="gallery-item animate"><img src="https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=400&q=80" alt="Ambiente" loading="lazy"></figure>
       </div>
     </div>
   </main>
 
   <!-- Footer -->
-  <footer class="velvett-social-footer" id="velvett-contacto">
-    <div class="velvett-social-icons" role="navigation" aria-label="Redes sociales">
-      <a href="#" target="_blank" rel="noopener" aria-label="Instagram VELVETT"><i class="fab fa-instagram" aria-hidden="true"></i></a>
-      <a href="#" target="_blank" rel="noopener" aria-label="Facebook VELVETT"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
-      <a href="#" target="_blank" rel="noopener" aria-label="TikTok VELVETT"><i class="fab fa-tiktok" aria-hidden="true"></i></a>
-      <a href="#" target="_blank" rel="noopener" aria-label="Twitter VELVETT"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+  <footer id="contacto">
+    <div class="social">
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+      <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
     </div>
-    <p class="velvett-copyright">© 2026 VELVETT Agency - Todos los derechos reservados.</p>
+    <p class="copyright">© 2026 VELVETT Agency - Todos los derechos reservados.</p>
   </footer>
 
-  <a href="https://wa.me/573118091297" class="velvett-wpp" target="_blank" rel="noopener" aria-label="Contáctanos por WhatsApp">
-    <i class="fab fa-whatsapp" aria-hidden="true"></i>
+  <a href="https://wa.me/573118091297" class="wpp" target="_blank" rel="noopener" aria-label="WhatsApp">
+    <i class="fab fa-whatsapp"></i>
   </a>
 
 </div>
 
-<!-- Scripts externos vía CDN -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+<!-- Font Awesome (lightweight) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 
-<!-- Script principal scoped para WordPress -->
+<!-- Optimized JS - Vanilla, no dependencies -->
 <script>
-(function() {
-  'use strict';
-  
-  // Esperar a que DOM y scripts externos estén listos
-  function whenReady(callback) {
-    if(document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
-      init();
-    }
-    function init() {
-      // Esperar librerías externas
-      const checkLibs = setInterval(() => {
-        if(typeof THREE !== 'undefined' && typeof gsap !== 'undefined' && typeof Swiper !== 'undefined') {
-          clearInterval(checkLibs);
-          callback();
-        }
-      }, 50);
-    }
-  }
+(function(){'use strict';const root=document.querySelector('[data-velvett]');if(!root)return;
 
-  whenReady(() => {
-    const root = document.querySelector('[data-velvett-init]');
-    if(!root) return;
+// Mobile Menu
+const menuBtn=root.querySelector('.menu-btn'),mobileMenu=root.querySelector('.mobile-menu'),overlay=root.querySelector('.mobile-overlay');
+function toggleMenu(){const a=mobileMenu.classList.toggle('active');overlay.classList.toggle('active');menuBtn.classList.toggle('active');document.body.style.overflow=a?'hidden':''}
+menuBtn?.addEventListener('click',toggleMenu);overlay?.addEventListener('click',toggleMenu);
+root.querySelectorAll('.mobile-links a').forEach(l=>l.addEventListener('click',toggleMenu));
 
-    // === Preloader ===
-    const preloader = root.querySelector('.velvett-preloader');
-    window.addEventListener('load', () => {
-      setTimeout(() => preloader && preloader.classList.add('hidden'), 400);
-    });
+// Smooth Scroll
+root.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{const t=a.getAttribute('href');if(t==='#')return;const el=document.getElementById(t.slice(1))||root.querySelector(t);if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth',block:'start'});if(window.innerWidth<768)toggleMenu()}})});
 
-    // === Drawer Menu ===
-    const menuToggle = root.querySelector('.velvett-menu-toggle');
-    const drawer = root.querySelector('.velvett-drawer');
-    const drawerOverlay = root.querySelector('.velvett-drawer-overlay');
-    
-    function toggleDrawer() {
-      const isActive = drawer.classList.toggle('active');
-      drawerOverlay.classList.toggle('active');
-      menuToggle.classList.toggle('active');
-      menuToggle.setAttribute('aria-expanded', isActive);
-      document.body.style.overflow = isActive ? 'hidden' : '';
-    }
-    if(menuToggle) {
-      menuToggle.addEventListener('click', toggleDrawer);
-      drawerOverlay.addEventListener('click', toggleDrawer);
-      drawer.querySelectorAll('a').forEach(link => link.addEventListener('click', toggleDrawer));
-    }
+// Header scroll effect
+const header=root.querySelector('header');window.addEventListener('scroll',()=>header?.classList.toggle('scrolled',window.scrollY>30),{passive:true});
 
-    // === Smooth Scroll (scoped) ===
-    root.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if(href === '#') return;
-        // Buscar dentro del root o en todo el doc para anclas externas
-        const target = root.querySelector(href) || document.querySelector(href);
-        if(target) {
-          e.preventDefault();
-          const headerOffset = 80;
-          const elementPosition = target.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-          window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-          if(window.innerWidth < 992) toggleDrawer();
-        }
-      });
-    });
+// FAQ Accordion
+root.querySelectorAll('.faq-q').forEach(btn=>{btn.addEventListener('click',()=>{const item=btn.parentElement,active=item.classList.toggle('active');btn.setAttribute('aria-expanded',active);root.querySelectorAll('.faq-item').forEach(i=>{if(i!==item){i.classList.remove('active');i.querySelector('.faq-q').setAttribute('aria-expanded','false')}})})});
 
-    // === Header scroll effect ===
-    const header = root.querySelector('.velvett-header');
-    const onScroll = () => {
-      if(header) {
-        header.classList.toggle('scrolled', window.scrollY > 50);
-      }
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
+// Lightweight Carousel (CSS + minimal JS)
+function initCarousel(trackId,navId){const track=root.querySelector('#'+trackId),nav=root.querySelector('#'+navId);if(!track||!nav)return;const slides=track.children,dots=[];slides.forEach((_,i)=>{const d=document.createElement('button');d.className='carousel-dot'+(i===0?' active':'');d.setAttribute('aria-label','Slide '+(i+1));d.addEventListener('click',()=>goTo(i));nav.appendChild(d);dots.push(d)});let current=0;function goTo(i){current=i;track.style.transform='translateX(-'+(i*100)+'%)';dots.forEach((d,idx)=>d.classList.toggle('active',idx===i))}let auto=setInterval(()=>goTo((current+1)%slides.length),4000);track.addEventListener('mouseenter',()=>clearInterval(auto));track.addEventListener('mouseleave',()=>auto=setInterval(()=>goTo((current+1)%slides.length),4000))}
+initCarousel('benefitsTrack','benefitsNav');initCarousel('financeTrack','financeNav');
 
-    // === Accordion FAQ ===
-    root.querySelectorAll('.velvett-accordion-header').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const item = btn.parentElement;
-        const isActive = item.classList.toggle('active');
-        btn.setAttribute('aria-expanded', isActive);
-        // Close others
-        root.querySelectorAll('.velvett-accordion-item').forEach(el => {
-          if(el !== item) {
-            el.classList.remove('active');
-            el.querySelector('.velvett-accordion-header').setAttribute('aria-expanded', 'false');
-          }
-        });
-      });
-    });
+// Simple reveal on scroll (Intersection Observer)
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='none';obs.unobserve(e.target)}})},{threshold:.1});
+root.querySelectorAll('.animate').forEach(el=>{el.style.opacity='0';el.style.transform='translateY(16px)';el.style.transition='opacity .6s var(--e),transform .6s var(--e)';obs.observe(el)});
 
-    // === Scroll Reveal ===
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if(entry.isIntersecting) {
-          entry.target.classList.add('active');
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-    root.querySelectorAll('.velvett-reveal').forEach(el => revealObserver.observe(el));
+// Micro-interactions (hover only, desktop)
+if(window.matchMedia('(hover:hover)').matches){root.querySelectorAll('.btn,.service,.carousel-card').forEach(el=>{el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2;el.style.transform='translate('+x*0.03+'px,'+y*0.03+'px)'});el.addEventListener('mouseleave',()=>{el.style.transform=''})})}
 
-    // === Three.js Particles (Optimizado para WordPress) ===
-    const initParticles = () => {
-      // Detectar capacidad del dispositivo
-      const isLowEnd = navigator.hardwareConcurrency <= 4 || /Mobi|Android/i.test(navigator.userAgent);
-      if(isLowEnd) return;
+// Performance: Pause animations when tab hidden
+document.addEventListener('visibilitychange',()=>{if(document.hidden){root.querySelectorAll('.animate').forEach(el=>{el.style.transition='none'})}else{root.querySelectorAll('.animate').forEach(el=>{el.style.transition='opacity .6s var(--e),transform .6s var(--e)'})}});
 
-      const canvasContainer = root.querySelector('.velvett-canvas');
-      if(!canvasContainer) return;
-
-      try {
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' });
-        renderer.setSize(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        canvasContainer.appendChild(renderer.domElement);
-
-        const particleCount = 500;
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(particleCount * 3);
-        const colors = new Float32Array(particleCount * 3);
-        const sizes = new Float32Array(particleCount);
-
-        const colorPalette = [
-          new THREE.Color('#D5B1B8'),
-          new THREE.Color('#803655'),
-          new THREE.Color('#F5EBED')
-        ];
-
-        for(let i = 0; i < particleCount; i++) {
-          positions[i*3] = (Math.random() - 0.5) * 20;
-          positions[i*3+1] = (Math.random() - 0.5) * 20;
-          positions[i*3+2] = (Math.random() - 0.5) * 20;
-          const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-          colors[i*3] = color.r; colors[i*3+1] = color.g; colors[i*3+2] = color.b;
-          sizes[i] = Math.random() * 0.08 + 0.02;
-        }
-
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-
-        const material = new THREE.ShaderMaterial({
-          uniforms: { time: { value: 0 }, pixelRatio: { value: renderer.getPixelRatio() } },
-          vertexShader: `
-            attribute float size; attribute vec3 color; varying vec3 vColor; uniform float time;
-            void main() {
-              vColor = color;
-              vec3 pos = position;
-              pos.y += sin(time + position.x * 2.0) * 0.3;
-              pos.x += cos(time * 0.5 + position.z) * 0.2;
-              vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-              gl_PointSize = size * 300.0 / -mvPosition.z;
-              gl_Position = projectionMatrix * mvPosition;
-            }
-          `,
-          fragmentShader: `
-            varying vec3 vColor;
-            void main() {
-              float dist = length(gl_PointCoord - vec2(0.5));
-              if(dist > 0.5) discard;
-              float alpha = 1.0 - smoothstep(0.3, 0.5, dist);
-              gl_FragColor = vec4(vColor, alpha * 0.6);
-            }
-          `,
-          transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
-        });
-
-        const particles = new THREE.Points(geometry, material);
-        scene.add(particles);
-        camera.position.z = 15;
-
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (e) => {
-          mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-          mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-        }, { passive: true });
-
-        let animationFrame;
-        const clock = new THREE.Clock();
-        const animate = () => {
-          animationFrame = requestAnimationFrame(animate);
-          const delta = clock.getDelta();
-          const time = clock.getElapsedTime();
-          material.uniforms.time.value = time;
-          particles.rotation.y += delta * 0.05;
-          particles.rotation.x += (mouseY * 0.02 - particles.rotation.x) * 0.05;
-          particles.rotation.y += (mouseX * 0.02 - particles.rotation.y) * 0.05;
-          renderer.render(scene, camera);
-        };
-        animate();
-
-        const onResize = () => {
-          if(!canvasContainer) return;
-          camera.aspect = canvasContainer.offsetWidth / canvasContainer.offsetHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
-          renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-          material.uniforms.pixelRatio.value = renderer.getPixelRatio();
-        };
-        window.addEventListener('resize', onResize, { passive: true });
-
-        // Cleanup on page hide (WordPress navigation)
-        document.addEventListener('visibilitychange', () => {
-          if(document.hidden) {
-            cancelAnimationFrame(animationFrame);
-          } else {
-            animate();
-          }
-        });
-
-        return () => {
-          cancelAnimationFrame(animationFrame);
-          renderer.dispose();
-          geometry.dispose();
-          material.dispose();
-          if(renderer.domElement.parentNode) {
-            renderer.domElement.parentNode.removeChild(renderer.domElement);
-          }
-          window.removeEventListener('resize', onResize);
-        };
-      } catch(e) {
-        console.warn('VELVETT: Three.js no soportado en este dispositivo');
-      }
-    };
-    setTimeout(initParticles, 1000);
-
-    // === GSAP Animations ===
-    if(typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-      gsap.registerPlugin(ScrollTrigger);
-
-      // Hero text stagger
-      gsap.from(root.querySelectorAll('.velvett-hero-content > *'), {
-        duration: 1, y: 30, opacity: 0, stagger: 0.15, ease: 'power3.out', delay: 0.3
-      });
-
-      // Section titles reveal
-      gsap.utils.toArray(root.querySelectorAll('.velvett-title, .velvett-subtitle')).forEach(el => {
-        gsap.from(el, {
-          scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' },
-          duration: 0.8, y: 24, opacity: 0, ease: 'power3.out'
-        });
-      });
-
-      // Cards stagger reveal
-      gsap.utils.toArray(root.querySelectorAll('.velvett-services-grid, .velvett-gallery-grid')).forEach(grid => {
-        gsap.from(grid.children, {
-          scrollTrigger: { trigger: grid, start: 'top 80%' },
-          duration: 0.6, y: 30, opacity: 0, stagger: 0.1, ease: 'power2.out'
-        });
-      });
-    }
-
-    // === Swipers Optimizados ===
-    const initSwiper = (selector, config) => {
-      if(typeof Swiper === 'undefined') return null;
-      return new Swiper(selector, {
-        loop: true, speed: 900, grabCursor: true, preloadImages: false,
-        lazy: { loadPrevNext: true },
-        autoplay: { delay: config.delay || 4000, disableOnInteraction: false, pauseOnMouseEnter: true },
-        pagination: { el: '.swiper-pagination', clickable: true, dynamicBullets: true },
-        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-        keyboard: { enabled: true }, mousewheel: { enabled: true, sensitivity: 1 },
-        breakpoints: config.breakpoints, ...config
-      });
-    };
-
-    initSwiper(root.querySelector('.velvett-benefits-swiper'), {
-      slidesPerView: 1, spaceBetween: 24,
-      breakpoints: { 576: { slidesPerView: 2 }, 768: { slidesPerView: 3 }, 1024: { slidesPerView: 4 } }
-    });
-    initSwiper(root.querySelector('.velvett-offers-swiper'), {
-      slidesPerView: 1.1, spaceBetween: 16, centeredSlides: true,
-      breakpoints: { 576: { slidesPerView: 2.1, centeredSlides: false }, 768: { slidesPerView: 3 }, 1024: { slidesPerView: 4 } }
-    });
-    initSwiper(root.querySelector('.velvett-finance-swiper'), {
-      slidesPerView: 1.1, spaceBetween: 16, centeredSlides: true,
-      breakpoints: { 576: { slidesPerView: 2.1, centeredSlides: false }, 768: { slidesPerView: 3 }, 1024: { slidesPerView: 5 } }
-    });
-    initSwiper(root.querySelector('.velvett-gallery-grid')?.closest('.swiper'), {
-      slidesPerView: 1, spaceBetween: 20,
-      breakpoints: { 768: { slidesPerView: 2 }, 1024: { slidesPerView: 4 } }
-    });
-
-    // === Micro-interacciones (solo desktop con hover) ===
-    if(window.matchMedia('(hover: hover)').matches) {
-      root.querySelectorAll('.velvett-btn, .velvett-service-card, .velvett-offer-card').forEach(el => {
-        el.addEventListener('mousemove', (e) => {
-          const rect = el.getBoundingClientRect();
-          const x = e.clientX - rect.left - rect.width/2;
-          const y = e.clientY - rect.top - rect.height/2;
-          gsap.to(el, { x: x * 0.05, y: y * 0.05, duration: 0.3, ease: 'power2.out' });
-        });
-        el.addEventListener('mouseleave', () => {
-          gsap.to(el, { x: 0, y: 0, duration: 0.4, ease: 'power2.out' });
-        });
-      });
-    }
-
-    // === Cleanup al desmontar (para Gutenberg dinámico) ===
-    if(typeof module !== 'undefined' && module.hot) {
-      module.hot.dispose(() => {
-        // Aquí iría lógica de cleanup si usas HMR
-      });
-    }
-  });
+console.log('✓ VELVETT Lite loaded - Performance optimized');
 })();
 </script>
 
-<!-- Schema.org SEO -->
+<!-- Structured Data for SEO -->
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Organization","name":"VELVETT Agency","url":"https://velvett-agency.com","logo":"https://velvett-agency.com/logo.png","sameAs":["https://instagram.com/velvett","https://tiktok.com/@velvett"],"address":{"@type":"PostalAddress","addressLocality":"Bogotá","addressCountry":"CO"}}
 </script>
