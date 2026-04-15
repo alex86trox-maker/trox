@@ -1,4 +1,4 @@
-<!-- VELVETT con Fondo Corregido - WordPress Gutenberg Compatible -->
+<!-- VELVETT con Lightbox - WordPress Gutenberg Compatible -->
 <!-- Copia TODO en un bloque "HTML Personalizado" de Gutenberg -->
 
 <div id="velvett-app" class="velvett" data-velvett>
@@ -13,7 +13,7 @@
       position:relative
     }
     
-    /* === FONDO DIFUMINADO GLOBAL - URL CORREGIDA === */
+    /* === FONDO DIFUMINADO GLOBAL === */
     .velvett::before{
       content:'';
       position:fixed;
@@ -70,6 +70,8 @@
       0%,100%{box-shadow:0 0 4px rgba(213,177,184,.6),0 0 8px rgba(213,177,184,.3)}
       50%{box-shadow:0 0 8px rgba(213,177,184,.9),0 0 16px rgba(213,177,184,.5),0 0 24px rgba(213,177,184,.3)}
     }
+    @keyframes lightboxFade{from{opacity:0}to{opacity:1}}
+    @keyframes lightboxZoom{from{transform:scale(.95)}to{transform:scale(1)}}
     
     .velvett .animate{animation:fadeUp .7s var(--e) forwards;opacity:0}
     .velvett .animate:nth-child(1){animation-delay:.15s}
@@ -170,9 +172,10 @@
     .velvett .about-text h2{font-size:clamp(1.5rem,3vw,2rem);margin-bottom:.8rem}
     .velvett .about-text p{color:var(--p);margin-bottom:1rem;line-height:1.7}
     
-    /* === GALERÍA === */
+    /* === GALERÍA CON LIGHTBOX === */
     .velvett .gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;position:relative;z-index:1}
-    .velvett .gallery-item{aspect-ratio:3/4;border-radius:16px;overflow:hidden;position:relative;cursor:pointer;background:var(--w)}
+    .velvett .gallery-item{aspect-ratio:3/4;border-radius:16px;overflow:hidden;position:relative;cursor:pointer;background:var(--w);transition:transform .3s var(--e)}
+    .velvett .gallery-item:hover{transform:translateY(-4px)}
     .velvett .gallery-img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--eb)}
     .velvett .gallery-item::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(44,0,29,.8),transparent 60%);opacity:0;transition:opacity .4s var(--e);z-index:1}
     .velvett .gallery-item::after{content:'';position:absolute;inset:2px;border:2px solid var(--a);border-radius:14px;opacity:0;transform:scale(.95);transition:all .4s var(--e);z-index:2;pointer-events:none}
@@ -181,6 +184,72 @@
     .velvett .gallery-item:hover::after{opacity:1;transform:scale(1)}
     .velvett .gallery-caption{position:absolute;bottom:0;left:0;right:0;padding:1rem;color:var(--w);font-size:.9rem;font-weight:500;transform:translateY(10px);opacity:0;transition:all .4s var(--e);z-index:3}
     .velvett .gallery-item:hover .gallery-caption{transform:translateY(0);opacity:1}
+    
+    /* === LIGHTBOX === */
+    .velvett-lightbox{
+      position:fixed;inset:0;z-index:9999;
+      background:rgba(44,0,29,.98);
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;visibility:hidden;pointer-events:none;
+      transition:opacity .4s var(--e),visibility .4s var(--e);
+    }
+    .velvett-lightbox.active{opacity:1;visibility:visible;pointer-events:auto}
+    
+    .velvett-lightbox::before{
+      content:'';position:absolute;inset:0;
+      background:radial-gradient(circle at center, transparent 0%, rgba(44,0,29,.95) 100%);
+      z-index:1;
+    }
+    
+    .velvett-lightbox-content{
+      position:relative;z-index:2;
+      max-width:95vw;max-height:95vh;
+      display:flex;align-items:center;justify-content:center;
+    }
+    
+    .velvett-lightbox-img{
+      max-width:100%;max-height:90vh;
+      border-radius:8px;
+      box-shadow:0 25px 80px rgba(0,0,0,.5);
+      animation:lightboxZoom .4s var(--e) forwards;
+      opacity:0;transform:scale(.98);
+    }
+    .velvett-lightbox.active .velvett-lightbox-img{
+      opacity:1;transform:scale(1);
+    }
+    
+    .velvett-lightbox-counter{
+      position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+      color:var(--a);font-size:.9rem;font-weight:500;
+      background:rgba(128,54,85,.8);padding:6px 16px;border-radius:20px;
+      z-index:3;backdrop-filter:blur(5px);
+    }
+    
+    .velvett-lightbox-close{
+      position:absolute;top:20px;right:20px;
+      width:44px;height:44px;border-radius:50%;
+      background:rgba(255,255,255,.15);border:2px solid var(--a);
+      color:var(--a);display:grid;place-items:center;
+      cursor:pointer;transition:all .3s var(--e);
+      z-index:3;font-size:1.2rem;
+    }
+    .velvett-lightbox-close:hover{
+      background:var(--p);color:var(--w);transform:rotate(90deg) scale(1.1);
+    }
+    
+    .velvett-lightbox-nav{
+      position:absolute;top:50%;transform:translateY(-50%);
+      width:50px;height:50px;border-radius:50%;
+      background:rgba(255,255,255,.15);border:2px solid var(--a);
+      color:var(--a);display:grid;place-items:center;
+      cursor:pointer;transition:all .3s var(--e);
+      z-index:3;font-size:1.2rem;
+    }
+    .velvett-lightbox-nav:hover{
+      background:var(--p);color:var(--w);transform:translateY(-50%) scale(1.1);
+    }
+    .velvett-lightbox-prev{left:20px}
+    .velvett-lightbox-next{right:20px}
     
     /* === FAQ === */
     .velvett .faq-item{background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border:1px solid rgba(128,54,85,.15);border-radius:12px;margin-bottom:.8rem;overflow:hidden;position:relative;z-index:1}
@@ -213,8 +282,13 @@
       .velvett .gallery{grid-template-columns:repeat(2,1fr)}
       .velvett .about{flex-direction:column}
       .velvett .particle:nth-child(n+14){display:none}
+      .velvett-lightbox-nav{width:44px;height:44px;font-size:1rem}
+      .velvett-lightbox-close{width:40px;height:40px;font-size:1rem}
     }
-    @media(max-width:480px){.velvett .gallery{grid-template-columns:1fr}}
+    @media(max-width:480px){
+      .velvett .gallery{grid-template-columns:1fr}
+      .velvett-lightbox-img{max-height:85vh}
+    }
     
     /* === REDUCED MOTION === */
     @media(prefers-reduced-motion:reduce){
@@ -222,6 +296,8 @@
       .velvett .animate{opacity:1!important;transform:none!important}
       .velvett .particles{display:none}
       .velvett::before{filter:blur(4px)!important}
+      .velvett-lightbox{transition:none!important}
+      .velvett-lightbox-img{animation:none!important;transform:none!important}
     }
     
     /* === WORDPRESS ADMIN BAR COMPAT === */
@@ -237,7 +313,6 @@
     </video>
     
     <div class="particles" aria-hidden="true">
-      <span class="particle"></span><span class="particle"></span><span class="particle"></span>
       <span class="particle"></span><span class="particle"></span><span class="particle"></span>
       <span class="particle"></span><span class="particle"></span><span class="particle"></span>
       <span class="particle"></span><span class="particle"></span><span class="particle"></span>
@@ -410,43 +485,70 @@
     </div>
   </div>
 
-  <!-- GALERÍA -->
+  <!-- GALERÍA CON LIGHTBOX -->
   <div class="container section" id="galeria">
     <h2 class="title animate">GALERÍA</h2>
     <div class="gallery">
-      <figure class="gallery-item animate">
-        <img class="gallery-img" src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80" alt="Sesión exclusiva" loading="lazy">
+      <figure class="gallery-item animate" data-lightbox>
+        <img class="gallery-img" src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=80" 
+             data-full="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1920&q=90" 
+             alt="Sesión exclusiva" loading="lazy">
         <figcaption class="gallery-caption">Sesión Premium</figcaption>
       </figure>
-      <figure class="gallery-item animate">
-        <img class="gallery-img" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=80" alt="Modelo profesional" loading="lazy">
+      <figure class="gallery-item animate" data-lightbox>
+        <img class="gallery-img" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=80" 
+             data-full="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=1920&q=90" 
+             alt="Modelo profesional" loading="lazy">
         <figcaption class="gallery-caption">Talento VELVETT</figcaption>
       </figure>
-      <figure class="gallery-item animate">
-        <img class="gallery-img" src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&q=80" alt="Estudio de lujo" loading="lazy">
+      <figure class="gallery-item animate" data-lightbox>
+        <img class="gallery-img" src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&q=80" 
+             data-full="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=1920&q=90" 
+             alt="Estudio de lujo" loading="lazy">
         <figcaption class="gallery-caption">Nuestro Estudio</figcaption>
       </figure>
-      <figure class="gallery-item animate">
-        <img class="gallery-img" src="https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=400&q=80" alt="Ambiente exclusivo" loading="lazy">
+      <figure class="gallery-item animate" data-lightbox>
+        <img class="gallery-img" src="https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=800&q=80" 
+             data-full="https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=1920&q=90" 
+             alt="Ambiente exclusivo" loading="lazy">
         <figcaption class="gallery-caption">Experiencia Única</figcaption>
       </figure>
-      <figure class="gallery-item animate">
-        <img class="gallery-img" src="https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400&q=80" alt="Modelo en acción" loading="lazy">
+      <figure class="gallery-item animate" data-lightbox>
+        <img class="gallery-img" src="https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=800&q=80" 
+             data-full="https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=1920&q=90" 
+             alt="Modelo en acción" loading="lazy">
         <figcaption class="gallery-caption">Momentos VELVETT</figcaption>
       </figure>
-      <figure class="gallery-item animate">
-        <img class="gallery-img" src="https://images.unsplash.com/photo-1556760544-74068565f05c?w=400&q=80" alt="Sesión profesional" loading="lazy">
+      <figure class="gallery-item animate" data-lightbox>
+        <img class="gallery-img" src="https://images.unsplash.com/photo-1556760544-74068565f05c?w=800&q=80" 
+             data-full="https://images.unsplash.com/photo-1556760544-74068565f05c?w=1920&q=90" 
+             alt="Sesión profesional" loading="lazy">
         <figcaption class="gallery-caption">Producción Premium</figcaption>
       </figure>
-      <figure class="gallery-item animate">
-        <img class="gallery-img" src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&q=80" alt="Modelo exclusiva" loading="lazy">
+      <figure class="gallery-item animate" data-lightbox>
+        <img class="gallery-img" src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800&q=80" 
+             data-full="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=1920&q=90" 
+             alt="Modelo exclusiva" loading="lazy">
         <figcaption class="gallery-caption">Talento Internacional</figcaption>
       </figure>
-      <figure class="gallery-item animate">
-        <img class="gallery-img" src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&q=80" alt="Backstage VELVETT" loading="lazy">
+      <figure class="gallery-item animate" data-lightbox>
+        <img class="gallery-img" src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800&q=80" 
+             data-full="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=1920&q=90" 
+             alt="Backstage VELVETT" loading="lazy">
         <figcaption class="gallery-caption">Detrás de Cámaras</figcaption>
       </figure>
     </div>
+  </div>
+
+  <!-- LIGHTBOX MODAL -->
+  <div class="velvett-lightbox" id="velvettLightbox" role="dialog" aria-modal="true" aria-label="Galería en pantalla completa">
+    <button class="velvett-lightbox-close" aria-label="Cerrar galería"><i class="fas fa-times"></i></button>
+    <button class="velvett-lightbox-nav velvett-lightbox-prev" aria-label="Imagen anterior"><i class="fas fa-chevron-left"></i></button>
+    <div class="velvett-lightbox-content">
+      <img class="velvett-lightbox-img" src="" alt="">
+      <div class="velvett-lightbox-counter"><span class="lb-current">1</span> / <span class="lb-total">8</span></div>
+    </div>
+    <button class="velvett-lightbox-nav velvett-lightbox-next" aria-label="Imagen siguiente"><i class="fas fa-chevron-right"></i></button>
   </div>
 
   <!-- FAQ -->
@@ -488,9 +590,100 @@
 <!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 
-<!-- JavaScript -->
+<!-- JavaScript con Lightbox -->
 <script>
 (function(){'use strict';const root=document.querySelector('[data-velvett]');if(!root)return;
+
+// === LIGHTBOX GALLERY ===
+const lightbox={
+  el:root.querySelector('#velvettLightbox'),
+  img:root.querySelector('.velvett-lightbox-img'),
+  counter:root.querySelector('.velvett-lightbox-counter'),
+  items:[],
+  current:0,
+  
+  init(){
+    // Recopilar imágenes de la galería
+    this.items=Array.from(root.querySelectorAll('[data-lightbox]')).map((item,i)=>({
+      src:item.querySelector('img').dataset.full,
+      alt:item.querySelector('img').alt,
+      caption:item.querySelector('.gallery-caption')?.textContent||''
+    }));
+    
+    // Event listeners para abrir
+    root.querySelectorAll('[data-lightbox]').forEach((item,idx)=>{
+      item.addEventListener('click',(e)=>{
+        e.preventDefault();
+        this.open(idx);
+      });
+      item.addEventListener('keydown',(e)=>{
+        if(e.key==='Enter'||e.key===' '){e.preventDefault();this.open(idx)}
+      });
+      item.tabIndex=0;
+      item.setAttribute('role','button');
+      item.setAttribute('aria-label','Ver en pantalla completa: '+item.querySelector('img').alt);
+    });
+    
+    // Event listeners del lightbox
+    root.querySelector('.velvett-lightbox-close').addEventListener('click',()=>this.close());
+    root.querySelector('.velvett-lightbox-prev').addEventListener('click',(e)=>{e.stopPropagation();this.prev()});
+    root.querySelector('.velvett-lightbox-next').addEventListener('click',(e)=>{e.stopPropagation();this.next()});
+    this.el.addEventListener('click',(e)=>{if(e.target===this.el)this.close()});
+    
+    // Teclado
+    document.addEventListener('keydown',(e)=>{
+      if(!this.el.classList.contains('active'))return;
+      if(e.key==='Escape')this.close();
+      if(e.key==='ArrowLeft')this.prev();
+      if(e.key==='ArrowRight')this.next();
+    });
+    
+    // Swipe para móvil
+    let touchStartX=0;
+    this.el.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX},{passive:true});
+    this.el.addEventListener('touchend',e=>{
+      const diff=touchStartX-e.changedTouches[0].clientX;
+      if(Math.abs(diff)>50){diff>0?this.next():this.prev()}
+    },{passive:true});
+  },
+  
+  open(index){
+    this.current=index;
+    this.update();
+    this.el.classList.add('active');
+    document.body.style.overflow='hidden';
+    // Focus en close button para accesibilidad
+    setTimeout(()=>root.querySelector('.velvett-lightbox-close')?.focus(),100);
+  },
+  
+  close(){
+    this.el.classList.remove('active');
+    document.body.style.overflow='';
+    // Regresar focus a la imagen que abrió el lightbox
+    const galleryItems=root.querySelectorAll('[data-lightbox]');
+    if(galleryItems[this.current])galleryItems[this.current].focus();
+  },
+  
+  prev(){this.current=(this.current-1+this.items.length)%this.items.length;this.update()},
+  next(){this.current=(this.current+1)%this.items.length;this.update()},
+  
+  update(){
+    const item=this.items[this.current];
+    // Animación de fade para cambiar imagen
+    this.img.style.opacity='0';
+    setTimeout(()=>{
+      this.img.src=item.src;
+      this.img.alt=item.alt;
+      this.img.style.opacity='1';
+    },150);
+    // Actualizar contador
+    root.querySelector('.lb-current').textContent=this.current+1;
+    root.querySelector('.lb-total').textContent=this.items.length;
+  }
+};
+lightbox.init();
+
+// === RESTO DE FUNCIONALIDADES ===
 
 // Smooth Scroll
 root.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{const t=a.getAttribute('href');if(t==='#')return;const el=document.getElementById(t.slice(1));if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth',block:'start'})}})});
@@ -550,7 +743,7 @@ if(heroVideo){const obsV=new IntersectionObserver(entries=>{entries.forEach(e=>{
 // Performance
 document.addEventListener('visibilitychange',()=>{if(document.hidden){root.querySelectorAll('.carousel-track').forEach(t=>t.style.transition='none')}else{root.querySelectorAll('.carousel-track').forEach(t=>t.style.transition='transform .6s var(--e)')}});
 
-console.log('✓ VELVETT loaded - Fondo corregido con URL directa');
+console.log('✓ VELVETT loaded - Lightbox gallery activo');
 })();
 </script>
 
