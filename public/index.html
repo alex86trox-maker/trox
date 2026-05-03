@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Verification Free - Recibe SMS Online</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0f0f0f;
+            --bg-card: #1a1a1a;
+            --bg-hover: #252525;
+            --green: #25D366;
+            --green-dark: #128C7E;
+            --blue: #0088cc;
+            --orange: #ffa500;
+            --border: #2a2a2a;
+            --text: #e0e0e0;
+            --text-muted: #888;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--bg-card) !important;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+        }
+
+        .navbar-brand {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--green) !important;
+        }
+
+        .navbar-brand i {
+            margin-right: 8px;
+        }
+
+        /* Select de país */
+        .country-select {
+            background: var(--bg-hover);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .country-select:hover {
+            border-color: var(--green);
+        }
+
+        .country-select:focus {
+            outline: none;
+            border-color: var(--green);
+            box-shadow: 0 0 0 2px rgba(37, 211, 102, 0.2);
+        }
+
+        /* Botones */
+        .btn-refresh {
+            background: var(--green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-refresh:hover {
+            background: var(--green-dark);
+            transform: scale(1.05);
+        }
+
+        .btn-refresh:active {
+            transform: scale(0.95);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: rgba(37, 211, 102, 0.05);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 20px;
+        }
+
+        .card-header h5 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card-header h5 i {
+            margin-right: 8px;
+            color: var(--green);
+        }
+
+        .card-header small {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .card-body {
+            padding: 15px;
+        }
+
+        /* Números */
+        .number-card {
+            background: var(--bg-hover);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .number-card:hover {
+            background: #2a2a2a;
+            border-color: #3a3a3a;
+            transform: translateX(5px);
+        }
+
+        .number-card.active {
+            border-color: var(--green) !important;
+            background: rgba(37, 211, 102, 0.08) !important;
+            box-shadow: 0 0 20px rgba(37, 211, 102, 0.15);
+        }
+
+        .number-card.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--green);
+            border-radius: 0 3px 3px 0;
+        }
+
+        .number-card .phone-number {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: 0.5px;
+        }
+
+        .number-card .provider-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            background: rgba(37, 211, 102, 0.15);
+            color: var(--green);
+        }
+
+        .number-card .status-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        .status-available {
+            background: rgba(37, 211, 102, 0.15);
+            color: var(--green);
+        }
+
+        /* Área de mensajes */
+        .messages-area {
+            min-height: 300px;
+            max-height: 55vh;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .messages-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages-area::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 3px;
+        }
+
+        .messages-area::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .messages-area::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+
+        .message-bubble {
+            background: var(--bg-hover);
+            border-left: 3px solid var(--green);
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message-bubble .msg-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .message-bubble .msg-from {
+            font-size: 0.8rem;
+            color: var(--blue);
+            font-weight: 500;
+        }
+
+        .message-bubble .msg-time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .message-bubble .msg-text {
+            font-size: 0.95rem;
+            color: var(--text);
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .message-bubble .otp-badge {
+            display: inline-block;
+            background: rgba(37, 211, 102, 0.15);
+            color: var(--green);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 8px;
+            letter-spacing: 2px;
+        }
+
+        /* Panel OTP */
+        .otp-panel {
+            background: linear-gradient(135deg, rgba(37, 211, 102, 0.1), rgba(18, 140, 126, 0.1));
+            border: 2px solid var(--green);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px;
+            display: none;
+            animation: pulse-border 2s infinite;
+        }
+
+        .otp-panel.show {
+            display: block;
+        }
+
+        .otp-panel h6 {
+            color: var(--green);
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .otp-panel .otp-code {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--green);
+            text-align: center;
+            letter-spacing: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn-copy {
+            background: var(--green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-copy:hover {
+            background: var(--green-dark);
+        }
+
+        .btn-copy.copied {
+            background: #075e54;
+        }
+
+        /* Placeholder */
+        .placeholder-icon {
+            font-size: 4rem;
+            color: #2a2a2a;
+        }
+
+        .placeholder-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Badge contador */
+        .badge-counter {
+            background: var(--green);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Alert de advertencia */
+        .warning-alert {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .warning-alert .warning-icon {
+            color: var(--orange);
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .warning-alert .warning-text {
+            color: var(--orange);
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .warning-alert ol {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin: 8px 0 0 0;
+            padding-left: 20px;
+        }
+
+        .warning-alert ol li {
+            margin-bottom: 4px;
+        }
+
+        /* Animaciones */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse-border {
+            0%, 100% {
+                border-color: var(--green);
+                box-shadow: 0 0 20px rgba(37, 211, 102, 0.2);
+            }
+            50% {
+                border-color: var(--green-dark);
+                box-shadow: 0 0 30px rgba(37, 211, 102, 0.4);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--green);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .number-card .phone-number {
+                font-size: 0.95rem;
+            }
+            
+            .otp-panel .otp-code {
+                font-size: 2rem;
+                letter-spacing: 5px;
+            }
+            
+            .messages-area {
+                max-height: 40vh;
+            }
+        }
+
+        /* Toast de notificación */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--green);
+            border-radius: 10px;
+            padding: 15px 20px;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container-fluid">
+            <span class="navbar-brand">
+                <i class="fas fa-sms"></i> SMS Verification Free
+            </span>
+            <div class="d-flex align-items-center gap-2">
+                <select id="countrySelect" class="country-select">
+                    <option value="US">🇺🇸 Estados Unidos</option>
+                    <option value="UK">🇬🇧 Reino Unido</option>
+                    <option value="ES">🇪🇸 España</option>
+                    <option value="CA">🇨🇦 Canadá</option>
+                    <option value="FR">🇫🇷 Francia</option>
+                    <option value="DE">🇩🇪 Alemania</option>
+                </select>
+                <button class="btn-refresh" onclick="loadNumbers()" title="Actualizar números">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="container-fluid p-3">
+        <div class="row g-3">
+            <!-- Panel izquierdo: Números disponibles -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-phone"></i> Números Disponibles</h5>
+                        <small>Selecciona un número para empezar a recibir SMS</small>
+                    </div>
+                    <div class="card-body">
+                        <div id="numbersList" style="max-height: 60vh; overflow-y: auto;">
+                            <div class="text-center py-5">
+                                <div class="spinner mx-auto mb-3"></div>
+                                <p class="placeholder-text">Cargando números disponibles...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advertencia -->
+                <div class="warning-alert mt-3">
+                    <div class="d-flex align-items-start">
+                        <i class="fas fa-exclamation-triangle warning-icon"></i>
+                        <div>
+                            <strong class="warning-text">⚠️ Importante</strong>
+                            <ol>
+                                <li>Estos números son <strong>públicos y compartidos</strong></li>
+                                <li>Úsalos solo para verificaciones temporales</li>
+                                <li>No los uses en cuentas bancarias o importantes</li>
+                                <li>Los mensajes pueden ser vistos por otros usuarios</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel derecho: Mensajes y OTP -->
+            <div class="col-md-8">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5><i class="fas fa-envelope"></i> Mensajes Recibidos</h5>
+                            <small id="currentNumber">Selecciona un número para ver sus mensajes</small>
+                        </div>
+                        <span class="badge-counter" id="messageCount">0 mensajes</span>
+                    </div>
+                    
+                    <!-- Área de mensajes -->
+                    <div class="messages-area" id="messagesArea">
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox placeholder-icon"></i>
+                            <p class="placeholder-text mt-3">Selecciona un número disponible<br>para comenzar a recibir mensajes</p>
+                            <small style="color: #555;">
+                                <i class="fas fa-info-circle"></i> 
+                                Ideal para verificación de Telegram, WhatsApp y más
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Panel OTP detectado -->
+                    <div class="otp-panel" id="otpPanel">
+                        <h6><i class="fas fa-key"></i> ¡CÓDIGO DETECTADO!</h6>
+                        <div class="otp-code" id="otpCode">------</div>
+                        <button class="btn-copy" id="btnCopy" onclick="copyOTP()">
+                            <i class="fas fa-copy"></i> Copiar Código
+                        </button>
+                        <small class="d-block text-center mt-2" style="color: #888;">
+                            El código se ha copiado automáticamente al portapapeles
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer informativo -->
+        <div class="text-center mt-3" style="color: #555; font-size: 0.8rem;">
+            <p>
+                <i class="fas fa-shield-alt"></i> 
+                Servicio gratuito de recepción de SMS temporales · 
+                No almacenamos información personal · 
+                <span id="connectionStatus" style="color: #888;">
+                    <i class="fas fa-circle" style="font-size: 0.5rem; color: #888;"></i> 
+                    Conectando...
+                </span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        // ==========================================
+        // CONFIGURACIÓN
+        // ==========================================
+        const API_URL = window.location.origin; // Usa la misma URL del servidor
+        const socket = io(API_URL);
+        
+        let selectedNumber = null;
+        let selectedProvider = null;
+        let currentOTP = null;
+
+        // ==========================================
+        // INICIALIZACIÓN
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNumbers();
+            setupSocketListeners();
+            
+            // Evento para cambiar de país
+            document.getElementById('countrySelect').addEventListener('change', loadNumbers);
+            
+            // Actualizar estado de conexión
+            updateConnectionStatus('connecting');
+        });
+
+        // ==========================================
+        // CARGAR NÚMEROS DISPONIBLES
+        // ==========================================
+        async function loadNumbers() {
+            const country = document.getElementById('countrySelect').value;
+            const numbersList = document.getElementById('numbersList');
+            
+            // Mostrar loading
+            numbersList.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner mx-auto mb-3"></div>
+                    <p class="placeholder-text">Buscando números en ${getCountryName(country)}...</p>
+                    <small style="color: #555;">Consultando múltiples proveedores</small>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/numbers?country=${country}`);
+                
+                if (!response.ok) {
+                    throw new Error('Error del servidor');
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success || data.numbers.length === 0) {
+                    numbersList.innerHTML = `
+                        <div class="text-center py-5">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ffa500;"></i>
+                            <p class="placeholder-text mt-3">No hay números disponibles en ${getCountryName(country)}</p>
+                            <small style="color: #888;">Intenta con otro país o espera unos minutos</small>
+                            <br>
+                            <button class="btn-refresh mt-3" onclick="loadNumbers()">
+                                <i class="fas fa-redo"></i> Reintentar
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                displayNumbers(data.numbers);
+                updateConnectionStatus('connected');
+                
+            } catch (error) {
+                console.error('Error cargando números:', error);
+                numbersList.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: #e74c3c;"></i>
+                        <p class="placeholder-text mt-3">Error al cargar números</p>
+                        <small style="color: #888;">Verifica tu conexión e intenta de nuevo</small>
+                        <br>
+                        <button class="btn-refresh mt-3" onclick="loadNumbers()">
+                            <i class="fas fa-redo"></i> Reintentar
+                        </button>
+                    </div>
+                `;
+                updateConnectionStatus('error');
+            }
+        }
+
+        // ==========================================
+        // MOSTRAR NÚMEROS EN LA LISTA
+        // ==========================================
+        function displayNumbers(numbers) {
+            const numbersList = document.getElementById('numbersList');
+            
+            // Agrupar por proveedor
+            const grouped = numbers.reduce((acc, num) => {
+                const key = num.provider || 'desconocido';
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(num);
+                return acc;
+            }, {});
+            
+            let html = '';
+            
+            for (const [provider, nums] of Object.entries(grouped)) {
+                html += `
+                    <div class="mb-3">
+                        <small style="color: #888; text-transform: uppercase; letter-spacing: 1px; font-size: 0.7rem;">
+                            <i class="fas fa-server"></i> ${provider}
+                        </small>
+                `;
+                
+                nums.forEach(num => {
+                    const isActive = selectedNumber === num.number;
+                    html += `
+                        <div class="number-card ${isActive ? 'active' : ''}" 
+                             onclick="selectNumber('${num.number}', '${num.provider}')">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="phone-number">${num.number}</div>
+                                    ${num.lastMessage ? `
+                                        <small style="color: #888; font-size: 0.75rem;">
+                                            <i class="fas fa-comment"></i> ${num.lastMessage.substring(0, 40)}...
+                                        </small>
+                                    ` : ''}
+                                </div>
+                                <span class="status-available status-badge">
+                                    <i class="fas fa-check-circle"></i> Disponible
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            }
+            
+            numbersList.innerHTML = html;
+        }
+
+        // ==========================================
+        // SELECCIONAR NÚMERO PARA MONITOREAR
+        // ==========================================
+        function selectNumber(number, provider) {
+            // Detener monitoreo anterior
+            if (selectedNumber) {
+                socket.emit('stop-monitoring', {
+                    number: selectedNumber,
+                    provider: selectedProvider
+                });
+            }
+            
+            selectedNumber = number;
+            selectedProvider = provider;
+            
+            // Actualizar UI
+            document.getElementById('currentNumber').textContent = `Monitoreando: ${number}`;
+            document.getElementById('messagesArea').innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner mx-auto mb-3"></div>
+                    <p class="placeholder-text">Esperando mensajes entrantes...</p>
+                    <small style="color: #888;">
+                        <i class="fas fa-info-circle"></i> 
+                        Usa este número para registrarte en Telegram, WhatsApp u otros servicios
+                    </small>
+                </div>
+            `;
+            
+            // Ocultar panel OTP
+            document.getElementById('otpPanel').classList.remove('show');
+            
+            // Iniciar monitoreo vía Socket.IO
+            socket.emit('monitor-number', { number, provider });
+            
+            // Actualizar clases activas
+            document.querySelectorAll('.number-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Encontrar y activar la card correcta
+            const cards = document.querySelectorAll('.number-card');
+            cards.forEach(card => {
+                if (card.textContent.includes(number)) {
+                    card.classList.add('active');
+                }
+            });
+            
+            // También cargar mensajes existentes
+            loadExistingMessages(number, provider);
+        }
+
+        // ==========================================
+        // CARGAR MENSAJES EXISTENTES
+        // ==========================================
+        async function loadExistingMessages(number, provider) {
+            try {
+                const response = await fetch(`${API_URL}/api/messages/${number}?provider=${provider}`);
+                const data = await response.json();
+                
+                if (data.success && data.messages.length > 0) {
+                    const messagesArea = document.getElementById('messagesArea');
+                    messagesArea.innerHTML = '';
+                    
+                    data.messages.forEach(msg => {
+                        displayMessage(msg);
+                    });
+                    
+                    updateMessageCount(data.messages.length);
+                }
+            } catch (error) {
+                console.error('Error cargando mensajes:', error);
+            }
+        }
+
+        // ==========================================
+        // MOSTRAR MENSAJE EN LA INTERFAZ
+        // ==========================================
+        function displayMessage(message) {
+            const messagesArea = document.getElementById('messagesArea');
+            
+            // Limpiar placeholder si existe
+            const placeholder = messagesArea.querySelector('.text-center');
+            if (placeholder) {
+                messagesArea.innerHTML = '';
+            }
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message-bubble fade-in';
+            
+            const time = message.timestamp 
+                ? new Date(message.timestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+                : new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            
+            messageElement.innerHTML = `
+                <div class="msg-header">
+                    <span class="msg-from">
+                        <i class="fas fa-user-circle"></i> ${message.from || 'Remitente'}
+                    </span>
+                    <span class="msg-time">
+                        <i class="far fa-clock"></i> ${time}
+                    </span>
+                </div>
+                <div class="msg-text">${message.text}</div>
+                ${message.otp ? `
+                    <div class="otp-badge">
+                        <i class="fas fa-key"></i> Código: ${message.otp}
+                    </div>
+                ` : ''}
+            `;
+            
+            // Insertar al principio
+            messagesArea.insertBefore(messageElement, messagesArea.firstChild);
+            
+            // Actualizar contador
+            const count = messagesArea.querySelectorAll('.message-bubble').length;
+            updateMessageCount(count);
+            
+            // Si tiene OTP, mostrarlo en el panel
+            if (message.otp) {
+                showOTPPanel(message.otp);
+            }
+        }
+
+        // ==========================================
+        // MOSTRAR PANEL DE OTP
+        // ==========================================
+        function showOTPPanel(otp) {
+            currentOTP = otp;
+            
+            const otpPanel = document.getElementById('otpPanel');
+            const otpCode = document.getElementById('otpCode');
+            
+            otpCode.textContent = otp;
+            otpPanel.classList.add('show');
+            
+            // Scroll hacia el panel
+            otpPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Auto-copiar al portapapeles
+            copyOTP(true);
+            
+            // Notificación sonora (opcional)
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACAf39/f4B/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH');
+                audio.play().catch(() => {});
+            } catch (e) {}
+            
+            // Mostrar toast
+            showToast('¡Código detectado y copiado! 🎉');
+        }
+
+        // ==========================================
+        // COPIAR OTP AL PORTAPAPELES
+        // ==========================================
+        async function copyOTP(silent = false) {
+            if (!currentOTP) return;
+            
+            try {
+                await navigator.clipboard.writeText(currentOTP);
+                
+                const btnCopy = document.getElementById('btnCopy');
+                btnCopy.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+                btnCopy.classList.add('copied');
+                
+                setTimeout(() => {
+                    btnCopy.innerHTML = '<i class="fas fa-copy"></i> Copiar Código';
+                    btnCopy.classList.remove('copied');
+                }, 2000);
+                
+                if (!silent) {
+                    showToast('Código copiado al portapapeles ✅');
+                }
+            } catch (error) {
+                console.error('Error al copiar:', error);
+                if (!silent) {
+                    showToast('Selecciona y copia el código manualmente');
+                }
+            }
+        }
+
+        // ==========================================
+        // SOCKET.IO LISTENERS
+        // ==========================================
+        function setupSocketListeners() {
+            socket.on('connect', () => {
+                console.log('Conectado al servidor');
+                updateConnectionStatus('connected');
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('Desconectado del servidor');
+                updateConnectionStatus('error');
+            });
+            
+            socket.on('monitoring-started', (data) => {
+                console.log('Monitoreo iniciado:', data);
+            });
+            
+            socket.on('monitoring-stopped', (data) => {
+                console.log('Monitoreo detenido:', data);
+            });
+            
+            socket.on('existing-messages', (messages) => {
+                const messagesArea = document.getElementById('messagesArea');
+                messagesArea.innerHTML = '';
+                
+                messages.forEach(msg => {
+                    displayMessage(msg);
+                });
+            });
+            
+            socket.on('new-message', (message) => {
+                displayMessage(message);
+            });
+            
+            socket.on('otp-detected', (data) => {
+                showOTPPanel(data.otp);
+            });
+        }
+
+        // ==========================================
+        // UTILIDADES
+        // ==========================================
+        function updateMessageCount(count) {
+            const countElement = document.getElementById('messageCount');
+            countElement.textContent = `${count} mensaje${count !== 1 ? 's' : ''}`;
+        }
+
+        function updateConnectionStatus(status) {
+            const statusElement = document.getElementById('connectionStatus');
+            
+            switch (status) {
+                case 'connected':
+                    statusElement.innerHTML = '<i class="fas fa-circle" style="font-size: 0.5rem; color: #25D366;"></i> Conectado';
+                    break;
+                case 'connecting':
+                    statusElement.innerHTML = '<i class="fas fa-circle" style="font-size: 0.5rem; color: #ffa500;"></i> Conectando...';
+                    break;
+                case 'error':
+                    statusElement.innerHTML = '<i class="fas fa-circle" style="font-size: 0.5rem; color: #e74c3c;"></i> Desconectado';
+                    break;
+            }
+        }
+
+        function getCountryName(code) {
+            const countries = {
+                'US': 'Estados Unidos',
+                'UK': 'Reino Unido',
+                'ES': 'España',
+                'CA': 'Canadá',
+                'FR': 'Francia',
+                'DE': 'Alemania'
+            };
+            return countries[code] || code;
+        }
+
+        function showToast(message) {
+            // Eliminar toast anterior si existe
+            const existingToast = document.querySelector('.toast-notification');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification fade-in';
+            toast.innerHTML = `
+                <i class="fas fa-bell" style="color: #25D366; margin-right: 8px;"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Eliminar después de 3 segundos
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Limpiar al cerrar la página
+        window.addEventListener('beforeunload', () => {
+            if (selectedNumber) {
+                socket.emit('stop-monitoring', {
+                    number: selectedNumber,
+                    provider: selectedProvider
+                });
+            }
+        });
+
+        // Prevenir múltiples clicks rápidos
+        let clickTimeout;
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.number-card')) {
+                if (clickTimeout) {
+                    e.preventDefault();
+                    return;
+                }
+                clickTimeout = setTimeout(() => {
+                    clickTimeout = null;
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>
