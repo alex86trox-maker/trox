@@ -6,63 +6,125 @@ const socketIo = require('socket.io');
 const mongoose = require('mongoose');
 const path = require('path');
 
-// Verificar que los archivos existen
-try {
-  const tempSmsService = require('./services/tempSmsService');
-  const Message = require('./models/Message');
-} catch (error) {
-  console.error('Error cargando módulos:', error.message);
-}
-
 const app = express();
 const server = http.createServer(app);
-
 const io = socketIo(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
+  cors: { origin: "*", methods: ["GET", "POST"] }
 });
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// MongoDB con manejo de error mejorado
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/sms-verification';
+// MongoDB - sin dependencia de modelos
+const MONGODB_URI = process.env.MONGODB_URI;
+if (MONGODB_URI) {
+  mongoose.connect(MONGODB_URI)
+    .then(() => console.log('✅ MongoDB conectado'))
+    .catch(err => console.log('⚠️ MongoDB:', err.message));
+}
 
-mongoose.connect(MONGODB_URI, {
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000,
-})
-  .then(() => console.log('✅ Conectado a MongoDB'))
-  .catch(err => {
-    console.error('❌ Error conectando a MongoDB:', err.message);
-    console.log('⚠️ La app seguirá funcionando sin base de datos');
-  });
+// Cargar servicio SMS
+let tempSmsService = null;
+try {
+  tempSmsService = require('./services/tempSmsService');
+  console.log('✅ Servicio SMS cargado');
+} catch (error) {
+  console.log('⚠️ Servicio SMS no disponible:', error.message);
+}
 
-// Ruta de health check
+// ============ RUTAS ============
+
+// Health check
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    smsService: tempSmsService ? 'loaded' : 'not loaded',
     timestamp: new Date().toISOString()
   });
 });
 
+// API: Números disponibles
+app.get('/api/numbers', async (req, res) => {
+  try {
+    const country = req.query.country || 'US';
+    
+    if (tempSmsService) {
+      const numbers = await tempSmsService.getAllNumbers(country);
+      if (numbers.length > 0) {
+        return res.json({ success: true, country, numbers, total: numbers.length });
+      }
+    }
+    
+    // Números de respaldo
+    const backupNumbers = {
+      'US': [
+        { number: '+12345678901', country: 'US', provider: 'backup' },
+        { number: '+12345678902', country: 'US', provider: 'backup' }
+      ],
+      'UK': [
+        { number: '+447123456789', country: 'UK', provider: 'backup' },
+        { number: '+447123456780', country: 'UK', provider: 'backup' }
+      ],
+      'ES': [
+        { number: '+34612345678', country: 'ES', provider: 'backup' },
+        { number: '+34612345679', country: 'ES', provider: 'backup' }
+      ]
+    };
+    
+    const numbers = backupNumbers[country] || backupNumbers['US'];
+    res.json({ success: true, country, numbers, total: numbers.length });
+    
+  } catch (error) {
+    console.error('Error:', error.message);
+    // Respuesta de emergencia
+    res.json({
+      success: true,
+      country: req.query.country || 'US',
+      numbers: [
+        { number: '+447123456789', country: 'UK', provider: 'emergency' }
+      ],
+      total: 1
+    });
+  }
+});
+
+// API: Mensajes (versión simplificada)
+app.get('/api/messages/:number', (req, res) => {
+  res.json({
+    success: true,
+    number: req.params.number,
+    messages: [],
+    total: 0
+  });
+});
+
+// Socket.IO básico
+io.on('connection', (socket) => {
+  console.log('🔌 Cliente conectado:', socket.id);
+  
+  socket.on('monitor-number', (data) => {
+    console.log('📱 Monitoreando:', data);
+    socket.emit('monitoring-started', data);
+  });
+  
+  socket.on('stop-monitoring', (data) => {
+    socket.emit('monitoring-stopped', data);
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('🔌 Cliente desconectado');
+  });
+});
+
 // Ruta principal
-app.get('/', (req, res) => {
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// API básica de prueba
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'API funcionando correctamente' });
-});
-
-// Puerto con fallback
-const PORT = process.env.PORT || 3000;
-
+// Puerto
+const PORT = process.env.PORT || 10000;
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+  console.log(`🚀 Servidor en puerto ${PORT}`);
 });
