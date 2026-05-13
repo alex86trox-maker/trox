@@ -1,1 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mis XV Años - Ximena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&display=swap" rel="stylesheet"/>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;background:linear-gradient(160deg,#fff5f7 0%,#fde8ef 40%,#fdf3f0 100%);font-family:'Cormorant Garamond',Georgia,serif;overflow-x:hidden;}
 
+  /* Petals */
+  .petal{position:fixed;color:#f5c0cc;pointer-events:none;z-index:0;user-select:none;animation:fall linear infinite;}
+  @keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:0;}10%{opacity:.7;}80%{opacity:.7;}100%{transform:translateY(110vh) rotate(360deg);opacity:0;}}
+
+  /* Envelope screen */
+  #envelope-screen{display:flex;flex-direction:column;align-items:center;gap:24px;z-index:10;position:relative;transition:opacity .5s,transform .5s;}
+  #envelope-screen.hide{opacity:0;transform:scale(.85);pointer-events:none;}
+  .envelope-icon{font-size:72px;animation:float 3s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+  .envelope-text{font-family:'Cormorant Garamond',serif;color:#8B5A6B;font-size:18px;letter-spacing:.1em;}
+  .open-btn{padding:12px 32px;background:#c4738a;color:white;border:none;border-radius:99px;letter-spacing:.2em;font-size:13px;cursor:pointer;box-shadow:0 6px 20px rgba(196,115,138,.4);transition:transform .15s;}
+  .open-btn:hover{transform:scale(1.05);}
+  .open-btn:active{transform:scale(.96);}
+
+  /* Card */
+  #card-screen{display:none;position:relative;z-index:10;width:100%;max-width:380px;animation:slideUp .8s ease-out;}
+  @keyframes slideUp{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
+  .card{border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(196,115,138,.2);background:linear-gradient(180deg,#fff8f9 0%,#fffaf8 100%);border:1px solid #f0d0da;}
+
+  /* Floral header */
+  .card-header{position:relative;height:200px;overflow:hidden;}
+  .card-header img{width:100%;height:100%;object-fit:cover;object-position:top;opacity:.75;}
+  .card-header-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(255,248,249,.05) 0%,rgba(255,248,249,.88) 100%);}
+  .card-header-title{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+  .mis-label{font-family:'Cormorant Garamond',serif;color:#8B5A6B;letter-spacing:.3em;font-size:13px;text-transform:uppercase;}
+  .xv-title{font-family:'Great Vibes',cursive;font-size:3.5rem;color:#c4738a;line-height:1;text-shadow:0 2px 8px rgba(196,115,138,.3);}
+
+  /* Card body */
+  .card-body{padding:0 32px 32px;display:flex;flex-direction:column;align-items:center;gap:20px;}
+  .name{font-family:'Great Vibes',cursive;font-size:3rem;color:#7a3550;line-height:1.1;margin-top:8px;}
+  .crown-row{display:flex;align-items:center;gap:8px;margin-top:4px;}
+  .line-h{height:1px;width:32px;background:#e8c4cc;}
+  .crown{color:#c4738a;font-size:18px;}
+  .photo-wrap{position:relative;}
+  .photo-circle{width:160px;height:160px;border-radius:50%;overflow:hidden;border:4px solid #e8c4cc;box-shadow:0 8px 24px rgba(196,115,138,.25);}
+  .photo-circle img{width:100%;height:100%;object-fit:cover;object-position:top;}
+  .photo-badge{position:absolute;bottom:0;right:4px;width:28px;height:28px;border-radius:50%;background:#c4738a;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;}
+  .quote{text-align:center;font-size:11px;color:#a06878;line-height:1.8;font-style:italic;font-family:'Cormorant Garamond',serif;}
+  .divider{display:flex;align-items:center;gap:8px;width:100%;}
+  .divider-line{height:1px;flex:1;background:#f0d0da;}
+  .divider-flower{color:#e8c4cc;}
+
+  /* Music player */
+  .music-player{display:flex;flex-direction:column;align-items:center;gap:12px;}
+  .dale-play{font-family:'Cormorant Garamond',serif;letter-spacing:.3em;font-size:11px;color:#8B5A6B;text-transform:uppercase;}
+  .progress-bar{width:180px;height:2px;background:#e8c4cc;border-radius:99px;overflow:hidden;}
+  .progress-fill{height:100%;width:0%;background:#c4738a;border-radius:99px;transition:width .3s;}
+  .controls{display:flex;align-items:center;gap:20px;}
+  .ctrl-btn{background:none;border:none;color:#c4738a;cursor:pointer;font-size:16px;padding:0;display:flex;align-items:center;transition:color .2s;}
+  .ctrl-btn:hover{color:#8B5A6B;}
+  .play-btn{width:40px;height:40px;border-radius:50%;background:#c4738a;color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(196,115,138,.4);transition:background .2s;}
+  .play-btn:hover{background:#8B5A6B;}
+  .bars{display:none;gap:3px;align-items:flex-end;height:16px;}
+  .bars.active{display:flex;}
+  .bar{width:4px;background:#c4738a;border-radius:2px;animation:barPulse .8s ease-in-out infinite;}
+  @keyframes barPulse{0%,100%{height:4px;}50%{height:14px;}}
+  .bar:nth-child(1){animation-delay:0s;}
+  .bar:nth-child(2){animation-delay:.1s;}
+  .bar:nth-child(3){animation-delay:.2s;}
+  .bar:nth-child(4){animation-delay:.3s;}
+  .bar:nth-child(5){animation-delay:.4s;}
+
+  /* Family */
+  .family-block{text-align:center;display:flex;flex-direction:column;gap:8px;}
+  .family-label{font-size:10px;letter-spacing:.25em;color:#a06878;text-transform:uppercase;}
+  .family-name{font-family:'Great Vibes',cursive;font-size:1.6rem;color:#7a3550;}
+  .xv-big{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;letter-spacing:.2em;color:#c4738a;}
+
+  /* Date */
+  .date-block{display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .mes-title{font-family:'Great Vibes',cursive;font-size:1.8rem;color:#c4738a;}
+  .date-row{display:flex;align-items:center;gap:12px;}
+  .dia-label{font-size:10px;color:#a06878;letter-spacing:.2em;text-transform:uppercase;}
+  .dia-num{font-family:'Cormorant Garamond',serif;font-size:3.5rem;font-weight:700;color:#c4738a;line-height:1;}
+
+  /* Countdown */
+  .countdown-title{text-align:center;font-size:10px;letter-spacing:.3em;color:#c4738a;text-transform:uppercase;margin-bottom:12px;}
+  .countdown-box{display:flex;justify-content:center;align-items:flex-start;gap:8px;border-radius:16px;padding:16px 8px;background:linear-gradient(135deg,#fff0f3 0%,#fde8ef 100%);}
+  .cd-unit{display:flex;flex-direction:column;align-items:center;}
+  .cd-num{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:#7a3550;width:44px;text-align:center;line-height:1;}
+  .cd-label{font-size:9px;letter-spacing:.2em;color:#a06878;text-transform:uppercase;margin-top:4px;}
+  .cd-sep{color:#c4738a;font-size:1.8rem;font-weight:700;margin-top:4px;}
+
+  /* Calendar */
+  .cal-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .gran-dia{font-family:'Great Vibes',cursive;font-size:1.3rem;color:#c4738a;}
+  .cal-mes{text-align:center;font-family:'Great Vibes',cursive;font-size:1.4rem;color:#a06878;margin-bottom:8px;}
+  .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;width:100%;}
+  .cal-day-header{font-size:9px;color:#a06878;padding:4px 0;font-weight:600;letter-spacing:.05em;}
+  .cal-day{font-size:11px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto;color:#7a3550;}
+  .cal-day.today{background:#c4738a;color:white;font-weight:700;}
+  .cal-day.empty{visibility:hidden;}
+  .footer-flowers{color:#e8c4cc;font-size:1.5rem;letter-spacing:.5em;}
+</style>
+</head>
+<body>
+
+<!-- Floating petals -->
+<script>
+  const petalData=[{l:'5%',s:'10px',d:'0s',dur:'9s'},{l:'15%',s:'14px',d:'1.2s',dur:'10s'},{l:'28%',s:'8px',d:'2.4s',dur:'11s'},{l:'42%',s:'12px',d:'3.6s',dur:'9.5s'},{l:'55%',s:'10px',d:'4.8s',dur:'12s'},{l:'68%',s:'14px',d:'0.6s',dur:'10s'},{l:'78%',s:'9px',d:'1.8s',dur:'11.5s'},{l:'88%',s:'11px',d:'3s',dur:'9s'},{l:'35%',s:'13px',d:'5.4s',dur:'10.5s'},{l:'60%',s:'8px',d:'2s',dur:'12s'},{l:'20%',s:'11px',d:'4s',dur:'11s'},{l:'75%',s:'10px',d:'6s',dur:'9.5s'}];
+  petalData.forEach(p=>{const el=document.createElement('span');el.className='petal';el.textContent='✿';el.style.left=p.l;el.style.fontSize=p.s;el.style.animationDelay=p.d;el.style.animationDuration=p.dur;document.body.appendChild(el);});
+</script>
+
+<!-- Envelope screen -->
+<div id="envelope-screen">
+  <div class="envelope-icon">💌</div>
+  <p class="envelope-text">Tienes una invitación especial</p>
+  <button class="open-btn" onclick="openCard()">ABRIR INVITACIÓN</button>
+</div>
+
+<!-- Card -->
+<div id="card-screen">
+  <div class="card">
+
+    <!-- Header floral -->
+    <div class="card-header">
+      <img src="https://images.unsplash.com/photo-1713117222850-be0c0aa92136?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800" alt="Flores"/>
+      <div class="card-header-overlay"></div>
+      <div class="card-header-title">
+        <span class="mis-label">Mis</span>
+        <span class="xv-title">XV Años</span>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="card-body">
+
+      <!-- Name -->
+      <div style="display:flex;flex-direction:column;align-items:center;margin-top:8px;">
+        <div class="name">Ximena</div>
+        <div class="crown-row">
+          <div class="line-h"></div>
+          <span class="crown">♔</span>
+          <div class="line-h"></div>
+        </div>
+      </div>
+
+      <!-- Photo -->
+      <div class="photo-wrap">
+        <div class="photo-circle">
+          <img src="https://images.unsplash.com/photo-1775871299393-2cce027efaa9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400" alt="Ximena"/>
+        </div>
+        <div class="photo-badge">✦</div>
+      </div>
+
+      <!-- Quote -->
+      <p class="quote">"Hay momentos inolvidables que se atesoran con el corazón para siempre, por esa razón, con alegría y emoción, quiero compartir contigo esta noche maravillosa celebrando juntos mis XV años"</p>
+
+      <!-- Divider -->
+      <div class="divider"><div class="divider-line"></div><span class="divider-flower">✿</span><div class="divider-line"></div></div>
+
+      <!-- Music Player -->
+      <div class="music-player">
+        <p class="dale-play">Dale Play</p>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="controls">
+          <button class="ctrl-btn" onclick="restartAudio()" title="Reiniciar">&#9664;&#9664;</button>
+          <button class="play-btn" id="playBtn" onclick="togglePlay()">&#9654;</button>
+          <button class="ctrl-btn" onclick="toggleMute()" id="muteBtn" title="Silenciar">&#128266;</button>
+          <button class="ctrl-btn" title="Siguiente">&#9654;&#9654;</button>
+        </div>
+        <div class="bars" id="bars">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="divider"><div class="divider-line"></div><span class="divider-flower">✿</span><div class="divider-line"></div></div>
+
+      <!-- Family -->
+      <div class="family-block">
+        <p class="family-label">Acompáñame junto a mis padres:</p>
+        <p class="family-name">Rafael López &amp; Emilia Peredo</p>
+        <p class="family-label">Mis padrinos</p>
+        <p class="family-name">Freddy Pérez &amp; Mónica Bernat</p>
+        <p class="family-label">A festejar mis</p>
+        <p class="xv-big">XV AÑOS</p>
+      </div>
+
+      <!-- Date -->
+      <div class="date-block">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="height:1px;width:24px;background:#e8c4cc;"></div>
+          <span class="mes-title">Marzo</span>
+          <div style="height:1px;width:24px;background:#e8c4cc;"></div>
+        </div>
+        <div class="date-row">
+          <span class="dia-label">Sábado</span>
+          <span class="dia-num">14</span>
+          <span class="dia-label">2026</span>
+        </div>
+      </div>
+
+      <!-- Countdown -->
+      <div style="width:100%;">
+        <p class="countdown-title">Faltan</p>
+        <div class="countdown-box">
+          <div class="cd-unit"><div class="cd-num" id="cd-days">00</div><div class="cd-label">Días</div></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-unit"><div class="cd-num" id="cd-hours">00</div><div class="cd-label">Horas</div></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-unit"><div class="cd-num" id="cd-mins">00</div><div class="cd-label">Min</div></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-unit"><div class="cd-num" id="cd-secs">00</div><div class="cd-label">Seg</div></div>
+        </div>
+      </div>
+
+      <!-- Calendar -->
+      <div style="width:100%;">
+        <div class="cal-header">
+          <div class="divider-line"></div>
+          <span class="gran-dia">El Gran Día</span>
+          <div class="divider-line"></div>
+        </div>
+        <p class="cal-mes">Marzo</p>
+        <div class="calendar" id="calendar"></div>
+      </div>
+
+      <p class="footer-flowers">✿ ✦ ✿</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Open card ──
+function openCard(){
+  const env=document.getElementById('envelope-screen');
+  env.classList.add('hide');
+  setTimeout(()=>{
+    env.style.display='none';
+    document.getElementById('card-screen').style.display='block';
+  },500);
+}
+
+// ── Countdown ──
+const eventDate=new Date('2026-03-14T19:00:00');
+function updateCountdown(){
+  const now=new Date();
+  const diff=eventDate-now;
+  if(diff<=0){['days','hours','mins','secs'].forEach(k=>document.getElementById('cd-'+k).textContent='00');return;}
+  const days=Math.floor(diff/(1000*60*60*24));
+  const hours=Math.floor((diff/(1000*60*60))%24);
+  const mins=Math.floor((diff/(1000*60))%60);
+  const secs=Math.floor((diff/1000)%60);
+  document.getElementById('cd-days').textContent=String(days).padStart(2,'0');
+  document.getElementById('cd-hours').textContent=String(hours).padStart(2,'0');
+  document.getElementById('cd-mins').textContent=String(mins).padStart(2,'0');
+  document.getElementById('cd-secs').textContent=String(secs).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown,1000);
+
+// ── Music ──
+let audio=null,playing=false,muted=false;
+function initAudio(){
+  if(audio)return;
+  audio=new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+  audio.loop=true;
+  audio.addEventListener('timeupdate',()=>{
+    if(audio.duration)document.getElementById('progress').style.width=(audio.currentTime/audio.duration*100)+'%';
+  });
+}
+function togglePlay(){
+  initAudio();
+  const btn=document.getElementById('playBtn');
+  const bars=document.getElementById('bars');
+  if(playing){audio.pause();btn.innerHTML='&#9654;';bars.classList.remove('active');playing=false;}
+  else{audio.play();btn.innerHTML='&#9646;&#9646;';bars.classList.add('active');playing=true;}
+}
+function toggleMute(){
+  initAudio();
+  const btn=document.getElementById('muteBtn');
+  muted=!muted;audio.muted=muted;
+  btn.innerHTML=muted?'&#128263;':'&#128266;';
+}
+function restartAudio(){
+  if(audio)audio.currentTime=0;
+}
+
+// ── Calendar March 2026 ──
+(function buildCalendar(){
+  const cal=document.getElementById('calendar');
+  const days=['LUN','MAR','MIE','JUE','VIE','SAB','DOM'];
+  days.forEach(d=>{const el=document.createElement('div');el.className='cal-day-header';el.textContent=d;cal.appendChild(el);});
+  // March 2026 starts on Sunday (offset 6 in Mon-Sun grid)
+  for(let i=0;i<6;i++){const el=document.createElement('div');el.className='cal-day empty';el.textContent='';cal.appendChild(el);}
+  for(let d=1;d<=31;d++){
+    const el=document.createElement('div');
+    el.className='cal-day'+(d===14?' today':'');
+    el.textContent=d;
+    cal.appendChild(el);
+  }
+})();
+</script>
+</body>
+</html>
