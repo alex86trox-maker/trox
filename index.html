@@ -473,7 +473,7 @@
     </div>
     <div id="gal-tabs" style="display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:4px"></div>
     <div class="glow-card" style="position:relative;height:300px;border:1px solid rgba(201,168,76,.2)">
-      <div id="gal-images"></div>
+      <div id="gal-images" style="position:absolute;inset:0;overflow:hidden"></div>
       <div style="position:absolute;inset:0;z-index:2;background:linear-gradient(to top,rgba(8,8,8,.8) 0%,transparent 55%)"></div>
       <div style="position:absolute;bottom:0;left:0;right:0;z-index:3;text-align:center;padding:1.5rem 1.25rem 1rem">
         <p id="gal-caption" style="font-family:'Great Vibes',cursive;font-size:1.5rem;color:rgba(255,255,255,.96);text-shadow:0 1px 12px rgba(0,0,0,.6)"></p>
@@ -819,52 +819,106 @@ function buildGallery(){
   const tabs=document.getElementById('gal-tabs');
   const imgs=document.getElementById('gal-images');
   if(!tabs||!imgs) return;
+
+  // ── Tabs ──
   tabs.innerHTML='';
   GALLERY_TABS.forEach(t=>{
     const b=document.createElement('button');
     b.className='gallery-tab'+(t===galTab?' active':'');
     b.textContent=t;
-    b.onclick=()=>{galTab=t;galIdx=0;buildGallery();};
+    b.onclick=()=>{galTab=t;galIdx=0;renderGalleryImages();renderGalleryMeta();renderGalleryTabs();};
     tabs.appendChild(b);
   });
-  const list=GALLERY_IMAGES[galTab]||[];
-  imgs.innerHTML='';
-  list.forEach((img,i)=>{
-    const el=document.createElement('img');
-    el.src=img.url; el.alt=img.caption;
-    el.className='gal-img'+(i===galIdx?' active':'');
-    imgs.appendChild(el);
+
+  renderGalleryImages();
+  renderGalleryMeta();
+}
+
+function renderGalleryTabs(){
+  const tabs=document.getElementById('gal-tabs');
+  if(!tabs) return;
+  tabs.querySelectorAll('.gallery-tab').forEach(b=>{
+    b.classList.toggle('active', b.textContent===galTab);
   });
+}
+
+function renderGalleryImages(){
+  const imgs=document.getElementById('gal-images');
+  if(!imgs) return;
+  const list=GALLERY_IMAGES[galTab]||[];
+
+  // If tab changed, rebuild all images
+  if(imgs.dataset.tab !== galTab){
+    imgs.dataset.tab = galTab;
+    imgs.innerHTML='';
+    list.forEach((img,i)=>{
+      const el=document.createElement('img');
+      el.src=img.url; el.alt=img.caption;
+      el.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s ease;filter:grayscale(15%)';
+      imgs.appendChild(el);
+    });
+  }
+
+  // Show only active image
+  const allImgs = imgs.querySelectorAll('img');
+  allImgs.forEach((el,i)=>{
+    el.style.opacity = i===galIdx ? '1' : '0';
+    el.style.zIndex  = i===galIdx ? '1' : '0';
+  });
+
+  renderGalleryMeta();
+}
+
+function renderGalleryMeta(){
+  const list=GALLERY_IMAGES[galTab]||[];
   const cap=document.getElementById('gal-caption');
   const ctr=document.getElementById('gal-counter');
   if(cap) cap.textContent=list[galIdx]?list[galIdx].caption:'';
   if(ctr) ctr.textContent=(galIdx+1)+' / '+list.length;
+
   // Thumbs
   const thumbs=document.getElementById('gal-thumbs');
   if(thumbs){
-    thumbs.innerHTML='';
-    list.forEach((img,i)=>{
-      const d=document.createElement('div');
-      d.className='gallery-thumb'+(i===galIdx?' active':'');
-      d.onclick=()=>{galIdx=i;buildGallery();};
-      d.innerHTML='<img src="'+img.url+'" alt="" style="width:100%;height:100%;object-fit:cover" />';
-      thumbs.appendChild(d);
+    // Rebuild thumbs only when tab changes
+    if(thumbs.dataset.tab !== galTab){
+      thumbs.dataset.tab = galTab;
+      thumbs.innerHTML='';
+      list.forEach((img,i)=>{
+        const d=document.createElement('div');
+        d.className='gallery-thumb';
+        d.dataset.idx=String(i);
+        d.onclick=()=>{galIdx=i;renderGalleryImages();};
+        d.innerHTML='<img src="'+img.url+'" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover" />';
+        thumbs.appendChild(d);
+      });
+    }
+    thumbs.querySelectorAll('.gallery-thumb').forEach(d=>{
+      d.classList.toggle('active', Number(d.dataset.idx)===galIdx);
     });
   }
+
   // Dots
   const dots=document.getElementById('gal-dots');
   if(dots){
-    dots.innerHTML='';
-    list.forEach((_,i)=>{
-      const b=document.createElement('button');
-      b.className='gallery-dot'+(i===galIdx?' active':'');
-      b.onclick=()=>{galIdx=i;buildGallery();};
-      dots.appendChild(b);
+    if(dots.dataset.tab !== galTab){
+      dots.dataset.tab = galTab;
+      dots.innerHTML='';
+      list.forEach((_,i)=>{
+        const b=document.createElement('button');
+        b.className='gallery-dot';
+        b.dataset.idx=String(i);
+        b.onclick=()=>{galIdx=i;renderGalleryImages();};
+        dots.appendChild(b);
+      });
+    }
+    dots.querySelectorAll('.gallery-dot').forEach(b=>{
+      b.classList.toggle('active', Number(b.dataset.idx)===galIdx);
     });
   }
 }
-function galNext(){const list=GALLERY_IMAGES[galTab]||[];galIdx=(galIdx+1)%list.length;buildGallery();}
-function galPrev(){const list=GALLERY_IMAGES[galTab]||[];galIdx=(galIdx-1+list.length)%list.length;buildGallery();}
+
+function galNext(){const list=GALLERY_IMAGES[galTab]||[];galIdx=(galIdx+1)%list.length;renderGalleryImages();}
+function galPrev(){const list=GALLERY_IMAGES[galTab]||[];galIdx=(galIdx-1+list.length)%list.length;renderGalleryImages();}
 buildGallery();
 
 // ── Itinerary ────────────────────────────────────────────────
