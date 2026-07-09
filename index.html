@@ -76,10 +76,44 @@
   .itin-card-hover:hover{transform:translateX(4px)}
 
   /* ── NEW: glowing cards ── */
-  @property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
-  @keyframes rotateBorder{from{--angle:0deg}to{--angle:360deg}}
-  .glow-card{position:relative;border-radius:2px;overflow:hidden}
-  .glow-card::before{content:'';position:absolute;inset:-3px;border-radius:5px;background:conic-gradient(from var(--angle,0deg),transparent 0deg,rgba(0,200,150,0) 35deg,rgba(0,200,150,0.95) 85deg,rgba(201,168,76,1) 128deg,rgba(0,200,150,0.95) 172deg,rgba(0,200,150,0) 218deg,transparent 360deg);animation:rotateBorder 4s linear infinite;z-index:0;filter:blur(2px);pointer-events:none}
+  @keyframes borderGlowPulse{
+    0%,100%{box-shadow:0 0 8px rgba(0,200,150,0.15), 0 0 24px rgba(0,200,150,0.08), inset 0 0 0 0 transparent}
+    50%     {box-shadow:0 0 18px rgba(0,200,150,0.45), 0 0 48px rgba(0,200,150,0.18), inset 0 0 0 0 transparent}
+  }
+  .glow-card{
+    position:relative;
+    border-radius:2px;
+    overflow:hidden;
+    border-top:none !important;
+    border-bottom:none !important;
+    border-left:2px solid transparent !important;
+    border-right:2px solid transparent !important;
+    background-clip:padding-box;
+    animation:borderGlowPulse 3s ease-in-out infinite
+  }
+  /* Left & right linear gradient border */
+  .glow-card::before{
+    content:'';
+    position:absolute;
+    top:0; bottom:0;
+    left:-2px;
+    width:2px;
+    background:linear-gradient(to bottom, transparent 0%, rgba(0,200,150,0.3) 20%, rgba(0,200,150,1) 50%, rgba(0,200,150,0.3) 80%, transparent 100%);
+    border-radius:2px;
+    pointer-events:none;
+    z-index:2
+  }
+  .glow-card::after{
+    content:'';
+    position:absolute;
+    top:0; bottom:0;
+    right:-2px;
+    width:2px;
+    background:linear-gradient(to bottom, transparent 0%, rgba(201,168,76,0.3) 20%, rgba(201,168,76,1) 50%, rgba(201,168,76,0.3) 80%, transparent 100%);
+    border-radius:2px;
+    pointer-events:none;
+    z-index:2
+  }
   .glow-card > *{position:relative;z-index:1}
 
   .gift-body{max-height:0;overflow:hidden;transition:max-height 0.45s ease-in-out}
