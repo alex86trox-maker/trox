@@ -7,11 +7,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bodoni+Moda:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Great+Vibes&display=swap" rel="stylesheet" />
+<!-- Font Awesome for social icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html,body{background:#04100c;min-height:100vh}
   body{font-family:'Cormorant Garamond',Georgia,serif;color:#fff;overflow-x:hidden}
 
+  /* ── Animations ── */
   @keyframes goldShimmer{0%{background-position:0% center}100%{background-position:200% center}}
   @keyframes emeraldShimmer{0%{background-position:0% center}100%{background-position:200% center}}
   @keyframes fadeInUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
@@ -19,51 +22,75 @@
   @keyframes blinkColon{0%,100%{opacity:1}50%{opacity:0.1}}
   @keyframes shimmerBox{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
   @keyframes tickerMove{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  @keyframes floatDiamond{0%,100%{transform:translateY(0) rotate(0deg);opacity:.85}50%{transform:translateY(-8px) rotate(8deg);opacity:1}}
   @keyframes scanline{0%{background-position:0 0}100%{background-position:0 100%}}
   @keyframes aurora{0%{transform:translateX(-30%) translateY(0) rotate(-12deg);opacity:0.18}50%{transform:translateX(20%) translateY(-60px) rotate(-6deg);opacity:0.32}100%{transform:translateX(-30%) translateY(0) rotate(-12deg);opacity:0.18}}
   @keyframes auroraB{0%{transform:translateX(20%) translateY(0) rotate(10deg);opacity:0.12}50%{transform:translateX(-10%) translateY(50px) rotate(4deg);opacity:0.24}100%{transform:translateX(20%) translateY(0) rotate(10deg);opacity:0.12}}
   @keyframes borderGlow{0%,100%{border-color:rgba(0,200,150,0.25)}50%{border-color:rgba(0,200,150,0.55)}}
   @keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-  @keyframes push{
-    0%  {transform:translate(0,-1em) rotate(-45deg)}
-    5%  {transform:translate(0,-1em) rotate(-50deg)}
-    20% {transform:translate(1em,-2em) rotate(47deg)}
-    25% {transform:translate(1em,-2em) rotate(45deg)}
-    30% {transform:translate(1em,-2em) rotate(40deg)}
-    45% {transform:translate(2em,-3em) rotate(137deg)}
-    50% {transform:translate(2em,-3em) rotate(135deg)}
-    55% {transform:translate(2em,-3em) rotate(130deg)}
-    70% {transform:translate(3em,-4em) rotate(217deg)}
-    75% {transform:translate(3em,-4em) rotate(220deg)}
-    100%{transform:translate(0,-1em) rotate(-225deg)}
+  /* ── NEW: card glow pulse ── */
+  @keyframes cardGlowPulse{
+    0%,100%{box-shadow:0 10px 40px rgba(0,0,0,.4),0 0 0 1px rgba(0,200,150,0.2),0 0 24px rgba(0,200,150,0.08)}
+    50%{box-shadow:0 10px 40px rgba(0,0,0,.4),0 0 0 1px rgba(0,200,150,0.55),0 0 40px rgba(0,200,150,0.22)}
   }
+  @keyframes heroPhotoFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-7px) scale(1.01)}}
+  @keyframes splashPulse{0%,100%{opacity:.55}50%{opacity:.8}}
 
-  .gold-shimmer-text{background:linear-gradient(135deg,#2A6B4C 0%,#00C896 25%,#7FFFD4 50%,#00C896 75%,#2A6B4C 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:emeraldShimmer 3s linear infinite}
-  .fuchsia-shimmer-text{background:linear-gradient(135deg,#C9A84C 0%,#F0D474 40%,#FFFACD 55%,#F0D474 75%,#C9A84C 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:goldShimmer 4s linear infinite}
+  /* ── Utility classes ── */
+  .gold-shimmer-text{
+    background:linear-gradient(135deg,#2A6B4C 0%,#00C896 25%,#7FFFD4 50%,#00C896 75%,#2A6B4C 100%);
+    background-size:200% auto;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;animation:emeraldShimmer 3s linear infinite
+  }
+  .fuchsia-shimmer-text{
+    background:linear-gradient(135deg,#C9A84C 0%,#F0D474 40%,#FFFACD 55%,#F0D474 75%,#C9A84C 100%);
+    background-size:200% auto;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;animation:goldShimmer 4s linear infinite
+  }
   .fade-in-up{animation:fadeInUp 1s cubic-bezier(0.22,1,0.36,1) 0.4s both}
   .scale-in{animation:scaleIn 0.55s cubic-bezier(0.22,1,0.36,1)}
+
   .ticker-inner{display:flex;white-space:nowrap;animation:tickerMove 18s linear infinite}
   .cd-colon{animation:blinkColon 1.2s ease-in-out infinite}
   .shimmer-box{position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,rgba(0,200,150,0.08) 50%,transparent 80%);animation:shimmerBox 3s ease-in-out infinite}
   .scanlines{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);animation:scanline 8s linear infinite;opacity:0.25}
   .aurora-a{position:absolute;width:140%;height:260px;background:linear-gradient(120deg,transparent 0%,rgba(0,200,150,0.18) 30%,rgba(0,255,180,0.25) 50%,rgba(0,200,150,0.18) 70%,transparent 100%);border-radius:50%;filter:blur(48px);animation:aurora 9s ease-in-out infinite;pointer-events:none}
   .aurora-b{position:absolute;width:120%;height:200px;background:linear-gradient(120deg,transparent 0%,rgba(201,168,76,0.12) 35%,rgba(240,212,116,0.18) 55%,rgba(201,168,76,0.12) 75%,transparent 100%);border-radius:50%;filter:blur(40px);animation:auroraB 12s ease-in-out infinite;pointer-events:none}
+  .diamond-float-0{animation:floatDiamond 3s ease-in-out infinite 0s}
+  .diamond-float-1{animation:floatDiamond 3s ease-in-out infinite .75s}
+  .diamond-float-2{animation:floatDiamond 3s ease-in-out infinite 1.5s}
+  .diamond-float-3{animation:floatDiamond 3s ease-in-out infinite 2.25s}
+  .glow-border{animation:borderGlow 3s ease-in-out infinite}
+  .float-card{animation:floatUp 4s ease-in-out infinite}
   .itin-card-hover{transition:transform .3s}
   .itin-card-hover:hover{transform:translateX(4px)}
+
+  /* ── NEW: glowing cards ── */
+  .glow-card{animation:cardGlowPulse 3s ease-in-out infinite;border-radius:2px;overflow:hidden}
+
   .gift-body{max-height:0;overflow:hidden;transition:max-height 0.45s ease-in-out}
   .gift-body-open{max-height:520px}
   .gift-chevron{transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);color:rgba(0,200,150,0.6);font-size:1.2rem;line-height:1}
   .gift-chevron-open{transform:rotate(180deg)}
+
   input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.22)}
   input,select,textarea{box-sizing:border-box}
   button{cursor:pointer}
 
+  /* ── Layout ── */
   #app{max-width:480px;margin:0 auto;background:#04100c;min-height:100vh}
   section,footer{padding:3.5rem 1.5rem 4rem}
+
+  /* ── Canvas (petals) ── */
   #petal-canvas{position:fixed;inset:0;pointer-events:none;z-index:8888}
+
+  /* ── Splash ── */
   #splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;overflow:hidden;background:#080808}
   #splash.hidden{display:none}
 
+  /* ── Gallery ── */
   .gal-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s;filter:grayscale(20%)}
   .gal-img.active{opacity:1}
   .gallery-dot{height:3px;border-radius:0;cursor:pointer;border:none;transition:all .2s;background:rgba(201,168,76,0.2);width:5px;padding:0}
@@ -72,39 +99,82 @@
   .gallery-thumb.active{border-color:#00C896;opacity:1;transform:scale(1.12);box-shadow:0 4px 16px rgba(0,200,150,0.4)}
   .gallery-tab{flex-shrink:0;border-radius:1px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.58rem;letter-spacing:.28em;padding:.6rem 1.1rem;border:1px solid rgba(201,168,76,0.25);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.45);box-shadow:none;transition:all .25s;white-space:nowrap}
   .gallery-tab.active{border-color:#00C896;background:rgba(0,200,150,0.12);color:rgba(255,255,255,0.95);box-shadow:0 4px 20px rgba(0,200,150,0.25)}
+
+  /* ── RSVP attend buttons ── */
   .attend-btn{flex:1;border-radius:2px;font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.35em;padding:.9rem;border:1px solid rgba(201,168,76,0.3);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.55);transition:all .25s}
   .attend-btn.selected{border-color:#00C896;background:rgba(0,200,150,0.12);color:rgba(255,255,255,0.92)}
+
+  /* ── Itin timeline ── */
   #itin-line{position:absolute;left:28px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,rgba(201,168,76,0.4) 8%,rgba(201,168,76,0.2) 50%,rgba(201,168,76,0.4) 92%,transparent);transform-origin:top;transform:scaleY(0);transition:transform 1.8s cubic-bezier(0.22,1,0.36,1)}
   #itin-line.visible{transform:scaleY(1)}
 
-  /* ── Loader ── */
-  #loader{position:relative;width:5.4em;height:5.4em;background-color:#050505;margin:0 auto 2rem;font-size:13px}
-  #hill{position:absolute;width:7.1em;height:7.1em;top:1.7em;left:1.7em;background-color:transparent;border-left:.25em solid whitesmoke;transform:rotate(45deg)}
-  #hill:after{content:'';position:absolute;width:7.1em;height:7.1em;left:0;background-color:#050505}
-  #box{position:absolute;left:0;bottom:-.1em;width:1em;height:1em;background-color:transparent;border:.25em solid whitesmoke;border-radius:15%;transform:translate(0,-1em) rotate(-45deg);animation:push 2.5s cubic-bezier(.79,0,.47,.97) infinite}
+  /* ── NEW: Social Icons Animation ── */
+  .social-list{display:flex;justify-content:center;gap:2.5rem;list-style:none;margin:0;padding:0}
+  .social-li{position:relative;list-style:none;cursor:pointer}
+  .social-li a{text-decoration:none;display:block}
+  .social-li .fa-brands{font-size:3.8em;color:#1a1a1a;display:block}
+  .social-li a::before{
+    font-family:"Font Awesome 6 Brands";
+    position:absolute;top:0;left:0;
+    font-size:3.8em;height:0;overflow:hidden;
+    transition:0.5s ease-in-out;display:block
+  }
+  .social-li.ig a::before{
+    content:"\f16d";
+    background-image:linear-gradient(45deg,#f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    border-bottom:3px solid #dc2743
+  }
+  .social-li.wa a::before{content:"\f232";color:#25D366;border-bottom:3px solid #25D366}
+  .social-li.tw a::before{content:"\e61b";color:#1DA1F2;border-bottom:3px solid #1DA1F2}
+  .social-li:hover a::before{height:100%}
+
+  /* ── NEW: Hero photo frame ── */
+  .hero-photo-wrap{
+    position:relative;width:180px;height:240px;margin:0 auto 1.75rem;
+    border-radius:3px;overflow:hidden;
+    border:1px solid rgba(201,168,76,0.4);
+    box-shadow:0 0 0 1px rgba(0,200,150,0.2),0 0 32px rgba(0,200,150,0.3),0 0 80px rgba(0,200,150,0.1),0 24px 60px rgba(0,0,0,0.7);
+    animation:heroPhotoFloat 5s ease-in-out infinite
+  }
+  .hero-photo-wrap img{width:100%;height:100%;object-fit:cover;filter:brightness(.92) saturate(1.1)}
+  .hero-photo-shimmer{position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,rgba(0,200,150,0.07) 50%,transparent 80%);animation:shimmerBox 4s ease-in-out infinite;pointer-events:none}
+  .hero-photo-corner{position:absolute;width:18px;height:18px;border-color:rgba(201,168,76,0.8);border-style:solid}
+  .hero-photo-tl{top:6px;left:6px;border-width:1.5px 0 0 1.5px}
+  .hero-photo-tr{top:6px;right:6px;border-width:1.5px 1.5px 0 0}
+  .hero-photo-bl{bottom:6px;left:6px;border-width:0 0 1.5px 1.5px}
+  .hero-photo-br{bottom:6px;right:6px;border-width:0 1.5px 1.5px 0}
 </style>
 </head>
 <body>
 
+<!-- Petal Canvas -->
 <canvas id="petal-canvas"></canvas>
 
-<!-- SPLASH -->
+<!-- ── SPLASH ───────────────────────────────────────────────── -->
 <div id="splash" onclick="closeSplash()">
   <img src="https://images.unsplash.com/photo-1613909671501-f9678ffc1d33?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22;filter:grayscale(40%)" />
   <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(8,8,8,.65) 20%,rgba(8,8,8,.92) 100%)"></div>
   <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 38px,rgba(201,168,76,.04) 38px,rgba(201,168,76,.04) 39px)"></div>
+
+  <!-- Corner diamonds -->
+  <svg class="diamond-float-0" viewBox="0 0 36 36" fill="none" style="position:absolute;top:18px;left:18px;width:36px;height:36px;filter:drop-shadow(0 0 6px rgba(201,168,76,.7))"><polygon points="18,2 34,18 18,34 2,18" fill="rgba(201,168,76,.18)" stroke="rgba(201,168,76,.9)" stroke-width="1.5"/><polygon points="18,8 28,18 18,28 8,18" fill="rgba(201,168,76,.10)" stroke="rgba(201,168,76,.5)" stroke-width="1"/></svg>
+  <svg class="diamond-float-1" viewBox="0 0 36 36" fill="none" style="position:absolute;top:18px;right:18px;width:36px;height:36px;filter:drop-shadow(0 0 6px rgba(201,168,76,.7))"><polygon points="18,2 34,18 18,34 2,18" fill="rgba(201,168,76,.18)" stroke="rgba(201,168,76,.9)" stroke-width="1.5"/><polygon points="18,8 28,18 18,28 8,18" fill="rgba(201,168,76,.10)" stroke="rgba(201,168,76,.5)" stroke-width="1"/></svg>
+  <svg class="diamond-float-2" viewBox="0 0 36 36" fill="none" style="position:absolute;bottom:18px;left:18px;width:36px;height:36px;filter:drop-shadow(0 0 6px rgba(201,168,76,.7))"><polygon points="18,2 34,18 18,34 2,18" fill="rgba(201,168,76,.18)" stroke="rgba(201,168,76,.9)" stroke-width="1.5"/><polygon points="18,8 28,18 18,28 8,18" fill="rgba(201,168,76,.10)" stroke="rgba(201,168,76,.5)" stroke-width="1"/></svg>
+  <svg class="diamond-float-3" viewBox="0 0 36 36" fill="none" style="position:absolute;bottom:18px;right:18px;width:36px;height:36px;filter:drop-shadow(0 0 6px rgba(201,168,76,.7))"><polygon points="18,2 34,18 18,34 2,18" fill="rgba(201,168,76,.18)" stroke="rgba(201,168,76,.9)" stroke-width="1.5"/><polygon points="18,8 28,18 18,28 8,18" fill="rgba(201,168,76,.10)" stroke="rgba(201,168,76,.5)" stroke-width="1"/></svg>
+
   <div class="fade-in-up" style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 2.5rem">
     <p style="font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.78em;color:#00C896;margin-bottom:1.2rem">Fashion Edition · XV Años</p>
     <h1 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:9rem;line-height:.82;letter-spacing:.04em">15</h1>
     <p style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.55em;color:rgba(201,168,76,.75);margin-bottom:.4rem">AÑOS DE</p>
     <p style="font-family:'Great Vibes',cursive;font-size:3rem;color:rgba(255,255,255,.92);margin-bottom:1.5rem">Sofía Valentina</p>
     <div style="border:1px solid rgba(201,168,76,.4);border-radius:2px;padding:.55rem 1.8rem;margin-bottom:1.75rem;font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.38em;color:rgba(201,168,76,.85);background:rgba(201,168,76,.06)">15 · NOV · 2026 &nbsp;|&nbsp; 7:00 PM</div>
-    <button style="border:none;border-radius:2px;color:#080808;font-weight:900;padding:1rem 2.8rem;background:linear-gradient(135deg,#C9A84C 0%,#F0D474 50%,#C9A84C 100%);font-family:'Bebas Neue',sans-serif;font-size:.88rem;letter-spacing:.48em">✦ Abrir Invitación ✦</button>
+    <button style="border:none;border-radius:2px;color:#080808;font-weight:900;padding:1rem 2.8rem;background:linear-gradient(135deg,#C9A84C 0%,#F0D474 50%,#C9A84C 100%);font-family:'Bebas Neue',sans-serif;font-size:.88rem;letter-spacing:.48em;box-shadow:0 8px 28px rgba(201,168,76,.4)">✦ Abrir Invitación ✦</button>
     <p style="font-size:.5rem;letter-spacing:.18em;color:rgba(255,255,255,.3);margin-top:.75rem;font-family:'Bebas Neue',sans-serif">Toca en cualquier lugar para abrir</p>
   </div>
 </div>
 
-<!-- MAIN -->
+<!-- ── MAIN ───────────────────────────────────────────────── -->
 <div id="app" style="display:none">
 
   <!-- HERO -->
@@ -114,12 +184,24 @@
     <div class="aurora-a" style="top:15%;left:-20%"></div>
     <div class="aurora-b" style="top:45%;left:10%"></div>
     <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,8,8,.7) 0%,rgba(8,8,8,.35) 45%,rgba(8,8,8,.85) 100%);z-index:2"></div>
-    <div style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;padding:5rem 2rem 4rem;flex:1">
+    <div style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;padding:4rem 2rem 4rem;flex:1">
+
+      <!-- NEW: Hero photo -->
+      <div class="hero-photo-wrap">
+        <img src="https://images.unsplash.com/photo-1652928722394-e806c14b1c21?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=600" alt="Sofía Valentina" />
+        <div class="hero-photo-shimmer"></div>
+        <div class="hero-photo-corner hero-photo-tl"></div>
+        <div class="hero-photo-corner hero-photo-tr"></div>
+        <div class="hero-photo-corner hero-photo-bl"></div>
+        <div class="hero-photo-corner hero-photo-br"></div>
+      </div>
+
       <p style="font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.72em;color:#00C896;margin-bottom:.5rem">Estás invitada a mis</p>
       <h1 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:10rem;line-height:.78;letter-spacing:.04em">15</h1>
       <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.6em;color:rgba(240,212,116,.7);margin-bottom:.5rem">AÑOS</p>
       <p style="font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;letter-spacing:.22em;color:rgba(255,255,255,.4);margin:.25rem 0">de</p>
       <p style="font-family:'Great Vibes',cursive;font-size:3.2rem;color:rgba(255,255,255,.95);margin-bottom:2rem">Sofía Valentina</p>
+      <!-- Ornament line -->
       <div style="margin-bottom:2rem">
         <svg width="230" height="14" viewBox="0 0 230 14" fill="none">
           <line x1="0" y1="7" x2="88" y2="7" stroke="url(#hLf)" stroke-width=".8"/>
@@ -133,7 +215,8 @@
           </defs>
         </svg>
       </div>
-      <div style="width:100%;max-width:340px;border-radius:2px;position:relative;overflow:hidden;margin-bottom:2.5rem;padding:1.75rem;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.35);backdrop-filter:blur(24px);box-shadow:0 20px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(201,168,76,.15)">
+      <!-- Invitation card — with glow -->
+      <div class="glow-card" style="width:100%;max-width:340px;position:relative;overflow:hidden;margin-bottom:2.5rem;padding:1.75rem;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.35);backdrop-filter:blur(24px);box-shadow:0 20px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(201,168,76,.15)">
         <div style="position:absolute;top:0;left:10%;right:10%;height:1.5px;background:linear-gradient(to right,transparent,#C9A84C,transparent)"></div>
         <p style="font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.55em;color:rgba(201,168,76,.65);margin-bottom:.5rem">Invitación Oficial</p>
         <p style="font-family:'Great Vibes',cursive;font-size:2.2rem;color:#F0D474;margin-bottom:.75rem">Sofía Valentina</p>
@@ -164,7 +247,7 @@
       <h2 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">Mi Historia</h2>
       <div style="display:flex;justify-content:center;margin-top:.5rem"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLhist)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#00C896" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRhist)" stroke-width=".7"/><defs><linearGradient id="oLhist" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRhist" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
     </div>
-    <div style="border-radius:2px;overflow:hidden;border:1px solid rgba(201,168,76,.2);background:#0c1810;box-shadow:0 24px 72px rgba(0,0,0,.5)">
+    <div class="glow-card" style="border:1px solid rgba(201,168,76,.2);background:#0c1810;box-shadow:0 24px 72px rgba(0,0,0,.5)">
       <div style="position:relative;height:220px;overflow:hidden">
         <img src="https://images.unsplash.com/photo-1571924849183-a68a3879348d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800" alt="" style="width:100%;height:100%;object-fit:cover;filter:grayscale(20%);opacity:.6" />
         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(17,17,17,1) 0%,rgba(17,17,17,.3) 60%,transparent 100%)"></div>
@@ -186,18 +269,18 @@
       <div style="display:flex;justify-content:center;margin-top:.5rem"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLdate)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#00C896" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRdate)" stroke-width=".7"/><defs><linearGradient id="oLdate" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRdate" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
     </div>
     <div style="display:flex;gap:12px">
-      <div style="flex:1;border-radius:2px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:1.75rem .5rem 1.5rem;background:#0c1810;border:1px solid rgba(201,168,76,.2);box-shadow:0 10px 40px rgba(0,0,0,.4)">
+      <div class="glow-card" style="flex:1;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:1.75rem .5rem 1.5rem;background:#0c1810;border:1px solid rgba(201,168,76,.2)">
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,#C9A84C,transparent)"></div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.45em;color:rgba(201,168,76,.55);margin-bottom:.6rem">DÍA</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:3.5rem;line-height:1;color:#F0D474">15</div>
       </div>
-      <div style="flex:1;border-radius:2px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:1.75rem .5rem 1.5rem;background:#0c1810;border:1px solid rgba(201,168,76,.2);box-shadow:0 10px 40px rgba(0,0,0,.4)">
+      <div class="glow-card" style="flex:1;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:1.75rem .5rem 1.5rem;background:#0c1810;border:1px solid rgba(201,168,76,.2)">
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,#C9A84C,transparent)"></div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.45em;color:rgba(201,168,76,.55);margin-bottom:.6rem">MES · AÑO</div>
         <div style="font-family:'Bodoni Moda',serif;font-size:1rem;font-style:italic;color:rgba(255,255,255,.55);line-height:1.4;white-space:pre">Nov
 2026</div>
       </div>
-      <div style="flex:1;border-radius:2px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:1.75rem .5rem 1.5rem;background:#0c1810;border:1px solid rgba(201,168,76,.2);box-shadow:0 10px 40px rgba(0,0,0,.4)">
+      <div class="glow-card" style="flex:1;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:1.75rem .5rem 1.5rem;background:#0c1810;border:1px solid rgba(201,168,76,.2)">
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,#C9A84C,transparent)"></div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.45em;color:rgba(201,168,76,.55);margin-bottom:.6rem">HORA</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:3.5rem;line-height:1;color:#F0D474">7</div>
@@ -216,8 +299,9 @@
         <div style="display:flex;justify-content:center;margin-top:.5rem"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLcd)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#00C896" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRcd)" stroke-width=".7"/><defs><linearGradient id="oLcd" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRcd" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
       </div>
       <div style="display:flex;align-items:flex-start;justify-content:center;gap:10px;margin-top:1rem">
+        <!-- DÍAS -->
         <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-          <div style="position:relative;overflow:hidden;border-radius:2px;display:flex;align-items:center;justify-content:center;width:72px;height:84px;background:#0c1810;border:1px solid rgba(201,168,76,.25);box-shadow:0 8px 32px rgba(0,0,0,.5),inset 0 1px 0 rgba(201,168,76,.1)">
+          <div class="glow-card" style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:72px;height:84px;background:#0c1810;border:1px solid rgba(201,168,76,.25)">
             <div style="position:absolute;top:0;left:0;right:0;bottom:50%;background:rgba(255,255,255,.03)"></div>
             <div class="shimmer-box"></div>
             <span id="cd-days" style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.04em;background:linear-gradient(180deg,#F0D474 0%,#C9A84C 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;position:relative;z-index:1">000</span>
@@ -225,8 +309,9 @@
           <span style="font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.38em;color:rgba(201,168,76,.45)">DÍAS</span>
         </div>
         <span class="cd-colon" style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:rgba(0,200,150,.45);padding-bottom:2.2rem">:</span>
+        <!-- HORAS -->
         <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-          <div style="position:relative;overflow:hidden;border-radius:2px;display:flex;align-items:center;justify-content:center;width:72px;height:84px;background:#0c1810;border:1px solid rgba(201,168,76,.25);box-shadow:0 8px 32px rgba(0,0,0,.5),inset 0 1px 0 rgba(201,168,76,.1)">
+          <div class="glow-card" style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:72px;height:84px;background:#0c1810;border:1px solid rgba(201,168,76,.25)">
             <div style="position:absolute;top:0;left:0;right:0;bottom:50%;background:rgba(255,255,255,.03)"></div>
             <div class="shimmer-box"></div>
             <span id="cd-hours" style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.04em;background:linear-gradient(180deg,#F0D474 0%,#C9A84C 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;position:relative;z-index:1">00</span>
@@ -234,8 +319,9 @@
           <span style="font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.38em;color:rgba(201,168,76,.45)">HORAS</span>
         </div>
         <span class="cd-colon" style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:rgba(0,200,150,.45);padding-bottom:2.2rem">:</span>
+        <!-- MIN -->
         <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-          <div style="position:relative;overflow:hidden;border-radius:2px;display:flex;align-items:center;justify-content:center;width:72px;height:84px;background:#0c1810;border:1px solid rgba(201,168,76,.25);box-shadow:0 8px 32px rgba(0,0,0,.5),inset 0 1px 0 rgba(201,168,76,.1)">
+          <div class="glow-card" style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:72px;height:84px;background:#0c1810;border:1px solid rgba(201,168,76,.25)">
             <div style="position:absolute;top:0;left:0;right:0;bottom:50%;background:rgba(255,255,255,.03)"></div>
             <div class="shimmer-box"></div>
             <span id="cd-mins" style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.04em;background:linear-gradient(180deg,#F0D474 0%,#C9A84C 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;position:relative;z-index:1">00</span>
@@ -243,8 +329,9 @@
           <span style="font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.38em;color:rgba(201,168,76,.45)">MIN</span>
         </div>
         <span class="cd-colon" style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:rgba(0,200,150,.45);padding-bottom:2.2rem">:</span>
+        <!-- SEG -->
         <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-          <div style="position:relative;overflow:hidden;border-radius:2px;display:flex;align-items:center;justify-content:center;width:72px;height:84px;background:#0c1810;border:1px solid rgba(201,168,76,.25);box-shadow:0 8px 32px rgba(0,0,0,.5),inset 0 1px 0 rgba(201,168,76,.1)">
+          <div class="glow-card" style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:72px;height:84px;background:#0c1810;border:1px solid rgba(201,168,76,.25)">
             <div style="position:absolute;top:0;left:0;right:0;bottom:50%;background:rgba(255,255,255,.03)"></div>
             <div class="shimmer-box"></div>
             <span id="cd-secs" style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.04em;background:linear-gradient(180deg,#F0D474 0%,#C9A84C 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;position:relative;z-index:1">00</span>
@@ -262,7 +349,7 @@
       <h2 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">El Lugar</h2>
       <div style="display:flex;justify-content:center;margin-top:.5rem"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLloc)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#00C896" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRloc)" stroke-width=".7"/><defs><linearGradient id="oLloc" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRloc" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
     </div>
-    <div id="lugar-box" style="border-radius:2px;overflow:hidden;border:1px solid rgba(201,168,76,.2);background:#0c1810;transition:box-shadow .3s">
+    <div id="lugar-box" class="glow-card" style="border:1px solid rgba(201,168,76,.2);background:#0c1810;transition:box-shadow .3s">
       <button onclick="toggleLugar()" style="display:flex;align-items:center;gap:18px;padding:1.5rem;width:100%;text-align:left;border:none;background:transparent">
         <div style="flex-shrink:0;border-radius:2px;display:flex;align-items:center;justify-content:center;width:56px;height:56px;background:linear-gradient(145deg,#00C896,#006B4A);box-shadow:0 8px 28px rgba(0,200,150,.4)">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.95)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
@@ -296,15 +383,15 @@
       <div style="display:flex;justify-content:center;margin-top:.5rem"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLgal)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#00C896" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRgal)" stroke-width=".7"/><defs><linearGradient id="oLgal" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRgal" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
     </div>
     <div id="gal-tabs" style="display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:4px"></div>
-    <div style="position:relative;border-radius:2px;overflow:hidden;height:300px;box-shadow:0 24px 72px rgba(0,0,0,.6),0 0 0 1px rgba(201,168,76,.2)">
+    <div class="glow-card" style="position:relative;height:300px;border:1px solid rgba(201,168,76,.2)">
       <div id="gal-images"></div>
       <div style="position:absolute;inset:0;z-index:2;background:linear-gradient(to top,rgba(8,8,8,.8) 0%,transparent 55%)"></div>
       <div style="position:absolute;bottom:0;left:0;right:0;z-index:3;text-align:center;padding:1.5rem 1.25rem 1rem">
         <p id="gal-caption" style="font-family:'Great Vibes',cursive;font-size:1.5rem;color:rgba(255,255,255,.96);text-shadow:0 1px 12px rgba(0,0,0,.6)"></p>
       </div>
       <div id="gal-counter" style="position:absolute;top:14px;right:14px;z-index:10;border-radius:1px;padding:5px 14px;background:#00C896;font-family:'Bebas Neue',sans-serif;font-size:.6rem;font-weight:700;color:white;letter-spacing:.2em"></div>
-      <button onclick="galPrev()" style="position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:10;display:flex;align-items:center;justify-content:center;border-radius:1px;width:42px;height:42px;background:rgba(8,8,8,.85);border:1px solid rgba(201,168,76,.3);font-size:1.4rem;color:#C9A84C;backdrop-filter:blur(8px)">&#8249;</button>
-      <button onclick="galNext()" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);z-index:10;display:flex;align-items:center;justify-content:center;border-radius:1px;width:42px;height:42px;background:rgba(8,8,8,.85);border:1px solid rgba(201,168,76,.3);font-size:1.4rem;color:#C9A84C;backdrop-filter:blur(8px)">&#8250;</button>
+      <button onclick="galPrev()" style="position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:10;display:flex;align-items:center;justify-content:center;border-radius:1px;width:42px;height:42px;background:rgba(8,8,8,.85);border:1px solid rgba(201,168,76,.3);font-size:1.4rem;color:#C9A84C;backdrop-filter:blur(8px)">‹</button>
+      <button onclick="galNext()" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);z-index:10;display:flex;align-items:center;justify-content:center;border-radius:1px;width:42px;height:42px;background:rgba(8,8,8,.85);border:1px solid rgba(201,168,76,.3);font-size:1.4rem;color:#C9A84C;backdrop-filter:blur(8px)">›</button>
     </div>
     <div id="gal-thumbs" style="display:flex;gap:8px;margin-top:14px;justify-content:center;flex-wrap:wrap"></div>
     <div id="gal-dots" style="display:flex;gap:6px;justify-content:center;margin-top:12px"></div>
@@ -342,7 +429,7 @@
     <div id="extra-accordions"></div>
   </section>
 
-  <!-- HASHTAG -->
+  <!-- HASHTAG — social icons with hover animation -->
   <section style="padding:3.5rem 1.5rem 4rem;background:#060f0c;text-align:center">
     <div style="text-align:center;margin-bottom:2rem">
       <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:rgba(0,200,150,.75);margin-bottom:.5rem">Comparte el momento</span>
@@ -350,17 +437,27 @@
       <div style="display:flex;justify-content:center;margin-top:.5rem"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLhash)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#00C896" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRhash)" stroke-width=".7"/><defs><linearGradient id="oLhash" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRhash" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
     </div>
     <p style="font-size:.88rem;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:1.75rem">¡Prepárate para la fiesta! Etiquétame en Instagram y TikTok con mi hashtag en tus fotos y videos.</p>
-    <div style="display:inline-block;padding:1.25rem 2.5rem;border-radius:2px;background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.25);box-shadow:0 0 40px rgba(0,200,150,.1);margin-bottom:1.5rem">
+    <div style="display:inline-block;padding:1.25rem 2.5rem;border-radius:2px;background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.25);box-shadow:0 0 40px rgba(0,200,150,.1);margin-bottom:2.5rem">
       <p class="fuchsia-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.06em">#SofiaXV2026</p>
     </div>
-    <div style="display:flex;gap:10px;justify-content:center">
-      <a href="#" style="display:flex;align-items:center;gap:8px;border-radius:2px;padding:.75rem 1.25rem;border:1px solid rgba(201,168,76,.2);background:rgba(255,255,255,.03);font-family:'Bebas Neue',sans-serif;font-size:.6rem;letter-spacing:.28em;color:rgba(255,255,255,.6);text-decoration:none">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> Instagram
-      </a>
-      <a href="#" style="display:flex;align-items:center;gap:8px;border-radius:2px;padding:.75rem 1.25rem;border:1px solid rgba(201,168,76,.2);background:rgba(255,255,255,.03);font-family:'Bebas Neue',sans-serif;font-size:.6rem;letter-spacing:.28em;color:rgba(255,255,255,.6);text-decoration:none">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg> TikTok
-      </a>
-    </div>
+    <!-- NEW: Social icons with hover fill animation -->
+    <ul class="social-list">
+      <li class="social-li ig">
+        <a href="#" aria-label="Instagram">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+      </li>
+      <li class="social-li wa">
+        <a href="#" aria-label="WhatsApp">
+          <i class="fa-brands fa-whatsapp"></i>
+        </a>
+      </li>
+      <li class="social-li tw">
+        <a href="#" aria-label="X / Twitter">
+          <i class="fa-brands fa-x-twitter"></i>
+        </a>
+      </li>
+    </ul>
   </section>
 
   <!-- LA MÚSICA -->
@@ -371,7 +468,7 @@
       <div style="display:flex;justify-content:center;margin-top:.5rem"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLmus)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#00C896" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRmus)" stroke-width=".7"/><defs><linearGradient id="oLmus" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRmus" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
     </div>
     <p style="text-align:center;font-size:.88rem;font-style:italic;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:2rem">¿Qué canciones son infaltables?<br>Ayúdame con la selección musical de la noche.</p>
-    <div style="border-radius:2px;padding:1.75rem;background:#0c1810;border:1px solid rgba(201,168,76,.2);box-shadow:0 20px 60px rgba(0,0,0,.4),inset 0 1px 0 rgba(201,168,76,.08)">
+    <div class="glow-card" style="padding:1.75rem;background:#0c1810;border:1px solid rgba(201,168,76,.2);box-shadow:0 20px 60px rgba(0,0,0,.4),inset 0 1px 0 rgba(201,168,76,.08)">
       <div id="song-success" style="display:none;text-align:center;padding:1.5rem 0" class="scale-in">
         <div style="display:flex;justify-content:center;margin-bottom:.75rem"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#F0D474" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
         <p style="font-family:'Great Vibes',cursive;font-size:2rem;color:#F0D474">¡Gracias!</p>
@@ -394,472 +491,387 @@
       <h2 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">Regalos</h2>
       <div style="display:flex;justify-content:center;margin-top:.5rem"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLgift)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#00C896" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRgift)" stroke-width=".7"/><defs><linearGradient id="oLgift" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRgift" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
     </div>
-    <p style="text-align:center;font-size:.85rem;font-style:italic;color:rgba(255,255,255,.4);line-height:1.8;margin-bottom:1.75rem">El mejor regalo es tu presencia, pero si deseas hacerme un obsequio, aquí tienes las opciones.</p>
-    <div id="gift-accordions"></div>
+    <p style="text-align:center;font-size:.88rem;font-style:italic;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:2rem">El mejor regalo es tu presencia, pero si deseas hacerme un obsequio, aquí tienes las opciones.</p>
+    <div id="gifts-container" style="display:flex;flex-direction:column;gap:12px"></div>
   </section>
 
   <!-- RSVP -->
-  <section style="padding:4rem 1.5rem 5rem;position:relative;overflow:hidden;background:#080808">
-    <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 38px,rgba(0,200,150,.02) 38px,rgba(0,200,150,.02) 39px)"></div>
-    <div style="position:relative;z-index:10">
-      <div style="text-align:center;margin-bottom:2rem">
-        <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:rgba(0,200,150,.75);margin-bottom:.5rem">Confirma tu asistencia</span>
-        <h2 class="fuchsia-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">RSVP</h2>
-        <div style="display:flex;justify-content:center;margin-top:.5rem"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLrsvp)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#00C896" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRrsvp)" stroke-width=".7"/><defs><linearGradient id="oLrsvp" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRrsvp" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
-      </div>
-      <p style="text-align:center;margin-bottom:2rem;font-size:.88rem;font-style:italic;color:rgba(255,255,255,.45);line-height:1.8">Por favor confirma antes del<br><strong style="color:rgba(255,255,255,.7)">1 de Noviembre, 2026</strong></p>
-      <div id="rsvp-success" style="display:none;text-align:center;padding:2.5rem 0" class="scale-in">
-        <div style="border-radius:2px;display:flex;align-items:center;justify-content:center;width:80px;height:80px;margin:0 auto 1.25rem;background:linear-gradient(145deg,#C9A84C,#7A5C1E);box-shadow:0 14px 44px rgba(201,168,76,.45);font-size:2.5rem">✓</div>
-        <h3 style="font-family:'Great Vibes',cursive;font-size:4rem;color:#F0D474;line-height:1">¡Gracias!</h3>
-        <p style="font-size:.9rem;font-style:italic;margin-top:14px;color:rgba(255,255,255,.45);line-height:1.8">Tu confirmación fue registrada.<br>¡Te esperamos con los brazos abiertos!</p>
-      </div>
-      <div id="rsvp-form" style="border-radius:2px;padding:2rem 1.75rem;background:#0c1810;border:1px solid rgba(201,168,76,.2);box-shadow:0 20px 60px rgba(0,0,0,.4),inset 0 1px 0 rgba(201,168,76,.08)">
-        <input id="rsvp-name" type="text" placeholder="Tu nombre completo" style="width:100%;border-radius:2px;display:block;margin-bottom:.75rem;padding:.95rem 1.2rem;border:1px solid rgba(0,200,150,.2);background:rgba(0,200,150,.03);color:rgba(255,255,255,.88);font-size:.9rem;font-family:inherit;outline:none" />
-        <input id="rsvp-guests" type="text" placeholder="Nombres de acompañantes (opcional)" style="width:100%;border-radius:2px;display:block;margin-bottom:.75rem;padding:.95rem 1.2rem;border:1px solid rgba(0,200,150,.2);background:rgba(0,200,150,.03);color:rgba(255,255,255,.88);font-size:.9rem;font-family:inherit;outline:none" />
-        <p style="font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.4em;color:rgba(201,168,76,.55);margin-bottom:.6rem">¿Asistirás?</p>
-        <div style="display:flex;gap:.75rem;margin-bottom:18px">
-          <button id="btn-yes" class="attend-btn" onclick="setAttending('yes')">✓ Asistiré</button>
-          <button id="btn-no" class="attend-btn" onclick="setAttending('no')">✗ No podré</button>
+  <section style="padding:3.5rem 1.5rem 4rem;background:#080808">
+    <div style="text-align:center;margin-bottom:2rem">
+      <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:rgba(0,200,150,.75);margin-bottom:.5rem">Confirma tu asistencia</span>
+      <h2 class="fuchsia-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">RSVP</h2>
+      <div style="display:flex;justify-content:center;margin-top:.5rem"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLrsvp)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#00C896" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRrsvp)" stroke-width=".7"/><defs><linearGradient id="oLrsvp" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRrsvp" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
+      <p style="font-size:.76rem;color:rgba(255,255,255,.3);margin-top:.75rem;font-style:italic">Por favor confirma antes del 1 de Noviembre, 2026</p>
+    </div>
+    <div class="glow-card" style="padding:1.75rem;background:#0c1810;border:1px solid rgba(201,168,76,.2)">
+      <div id="rsvp-success" style="display:none;text-align:center;padding:2rem 0" class="scale-in">
+        <div style="display:flex;justify-content:center;margin-bottom:.75rem">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
-        <p style="font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.4em;color:rgba(201,168,76,.55);margin-bottom:.6rem">¿Restricción alimentaria?</p>
-        <select id="rsvp-diet" style="width:100%;border-radius:2px;display:block;margin-bottom:.75rem;padding:.95rem 1.2rem;border:1px solid rgba(0,200,150,.2);background:#0a1410;color:rgba(255,255,255,.88);font-size:.9rem;font-family:inherit;outline:none">
-          <option value="none">No</option>
-          <option value="celiac">Celíaco</option>
-          <option value="vegan">Vegano</option>
-          <option value="vegetarian">Vegetariano</option>
-          <option value="other">Otra</option>
+        <p style="font-family:'Great Vibes',cursive;font-size:2.4rem;color:#F0D474">¡Gracias!</p>
+        <p style="font-size:.88rem;color:rgba(255,255,255,.45);margin-top:8px;line-height:1.7">Tu confirmación fue registrada.<br>¡Te esperamos con los brazos abiertos!</p>
+      </div>
+      <div id="rsvp-form">
+        <!-- Asistencia -->
+        <p style="font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.45em;color:rgba(201,168,76,.55);margin-bottom:.75rem">¿Asistirás?</p>
+        <div style="display:flex;gap:10px;margin-bottom:1.5rem">
+          <button class="attend-btn" id="btn-yes" onclick="selectAttend('yes')">✓ Asistiré</button>
+          <button class="attend-btn" id="btn-no" onclick="selectAttend('no')">✗ No podré</button>
+        </div>
+        <!-- Restricción -->
+        <p style="font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.45em;color:rgba(201,168,76,.55);margin-bottom:.75rem">¿Restricción alimentaria?</p>
+        <select id="rsvp-food" style="width:100%;border-radius:2px;padding:.85rem 1.1rem;border:1px solid rgba(0,200,150,.2);background:rgba(0,200,150,.03);color:rgba(255,255,255,.75);font-family:inherit;font-size:.88rem;outline:none;margin-bottom:1.5rem;appearance:none">
+          <option value="no">No</option>
+          <option value="celiaco">Celíaco</option>
+          <option value="vegano">Vegano</option>
+          <option value="vegetariano">Vegetariano</option>
+          <option value="otra">Otra</option>
         </select>
-        <p style="font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.4em;color:rgba(201,168,76,.55);margin-bottom:.6rem">¿Necesitas transporte?</p>
-        <select id="rsvp-bus" style="width:100%;border-radius:2px;display:block;margin-bottom:.75rem;padding:.95rem 1.2rem;border:1px solid rgba(0,200,150,.2);background:#0a1410;color:rgba(255,255,255,.88);font-size:.9rem;font-family:inherit;outline:none">
+        <!-- Transporte -->
+        <p style="font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.45em;color:rgba(201,168,76,.55);margin-bottom:.75rem">¿Necesitas transporte?</p>
+        <select id="rsvp-transport" style="width:100%;border-radius:2px;padding:.85rem 1.1rem;border:1px solid rgba(0,200,150,.2);background:rgba(0,200,150,.03);color:rgba(255,255,255,.75);font-family:inherit;font-size:.88rem;outline:none;margin-bottom:1.75rem;appearance:none">
           <option value="no">No, iré por mi cuenta</option>
-          <option value="yes">Sí, reservar asiento en el bus</option>
+          <option value="bus">Sí, reservar asiento en el bus</option>
         </select>
-        <p id="rsvp-error" style="font-size:.72rem;color:#00C896;margin-bottom:8px;font-family:'Bebas Neue',sans-serif;letter-spacing:.08em;display:none"></p>
-        <button onclick="submitRsvp()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border-radius:2px;color:#030d09;border:none;padding:1.1rem;background:linear-gradient(135deg,#00C896 0%,#7FFFD4 50%,#00C896 100%);box-shadow:0 10px 32px rgba(0,200,150,.35);font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.38em;font-weight:700">Confirmar Asistencia</button>
-        <p style="text-align:center;margin-top:.75rem;font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.18em;color:rgba(255,255,255,.2)">Tu información es privada y confidencial</p>
+        <button onclick="submitRSVP()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border-radius:2px;color:#030d09;border:none;padding:1.1rem;background:linear-gradient(135deg,#C9A84C 0%,#F0D474 50%,#C9A84C 100%);box-shadow:0 10px 32px rgba(201,168,76,.3);font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.45em;font-weight:700">Confirmar Asistencia</button>
+        <p style="font-size:.48rem;letter-spacing:.18em;color:rgba(255,255,255,.2);margin-top:.75rem;text-align:center;font-family:'Bebas Neue',sans-serif">Tu información es privada y confidencial</p>
       </div>
     </div>
   </section>
 
   <!-- FOOTER -->
-  <footer style="padding:5rem 1.5rem 3.5rem;text-align:center;position:relative;overflow:hidden;background:#050505">
-    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,.5),transparent)"></div>
-
-    <!-- LOADER reemplaza la corona -->
-    <div id="loader">
-      <div id="box"></div>
-      <div id="hill"></div>
-    </div>
-
-    <p style="font-style:italic;line-height:2;margin-bottom:1.5rem;color:rgba(255,255,255,.35);font-size:.95rem">"Hoy cumplo quince años y empiezo a ser<br>la mujer que siempre soñé."</p>
-    <div style="display:inline-block;margin-bottom:2rem;border-radius:1px;padding:.95rem 2.5rem;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.25);box-shadow:0 8px 40px rgba(0,0,0,.3)">
-      <span style="font-family:'Great Vibes',cursive;font-size:2.4rem;color:#F0D474">Sofía Valentina</span>
-    </div>
-    <div style="margin-bottom:2rem;display:flex;flex-direction:column;gap:8px;align-items:center">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.5em;color:rgba(255,255,255,.2);margin-bottom:4px">Accesos rápidos</p>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.3em;color:rgba(201,168,76,.4)">RSVP</span>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.3em;color:rgba(201,168,76,.4)">Programa</span>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.3em;color:rgba(201,168,76,.4)">El Lugar</span>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.3em;color:rgba(201,168,76,.4)">Galería</span>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.3em;color:rgba(201,168,76,.4)">Regalos</span>
-    </div>
-    <div style="padding-top:2rem;margin-top:2rem;border-top:1px solid rgba(201,168,76,.08)">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:.75rem;margin-bottom:1.5rem">
-        <img src="https://hercules-cdn.com/file_c1j13Du9oOnVHd30zwsWoM08" alt="Gueka Ideas" style="height:80px;width:auto;filter:brightness(0) invert(1) opacity(.85)" />
-        <p style="font-size:.72rem;color:rgba(255,255,255,.5);line-height:1.8;text-align:center;max-width:300px">
-          Esta tarjeta digital es propiedad exclusiva de <strong style="color:rgba(255,255,255,.75)">Gueka Ideas</strong>.<br>Uso permitido únicamente para fines personales.
-        </p>
-        <p style="font-size:.6rem;color:rgba(255,255,255,.25);letter-spacing:.12em;font-family:'Bebas Neue',sans-serif;text-align:center">© 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</p>
-      </div>
+  <footer style="padding:4rem 1.5rem 5rem;text-align:center;background:#04100c;border-top:1px solid rgba(201,168,76,.1)">
+    <div style="font-size:2rem;margin-bottom:1rem">👑</div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:rgba(255,255,255,.55);line-height:1.8;margin-bottom:1.25rem;max-width:280px;margin-left:auto;margin-right:auto">"Hoy cumplo quince años y empiezo a ser la mujer que siempre soñé."</p>
+    <p style="font-family:'Great Vibes',cursive;font-size:1.8rem;color:rgba(201,168,76,.8)">Sofía Valentina</p>
+    <div style="height:1px;margin:2rem auto;max-width:200px;background:linear-gradient(to right,transparent,rgba(201,168,76,.3),transparent)"></div>
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.38em;color:rgba(255,255,255,.2)">Accesos rápidos</p>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:1rem">
+      <a href="#" onclick="document.querySelector('#app section').scrollIntoView({behavior:'smooth'});return false" style="border-radius:2px;padding:.6rem 1.1rem;border:1px solid rgba(201,168,76,.2);background:rgba(255,255,255,.03);font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.28em;color:rgba(255,255,255,.5);text-decoration:none">RSVP</a>
+      <a href="#" onclick="document.querySelectorAll('#app section')[6].scrollIntoView({behavior:'smooth'});return false" style="border-radius:2px;padding:.6rem 1.1rem;border:1px solid rgba(201,168,76,.2);background:rgba(255,255,255,.03);font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.28em;color:rgba(255,255,255,.5);text-decoration:none">Galería</a>
+      <a href="#" onclick="document.querySelectorAll('#app section')[2].scrollIntoView({behavior:'smooth'});return false" style="border-radius:2px;padding:.6rem 1.1rem;border:1px solid rgba(201,168,76,.2);background:rgba(255,255,255,.03);font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.28em;color:rgba(255,255,255,.5);text-decoration:none">La Fecha</a>
     </div>
   </footer>
-
 </div>
 
 <script>
-const EVENT_DATE = new Date("2026-11-15T19:00:00");
-
-const GALLERY_CATEGORIES = [
-  { label:"Sesión de Fotos", images:[
-    { src:"https://images.unsplash.com/photo-1677211905366-c485bf8e9436?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"Sofía Valentina · Fashion Shoot" },
-    { src:"https://images.unsplash.com/photo-1677211721837-d5227b5a6dcc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"Elegancia y poder" },
-    { src:"https://images.unsplash.com/photo-1677212087600-651a104e3c46?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"Un momento eterno" },
-    { src:"https://images.unsplash.com/photo-1677211813054-47b29c712ca2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"La quinceañera" },
-    { src:"https://images.unsplash.com/photo-1604625959095-b9e2e9ec41a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"Negro y oro · Forever 15" },
-  ]},
-  { label:"Vestido & Tiara", images:[
-    { src:"https://images.unsplash.com/photo-1776142951857-9474705bd7bb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"La princesa ya llegó" },
-    { src:"https://images.unsplash.com/photo-1776013113852-a0e950a8dcf1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"Con flores en la mano" },
-    { src:"https://images.unsplash.com/photo-1775871299436-baf2aa9b9da8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"Corona de reina" },
-    { src:"https://images.unsplash.com/photo-1776013114439-fb963d62a713?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"Suave y brillante" },
-    { src:"https://images.unsplash.com/photo-1763625644414-949f2a17bc3f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"El bouquet de los 15" },
-  ]},
-  { label:"Baile & Celebración", images:[
-    { src:"https://images.unsplash.com/photo-1565462905097-5e701c31dcfb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"El primer vals" },
-    { src:"https://images.unsplash.com/photo-1531318701087-32c11653dd77?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"A bailar toda la noche" },
-    { src:"https://images.unsplash.com/photo-1678189211831-3404f430e267?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"Movimientos de reina" },
-    { src:"https://images.unsplash.com/photo-1763652032202-44c128dff5a9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"¡Confeti y alegría!" },
-    { src:"https://images.unsplash.com/photo-1571924849183-a68a3879348d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"La noche más especial" },
-  ]},
-];
-
-const TICKER_ITEMS = ["SOFÍA VALENTINA","XV AÑOS","15 · NOV · 2026","FASHION EDITION","7:00 PM","BOGOTÁ · COLOMBIA"];
-
-const ITINERARY = [
-  { icon:"church",  name:"Misa de Acción de Gracias",  time:"6:00 PM",  desc:"Ceremonia religiosa en la Parroquia Nuestra Señora del Rosario." },
-  { icon:"sparkle", name:"Recepción de Invitados",     time:"7:00 PM",  desc:"Bienvenida con cóctel de bienvenida y música en vivo." },
-  { icon:"crown",   name:"Entrada de la Quinceañera",  time:"7:30 PM",  desc:"El momento más esperado: la llegada de Sofía Valentina." },
-  { icon:"glass",   name:"Brindis y Vals Principal",   time:"8:00 PM",  desc:"El primer vals junto a su chambelán de honor." },
-  { icon:"utensils",name:"Cena de Gala",               time:"8:30 PM",  desc:"Menú especial preparado para esta noche única." },
-  { icon:"cake",    name:"Corte del Pastel",            time:"10:00 PM", desc:"El tradicional corte del pastel de quinceañera." },
-  { icon:"music",   name:"Baile Sorpresa",              time:"10:30 PM", desc:"Sofía y sus chambelanes presentan una coreografía especial." },
-  { icon:"star",    name:"Fiesta y Baile Libre",        time:"11:00 PM", desc:"¡A bailar toda la noche hasta el amanecer!" },
-];
-
-const ICONS = {
-  church:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="5"/><line x1="10" y1="3.5" x2="14" y2="3.5"/><polyline points="5,10 12,5 19,10"/><rect x="5" y="10" width="14" height="12" rx="1"/><rect x="9" y="16" width="6" height="6"/></svg>`,
-  sparkle:`<svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(255,255,255,.92)"><path d="M12 2c0 4.5-2.5 7.5-10 10 7.5 2.5 10 5.5 10 10 0-4.5 2.5-7.5 10-10-7.5-2.5-10-5.5-10-10z"/></svg>`,
-  crown:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><polyline points="3,8 7,14 12,6 17,14 21,8 19,20 5,20"/></svg>`,
-  glass:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"/><line x1="12" y1="11" x2="12" y2="22"/><path d="M5 2l2 9a5 5 0 0010 0l2-9z"/></svg>`,
-  utensils:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><line x1="7" y1="2" x2="7" y2="22"/><path d="M21 15V2a5 5 0 00-5 5v6h3.5a1.5 1.5 0 010 3H16v4"/></svg>`,
-  cake:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v3"/><path d="M8 5c0 2.2 1.8 4 4 4s4-1.8 4-4"/><rect x="3" y="9" width="18" height="13" rx="2"/><line x1="3" y1="15" x2="21" y2="15"/></svg>`,
-  music:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
-  star:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`,
+// ── Data ──────────────────────────────────────────────────────
+const GALLERY_TABS = ['Toda','Familia','Amigas','Moda'];
+const GALLERY_IMAGES = {
+  Toda:[
+    {url:'https://images.unsplash.com/photo-1652928722394-e806c14b1c21?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',caption:'Sofía Valentina'},
+    {url:'https://images.unsplash.com/photo-1663162143055-163b540ed204?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',caption:'Momentos especiales'},
+    {url:'https://images.unsplash.com/photo-1666590160022-fe5b8bc5ed00?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',caption:'Con amor'},
+    {url:'https://images.unsplash.com/photo-1548047825-d315ab5df63f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',caption:'Fashion Edition'},
+  ],
+  Familia:[
+    {url:'https://images.unsplash.com/photo-1571924849183-a68a3879348d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',caption:'Mi familia'},
+    {url:'https://images.unsplash.com/photo-1576577941261-eb2a866fbcae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',caption:'Juntos siempre'},
+  ],
+  Amigas:[
+    {url:'https://images.unsplash.com/photo-1555595960-b0285521dad1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',caption:'Mis mejores amigas'},
+    {url:'https://images.unsplash.com/photo-1566699282355-55466ad57d5b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',caption:'Para siempre'},
+  ],
+  Moda:[
+    {url:'https://images.unsplash.com/photo-1659402565335-f0e53dd2bbd5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',caption:'Mis outfits favoritos'},
+    {url:'https://images.unsplash.com/photo-1666590161467-c4856571e9db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',caption:'Fashion is life'},
+  ],
 };
-
+const ITIN_ITEMS = [
+  {time:'6:30 PM',icon:'🌸',title:'Recepción de Invitadas',desc:'Bienvenida y coctel de bienvenida'},
+  {time:'7:00 PM',icon:'👑',title:'Entrada de la Quinceañera',desc:'El gran momento ha llegado'},
+  {time:'7:30 PM',icon:'🎭',title:'Vals de Honor',desc:'El vals con su chambelán principal'},
+  {time:'8:00 PM',icon:'🍽️',title:'Cena de Gala',desc:'Menú especial preparado con amor'},
+  {time:'9:00 PM',icon:'🎂',title:'Pastel de XV Años',desc:'El brindis y el momento más dulce'},
+  {time:'9:30 PM',icon:'🎵',title:'Baile Sorpresa',desc:'Coreografía especial de Sofía'},
+  {time:'10:00 PM',icon:'🎉',title:'Fiesta y Baile',desc:'¡A bailar toda la noche!'},
+];
 const PADRINOS = [
-  { name:"Carlos & María Rodríguez", role:"Pastel",      photo:"https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&w=160&h=160" },
-  { name:"Familia González",         role:"Flores",      photo:"https://images.unsplash.com/photo-1765292783377-e2b769632228?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&w=160&h=160" },
-  { name:"Andrea & Pablo Martínez",  role:"Música",      photo:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&w=160&h=160" },
-  { name:"Hernán & Laura García",    role:"Fotografía",  photo:"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&w=160&h=160" },
-  { name:"Familia Torres",           role:"Decoración",  photo:"https://images.unsplash.com/photo-1544005313-94ddf0286df2?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&w=160&h=160" },
-  { name:"Claudia & Sergio Blanco",  role:"Brindis",     photo:"https://images.unsplash.com/photo-1552058544-f2b08422138a?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&w=160&h=160" },
+  {categoria:'Torta',nombres:'Familia Rodríguez'},
+  {categoria:'Flores',nombres:'Familia López'},
+  {categoria:'Fotografía',nombres:'Familia Martínez'},
+  {categoria:'Música',nombres:'Familia García'},
+  {categoria:'Decoración',nombres:'Familia Torres'},
+  {categoria:'Catering',nombres:'Familia Vargas'},
 ];
-
-const EXTRA_ITEMS = [
-  {
-    gradient:"linear-gradient(145deg,#00C896,#006B4A)",
-    icon:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg>`,
-    label:"Dress Code", sub:"Formal y elegante",
-    body:`<div style="padding:0 1.5rem 1.5rem"><div style="border-radius:2px;padding:1.5rem;background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.12)"><p style="font-family:'Bodoni Moda',serif;font-size:1.1rem;font-weight:700;color:rgba(255,255,255,.95);margin-bottom:.75rem">Formal y elegante</p><p style="font-size:.85rem;color:rgba(255,255,255,.5);line-height:1.8;margin-bottom:1.25rem">La noche merece lo mejor de ti. Te invitamos a vestir con elegancia y brillo.</p><div style="margin-bottom:.75rem;padding:.85rem 1rem;border-radius:2px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.1)"><p style="font-family:'Bebas Neue',sans-serif;font-size:.7rem;letter-spacing:.2em;color:#F0D474;margin-bottom:4px">Damas</p><p style="font-size:.8rem;color:rgba(255,255,255,.5)">Vestido largo o cocktail. Evitar el blanco y negro sólido.</p></div><div style="margin-bottom:.75rem;padding:.85rem 1rem;border-radius:2px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.1)"><p style="font-family:'Bebas Neue',sans-serif;font-size:.7rem;letter-spacing:.2em;color:#F0D474;margin-bottom:4px">Caballeros</p><p style="font-size:.8rem;color:rgba(255,255,255,.5)">Traje formal o smoking. Corbata o moño.</p></div><div style="margin-bottom:.75rem;padding:.85rem 1rem;border-radius:2px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.1)"><p style="font-family:'Bebas Neue',sans-serif;font-size:.7rem;letter-spacing:.2em;color:#F0D474;margin-bottom:4px">Color sugerido</p><p style="font-size:.8rem;color:rgba(255,255,255,.5)">Tonos dorados, vino, azul marino y nude son bienvenidos.</p></div></div></div>`,
-  },
-  {
-    gradient:"linear-gradient(145deg,#7A5C1E,#C9A84C)",
-    icon:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>`,
-    label:"Hospedaje", sub:"Hoteles cercanos al salón",
-    body:`<div style="padding:0 1.5rem 1.5rem"><div style="border-radius:2px;padding:1.5rem;background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.12)"><p style="font-size:.82rem;color:rgba(255,255,255,.45);margin-bottom:1.25rem">Referencias de hoteles cercanos al salón de eventos:</p><div style="margin-bottom:.75rem;padding:1rem;border-radius:2px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.1)"><p style="font-family:'Bodoni Moda',serif;font-size:.9rem;font-weight:700;color:rgba(255,255,255,.9);margin-bottom:3px">Hotel Hilton Bogotá</p><p style="font-size:.75rem;color:rgba(255,255,255,.4)">Carrera 7 # 26-54</p><p style="font-size:.72rem;color:#00C896;margin-top:2px">reservas@hilton.com</p></div><div style="margin-bottom:.75rem;padding:1rem;border-radius:2px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.1)"><p style="font-family:'Bodoni Moda',serif;font-size:.9rem;font-weight:700;color:rgba(255,255,255,.9);margin-bottom:3px">Hotel Sheraton</p><p style="font-size:.75rem;color:rgba(255,255,255,.4)">Av. El Dorado 69-70</p><p style="font-size:.72rem;color:#00C896;margin-top:2px">reservas@sheraton.com</p></div><div style="margin-bottom:.75rem;padding:1rem;border-radius:2px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.1)"><p style="font-family:'Bodoni Moda',serif;font-size:.9rem;font-weight:700;color:rgba(255,255,255,.9);margin-bottom:3px">Howard Johnson</p><p style="font-size:.75rem;color:rgba(255,255,255,.4)">Calle 100 # 19-61</p><p style="font-size:.72rem;color:#00C896;margin-top:2px">reservas@hojo.com.co</p></div></div></div>`,
-  },
-  {
-    gradient:"linear-gradient(145deg,#C9A84C,#F0D474)",
-    icon:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`,
-    label:"Servicio de Bus", sub:"Reserva tu lugar al confirmar",
-    body:`<div style="padding:0 1.5rem 1.5rem"><div style="border-radius:2px;padding:1.5rem;background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.12)"><p style="font-size:.82rem;color:rgba(255,255,255,.45);margin-bottom:1.25rem">Reserva tu lugar en el formulario de confirmación de asistencia.</p><div style="margin-bottom:.75rem;padding:.85rem 1rem;border-radius:2px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.1)"><p style="font-family:'Bebas Neue',sans-serif;font-size:.62rem;letter-spacing:.2em;color:#F0D474;margin-bottom:3px">Partida</p><p style="font-size:.8rem;color:rgba(255,255,255,.55)">Av. Independencia 432 — 17:00</p></div><div style="margin-bottom:.75rem;padding:.85rem 1rem;border-radius:2px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.1)"><p style="font-family:'Bebas Neue',sans-serif;font-size:.62rem;letter-spacing:.2em;color:#F0D474;margin-bottom:3px">Parada intermedia</p><p style="font-size:.8rem;color:rgba(255,255,255,.55)">Av. 1° de Mayo 1234 — 17:30</p></div><div style="margin-bottom:.75rem;padding:.85rem 1rem;border-radius:2px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.1)"><p style="font-family:'Bebas Neue',sans-serif;font-size:.62rem;letter-spacing:.2em;color:#F0D474;margin-bottom:3px">Destino</p><p style="font-size:.8rem;color:rgba(255,255,255,.55)">Salón de Eventos · Calle de los Sueños 123</p></div></div></div>`,
-  },
-];
-
 const GIFTS = [
-  {
-    gradient:"linear-gradient(145deg,#C9A84C,#F0D474)",
-    icon:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,12 20,22 4,22 4,12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>`,
-    label:"Mesa de Regalos", sub:"Liverpool · El Puerto de Liverpool",
-    body:`<div style="text-align:center"><p style="font-family:'Great Vibes',cursive;font-size:1.6rem;color:#F0D474;margin-bottom:1rem">Mesa de Regalos</p><p style="color:rgba(255,255,255,.55);font-size:.82rem;line-height:1.8">Número de mesa: <strong style="color:#F0D474">456789</strong><br>Tienda: Liverpool · Bogotá<br><a href="#" style="color:#00C896;text-decoration:none">Ir a la lista →</a></p></div>`,
-  },
-  {
-    gradient:"linear-gradient(145deg,#7A5C1E,#C9A84C)",
-    icon:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`,
-    label:"Transferencia Bancaria", sub:"Bancolombia · Cuenta de ahorros",
-    body:`<div style="text-align:center"><p style="font-family:'Great Vibes',cursive;font-size:1.6rem;color:#F0D474;margin-bottom:1rem">Datos Bancarios</p><p style="color:rgba(255,255,255,.55);font-size:.82rem;line-height:1.8">Banco: Bancolombia<br>Cuenta Ahorros: <strong style="color:#F0D474">123-456789-00</strong><br>Alias / Nequi: <strong style="color:#F0D474">sofiaxv2026</strong><br>Titular: Familia Rodríguez</p></div>`,
-  },
-  {
-    gradient:"linear-gradient(145deg,#00C896,#006B4A)",
-    icon:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`,
-    label:"Sobre de Efectivo", sub:"El regalo más práctico",
-    body:`<div style="text-align:center"><p style="font-family:'Great Vibes',cursive;font-size:1.6rem;color:#F0D474;margin-bottom:1rem">Con todo tu amor</p><p style="color:rgba(255,255,255,.55);font-size:.82rem;line-height:1.8">Tu presencia y cariño son el mejor regalo.<br>Si deseas obsequiar efectivo, puedes<br>entregarlo directamente el día del evento.</p></div>`,
-  },
+  {id:'g1',icon:'💳',title:'Mesa de Regalos',desc:'Tienda Liverpool · Número de mesa: 47892',detail:'Puedes encontrar los artículos seleccionados en cualquier sucursal Liverpool o en su página web con el número de mesa.'},
+  {id:'g2',icon:'💰',title:'Sobre de Efectivo',desc:'Una contribución para mis sueños',detail:'Si prefieres dar un aporte en efectivo, con mucho amor lo recibiré para mis proyectos futuros.'},
+  {id:'g3',icon:'✈️',title:'Fondo de Viaje',desc:'Para mi primer viaje soñado',detail:'Contribuye a mi fondo de viaje a Europa. Puedes hacer tu aporte por Nequi o Daviplata: 300 123 4567.'},
+];
+const EXTRA_ITEMS = [
+  {id:'e1',icon:'👗',title:'Código de Vestimenta',body:'Etiqueta formal. Solicitamos evitar el color blanco y verde esmeralda (reservados para la quinceañera y su corte). ¡Lúcete con tu mejor look!'},
+  {id:'e2',icon:'📸',title:'Fotógrafo y Video',body:'Contaremos con fotógrafo y videógrafo profesional toda la noche. Habrá también un photobooth con props temáticos para que te lleves un recuerdo.'},
+  {id:'e3',icon:'🚗',title:'Estacionamiento',body:'El lugar cuenta con parqueadero gratuito con capacidad para 80 vehículos. También habrá transporte desde el punto de encuentro Parque 93 a las 6:15 PM.'},
+  {id:'e4',icon:'🎁',title:'Sorpresas de la Noche',body:'Tenemos preparadas varias sorpresas especiales. ¡No te pierdas ningún momento de esta noche mágica!'},
 ];
 
-let galCat = 0, galIdx = 0;
-let openExtra = null, openGift = null;
-let openLugar = false;
-let rsvpAttending = null;
+// ── State ─────────────────────────────────────────────────────
+let galTab = 'Toda', galIdx = 0, attendVal = null;
 
-function closeSplash() {
+// ── Splash ───────────────────────────────────────────────────
+function closeSplash(){
   document.getElementById('splash').classList.add('hidden');
-  document.getElementById('app').style.display = 'block';
-  initAll();
-}
-
-function initAll() {
-  buildTicker();
-  buildItinerary();
-  buildPadrinos();
-  buildExtraAccordions();
-  buildGiftAccordions();
-  buildGallery();
+  document.getElementById('app').style.display='block';
   startCountdown();
-  initPetals();
-  initItinObserver();
+  startPetals();
+  setTimeout(()=>{
+    const line=document.getElementById('itin-line');
+    if(line) line.classList.add('visible');
+  },800);
 }
 
-function buildTicker() {
-  const el = document.getElementById('ticker');
-  const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
-  el.innerHTML = items.map((t, i) =>
-    `<span style="font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:.18em;color:#fff;padding:0 2.5rem">${i > 0 ? '<span style="color:rgba(255,255,255,.4)">✦</span> ' + t : t}</span>`
-  ).join('');
+// ── Ticker ───────────────────────────────────────────────────
+function buildTicker(){
+  const items='✦ XV AÑOS · SOFÍA VALENTINA · 15 NOV 2026 · BOGOTÁ · FASHION EDITION · ';
+  const t=document.getElementById('ticker');
+  if(!t) return;
+  t.innerHTML='<span style="font-family:\'Bebas Neue\',sans-serif;font-size:.62rem;letter-spacing:.3em;color:rgba(8,8,8,.85);font-weight:700">'+items.repeat(12)+'</span>';
 }
+buildTicker();
 
-function startCountdown() {
-  function tick() {
-    const diff = EVENT_DATE.getTime() - Date.now();
-    if (diff <= 0) return;
-    document.getElementById('cd-days').textContent  = String(Math.floor(diff/86400000)).padStart(3,'0');
-    document.getElementById('cd-hours').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
-    document.getElementById('cd-mins').textContent  = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
-    document.getElementById('cd-secs').textContent  = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+// ── Countdown ────────────────────────────────────────────────
+function startCountdown(){
+  const target=new Date('2026-11-15T19:00:00');
+  function tick(){
+    const now=new Date(), diff=target-now;
+    if(diff<=0){
+      document.getElementById('cd-days').textContent='000';
+      document.getElementById('cd-hours').textContent='00';
+      document.getElementById('cd-mins').textContent='00';
+      document.getElementById('cd-secs').textContent='00';
+      return;
+    }
+    const d=Math.floor(diff/86400000);
+    const h=Math.floor((diff%86400000)/3600000);
+    const m=Math.floor((diff%3600000)/60000);
+    const s=Math.floor((diff%60000)/1000);
+    document.getElementById('cd-days').textContent=String(d).padStart(3,'0');
+    document.getElementById('cd-hours').textContent=String(h).padStart(2,'0');
+    document.getElementById('cd-mins').textContent=String(m).padStart(2,'0');
+    document.getElementById('cd-secs').textContent=String(s).padStart(2,'0');
   }
-  tick();
-  setInterval(tick, 1000);
+  tick(); setInterval(tick,1000);
 }
 
-function buildItinerary() {
-  const container = document.getElementById('itin-container');
-  ITINERARY.forEach(item => {
-    const div = document.createElement('div');
-    div.style.cssText = 'display:flex;align-items:flex-start;gap:18px;padding-bottom:1.875rem';
-    div.innerHTML = `
-      <div style="flex-shrink:0;border-radius:2px;z-index:10;display:flex;align-items:center;justify-content:center;width:56px;height:56px;background:linear-gradient(145deg,#00C896,#006B4A);box-shadow:0 6px 24px rgba(0,200,150,.4)">${ICONS[item.icon]}</div>
-      <div class="itin-card-hover" style="flex:1;border-radius:2px;position:relative;overflow:hidden;margin-top:.45rem;padding:1rem 1.25rem;background:#0c1810;border:1px solid rgba(201,168,76,.15);box-shadow:0 6px 28px rgba(0,0,0,.3)">
-        <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,#F0D474,#C9A84C,#7A5C1E)"></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;padding-left:6px">
-          <span style="font-family:'Bodoni Moda',serif;font-size:.84rem;font-weight:700;color:rgba(255,255,255,.92)">${item.name}</span>
-          <span style="border-radius:1px;color:#080808;flex-shrink:0;white-space:nowrap;margin-left:8px;font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.25em;font-weight:700;padding:.3rem .75rem;background:linear-gradient(135deg,#C9A84C,#F0D474)">${item.time}</span>
-        </div>
-        <p style="font-size:.75rem;color:rgba(255,255,255,.38);line-height:1.55;padding-left:6px">${item.desc}</p>
-      </div>`;
-    container.appendChild(div);
+// ── Gallery ──────────────────────────────────────────────────
+function buildGallery(){
+  const tabs=document.getElementById('gal-tabs');
+  const imgs=document.getElementById('gal-images');
+  if(!tabs||!imgs) return;
+  tabs.innerHTML='';
+  GALLERY_TABS.forEach(t=>{
+    const b=document.createElement('button');
+    b.className='gallery-tab'+(t===galTab?' active':'');
+    b.textContent=t;
+    b.onclick=()=>{galTab=t;galIdx=0;buildGallery();};
+    tabs.appendChild(b);
   });
-}
-
-function initItinObserver() {
-  const el = document.getElementById('itin-container');
-  const obs = new IntersectionObserver(([e]) => {
-    if (e.isIntersecting) document.getElementById('itin-line').classList.add('visible');
-  }, { threshold: 0.1 });
-  obs.observe(el);
-}
-
-function buildPadrinos() {
-  const grid = document.getElementById('padrinos-grid');
-  PADRINOS.forEach(p => {
-    const div = document.createElement('div');
-    div.style.cssText = 'border-radius:2px;overflow:hidden;position:relative;padding:1.5rem 1rem 1.25rem;background:#0c1810;border:1px solid rgba(201,168,76,.15);box-shadow:0 6px 28px rgba(0,0,0,.3);display:flex;flex-direction:column;align-items:center;text-align:center';
-    div.innerHTML = `
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,#C9A84C,transparent)"></div>
-      <div style="margin-bottom:.85rem">
-        <div style="width:72px;height:72px;border-radius:50%;padding:2px;background:linear-gradient(135deg,#C9A84C,#00C896,#C9A84C)">
-          <img src="${p.photo}" alt="${p.name}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;border:2px solid #111" />
-        </div>
-      </div>
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.35em;color:#00C896;margin-bottom:5px">${p.role}</p>
-      <p style="font-family:'Bodoni Moda',serif;font-size:.78rem;font-weight:700;color:rgba(255,255,255,.88);line-height:1.4">${p.name}</p>`;
-    grid.appendChild(div);
+  const list=GALLERY_IMAGES[galTab]||[];
+  imgs.innerHTML='';
+  list.forEach((img,i)=>{
+    const el=document.createElement('img');
+    el.src=img.url; el.alt=img.caption;
+    el.className='gal-img'+(i===galIdx?' active':'');
+    imgs.appendChild(el);
   });
-}
-
-function buildExtraAccordions() {
-  const container = document.getElementById('extra-accordions');
-  EXTRA_ITEMS.forEach((item, i) => {
-    const div = document.createElement('div');
-    div.id = `extra-box-${i}`;
-    div.style.cssText = 'border-radius:2px;overflow:hidden;margin-bottom:14px;border:1px solid rgba(201,168,76,.18);background:#0c1810;box-shadow:none;transition:box-shadow .3s';
-    div.innerHTML = `
-      <button onclick="toggleExtra(${i})" style="display:flex;align-items:center;gap:1rem;width:100%;text-align:left;border:none;background:transparent;padding:1.25rem 1.5rem;cursor:pointer">
-        <div style="flex-shrink:0;border-radius:2px;display:flex;align-items:center;justify-content:center;width:50px;height:50px;background:${item.gradient};box-shadow:0 6px 20px rgba(0,0,0,.4)">${item.icon}</div>
-        <div style="flex:1">
-          <div style="font-family:'Bodoni Moda',serif;font-size:1rem;font-weight:700;color:rgba(255,255,255,.92)">${item.label}</div>
-          <div style="font-size:.7rem;color:rgba(255,255,255,.35);margin-top:2px">${item.sub}</div>
-        </div>
-        <span id="extra-chev-${i}" class="gift-chevron">▾</span>
-      </button>
-      <div id="extra-body-${i}" class="gift-body">${item.body}</div>`;
-    container.appendChild(div);
-  });
-}
-
-function toggleExtra(i) {
-  openExtra = (openExtra === i) ? null : i;
-  [0,1,2].forEach(j => {
-    const body = document.getElementById(`extra-body-${j}`);
-    const chev = document.getElementById(`extra-chev-${j}`);
-    const box  = document.getElementById(`extra-box-${j}`);
-    if (openExtra === j) {
-      body.classList.add('gift-body-open');
-      chev.classList.add('gift-chevron-open');
-      box.style.border = '1px solid rgba(0,200,150,.3)';
-      box.style.boxShadow = '0 14px 48px rgba(0,200,150,.1)';
-    } else {
-      body.classList.remove('gift-body-open');
-      chev.classList.remove('gift-chevron-open');
-      box.style.border = '1px solid rgba(201,168,76,.18)';
-      box.style.boxShadow = 'none';
-    }
-  });
-}
-
-function buildGiftAccordions() {
-  const container = document.getElementById('gift-accordions');
-  GIFTS.forEach((g, i) => {
-    const div = document.createElement('div');
-    div.id = `gift-box-${i}`;
-    div.style.cssText = 'border-radius:2px;overflow:hidden;margin-bottom:14px;border:1px solid rgba(201,168,76,.18);background:#0c1810;box-shadow:none;transition:box-shadow .3s';
-    div.innerHTML = `
-      <button onclick="toggleGift(${i})" style="display:flex;align-items:center;gap:1rem;width:100%;text-align:left;border:none;background:transparent;padding:1.25rem 1.5rem;cursor:pointer">
-        <div style="flex-shrink:0;border-radius:2px;display:flex;align-items:center;justify-content:center;width:50px;height:50px;background:${g.gradient};box-shadow:0 6px 20px rgba(0,0,0,.4)">${g.icon}</div>
-        <div style="flex:1">
-          <div style="font-family:'Bodoni Moda',serif;font-size:1rem;font-weight:700;color:rgba(255,255,255,.92)">${g.label}</div>
-          <div style="font-size:.7rem;color:rgba(255,255,255,.35);margin-top:2px">${g.sub}</div>
-        </div>
-        <span id="gift-chev-${i}" class="gift-chevron">▾</span>
-      </button>
-      <div id="gift-body-${i}" class="gift-body">
-        <div style="padding:0 1.5rem 1.5rem">
-          <div style="border-radius:2px;padding:1.5rem;background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.12)">${g.body}</div>
-        </div>
-      </div>`;
-    container.appendChild(div);
-  });
-}
-
-function toggleGift(i) {
-  openGift = (openGift === i) ? null : i;
-  [0,1,2].forEach(j => {
-    const body = document.getElementById(`gift-body-${j}`);
-    const chev = document.getElementById(`gift-chev-${j}`);
-    const box  = document.getElementById(`gift-box-${j}`);
-    if (openGift === j) {
-      body.classList.add('gift-body-open');
-      chev.classList.add('gift-chevron-open');
-      box.style.border = '1px solid rgba(0,200,150,.3)';
-      box.style.boxShadow = '0 14px 48px rgba(0,200,150,.1)';
-    } else {
-      body.classList.remove('gift-body-open');
-      chev.classList.remove('gift-chevron-open');
-      box.style.border = '1px solid rgba(201,168,76,.18)';
-      box.style.boxShadow = 'none';
-    }
-  });
-}
-
-function toggleLugar() {
-  openLugar = !openLugar;
-  const body = document.getElementById('lugar-body');
-  const chev = document.getElementById('lugar-chevron');
-  const box  = document.getElementById('lugar-box');
-  if (openLugar) {
-    body.classList.add('gift-body-open');
-    chev.classList.add('gift-chevron-open');
-    box.style.border = '1px solid rgba(201,168,76,.4)';
-    box.style.boxShadow = '0 24px 72px rgba(0,0,0,.5)';
-  } else {
-    body.classList.remove('gift-body-open');
-    chev.classList.remove('gift-chevron-open');
-    box.style.border = '1px solid rgba(201,168,76,.2)';
-    box.style.boxShadow = 'none';
+  const cap=document.getElementById('gal-caption');
+  const ctr=document.getElementById('gal-counter');
+  if(cap) cap.textContent=list[galIdx]?list[galIdx].caption:'';
+  if(ctr) ctr.textContent=(galIdx+1)+' / '+list.length;
+  // Thumbs
+  const thumbs=document.getElementById('gal-thumbs');
+  if(thumbs){
+    thumbs.innerHTML='';
+    list.forEach((img,i)=>{
+      const d=document.createElement('div');
+      d.className='gallery-thumb'+(i===galIdx?' active':'');
+      d.onclick=()=>{galIdx=i;buildGallery();};
+      d.innerHTML='<img src="'+img.url+'" alt="" style="width:100%;height:100%;object-fit:cover" />';
+      thumbs.appendChild(d);
+    });
+  }
+  // Dots
+  const dots=document.getElementById('gal-dots');
+  if(dots){
+    dots.innerHTML='';
+    list.forEach((_,i)=>{
+      const b=document.createElement('button');
+      b.className='gallery-dot'+(i===galIdx?' active':'');
+      b.onclick=()=>{galIdx=i;buildGallery();};
+      dots.appendChild(b);
+    });
   }
 }
+function galNext(){const list=GALLERY_IMAGES[galTab]||[];galIdx=(galIdx+1)%list.length;buildGallery();}
+function galPrev(){const list=GALLERY_IMAGES[galTab]||[];galIdx=(galIdx-1+list.length)%list.length;buildGallery();}
+buildGallery();
 
-function buildGallery() {
-  const tabsEl = document.getElementById('gal-tabs');
-  GALLERY_CATEGORIES.forEach((cat, i) => {
-    const btn = document.createElement('button');
-    btn.className = `gallery-tab${i===0?' active':''}`;
-    btn.textContent = cat.label;
-    btn.onclick = () => switchGalCat(i);
-    tabsEl.appendChild(btn);
-  });
-  renderGallery();
-}
-
-function renderGallery() {
-  const imgs = GALLERY_CATEGORIES[galCat].images;
-  const imagesEl = document.getElementById('gal-images');
-  imagesEl.innerHTML = imgs.map((img, i) =>
-    `<img class="gal-img${i===galIdx?' active':''}" src="${img.src}" alt="" />`
-  ).join('');
-  document.getElementById('gal-caption').textContent = imgs[galIdx].caption;
-  document.getElementById('gal-counter').textContent = `${galIdx+1} / ${imgs.length}`;
-  const thumbsEl = document.getElementById('gal-thumbs');
-  thumbsEl.innerHTML = imgs.map((img, i) =>
-    `<div class="gallery-thumb${i===galIdx?' active':''}" onclick="setGalIdx(${i})" style="position:relative">
-      <img src="${img.src}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(30%)" />
-    </div>`
-  ).join('');
-  const dotsEl = document.getElementById('gal-dots');
-  dotsEl.innerHTML = imgs.map((_, i) =>
-    `<button class="gallery-dot${i===galIdx?' active':''}" onclick="setGalIdx(${i})"></button>`
-  ).join('');
-  document.querySelectorAll('.gallery-tab').forEach((t, i) => {
-    t.classList.toggle('active', i === galCat);
+// ── Itinerary ────────────────────────────────────────────────
+function buildItin(){
+  const c=document.getElementById('itin-container');
+  if(!c) return;
+  const line=c.querySelector('#itin-line');
+  ITIN_ITEMS.forEach((item,i)=>{
+    const d=document.createElement('div');
+    d.className='itin-card-hover';
+    d.style.cssText='display:flex;align-items:flex-start;gap:18px;padding:0 0 1.75rem 0;margin-left:0';
+    d.innerHTML=`
+      <div style="position:relative;z-index:2;flex-shrink:0;width:56px;height:56px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:#0c1810;border:1px solid rgba(201,168,76,.25);box-shadow:0 4px 16px rgba(0,0,0,.4)">${item.icon}</div>
+      <div style="flex:1;padding-top:.4rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.45em;color:#00C896;margin-bottom:.2rem">${item.time}</div>
+        <div style="font-family:'Bodoni Moda',serif;font-size:1rem;font-weight:700;color:rgba(255,255,255,.9);margin-bottom:.25rem">${item.title}</div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.4);line-height:1.6">${item.desc}</div>
+      </div>`;
+    c.insertBefore(d, line.nextSibling ? null : null);
+    c.appendChild(d);
   });
 }
+buildItin();
 
-function switchGalCat(i) { galCat = i; galIdx = 0; renderGallery(); }
-function setGalIdx(i) { galIdx = i; renderGallery(); }
-function galPrev() { const n = GALLERY_CATEGORIES[galCat].images.length; galIdx = (galIdx - 1 + n) % n; renderGallery(); }
-function galNext() { const n = GALLERY_CATEGORIES[galCat].images.length; galIdx = (galIdx + 1) % n; renderGallery(); }
+// ── Padrinos ─────────────────────────────────────────────────
+function buildPadrinos(){
+  const g=document.getElementById('padrinos-grid');
+  if(!g) return;
+  PADRINOS.forEach(p=>{
+    const d=document.createElement('div');
+    d.style.cssText='border-radius:2px;padding:1.25rem;background:#0c1810;border:1px solid rgba(201,168,76,.15);text-align:center;animation:cardGlowPulse 3s ease-in-out infinite';
+    d.innerHTML=`<div style="font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.42em;color:rgba(201,168,76,.55);margin-bottom:.4rem">${p.categoria}</div><div style="font-family:'Cormorant Garamond',serif;font-size:.92rem;color:rgba(255,255,255,.8);line-height:1.4">${p.nombres}</div>`;
+    g.appendChild(d);
+  });
+}
+buildPadrinos();
 
-function setAttending(val) {
-  rsvpAttending = val;
-  document.getElementById('btn-yes').classList.toggle('selected', val === 'yes');
-  document.getElementById('btn-no').classList.toggle('selected', val === 'no');
+// ── Gifts ────────────────────────────────────────────────────
+function buildGifts(){
+  const c=document.getElementById('gifts-container');
+  if(!c) return;
+  GIFTS.forEach(g=>{
+    const d=document.createElement('div');
+    d.className='glow-card';
+    d.style.cssText='background:#0c1810;border:1px solid rgba(201,168,76,.2)';
+    d.id='gift-wrap-'+g.id;
+    d.innerHTML=`
+      <button onclick="toggleGift('${g.id}')" style="display:flex;align-items:center;gap:14px;padding:1.25rem;width:100%;text-align:left;border:none;background:transparent">
+        <span style="font-size:1.6rem">${g.icon}</span>
+        <div style="flex:1">
+          <div style="font-family:'Bodoni Moda',serif;font-size:.95rem;font-weight:700;color:rgba(255,255,255,.9)">${g.title}</div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.4);margin-top:2px">${g.desc}</div>
+        </div>
+        <span class="gift-chevron" id="chev-${g.id}">▾</span>
+      </button>
+      <div class="gift-body" id="body-${g.id}">
+        <div style="padding:0 1.25rem 1.25rem;border-top:1px solid rgba(201,168,76,.1);padding-top:1rem">
+          <p style="font-size:.85rem;color:rgba(255,255,255,.5);line-height:1.8">${g.detail}</p>
+        </div>
+      </div>`;
+    c.appendChild(d);
+  });
+}
+buildGifts();
+function toggleGift(id){
+  const body=document.getElementById('body-'+id);
+  const chev=document.getElementById('chev-'+id);
+  if(!body) return;
+  const open=body.classList.contains('gift-body-open');
+  document.querySelectorAll('.gift-body').forEach(b=>b.classList.remove('gift-body-open'));
+  document.querySelectorAll('.gift-chevron').forEach(c=>c.classList.remove('gift-chevron-open'));
+  if(!open){body.classList.add('gift-body-open');chev.classList.add('gift-chevron-open');}
 }
 
-function submitRsvp() {
-  const name = document.getElementById('rsvp-name').value.trim();
-  const errEl = document.getElementById('rsvp-error');
-  if (!name) { errEl.textContent = 'Por favor ingresa tu nombre.'; errEl.style.display = 'block'; return; }
-  if (!rsvpAttending) { errEl.textContent = 'Por favor selecciona tu asistencia.'; errEl.style.display = 'block'; return; }
-  errEl.style.display = 'none';
-  document.getElementById('rsvp-form').style.display = 'none';
-  document.getElementById('rsvp-success').style.display = 'block';
+// ── Extra accordions ─────────────────────────────────────────
+function buildExtra(){
+  const c=document.getElementById('extra-accordions');
+  if(!c) return;
+  EXTRA_ITEMS.forEach(item=>{
+    const d=document.createElement('div');
+    d.className='glow-card';
+    d.style.cssText='background:#0c1810;border:1px solid rgba(201,168,76,.2);margin-bottom:10px';
+    d.innerHTML=`
+      <button onclick="toggleExtra('${item.id}')" style="display:flex;align-items:center;gap:14px;padding:1.25rem;width:100%;text-align:left;border:none;background:transparent">
+        <span style="font-size:1.4rem">${item.icon}</span>
+        <div style="flex:1;font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.2em;color:rgba(255,255,255,.85)">${item.title}</div>
+        <span class="gift-chevron" id="echev-${item.id}">▾</span>
+      </button>
+      <div class="gift-body" id="ebody-${item.id}">
+        <div style="padding:0 1.25rem 1.25rem;border-top:1px solid rgba(201,168,76,.1);padding-top:1rem">
+          <p style="font-size:.85rem;color:rgba(255,255,255,.5);line-height:1.8">${item.body}</p>
+        </div>
+      </div>`;
+    c.appendChild(d);
+  });
+}
+buildExtra();
+function toggleExtra(id){
+  const body=document.getElementById('ebody-'+id);
+  const chev=document.getElementById('echev-'+id);
+  if(!body) return;
+  const open=body.classList.contains('gift-body-open');
+  document.querySelectorAll('[id^="ebody-"]').forEach(b=>b.classList.remove('gift-body-open'));
+  document.querySelectorAll('[id^="echev-"]').forEach(c=>c.classList.remove('gift-chevron-open'));
+  if(!open){body.classList.add('gift-body-open');chev.classList.add('gift-chevron-open');}
 }
 
-function submitSong() {
-  const val = document.getElementById('song-input').value.trim();
-  if (!val) return;
-  document.getElementById('song-form').style.display = 'none';
-  document.getElementById('song-success').style.display = 'block';
+// ── Lugar accordion ──────────────────────────────────────────
+function toggleLugar(){
+  const body=document.getElementById('lugar-body');
+  const chev=document.getElementById('lugar-chevron');
+  body.classList.toggle('gift-body-open');
+  chev.classList.toggle('gift-chevron-open');
 }
 
-function initPetals() {
-  const canvas = document.getElementById('petal-canvas');
-  const ctx = canvas.getContext('2d');
-  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-  resize();
-  const petals = Array.from({ length: 38 }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height - canvas.height,
-    r: Math.random() * 5 + 3,
-    dx: (Math.random() - 0.5) * 1.2,
-    dy: Math.random() * 1.5 + 0.5,
-    op: Math.random() * 0.5 + 0.15,
-    color: Math.random() > 0.5 ? 'rgba(0,200,150,' : 'rgba(201,168,76,',
-  }));
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (const p of petals) {
+// ── RSVP ─────────────────────────────────────────────────────
+function selectAttend(val){
+  attendVal=val;
+  document.getElementById('btn-yes').classList.toggle('selected',val==='yes');
+  document.getElementById('btn-no').classList.toggle('selected',val==='no');
+}
+function submitRSVP(){
+  if(!attendVal){alert('Por favor indica si asistirás.');return;}
+  document.getElementById('rsvp-form').style.display='none';
+  document.getElementById('rsvp-success').style.display='block';
+}
+
+// ── Song ─────────────────────────────────────────────────────
+function submitSong(){
+  const v=document.getElementById('song-input').value.trim();
+  if(!v){document.getElementById('song-input').focus();return;}
+  document.getElementById('song-form').style.display='none';
+  document.getElementById('song-success').style.display='block';
+}
+
+// ── Petal Canvas ─────────────────────────────────────────────
+function startPetals(){
+  const canvas=document.getElementById('petal-canvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  let W,H,petals=[];
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+  resize(); window.addEventListener('resize',resize);
+  const COLORS=['rgba(0,200,150,.55)','rgba(201,168,76,.45)','rgba(127,255,212,.4)','rgba(240,212,116,.35)','rgba(0,200,150,.3)'];
+  function spawnPetal(){
+    return{x:Math.random()*W,y:-12,r:Math.random()*5+2,vy:Math.random()*1.2+.5,vx:(Math.random()-.5)*.8,rot:Math.random()*360,vr:(Math.random()-.5)*2,color:COLORS[Math.floor(Math.random()*COLORS.length)],alpha:Math.random()*.5+.3};
+  }
+  for(let i=0;i<28;i++){const p=spawnPetal();p.y=Math.random()*H;petals.push(p);}
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    if(Math.random()<.04) petals.push(spawnPetal());
+    petals=petals.filter(p=>p.y<H+20);
+    petals.forEach(p=>{
+      p.y+=p.vy; p.x+=p.vx; p.rot+=p.vr;
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.globalAlpha=p.alpha;
+      ctx.fillStyle=p.color;
       ctx.beginPath();
-      ctx.ellipse(p.x, p.y, p.r, p.r * 0.5, p.dx * 2, 0, Math.PI * 2);
-      ctx.fillStyle = `${p.color}${p.op})`;
+      ctx.ellipse(0,0,p.r,p.r*1.7,0,0,Math.PI*2);
       ctx.fill();
-      p.x += p.dx; p.y += p.dy;
-      if (p.y > canvas.height + 20) { p.y = -20; p.x = Math.random() * canvas.width; }
-    }
-    requestAnimationFrame(draw);
+      ctx.restore();
+    });
+    requestAnimationFrame(frame);
   }
-  draw();
-  window.addEventListener('resize', resize);
+  frame();
 }
 </script>
 </body>
