@@ -121,6 +121,31 @@
   .gift-chevron{transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);color:rgba(0,200,150,0.6);font-size:1.2rem;line-height:1}
   .gift-chevron-open{transform:rotate(180deg)}
 
+  /* ── Music FAB ── */
+  .music-fab{position:fixed;z-index:9000;bottom:18px;right:18px;width:48px;height:48px;display:flex;justify-content:flex-end;align-items:flex-end;transition:all 0.6s cubic-bezier(0.64,0.01,0.07,1.65)}
+  .music-fab .fab-bg{width:48px;height:48px;border-radius:50%;display:flex;justify-content:center;align-items:center;position:absolute;backdrop-filter:blur(10px)}
+  .music-fab .fab-main{width:48px;height:48px;border-radius:50%;z-index:9;background:linear-gradient(135deg,#00C896,#006B4A);box-shadow:0 4px 24px rgba(0,200,150,0.55);bottom:0;right:0;transition:all 0.6s 0.2s ease;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+  .music-fab .fab-action{opacity:0;right:0;bottom:0;cursor:pointer;border:none;width:48px;height:48px;border-radius:50%;position:absolute}
+  .music-fab .fab-action .fab-icon{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;opacity:0;border-radius:50%;transition:all 0.2s ease,background-color 0.3s ease}
+  .music-fab .fab-action.act-play{transition:all 0.3s 0s cubic-bezier(0.64,0.01,0.07,1.65);background:rgba(0,200,150,0.18);border:1px solid rgba(0,200,150,0.4)}
+  .music-fab .fab-action.act-prev{transition:all 0.3s 0.12s cubic-bezier(0.64,0.01,0.07,1.65);background:rgba(201,168,76,0.18);border:1px solid rgba(201,168,76,0.4)}
+  .music-fab .fab-action.act-next{transition:all 0.3s 0.22s cubic-bezier(0.64,0.01,0.07,1.65);background:rgba(201,168,76,0.18);border:1px solid rgba(201,168,76,0.4)}
+  .music-fab:hover{width:120px;height:120px;transition:all 0.6s cubic-bezier(0.64,0.01,0.07,1.65)}
+  .music-fab:hover .fab-main{box-shadow:0 6px 32px rgba(0,200,150,0.7)}
+  .music-fab:hover .fab-action{opacity:1}
+  .music-fab:hover .fab-action .fab-icon{opacity:0.92}
+  .music-fab:hover .fab-action.act-play{right:0;bottom:calc(100% - 48px);transition:all 0.3s 0s cubic-bezier(0.64,0.01,0.07,1.65)}
+  .music-fab:hover .fab-action.act-prev{bottom:45%;right:45%;transition:all 0.3s 0.12s cubic-bezier(0.64,0.01,0.07,1.65)}
+  .music-fab:hover .fab-action.act-next{bottom:0;right:calc(100% - 48px);transition:all 0.3s 0.22s cubic-bezier(0.64,0.01,0.07,1.65)}
+  .music-fab:hover .fab-action:hover .fab-icon{background-color:rgba(0,200,150,0.35);opacity:1}
+  @keyframes musicPulse{0%,100%{box-shadow:0 4px 24px rgba(0,200,150,0.55)}50%{box-shadow:0 4px 32px rgba(0,200,150,0.85),0 0 48px rgba(0,200,150,0.3)}}
+  .fab-main.playing{animation:musicPulse 1.8s ease-in-out infinite}
+  @keyframes noteSpin{from{transform:rotate(-15deg)}50%{transform:rotate(15deg)}to{transform:rotate(-15deg)}}
+  .fab-main.playing .note{display:inline-block;animation:noteSpin 0.8s ease-in-out infinite}
+  /* song title strip */
+  #song-strip{position:fixed;bottom:78px;right:18px;z-index:8999;max-width:200px;padding:6px 12px;border-radius:2px;background:rgba(8,8,8,0.88);border:1px solid rgba(0,200,150,0.3);backdrop-filter:blur(12px);font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.22em;color:#00C896;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(6px);transition:all 0.3s ease;pointer-events:none}
+  #song-strip.visible{opacity:1;transform:translateY(0)}
+
   input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.22)}
   input,select,textarea{box-sizing:border-box}
   button{cursor:pointer}
@@ -194,7 +219,25 @@
 </head>
 <body>
 
-<!-- Petal Canvas -->
+<!-- Music FAB -->
+<div id="song-strip"></div>
+<div class="music-fab" id="music-fab">
+  <button class="fab-action act-play fab-bg" onclick="togglePlay(event)" title="Play / Pausa">
+    <span class="fab-icon" id="fab-play-icon">▶</span>
+  </button>
+  <button class="fab-action act-prev fab-bg" onclick="prevSong(event)" title="Anterior">
+    <span class="fab-icon">⏮</span>
+  </button>
+  <button class="fab-action act-next fab-bg" onclick="nextSong(event)" title="Siguiente">
+    <span class="fab-icon">⏭</span>
+  </button>
+  <button class="fab-main" id="fab-main-btn" onclick="togglePlay(event)" title="Música">
+    <span class="note">🎵</span>
+  </button>
+</div>
+
+<!-- hidden audio -->
+<audio id="bg-audio" loop></audio>
 <canvas id="petal-canvas"></canvas>
 
 <!-- ── SPLASH ───────────────────────────────────────────────── -->
@@ -902,7 +945,69 @@ function submitSong(){
   document.getElementById('song-success').style.display='block';
 }
 
-// ── Petal Canvas ─────────────────────────────────────────────
+// ── Music Player ─────────────────────────────────────────────
+const SONGS = [
+  {
+    title:'Vals Op. 64 No. 1 · Chopin',
+    src:'https://archive.org/download/musopen-chopin/Waltz%20Op.%2064%20no.%201%20in%20D%20flat%20major.mp3'
+  },
+  {
+    title:'Grande Valse Brillante Op. 18 · Chopin',
+    src:'https://archive.org/download/musopen-chopin/Grande%20Valse%20Brilliante%2C%20Op.%2018%20in%20E%20Flat%20Major.mp3'
+  },
+  {
+    title:'Vals Op. 69 No. 1 · Chopin',
+    src:'https://archive.org/download/musopen-chopin/Waltz%20Op.%2069%20no.%201%20in%20A%20flat%20major.mp3'
+  },
+];
+let songIdx = 0, isPlaying = false;
+const audio = document.getElementById('bg-audio');
+const fabMain = document.getElementById('fab-main-btn');
+const fabPlayIcon = document.getElementById('fab-play-icon');
+const songStrip = document.getElementById('song-strip');
+
+function showStrip(title){
+  songStrip.textContent = '♪ ' + title;
+  songStrip.classList.add('visible');
+  clearTimeout(songStrip._t);
+  songStrip._t = setTimeout(()=>songStrip.classList.remove('visible'), 3500);
+}
+function loadSong(idx){
+  const s = SONGS[idx];
+  if(s.src){ audio.src = s.src; }
+  showStrip(s.title);
+}
+function togglePlay(e){
+  e.stopPropagation();
+  if(!isPlaying){
+    if(!audio.src && SONGS[songIdx].src) loadSong(songIdx);
+    if(SONGS[songIdx].src){
+      audio.play().catch(()=>{});
+    }
+    isPlaying = true;
+    fabMain.classList.add('playing');
+    fabPlayIcon.textContent = '⏸';
+    showStrip(SONGS[songIdx].title);
+  } else {
+    audio.pause();
+    isPlaying = false;
+    fabMain.classList.remove('playing');
+    fabPlayIcon.textContent = '▶';
+  }
+}
+function nextSong(e){
+  e.stopPropagation();
+  songIdx = (songIdx + 1) % SONGS.length;
+  loadSong(songIdx);
+  if(isPlaying && SONGS[songIdx].src) audio.play().catch(()=>{});
+}
+function prevSong(e){
+  e.stopPropagation();
+  songIdx = (songIdx - 1 + SONGS.length) % SONGS.length;
+  loadSong(songIdx);
+  if(isPlaying && SONGS[songIdx].src) audio.play().catch(()=>{});
+}
+audio.addEventListener('ended', ()=>nextSong({stopPropagation:()=>{}}));
 function startPetals(){
   const canvas=document.getElementById('petal-canvas');
   if(!canvas) return;
