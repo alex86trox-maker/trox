@@ -604,6 +604,14 @@
 </div>
 
 <script>
+// ══════════════════════════════════════════════════════════════
+// CONFIGURACIÓN WHATSAPP
+// Cambia este número por el número de la quinceañera/organizador
+// Formato: código de país + número, sin espacios ni símbolos
+// Ejemplo Colombia: 573001234567
+// ══════════════════════════════════════════════════════════════
+const WHATSAPP_NUMBER = '573001234567';
+
 // ── Data ──────────────────────────────────────────────────────
 const GALLERY_TABS = ['Toda','Familia','Amigas','Moda'];
 const GALLERY_IMAGES = {
@@ -862,6 +870,19 @@ function selectAttend(val){
 }
 function submitRSVP(){
   if(!attendVal){alert('Por favor indica si asistirás.');return;}
+  // ── WhatsApp: enviar confirmación de asistencia ──
+  const asistencia = attendVal === 'yes' ? '✅ Asistiré con gusto' : '❌ Lamentablemente no podré asistir';
+  const comida = document.getElementById('rsvp-food').value;
+  const transporte = document.getElementById('rsvp-transport').value;
+  const foodLabel = {no:'Sin restricción',celiaco:'Celíaco',vegano:'Vegano',vegetariano:'Vegetariano',otra:'Otra restricción'}[comida] || comida;
+  const transportLabel = transporte === 'bus' ? 'Sí, necesito asiento en el bus' : 'No, voy por mi cuenta';
+  const msg =
+    '🎉 *RSVP — XV Años Sofía Valentina*\n\n' +
+    '*Asistencia:* ' + asistencia + '\n' +
+    '*Restricción alimentaria:* ' + foodLabel + '\n' +
+    '*Transporte:* ' + transportLabel;
+  window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
+  // ── Mostrar pantalla de éxito ──
   document.getElementById('rsvp-form').style.display='none';
   document.getElementById('rsvp-success').style.display='block';
 }
@@ -870,6 +891,12 @@ function submitRSVP(){
 function submitSong(){
   const v=document.getElementById('song-input').value.trim();
   if(!v){document.getElementById('song-input').focus();return;}
+  // ── WhatsApp: enviar sugerencia de canción ──
+  const msg =
+    '🎵 *Sugerencia de canción — XV Años Sofía Valentina*\n\n' +
+    '*Canción sugerida:* ' + v;
+  window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
+  // ── Mostrar pantalla de éxito ──
   document.getElementById('song-form').style.display='none';
   document.getElementById('song-success').style.display='block';
 }
