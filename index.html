@@ -126,7 +126,14 @@
     /* LOCATION */
     #location-section { padding:3.5rem 1.5rem 4rem;background:linear-gradient(180deg,#fceef5 0%,#f8e4ee 100%);position:relative;overflow:hidden; }
     .loc-card { border-radius:1.75rem;overflow:hidden;border:1px solid rgba(212,160,170,0.25);background:rgba(255,255,255,0.97);box-shadow:0 24px 72px rgba(139,32,64,0.13),inset 0 1px 0 rgba(255,255,255,1); }
-    .loc-header { display:flex;align-items:center;gap:18px;padding:1.5rem 1.5rem 1.25rem;border-bottom:1px solid rgba(212,160,170,0.12); }
+    .loc-toggle { display:flex;align-items:center;gap:18px;padding:1.5rem 1.5rem 1.25rem;width:100%;text-align:left;cursor:pointer;border:none;background:transparent;font-family:inherit; }
+    .loc-toggle-right { display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0; }
+    .loc-toggle-label { font-size:0.5rem;letter-spacing:0.25em;text-transform:uppercase;font-weight:700;color:#c088a0; }
+    .loc-chevron { transition:transform 0.4s cubic-bezier(0.22,1,0.36,1); }
+    .loc-chevron.open { transform:rotate(180deg); }
+    .loc-body { overflow:hidden;max-height:0;transition:max-height 0.55s cubic-bezier(0.22,1,0.36,1); }
+    .loc-body.open { max-height:600px; }
+    .loc-header-inner { border-bottom:1px solid rgba(212,160,170,0.12); }
     .loc-icon-wrap { flex-shrink:0;border-radius:1rem;display:flex;align-items:center;justify-content:center;width:56px;height:56px;background:linear-gradient(145deg,#c0516a,#8b2040);box-shadow:0 8px 28px rgba(139,32,64,0.4); }
     .loc-name { font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:#3a0f1e;margin-bottom:3px; }
     .loc-addr { font-size:0.76rem;color:#c088a0;line-height:1.5; }
@@ -449,18 +456,24 @@
       <div class="orn-divider"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oL2)" stroke-width="0.7"/><polygon points="90,2 94,7 90,12 86,7" fill="#c9953a" opacity="0.9"/><polygon points="90,4.5 93,7 90,9.5 87,7" fill="#f0d080" opacity="0.8"/><circle cx="76" cy="7" r="1.8" fill="rgba(201,149,58,0.5)"/><circle cx="104" cy="7" r="1.8" fill="rgba(201,149,58,0.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oR2)" stroke-width="0.7"/><defs><linearGradient id="oL2" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,149,58,0.7)"/></linearGradient><linearGradient id="oR2" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,149,58,0.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
     </div>
     <div class="loc-card reveal">
-      <div class="loc-header">
+      <button class="loc-toggle loc-header-inner" onclick="toggleLocation(this)">
         <div class="loc-icon-wrap">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.95)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
         </div>
         <div><div class="loc-name">Salón de Eventos</div><div class="loc-addr">Calle de los Sueños 123<br>Bogotá, Colombia</div></div>
-      </div>
-      <div class="loc-map"><iframe title="Mapa" src="https://maps.google.com/maps?q=Bogot%C3%A1,+Colombia&output=embed" loading="lazy"></iframe></div>
-      <div class="loc-footer">
-        <a class="loc-btn" href="https://maps.google.com/maps?q=Bogotá,+Colombia" target="_blank" rel="noopener">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-          Cómo llegar
-        </a>
+        <div class="loc-toggle-right">
+          <span class="loc-toggle-label" id="loc-toggle-label">Ver mapa</span>
+          <svg class="loc-chevron" id="loc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c088a0" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </button>
+      <div class="loc-body" id="loc-body">
+        <div class="loc-map"><iframe title="Mapa" src="https://maps.google.com/maps?q=Bogot%C3%A1,+Colombia&output=embed" loading="lazy"></iframe></div>
+        <div class="loc-footer">
+          <a class="loc-btn" href="https://maps.google.com/maps?q=Bogotá,+Colombia" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            Cómo llegar
+          </a>
+        </div>
       </div>
     </div>
   </section>
@@ -654,13 +667,18 @@
           ha estado conmigo desde antes de nacer y estará para siempre."<br>
           <span style="font-family:'Great Vibes',cursive;font-size:1.3rem;color:rgba(240,180,200,0.9);display:block;margin-top:0.5rem">— Sofía Valentina</span>
         </div>
-        <button class="song-play-btn" id="song-play-btn" onclick="toggleSong()">
-          <svg id="song-play-icon" width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="none"><polygon points="5,3 19,12 5,21"/></svg>
-          <span id="song-play-text">Escuchar en Spotify</span>
-        </button>
-        <div class="song-progress" id="song-progress" style="display:none">
-          <div class="song-progress-bar" id="song-progress-bar"></div>
-        </div>
+        <!-- Spotify embed — reproduce la canción de verdad -->
+        <iframe
+          id="spotify-embed"
+          style="border-radius:14px;width:100%;margin-top:0.5rem;"
+          src="https://open.spotify.com/embed/track/6lanRgr6wXibZr8KgzXxBl?utm_source=generator&theme=0"
+          width="100%"
+          height="152"
+          frameBorder="0"
+          allowfullscreen=""
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+        ></iframe>
         <div style="margin-top:1.25rem">
           <a href="https://open.spotify.com/track/6lanRgr6wXibZr8KgzXxBl" target="_blank" rel="noopener"
              style="display:inline-flex;align-items:center;gap:8px;color:rgba(240,190,210,0.6);font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;font-weight:700;border:1px solid rgba(255,200,215,0.15);border-radius:999px;padding:0.5rem 1.2rem;">
@@ -940,14 +958,18 @@
 
   // ── Gallery
   var galleryPhotos = [
-    { src:'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=600&q=80', caption:'Mis sueños comienzan hoy' },
-    { src:'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=600&q=80', caption:'La magia de ser quince' },
-    { src:'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80', caption:'Rodeada de amor' },
-    { src:'https://images.unsplash.com/photo-1519741347686-c1e0aadf4611?w=600&q=80', caption:'Mi noche de princesa' },
-    { src:'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80', caption:'Flores para celebrar' },
-    { src:'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=600&q=80', caption:'Un recuerdo eterno' },
-    { src:'https://images.unsplash.com/photo-1496196614460-48988a57fccf?w=600&q=80', caption:'Luz de mis 15' },
-    { src:'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&q=80', caption:'La mejor noche de mi vida' }
+    { src:'https://images.unsplash.com/photo-1565630818262-65cd5df24407?w=800&q=85', caption:'Mi corona de princesa 👑' },
+    { src:'https://images.unsplash.com/photo-1625755106045-bc7870842718?w=800&q=85', caption:'La magia de mis quince' },
+    { src:'https://images.unsplash.com/photo-1566699282355-55466ad57d5b?w=800&q=85', caption:'Rodeada de flores y amor 🌸' },
+    { src:'https://images.unsplash.com/photo-1659401117403-c36a229a7a6e?w=800&q=85', caption:'Un sueño hecho realidad' },
+    { src:'https://images.unsplash.com/photo-1666590161467-c4856571e9db?w=800&q=85', caption:'Sofía, la protagonista 💖' },
+    { src:'https://images.unsplash.com/photo-1566699265033-ad62ebca60ee?w=800&q=85', caption:'Bailando hacia el futuro' },
+    { src:'https://images.unsplash.com/photo-1663162143055-163b540ed204?w=800&q=85', caption:'Una noche especial 🌹' },
+    { src:'https://images.unsplash.com/photo-1565630836559-ab9094a6ef94?w=800&q=85', caption:'Mis quince son para siempre' },
+    { src:'https://images.unsplash.com/photo-1666590160022-fe5b8bc5ed00?w=800&q=85', caption:'Flores que adornan mi historia' },
+    { src:'https://images.unsplash.com/photo-1548047825-d315ab5df63f?w=800&q=85', caption:'Elegancia y juventud ✨' },
+    { src:'https://images.unsplash.com/photo-1775871299393-2cce027efaa9?w=800&q=85', caption:'La quinceañera del año 🎀' },
+    { src:'https://images.unsplash.com/photo-1519741347686-c1e0aadf4611?w=800&q=85', caption:'Celebrando con todo mi corazón 💕' }
   ];
   var gIdx = 0;
   function renderGallery(){
@@ -1047,6 +1069,17 @@
     document.querySelectorAll('.gift-body.open').forEach(function(b){ b.classList.remove('open'); });
     document.querySelectorAll('.gift-chevron.open').forEach(function(c){ c.classList.remove('open'); });
     if(!isOpen){ body.classList.add('open'); chev.classList.add('open'); }
+  }
+
+  // ── Location accordion
+  function toggleLocation(){
+    var body = document.getElementById('loc-body');
+    var chev = document.getElementById('loc-chevron');
+    var label = document.getElementById('loc-toggle-label');
+    var isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    chev.classList.toggle('open', !isOpen);
+    label.textContent = isOpen ? 'Ver mapa' : 'Cerrar';
   }
 
   // ── RSVP
