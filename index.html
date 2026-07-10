@@ -3,1483 +3,1132 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>{{NOMBRE_PROTAGONISTAS}} · Invitación</title>
+<title>XV Años · Sofía Valentina — Fashion Edition</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bodoni+Moda:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Great+Vibes&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
 <style>
-/* ════════════════════════════════════════════════════════════════
-   BASE RESET & TIPOGRAFÍA
-   ════════════════════════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{background:#04100c;min-height:100vh}
-body{font-family:'Cormorant Garamond',Georgia,serif;color:#fff;overflow-x:hidden}
+body{background:#080808;font-family:'Cormorant Garamond',Georgia,serif;color:#fff;min-height:100vh;overflow-x:hidden}
+#app{max-width:480px;margin:0 auto;overflow-x:hidden;position:relative}
+#petal-canvas{position:fixed;inset:0;pointer-events:none;z-index:8888}
 
-/* ─── Clase de ocultamiento que aplica el motor de planes ─── */
-.plan-hidden{display:none !important}
+/* ── Palette ──
+   --gold:#C9A84C  --gold-light:#F0D474  --gold-dark:#7A5C1E
+   --fuchsia:#FF2D78  --fuchsia-dark:#B30050
+   --bg:#080808  --surface:#111  --surface2:#0d0d0d */
 
-/* ════════════════════════════════════════════════════════════════
-   ANIMACIONES — Aquí puedes inyectar tus estilos visuales
-   ════════════════════════════════════════════════════════════════ */
+/* ── Animations ── */
 @keyframes goldShimmer{0%{background-position:0% center}100%{background-position:200% center}}
-@keyframes emeraldShimmer{0%{background-position:0% center}100%{background-position:200% center}}
+@keyframes fuchsiaShimmer{0%{background-position:0% center}100%{background-position:200% center}}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
 @keyframes scaleIn{from{opacity:0;transform:scale(0.88)}to{opacity:1;transform:scale(1)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 8px 32px rgba(255,45,120,0.4),0 0 0 0 rgba(255,45,120,0)}50%{box-shadow:0 12px 48px rgba(255,45,120,0.65),0 0 0 6px rgba(255,45,120,0.15)}}
 @keyframes blinkColon{0%,100%{opacity:1}50%{opacity:0.1}}
 @keyframes shimmerBox{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
 @keyframes tickerMove{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 @keyframes floatDiamond{0%,100%{transform:translateY(0) rotate(0deg);opacity:.85}50%{transform:translateY(-8px) rotate(8deg);opacity:1}}
-@keyframes aurora{0%{transform:translateX(-30%) translateY(0) rotate(-12deg);opacity:0.18}50%{transform:translateX(20%) translateY(-60px) rotate(-6deg);opacity:0.32}100%{transform:translateX(-30%) translateY(0) rotate(-12deg);opacity:0.18}}
-@keyframes auroraB{0%{transform:translateX(20%) translateY(0) rotate(10deg);opacity:0.12}50%{transform:translateX(-10%) translateY(50px) rotate(4deg);opacity:0.24}100%{transform:translateX(20%) translateY(0) rotate(10deg);opacity:0.12}}
-@keyframes musicPulse{0%,100%{box-shadow:0 4px 24px rgba(0,200,150,0.55)}50%{box-shadow:0 4px 32px rgba(0,200,150,0.85),0 0 48px rgba(0,200,150,0.3)}}
-@keyframes noteSpin{from{transform:rotate(-15deg)}50%{transform:rotate(15deg)}to{transform:rotate(-15deg)}}
+@keyframes scanline{0%{background-position:0 0}100%{background-position:0 100%}}
 @keyframes heroPhotoFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-7px) scale(1.01)}}
-@keyframes borderGlowPulse{
-  0%,100%{box-shadow:0 0 8px rgba(0,200,150,0.15),0 0 24px rgba(0,200,150,0.08)}
-  50%{box-shadow:0 0 18px rgba(0,200,150,0.45),0 0 48px rgba(0,200,150,0.18)}
-}
-@keyframes cardGlowPulse{
-  0%{box-shadow:0 8px 32px rgba(0,0,0,.55),0 0 0 1px rgba(0,200,150,0.18),0 0 18px rgba(0,200,150,0.10)}
-  25%{box-shadow:0 8px 32px rgba(0,0,0,.55),0 0 0 1px rgba(201,168,76,0.55),0 0 32px rgba(201,168,76,0.22)}
-  50%{box-shadow:0 8px 32px rgba(0,0,0,.55),0 0 0 1.5px rgba(0,200,150,0.7),0 0 48px rgba(0,200,150,0.32)}
-  75%{box-shadow:0 8px 32px rgba(0,0,0,.55),0 0 0 1px rgba(201,168,76,0.55),0 0 32px rgba(201,168,76,0.22)}
-  100%{box-shadow:0 8px 32px rgba(0,0,0,.55),0 0 0 1px rgba(0,200,150,0.18),0 0 18px rgba(0,200,150,0.10)}
-}
+@keyframes musicPulse{0%,100%{box-shadow:0 4px 24px rgba(255,45,120,0.55)}50%{box-shadow:0 4px 32px rgba(255,45,120,0.85),0 0 48px rgba(255,45,120,0.3)}}
+@keyframes noteSpin{from{transform:rotate(-15deg)}50%{transform:rotate(15deg)}to{transform:rotate(-15deg)}}
 
-/* ════════════════════════════════════════════════════════════════
-   HELPERS VISUALES — Esmeralda Noir Design System
-   ════════════════════════════════════════════════════════════════ */
-.gold-shimmer-text{background:linear-gradient(135deg,#2A6B4C 0%,#00C896 25%,#7FFFD4 50%,#00C896 75%,#2A6B4C 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:emeraldShimmer 3s linear infinite}
-.fuchsia-shimmer-text{background:linear-gradient(135deg,#C9A84C 0%,#F0D474 40%,#FFFACD 55%,#F0D474 75%,#C9A84C 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:goldShimmer 4s linear infinite}
-.fade-in-up{animation:fadeInUp 1s cubic-bezier(0.22,1,0.36,1) 0.4s both}
-.scale-in{animation:scaleIn 0.55s cubic-bezier(0.22,1,0.36,1)}
-.glow-card{position:relative;border-radius:2px;overflow:hidden;border-left:2px solid transparent !important;border-right:2px solid transparent !important;background-clip:padding-box;animation:borderGlowPulse 3s ease-in-out infinite}
-.glow-card::before{content:'';position:absolute;top:0;bottom:0;left:-2px;width:2px;background:linear-gradient(to bottom,transparent 0%,rgba(0,200,150,0.3) 20%,rgba(0,200,150,1) 50%,rgba(0,200,150,0.3) 80%,transparent 100%);border-radius:2px;pointer-events:none;z-index:2}
-.glow-card::after{content:'';position:absolute;top:0;bottom:0;right:-2px;width:2px;background:linear-gradient(to bottom,transparent 0%,rgba(201,168,76,0.3) 20%,rgba(201,168,76,1) 50%,rgba(201,168,76,0.3) 80%,transparent 100%);border-radius:2px;pointer-events:none;z-index:2}
-.glow-card>*{position:relative;z-index:1}
-.shimmer-box{position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,rgba(0,200,150,0.08) 50%,transparent 80%);animation:shimmerBox 3s ease-in-out infinite}
-.scanlines{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);opacity:0.25}
-.aurora-a{position:absolute;width:140%;height:260px;background:linear-gradient(120deg,transparent 0%,rgba(0,200,150,0.18) 30%,rgba(0,255,180,0.25) 50%,rgba(0,200,150,0.18) 70%,transparent 100%);border-radius:50%;filter:blur(48px);animation:aurora 9s ease-in-out infinite;pointer-events:none}
-.aurora-b{position:absolute;width:120%;height:200px;background:linear-gradient(120deg,transparent 0%,rgba(201,168,76,0.12) 35%,rgba(240,212,116,0.18) 55%,rgba(201,168,76,0.12) 75%,transparent 100%);border-radius:50%;filter:blur(40px);animation:auroraB 12s ease-in-out infinite;pointer-events:none}
-.diamond-float-0{animation:floatDiamond 3s ease-in-out infinite 0s}
-.diamond-float-1{animation:floatDiamond 3s ease-in-out infinite .75s}
-.diamond-float-2{animation:floatDiamond 3s ease-in-out infinite 1.5s}
-.diamond-float-3{animation:floatDiamond 3s ease-in-out infinite 2.25s}
+.gold-shimmer-text{background:linear-gradient(135deg,#7A5C1E 0%,#C9A84C 25%,#F0D474 50%,#C9A84C 75%,#7A5C1E 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:goldShimmer 3s linear infinite}
+.fuchsia-shimmer-text{background:linear-gradient(135deg,#B30050 0%,#FF2D78 40%,#FF8AB4 55%,#FF2D78 75%,#B30050 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:fuchsiaShimmer 4s linear infinite}
 
-/* Acordeón */
-.gift-body{max-height:0;overflow:hidden;transition:max-height 0.45s ease-in-out}
-.gift-body-open{max-height:560px}
-.gift-chevron{transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);color:rgba(0,200,150,0.6);font-size:1.2rem;line-height:1}
-.gift-chevron-open{transform:rotate(180deg)}
+/* ── TICKER ── */
+.ticker-wrap{overflow:hidden;background:#FF2D78;padding:8px 0}
+.ticker-inner{display:flex;white-space:nowrap;animation:tickerMove 18s linear infinite}
+.ticker-item{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:.18em;color:#fff;padding:0 2.5rem}
+.ticker-sep{color:rgba(255,255,255,0.5)}
 
-/* Música FAB flotante */
-.music-fab{position:fixed;z-index:9000;bottom:18px;right:18px;width:48px;height:48px;display:flex;justify-content:flex-end;align-items:flex-end;transition:all 0.6s cubic-bezier(0.64,0.01,0.07,1.65)}
-.music-fab .fab-bg{width:48px;height:48px;border-radius:50%;display:flex;justify-content:center;align-items:center;position:absolute;backdrop-filter:blur(10px)}
-.music-fab .fab-main{width:48px;height:48px;border-radius:50%;z-index:9;background:linear-gradient(135deg,#00C896,#006B4A);box-shadow:0 4px 24px rgba(0,200,150,0.55);bottom:0;right:0;transition:all 0.6s 0.2s ease;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
-.music-fab .fab-action{opacity:0;right:0;bottom:0;cursor:pointer;border:none;width:48px;height:48px;border-radius:50%;position:absolute}
-.music-fab .fab-action .fab-icon{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;opacity:0;border-radius:50%;transition:all 0.2s ease}
-.music-fab .fab-action.act-play{transition:all 0.3s 0s cubic-bezier(0.64,0.01,0.07,1.65);background:rgba(0,200,150,0.18);border:1px solid rgba(0,200,150,0.4)}
-.music-fab .fab-action.act-prev{transition:all 0.3s 0.12s cubic-bezier(0.64,0.01,0.07,1.65);background:rgba(201,168,76,0.18);border:1px solid rgba(201,168,76,0.4)}
-.music-fab .fab-action.act-next{transition:all 0.3s 0.22s cubic-bezier(0.64,0.01,0.07,1.65);background:rgba(201,168,76,0.18);border:1px solid rgba(201,168,76,0.4)}
-.music-fab:hover{width:120px;height:120px}
-.music-fab:hover .fab-action{opacity:1}
-.music-fab:hover .fab-action .fab-icon{opacity:0.92}
-.music-fab:hover .fab-action.act-play{right:0;bottom:calc(100% - 48px)}
-.music-fab:hover .fab-action.act-prev{bottom:45%;right:45%}
-.music-fab:hover .fab-action.act-next{bottom:0;right:calc(100% - 48px)}
-.fab-main.playing{animation:musicPulse 1.8s ease-in-out infinite}
-.fab-main.playing .note{display:inline-block;animation:noteSpin 0.8s ease-in-out infinite}
-#song-strip{position:fixed;bottom:78px;right:18px;z-index:8999;max-width:200px;padding:6px 12px;border-radius:2px;background:rgba(8,8,8,0.88);border:1px solid rgba(0,200,150,0.3);backdrop-filter:blur(12px);font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.22em;color:#00C896;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(6px);transition:all 0.3s ease;pointer-events:none}
-#song-strip.visible{opacity:1;transform:translateY(0)}
+/* ── SPLASH ── */
+#splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;overflow:hidden;background:#080808;transition:opacity .85s cubic-bezier(0.4,0,0.2,1),transform .85s cubic-bezier(0.4,0,0.2,1)}
+#splash.closing{opacity:0;transform:scale(1.06) translateY(-20px);pointer-events:none}
+#splash .splash-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22;filter:grayscale(40%)}
+#splash .vignette{position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(8,8,8,.65) 20%,rgba(8,8,8,.92) 100%)}
+#splash .diag{position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 38px,rgba(201,168,76,.04) 38px,rgba(201,168,76,.04) 39px)}
+.diamond-svg{position:absolute;width:36px;height:36px;pointer-events:none;filter:drop-shadow(0 0 6px rgba(201,168,76,.7));animation:floatDiamond 3s ease-in-out infinite}
+.diamond-tl{top:18px;left:18px;animation-delay:0s}
+.diamond-tr{top:18px;right:18px;animation-delay:.75s}
+.diamond-bl{bottom:18px;left:18px;animation-delay:1.5s}
+.diamond-br{bottom:18px;right:18px;animation-delay:2.25s}
+#splash .content{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 2.5rem;animation:fadeInUp 1s cubic-bezier(0.22,1,0.36,1) 0.4s both}
+#splash .fashion-tag{font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.78em;color:#FF2D78;margin-bottom:1.2rem}
+#splash h1{font-family:'Bebas Neue',sans-serif;font-size:9rem;line-height:.82;letter-spacing:.04em;filter:drop-shadow(0 2px 24px rgba(201,168,76,.45))}
+#splash .xv-label{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.55em;color:rgba(201,168,76,.75);margin-bottom:.4rem}
+#splash .splash-script{font-family:'Great Vibes',cursive;font-size:3rem;color:rgba(255,255,255,.92);margin-bottom:1.5rem}
+#splash .date-strip{border:1px solid rgba(201,168,76,.4);border-radius:2px;padding:.55rem 1.8rem;margin-bottom:1.75rem;font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.38em;color:rgba(201,168,76,.85);background:rgba(201,168,76,.06)}
+#splash .open-btn{border:none;cursor:pointer;border-radius:2px;color:#080808;font-weight:900;padding:1rem 2.8rem;background:linear-gradient(135deg,#C9A84C 0%,#F0D474 50%,#C9A84C 100%);background-size:200% auto;animation:goldShimmer 2.5s linear infinite,pulseGlow 2.8s ease-in-out infinite 2s;font-family:'Bebas Neue',sans-serif;font-size:.88rem;letter-spacing:.48em}
+#splash .tap-hint{font-size:.5rem;letter-spacing:.18em;color:rgba(255,255,255,.3);margin-top:.75rem;font-family:'Bebas Neue',sans-serif}
 
-/* Galería */
-.gal-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s;filter:grayscale(15%)}
-.gal-img.active{opacity:1}
-.gallery-dot{height:3px;border-radius:0;cursor:pointer;border:none;transition:all .2s;background:rgba(201,168,76,0.2);width:5px;padding:0}
-.gallery-dot.active{background:#00C896;width:28px}
-.gallery-thumb{border-radius:1px;overflow:hidden;flex-shrink:0;width:48px;height:48px;cursor:pointer;border:2px solid rgba(201,168,76,0.15);opacity:.45;transform:scale(1);transition:all .2s}
-.gallery-thumb.active{border-color:#00C896;opacity:1;transform:scale(1.12);box-shadow:0 4px 16px rgba(0,200,150,0.4)}
+/* ── MAIN ── */
+#main{display:none}
 
-/* Itinerario */
-.itin-card{transition:transform .3s}
-.itin-card:hover{transform:translateX(4px)}
-#itin-line{position:absolute;left:28px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,rgba(201,168,76,0.4) 8%,rgba(201,168,76,0.2) 50%,rgba(201,168,76,0.4) 92%,transparent);transform-origin:top;transform:scaleY(0);transition:transform 1.8s cubic-bezier(0.22,1,0.36,1)}
-#itin-line.visible{transform:scaleY(1)}
-
-/* Asistencia RSVP */
-.attend-btn{flex:1;border-radius:2px;font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.35em;padding:.9rem;border:1px solid rgba(201,168,76,0.3);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.55);transition:all .25s;cursor:pointer}
-.attend-btn.selected{border-color:#00C896;background:rgba(0,200,150,0.12);color:rgba(255,255,255,0.92)}
-
-/* Social icons */
-.social-list{display:flex;justify-content:center;gap:2.5rem;list-style:none;margin:0;padding:0}
-.social-li{position:relative;list-style:none;cursor:pointer}
-.social-li a{text-decoration:none;display:block}
-.social-li .fa-brands{font-size:3.8em;color:#1a1a1a;display:block}
-.social-li a::before{font-family:"Font Awesome 6 Brands";position:absolute;top:0;left:0;font-size:3.8em;height:0;overflow:hidden;transition:0.5s ease-in-out;display:block}
-.social-li.ig a::before{content:"\f16d";background-image:linear-gradient(45deg,#f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;border-bottom:3px solid #dc2743}
-.social-li.wa a::before{content:"\f232";color:#25D366;border-bottom:3px solid #25D366}
-.social-li.tw a::before{content:"\e61b";color:#1DA1F2;border-bottom:3px solid #1DA1F2}
-.social-li:hover a::before{height:100%}
-
-/* Hero foto */
-.hero-photo-wrap{position:relative;width:180px;height:240px;margin:0 auto 1.75rem;border-radius:3px;overflow:hidden;border:1px solid rgba(201,168,76,0.4);box-shadow:0 0 0 1px rgba(0,200,150,0.2),0 0 32px rgba(0,200,150,0.3),0 0 80px rgba(0,200,150,0.1),0 24px 60px rgba(0,0,0,0.7);animation:heroPhotoFloat 5s ease-in-out infinite}
+/* ── HERO ── */
+#hero{position:relative;text-align:center;overflow:hidden;display:flex;flex-direction:column;min-height:95vh;background:#080808}
+#hero .hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.18;filter:grayscale(50%)}
+#hero .hero-veil{position:absolute;inset:0;z-index:2;background:linear-gradient(to bottom,rgba(8,8,8,.7) 0%,rgba(8,8,8,.35) 45%,rgba(8,8,8,.85) 100%)}
+#hero .diag{position:absolute;inset:0;z-index:1;background:repeating-linear-gradient(45deg,transparent,transparent 38px,rgba(201,168,76,.03) 38px,rgba(201,168,76,.03) 39px)}
+#hero .inner{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;padding:4rem 2rem 4rem;flex:1}
+#hero .kicker{font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.72em;color:#FF2D78;margin-bottom:.5rem}
+#hero h1{font-family:'Bebas Neue',sans-serif;font-size:10rem;line-height:.78;letter-spacing:.04em;filter:drop-shadow(0 3px 24px rgba(201,168,76,.4))}
+#hero .anos{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.6em;color:rgba(240,212,116,.7);margin-bottom:.5rem}
+#hero .de{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;letter-spacing:.22em;color:rgba(255,255,255,.4);margin:.25rem 0}
+#hero .name{font-family:'Great Vibes',cursive;font-size:3.2rem;color:rgba(255,255,255,.95);filter:drop-shadow(0 1px 14px rgba(255,45,120,.35));margin-bottom:2rem}
+.hero-photo-wrap{position:relative;width:180px;height:240px;margin:0 auto 1.75rem;border-radius:3px;overflow:hidden;border:1px solid rgba(201,168,76,.4);box-shadow:0 0 0 1px rgba(255,45,120,.2),0 0 32px rgba(255,45,120,.2),0 24px 60px rgba(0,0,0,.7);animation:heroPhotoFloat 5s ease-in-out infinite}
 .hero-photo-wrap img{width:100%;height:100%;object-fit:cover;filter:brightness(.92) saturate(1.1)}
-.hero-photo-shimmer{position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,rgba(0,200,150,0.07) 50%,transparent 80%);animation:shimmerBox 4s ease-in-out infinite;pointer-events:none}
-.hero-photo-corner{position:absolute;width:18px;height:18px;border-color:rgba(201,168,76,0.8);border-style:solid}
+.hero-photo-shimmer{position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,rgba(255,45,120,.06) 50%,transparent 80%);animation:shimmerBox 4s ease-in-out infinite;pointer-events:none}
+.hero-photo-corner{position:absolute;width:18px;height:18px;border-color:rgba(201,168,76,.8);border-style:solid}
 .hero-photo-tl{top:6px;left:6px;border-width:1.5px 0 0 1.5px}
 .hero-photo-tr{top:6px;right:6px;border-width:1.5px 1.5px 0 0}
 .hero-photo-bl{bottom:6px;left:6px;border-width:0 0 1.5px 1.5px}
 .hero-photo-br{bottom:6px;right:6px;border-width:0 1.5px 1.5px 0}
+#hero .invite-card{width:100%;max-width:340px;border-radius:2px;position:relative;overflow:hidden;margin-bottom:2.5rem;padding:1.75rem 1.75rem 1.5rem;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.35);backdrop-filter:blur(24px);box-shadow:0 20px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(201,168,76,.15)}
+#hero .invite-card .top-line{position:absolute;top:0;left:10%;right:10%;height:1.5px;background:linear-gradient(to right,transparent,#C9A84C,transparent)}
+#hero .invite-card .inv-kicker{font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.55em;color:rgba(201,168,76,.65);margin-bottom:.5rem}
+#hero .invite-card .inv-name{font-family:'Great Vibes',cursive;font-size:2.2rem;color:#F0D474;margin-bottom:.75rem}
+#hero .invite-card .div{height:1px;margin:.75rem 0;background:linear-gradient(to right,transparent,rgba(201,168,76,.35),transparent)}
+#hero .invite-card .facts{display:flex;justify-content:center;gap:1.25rem;flex-wrap:wrap}
+#hero .invite-card .fact-sep{width:1px;background:rgba(201,168,76,.2)}
+#hero .invite-card .fact{text-align:center}
+#hero .invite-card .fact-label{font-family:'Bebas Neue',sans-serif;font-size:.46rem;letter-spacing:.42em;color:rgba(201,168,76,.55);margin-bottom:2px}
+#hero .invite-card .fact-value{font-family:'Bodoni Moda',serif;font-size:.88rem;font-weight:700;color:rgba(255,255,255,.9)}
+#hero .bottom-line{position:absolute;bottom:0;left:10%;right:10%;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,.3),transparent)}
+#hero .wave-svg{display:block;width:100%;position:relative;z-index:10;margin-top:auto}
 
-/* Ticker */
-.ticker-inner{display:flex;white-space:nowrap;animation:tickerMove 18s linear infinite}
-.cd-colon{animation:blinkColon 1.2s ease-in-out infinite}
+/* ── Section Header ── */
+.sec-header{text-align:center;margin-bottom:2rem}
+.sec-kicker{display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:#FF2D78;margin-bottom:.5rem}
+.sec-kicker-light{color:rgba(255,45,120,.75)}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em;line-height:1.15}
+.orn-div{display:flex;justify-content:center;margin-top:.5rem}
 
+/* ── MI HISTORIA ── */
+#historia-sec{padding:3.5rem 1.5rem 4rem;background:#0d0d0d}
+.historia-card{border-radius:2px;overflow:hidden;border:1px solid rgba(201,168,76,.2);background:#111;box-shadow:0 24px 72px rgba(0,0,0,.5)}
+.historia-img{position:relative;height:220px;overflow:hidden}
+.historia-img img{width:100%;height:100%;object-fit:cover;filter:grayscale(20%);opacity:.65}
+.historia-img .overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(17,17,17,1) 0%,rgba(17,17,17,.3) 60%,transparent 100%)}
+.historia-img .tag{position:absolute;bottom:16px;left:20px;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.55em;color:#FF2D78}
+.historia-body{padding:1.75rem}
+.historia-quote{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;color:rgba(255,255,255,.7);line-height:1.9;margin-bottom:1.25rem}
+.historia-div{height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,.3),transparent);margin-bottom:1.25rem}
+.historia-text{font-size:.85rem;color:rgba(255,255,255,.4);line-height:1.8}
+
+/* ── DATE ── */
+#date-sec{padding:3.5rem 1.5rem 4rem;background:#080808}
+.date-cards{display:flex;gap:12px}
+.date-card{flex:1;border-radius:2px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:1.75rem .5rem 1.5rem;background:#111;border:1px solid rgba(201,168,76,.2);box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.date-card .top-bar{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,#C9A84C,transparent)}
+.date-card .card-label{font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.45em;color:rgba(201,168,76,.55);margin-bottom:.6rem}
+.date-card .card-big{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;line-height:1;color:#F0D474}
+.date-card .card-sub{font-family:'Bodoni Moda',serif;font-size:1rem;font-style:italic;color:rgba(255,255,255,.55);line-height:1.4;white-space:pre}
+
+/* ── COUNTDOWN ── */
+#countdown-sec{padding:5rem 1.5rem;text-align:center;position:relative;overflow:hidden;background:#0a0a0a}
+#countdown-sec .scanlines{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,.15) 3px,rgba(0,0,0,.15) 4px);animation:scanline 8s linear infinite;opacity:.3}
+.cd-grid{display:flex;align-items:flex-start;justify-content:center;gap:10px;margin-top:1rem}
+.cd-col{display:flex;flex-direction:column;align-items:center;gap:10px}
+.cd-box{position:relative;overflow:hidden;border-radius:2px;display:flex;align-items:center;justify-content:center;width:72px;height:84px;background:#111;border:1px solid rgba(201,168,76,.25);box-shadow:0 8px 32px rgba(0,0,0,.5),inset 0 1px 0 rgba(201,168,76,.1)}
+.cd-box .top-gloss{position:absolute;top:0;left:0;right:0;bottom:50%;background:rgba(255,255,255,.03)}
+.cd-box .shimmer{position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,rgba(201,168,76,.07) 50%,transparent 80%);animation:shimmerBox 3s ease-in-out infinite}
+.cd-num{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.04em;background:linear-gradient(180deg,#F0D474 0%,#C9A84C 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;position:relative;z-index:1;transition:all .15s}
+.cd-label{font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.38em;color:rgba(201,168,76,.45)}
+.cd-colon{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:rgba(255,45,120,.45);padding-bottom:2.2rem;animation:blinkColon 1.2s ease-in-out infinite}
+
+/* ── LOCATION ── */
+#location-sec{padding:3.5rem 1.5rem 4rem;background:#0d0d0d}
+.loc-card{border-radius:2px;overflow:hidden;border:1px solid rgba(201,168,76,.2);background:#111;box-shadow:0 24px 72px rgba(0,0,0,.5)}
+.loc-toggle{display:flex;align-items:center;gap:18px;padding:1.5rem;width:100%;text-align:left;border:none;background:transparent;cursor:pointer}
+.loc-icon{flex-shrink:0;border-radius:2px;display:flex;align-items:center;justify-content:center;width:56px;height:56px;background:linear-gradient(145deg,#FF2D78,#B30050);box-shadow:0 8px 28px rgba(255,45,120,.45)}
+.loc-name{font-family:'Bodoni Moda',serif;font-size:1.05rem;font-weight:700;color:rgba(255,255,255,.95);margin-bottom:3px}
+.loc-addr{font-size:.76rem;color:rgba(255,255,255,.4);line-height:1.5}
+.loc-chevron{transition:transform .35s cubic-bezier(0.22,1,0.36,1);color:rgba(201,168,76,.5);font-size:1.2rem}
+.loc-body{max-height:0;overflow:hidden;transition:max-height .45s ease-in-out}
+.loc-body.open{max-height:400px}
+.loc-chevron.open{transform:rotate(180deg)}
+.loc-map{border-top:1px solid rgba(201,168,76,.1)}
+.loc-map iframe{width:100%;height:220px;border:none;display:block}
+.loc-btn-wrap{padding:1.25rem}
+.loc-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border-radius:2px;color:#080808;cursor:pointer;border:none;text-decoration:none;padding:1rem;background:linear-gradient(135deg,#C9A84C 0%,#F0D474 100%);box-shadow:0 10px 32px rgba(201,168,76,.35);font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.4em;font-weight:700}
+
+/* ── GALLERY ── */
+#gallery-sec{padding:3.5rem 1.5rem 4rem;background:#080808}
+.gallery-tabs{display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:4px}
+.gallery-tab{flex-shrink:0;border-radius:1px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.58rem;letter-spacing:.28em;padding:.6rem 1.1rem;border:1px solid rgba(201,168,76,.25);background:rgba(255,255,255,.03);color:rgba(255,255,255,.45);transition:all .25s;white-space:nowrap}
+.gallery-tab.active{border-color:#FF2D78;background:rgba(255,45,120,.12);color:rgba(255,255,255,.95);box-shadow:0 4px 20px rgba(255,45,120,.25)}
+.gallery-main{position:relative;border-radius:2px;overflow:hidden;height:300px;box-shadow:0 24px 72px rgba(0,0,0,.6),0 0 0 1px rgba(201,168,76,.2)}
+.gallery-main img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s;filter:grayscale(20%)}
+.gallery-main img.active{opacity:1}
+.gallery-main .grad-overlay{position:absolute;inset:0;z-index:2;background:linear-gradient(to top,rgba(8,8,8,.8) 0%,transparent 55%)}
+.gallery-caption{position:absolute;bottom:0;left:0;right:0;z-index:3;text-align:center;padding:1.5rem 1.25rem 1rem}
+.gallery-caption p{font-family:'Great Vibes',cursive;font-size:1.5rem;color:rgba(255,255,255,.96)}
+.gallery-badge{position:absolute;top:14px;right:14px;z-index:10;border-radius:1px;padding:5px 14px;background:#FF2D78;font-family:'Bebas Neue',sans-serif;font-size:.6rem;font-weight:700;color:white;letter-spacing:.2em}
+.gallery-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:10;display:flex;align-items:center;justify-content:center;border-radius:1px;width:42px;height:42px;cursor:pointer;background:rgba(8,8,8,.85);border:1px solid rgba(201,168,76,.3);font-size:1.4rem;color:#C9A84C;backdrop-filter:blur(8px);transition:transform .2s}
+.gallery-arrow:hover{transform:translateY(-50%) scale(1.1)}
+.gallery-arrow.prev{left:10px}
+.gallery-arrow.next{right:10px}
+.gallery-thumbs{display:flex;gap:8px;margin-top:14px;justify-content:center;flex-wrap:wrap}
+.gallery-thumb{border-radius:1px;overflow:hidden;flex-shrink:0;width:48px;height:48px;cursor:pointer;border:2px solid rgba(201,168,76,.15);opacity:.45;transition:all .2s}
+.gallery-thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(30%)}
+.gallery-thumb.active{border-color:#FF2D78;opacity:1;transform:scale(1.12);box-shadow:0 4px 16px rgba(255,45,120,.45)}
+.gallery-dots{display:flex;gap:6px;justify-content:center;margin-top:12px}
+.gallery-dot{height:3px;border-radius:0;cursor:pointer;border:none;background:rgba(201,168,76,.2);width:5px;padding:0;transition:all .2s}
+.gallery-dot.active{width:28px;background:#FF2D78}
+
+/* ── ITINERARY ── */
+#itinerary-sec{padding:3.5rem 1.5rem 4rem;background:#0d0d0d}
+.itin-list{position:relative}
+.itin-line{position:absolute;left:28px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,rgba(201,168,76,.4) 8%,rgba(201,168,76,.2) 50%,rgba(201,168,76,.4) 92%,transparent);transform-origin:top;transform:scaleY(0);transition:transform 1.8s cubic-bezier(0.22,1,0.36,1)}
+.itin-line.visible{transform:scaleY(1)}
+.itin-item{display:flex;align-items:flex-start;gap:18px;padding-bottom:1.875rem}
+.itin-item:last-child{padding-bottom:0}
+.itin-circle{flex-shrink:0;border-radius:2px;z-index:10;display:flex;align-items:center;justify-content:center;width:56px;height:56px;background:linear-gradient(145deg,#FF2D78,#B30050);box-shadow:0 6px 24px rgba(255,45,120,.45)}
+.itin-card{flex:1;border-radius:2px;position:relative;overflow:hidden;margin-top:.45rem;padding:1rem 1.25rem;background:#111;border:1px solid rgba(201,168,76,.15);box-shadow:0 6px 28px rgba(0,0,0,.3);transition:transform .3s}
+.itin-card:hover{transform:translateX(4px)}
+.itin-card .left-bar{position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,#F0D474,#C9A84C,#7A5C1E)}
+.itin-card .row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;padding-left:6px}
+.itin-card .itin-name{font-family:'Bodoni Moda',serif;font-size:.84rem;font-weight:700;color:rgba(255,255,255,.92)}
+.itin-card .itin-time{border-radius:1px;color:#080808;flex-shrink:0;white-space:nowrap;margin-left:8px;font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.25em;font-weight:700;padding:.3rem .75rem;background:linear-gradient(135deg,#C9A84C,#F0D474)}
+.itin-card .itin-desc{font-size:.75rem;color:rgba(255,255,255,.38);line-height:1.55;padding-left:6px}
+
+/* ── PADRINOS ── */
+#padrinos-sec{padding:3.5rem 1.5rem 4rem;background:#080808}
+.padrinos-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.padrino-card{border-radius:2px;overflow:hidden;border:1px solid rgba(201,168,76,.18);background:#111;padding:1.25rem;text-align:center;position:relative}
+.padrino-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,#FF2D78,transparent)}
+.padrino-icon{width:52px;height:52px;border-radius:2px;display:flex;align-items:center;justify-content:center;margin:0 auto .75rem;background:linear-gradient(145deg,#FF2D78,#B30050);box-shadow:0 6px 20px rgba(255,45,120,.4)}
+.padrino-cat{font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.42em;color:rgba(201,168,76,.55);margin-bottom:4px}
+.padrino-name{font-family:'Bodoni Moda',serif;font-size:.82rem;font-weight:700;color:rgba(255,255,255,.9);line-height:1.3}
+
+/* ── GIFTS ── */
+#gifts-sec{padding:3.5rem 1.5rem 4rem;background:#0d0d0d}
+.gift-card{border-radius:2px;overflow:hidden;margin-bottom:14px;border:1px solid rgba(201,168,76,.18);background:#111;transition:box-shadow .3s}
+.gift-card.open{box-shadow:0 14px 48px rgba(255,45,120,.12);border-color:rgba(255,45,120,.3)}
+.gift-toggle{display:flex;align-items:center;gap:1rem;width:100%;text-align:left;cursor:pointer;border:none;background:transparent;padding:1.25rem 1.5rem}
+.gift-icon{flex-shrink:0;border-radius:2px;display:flex;align-items:center;justify-content:center;width:50px;height:50px;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.gift-label-wrap{flex:1;text-align:left}
+.gift-label{font-family:'Bodoni Moda',serif;font-size:1rem;font-weight:700;color:rgba(255,255,255,.92)}
+.gift-sub{font-size:.7rem;color:rgba(255,255,255,.35);margin-top:2px}
+.gift-chevron{transition:transform .35s cubic-bezier(0.22,1,0.36,1);color:rgba(201,168,76,.5)}
+.gift-card.open .gift-chevron{transform:rotate(180deg)}
+.gift-body{max-height:0;overflow:hidden;transition:max-height .45s ease-in-out}
+.gift-card.open .gift-body{max-height:600px}
+.gift-inner{padding:0 1.5rem 1.5rem}
+.gift-box{border-radius:2px;padding:1.5rem;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.12)}
+.gift-box-title{font-family:'Great Vibes',cursive;font-size:1.6rem;color:#F0D474;text-align:center;margin-bottom:1.25rem}
+.gift-input{width:100%;border-radius:2px;display:block;margin-bottom:.75rem;padding:.9rem 1.1rem;border:1px solid rgba(201,168,76,.2);background:rgba(255,255,255,.04);color:rgba(255,255,255,.88);font-size:.88rem;font-family:inherit;outline:none}
+.gift-input::placeholder{color:rgba(255,255,255,.25)}
+.gift-input:focus{border-color:rgba(255,45,120,.5);box-shadow:0 0 0 2px rgba(255,45,120,.1)}
+.gift-qr-btn{width:100%;border-radius:2px;color:#080808;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;padding:.925rem;font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.38em;font-weight:700;background:linear-gradient(135deg,#C9A84C 0%,#F0D474 100%);box-shadow:0 8px 28px rgba(201,168,76,.35)}
+.gift-qr-img{display:flex;justify-content:center;margin-top:1.5rem}
+
+/* ── INFO EXTRA ── */
+#extra-sec{padding:3.5rem 1.5rem 4rem;background:#080808}
+.extra-card{border-radius:2px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(201,168,76,.18);background:#111}
+.extra-toggle{display:flex;align-items:center;gap:1rem;width:100%;text-align:left;cursor:pointer;border:none;background:transparent;padding:1.1rem 1.4rem}
+.extra-icon{flex-shrink:0;border-radius:2px;display:flex;align-items:center;justify-content:center;width:44px;height:44px;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.extra-title{flex:1;font-family:'Bodoni Moda',serif;font-size:.9rem;font-weight:700;color:rgba(255,255,255,.9)}
+.extra-chevron{transition:transform .35s cubic-bezier(0.22,1,0.36,1);color:rgba(201,168,76,.5)}
+.extra-card.open .extra-chevron{transform:rotate(180deg)}
+.extra-body{max-height:0;overflow:hidden;transition:max-height .45s ease-in-out}
+.extra-card.open .extra-body{max-height:400px}
+.extra-content{padding:.5rem 1.4rem 1.4rem;font-size:.82rem;color:rgba(255,255,255,.45);line-height:1.8}
+
+/* ── HASHTAG ── */
+#hashtag-sec{padding:3.5rem 1.5rem 4rem;background:#0d0d0d;text-align:center}
+.hashtag-box{border-radius:2px;padding:2rem 1.5rem;background:#111;border:1px solid rgba(201,168,76,.2);box-shadow:0 20px 60px rgba(0,0,0,.4),inset 0 1px 0 rgba(201,168,76,.08);position:relative;overflow:hidden}
+.hashtag-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,#FF2D78,transparent)}
+.hashtag-text{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.08em;color:#F0D474;margin-bottom:.75rem;display:block}
+.hashtag-sub{font-size:.88rem;font-style:italic;color:rgba(255,255,255,.4);line-height:1.7;margin-bottom:1.5rem}
+.hashtag-social{display:flex;justify-content:center;gap:2.5rem;list-style:none;margin:0;padding:0}
+.hashtag-social li{cursor:pointer}
+.hashtag-social li a{text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:6px;color:rgba(255,255,255,.35);font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.25em;transition:color .3s}
+.hashtag-social li a:hover{color:rgba(255,255,255,.85)}
+.hashtag-social li a i{font-size:2rem;transition:all .3s}
+.hashtag-social li.ig a:hover i{color:#dc2743}
+.hashtag-social li.wa a:hover i{color:#25D366}
+.hashtag-social li.tt a:hover i{color:#fff}
+
+/* ── RSVP ── */
+#rsvp-sec{padding:4rem 1.5rem 5rem;position:relative;overflow:hidden;background:#0a0a0a}
+#rsvp-sec::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 38px,rgba(255,45,120,.02) 38px,rgba(255,45,120,.02) 39px)}
+.rsvp-inner{position:relative;z-index:10}
+.rsvp-sub{text-align:center;margin-bottom:2rem;font-size:.88rem;font-style:italic;color:rgba(255,255,255,.45);line-height:1.8}
+.rsvp-card{border-radius:2px;padding:2rem 1.75rem;background:#111;border:1px solid rgba(201,168,76,.2);box-shadow:0 20px 60px rgba(0,0,0,.4),inset 0 1px 0 rgba(201,168,76,.08)}
+.rsvp-input{width:100%;border-radius:2px;display:block;margin-bottom:.75rem;padding:.95rem 1.2rem;border:1px solid rgba(201,168,76,.18);background:rgba(255,255,255,.04);color:rgba(255,255,255,.88);font-size:.9rem;font-family:inherit;outline:none}
+.rsvp-input::placeholder{color:rgba(255,255,255,.25)}
+.rsvp-toggle{display:flex;gap:.75rem;margin-bottom:18px}
+.rsvp-btn{flex:1;border-radius:2px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.35em;padding:.9rem;border:1px solid rgba(201,168,76,.3);background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);transition:all .25s}
+.rsvp-btn.active{border-color:#FF2D78;background:rgba(255,45,120,.15);color:rgba(255,255,255,.92);box-shadow:0 4px 20px rgba(255,45,120,.25)}
+.rsvp-error{font-size:.72rem;color:#FF2D78;margin-bottom:8px;font-family:'Bebas Neue',sans-serif;letter-spacing:.08em}
+.rsvp-submit{width:100%;border-radius:2px;color:#080808;cursor:pointer;border:none;padding:1.1rem;font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.38em;font-weight:700;background:linear-gradient(135deg,#C9A84C 0%,#F0D474 100%);box-shadow:0 10px 36px rgba(201,168,76,.4)}
+.rsvp-hint{text-align:center;margin-top:.75rem;font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.18em;color:rgba(255,255,255,.2)}
+.rsvp-thanks{text-align:center;padding:2.5rem 0;animation:scaleIn .55s cubic-bezier(0.22,1,0.36,1)}
+.rsvp-thanks-icon{border-radius:2px;display:flex;align-items:center;justify-content:center;width:80px;height:80px;margin:0 auto 1.25rem;background:linear-gradient(145deg,#C9A84C,#7A5C1E);box-shadow:0 14px 44px rgba(201,168,76,.45)}
+.rsvp-thanks h3{font-family:'Great Vibes',cursive;font-size:4rem;color:#F0D474;line-height:1}
+.rsvp-thanks p{font-size:.9rem;font-style:italic;margin-top:14px;color:rgba(255,255,255,.45);line-height:1.8}
+
+/* ── FOOTER ── */
+#footer-sec{padding:5rem 1.5rem 3.5rem;text-align:center;position:relative;overflow:hidden;background:#050505}
+#footer-sec .top-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,.5),transparent)}
+#footer-sec .seal{width:90px;height:90px;border-radius:2px;display:flex;align-items:center;justify-content:center;margin:0 auto 2rem;background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.2)}
+#footer-sec .poem{font-style:italic;line-height:2;margin-bottom:1.5rem;color:rgba(255,255,255,.35);font-size:.95rem}
+#footer-sec .signature-pill{display:inline-block;margin-bottom:2rem;border-radius:1px;padding:.95rem 2.5rem;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.25)}
+#footer-sec .signature-text{font-family:'Great Vibes',cursive;font-size:2.4rem;color:#F0D474}
+
+/* ── MUSIC FAB ── */
+.music-fab{position:fixed;z-index:9000;bottom:18px;right:18px;width:48px;height:48px;display:flex;justify-content:flex-end;align-items:flex-end;transition:all .6s cubic-bezier(0.64,.01,.07,1.65)}
+.music-fab .fab-bg{width:48px;height:48px;border-radius:50%;display:flex;justify-content:center;align-items:center;position:absolute;backdrop-filter:blur(10px)}
+.music-fab .fab-main{width:48px;height:48px;border-radius:50%;z-index:9;background:linear-gradient(135deg,#FF2D78,#B30050);box-shadow:0 4px 24px rgba(255,45,120,.55);bottom:0;right:0;transition:all .6s .2s ease;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.music-fab .fab-action{opacity:0;right:0;bottom:0;cursor:pointer;border:none;width:48px;height:48px;border-radius:50%;position:absolute}
+.music-fab .fab-action .fab-icon{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;opacity:0;border-radius:50%;transition:all .2s ease}
+.music-fab .fab-action.act-play{transition:all .3s 0s cubic-bezier(0.64,.01,.07,1.65);background:rgba(255,45,120,.18);border:1px solid rgba(255,45,120,.4)}
+.music-fab .fab-action.act-prev{transition:all .3s .12s cubic-bezier(0.64,.01,.07,1.65);background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.4)}
+.music-fab .fab-action.act-next{transition:all .3s .22s cubic-bezier(0.64,.01,.07,1.65);background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.4)}
+.music-fab:hover{width:120px;height:120px}
+.music-fab:hover .fab-main{box-shadow:0 6px 32px rgba(255,45,120,.7)}
+.music-fab:hover .fab-action{opacity:1}
+.music-fab:hover .fab-action .fab-icon{opacity:.92}
+.music-fab:hover .fab-action.act-play{right:0;bottom:calc(100% - 48px)}
+.music-fab:hover .fab-action.act-prev{bottom:45%;right:45%}
+.music-fab:hover .fab-action.act-next{bottom:0;right:calc(100% - 48px)}
+.fab-main.playing{animation:musicPulse 1.8s ease-in-out infinite}
+.fab-main.playing .note{display:inline-block;animation:noteSpin .8s ease-in-out infinite}
+#song-strip{position:fixed;bottom:78px;right:18px;z-index:8999;max-width:200px;padding:6px 12px;border-radius:2px;background:rgba(8,8,8,.88);border:1px solid rgba(255,45,120,.3);backdrop-filter:blur(12px);font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.22em;color:#FF2D78;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(6px);transition:all .3s ease;pointer-events:none}
+#song-strip.visible{opacity:1;transform:translateY(0)}
+
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,.22)}
 input,select,textarea{box-sizing:border-box}
-input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.22)}
 button{cursor:pointer}
-#app{max-width:480px;margin:0 auto;background:#04100c;min-height:100vh}
-section,footer{padding:3.5rem 1.5rem 4rem}
-#petal-canvas{position:fixed;inset:0;pointer-events:none;z-index:8888}
 </style>
 </head>
 <body>
 
-<!-- ────────────────────────────────────────────────────────────
-     STRIP: nombre de canción activa
-     ──────────────────────────────────────────────────────────── -->
 <div id="song-strip"></div>
-
-<!-- ════════════════════════════════════════════════════════════
-     BLOQUE MÚSICA — FAB flotante
-     data-plan: Solo PREMIUM y DELUXE tienen música de fondo.
-     El botón FAB se inyecta via JS tras validar el plan.
-     ════════════════════════════════════════════════════════════ -->
-<div class="music-fab" id="music-fab" data-plan="PREMIUM,DELUXE" style="display:none">
+<div class="music-fab" id="music-fab">
   <button class="fab-action act-play fab-bg" onclick="togglePlay(event)" title="Play / Pausa"><span class="fab-icon" id="fab-play-icon">▶</span></button>
-  <button class="fab-action act-prev fab-bg" onclick="prevTrack(event)" title="Anterior"><span class="fab-icon">⏮</span></button>
-  <button class="fab-action act-next fab-bg" onclick="nextTrack(event)" title="Siguiente"><span class="fab-icon">⏭</span></button>
-  <button class="fab-main" id="fab-main-btn" onclick="togglePlay(event)" title="Música"><span class="note">🎵</span></button>
+  <button class="fab-action act-prev fab-bg" onclick="prevSong(event)" title="Anterior"><span class="fab-icon">⏮</span></button>
+  <button class="fab-action act-next fab-bg" onclick="nextSong(event)" title="Siguiente"><span class="fab-icon">⏭</span></button>
+  <button class="fab-main" id="fab-main-btn" onclick="toggleFab(event)" title="Música"><span class="note">🎵</span></button>
 </div>
 
-<!-- Audio oculto – src inyectado por JS desde la variable AUDIO_TRACKS -->
 <audio id="bg-audio"></audio>
 <canvas id="petal-canvas"></canvas>
 
-<!-- ════════════════════════════════════════════════════════════
-     BLOQUE APERTURA / SPLASH
-     data-plan: CLASSIC, PREMIUM, DELUXE (todos los planes)
-     Bloquea el scroll hasta que el usuario toca el botón.
-     ════════════════════════════════════════════════════════════ -->
-<div id="splash" data-plan="CLASSIC,PREMIUM,DELUXE"
-     onclick="closeSplash()"
-     style="position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;overflow:hidden;background:#080808">
+<div id="app">
 
-  <!-- Imagen de fondo del splash -->
-  <img src="{{FOTO_PORTADA_SPLASH}}" alt=""
-       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22;filter:grayscale(40%)" />
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(8,8,8,.65) 20%,rgba(8,8,8,.92) 100%)"></div>
-  <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 38px,rgba(201,168,76,.04) 38px,rgba(201,168,76,.04) 39px)"></div>
-
-  <!-- Diamantes animados en esquinas -->
-  <svg class="diamond-float-0" viewBox="0 0 40 48" fill="none" style="position:absolute;top:18px;left:18px;width:38px;height:46px;filter:drop-shadow(0 0 8px rgba(0,230,120,.8))"><polygon points="20,2 38,14 38,34 20,46 2,34 2,14" fill="rgba(0,150,80,.22)" stroke="rgba(0,230,120,.95)" stroke-width="1.5"/><polygon points="20,8 32,17 32,31 20,40 8,31 8,17" fill="rgba(0,150,80,.14)" stroke="rgba(0,230,120,.65)" stroke-width="1"/><polygon points="20,14 26,20 26,28 20,34 14,28 14,20" fill="rgba(0,200,130,.12)" stroke="rgba(0,230,120,.4)" stroke-width=".8"/></svg>
-  <svg class="diamond-float-1" viewBox="0 0 40 48" fill="none" style="position:absolute;top:18px;right:18px;width:38px;height:46px;filter:drop-shadow(0 0 8px rgba(0,230,120,.8))"><polygon points="20,2 38,14 38,34 20,46 2,34 2,14" fill="rgba(0,150,80,.22)" stroke="rgba(0,230,120,.95)" stroke-width="1.5"/><polygon points="20,8 32,17 32,31 20,40 8,31 8,17" fill="rgba(0,150,80,.14)" stroke="rgba(0,230,120,.65)" stroke-width="1"/><polygon points="20,14 26,20 26,28 20,34 14,28 14,20" fill="rgba(0,200,130,.12)" stroke="rgba(0,230,120,.4)" stroke-width=".8"/></svg>
-  <svg class="diamond-float-2" viewBox="0 0 40 48" fill="none" style="position:absolute;bottom:18px;left:18px;width:38px;height:46px;filter:drop-shadow(0 0 8px rgba(0,230,120,.8))"><polygon points="20,2 38,14 38,34 20,46 2,34 2,14" fill="rgba(0,150,80,.22)" stroke="rgba(0,230,120,.95)" stroke-width="1.5"/><polygon points="20,8 32,17 32,31 20,40 8,31 8,17" fill="rgba(0,150,80,.14)" stroke="rgba(0,230,120,.65)" stroke-width="1"/><polygon points="20,14 26,20 26,28 20,34 14,28 14,20" fill="rgba(0,200,130,.12)" stroke="rgba(0,230,120,.4)" stroke-width=".8"/></svg>
-  <svg class="diamond-float-3" viewBox="0 0 40 48" fill="none" style="position:absolute;bottom:18px;right:18px;width:38px;height:46px;filter:drop-shadow(0 0 8px rgba(0,230,120,.8))"><polygon points="20,2 38,14 38,34 20,46 2,34 2,14" fill="rgba(0,150,80,.22)" stroke="rgba(0,230,120,.95)" stroke-width="1.5"/><polygon points="20,8 32,17 32,31 20,40 8,31 8,17" fill="rgba(0,150,80,.14)" stroke="rgba(0,230,120,.65)" stroke-width="1"/><polygon points="20,14 26,20 26,28 20,34 14,28 14,20" fill="rgba(0,200,130,.12)" stroke="rgba(0,230,120,.4)" stroke-width=".8"/></svg>
-
-  <div class="fade-in-up" style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 2.5rem">
-    <p style="font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.78em;color:#00C896;margin-bottom:1.2rem">{{SUBTITULO_EVENTO}} · XV Años</p>
-    <h1 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:9rem;line-height:.82;letter-spacing:.04em">15</h1>
-    <p style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.55em;color:rgba(201,168,76,.75);margin-bottom:.4rem">AÑOS DE</p>
-    <!-- ▼▼ VARIABLE: nombre de la protagonista ▼▼ -->
-    <p style="font-family:'Great Vibes',cursive;font-size:3rem;color:rgba(255,255,255,.92);margin-bottom:1.5rem">{{NOMBRE_PROTAGONISTAS}}</p>
-    <!-- ▼▼ VARIABLE: Fecha y hora formateada para mostrar ▼▼ -->
-    <div style="border:1px solid rgba(201,168,76,.4);border-radius:2px;padding:.55rem 1.8rem;margin-bottom:1.75rem;font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.38em;color:rgba(201,168,76,.85);background:rgba(201,168,76,.06)">{{FECHA_DISPLAY}} &nbsp;|&nbsp; {{HORA_DISPLAY}}</div>
-    <button style="border:none;border-radius:2px;color:#080808;font-weight:900;padding:1rem 2.8rem;background:linear-gradient(135deg,#C9A84C 0%,#F0D474 50%,#C9A84C 100%);font-family:'Bebas Neue',sans-serif;font-size:.88rem;letter-spacing:.48em;box-shadow:0 8px 28px rgba(201,168,76,.4)">✦ Abrir Invitación ✦</button>
-    <p style="font-size:.5rem;letter-spacing:.18em;color:rgba(255,255,255,.3);margin-top:.75rem;font-family:'Bebas Neue',sans-serif">Toca en cualquier lugar para abrir</p>
-  </div>
-</div>
-
-<!-- ════════════════════════════════════════════════════════════
-     CONTENEDOR PRINCIPAL DEL APP
-     ════════════════════════════════════════════════════════════ -->
-<div id="app" style="display:none">
-
-  <!-- ══ HERO / PORTADA ══════════════════════════════════════════
-       data-plan: todos los planes
-       ══════════════════════════════════════════════════════════ -->
-  <header data-plan="CLASSIC,PREMIUM,DELUXE"
-          style="position:relative;text-align:center;overflow:hidden;display:flex;flex-direction:column;min-height:95vh;background:#04100c;padding:0">
-    <!-- Foto de fondo hero -->
-    <img src="{{FOTO_FONDO_HERO}}" alt=""
-         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.18;filter:grayscale(50%)" />
-    <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 38px,rgba(201,168,76,.03) 38px,rgba(201,168,76,.03) 39px)"></div>
-    <div class="aurora-a" style="top:15%;left:-20%"></div>
-    <div class="aurora-b" style="top:45%;left:10%"></div>
-    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,8,8,.7) 0%,rgba(8,8,8,.35) 45%,rgba(8,8,8,.85) 100%);z-index:2"></div>
-
-    <div style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;padding:4rem 2rem 4rem;flex:1">
-      <!-- Foto principal de la protagonista -->
-      <div class="hero-photo-wrap">
-        <img src="{{FOTO_PROTAGONISTA_HERO}}" alt="{{NOMBRE_PROTAGONISTAS}}" />
-        <div class="hero-photo-shimmer"></div>
-        <div class="hero-photo-corner hero-photo-tl"></div>
-        <div class="hero-photo-corner hero-photo-tr"></div>
-        <div class="hero-photo-corner hero-photo-bl"></div>
-        <div class="hero-photo-corner hero-photo-br"></div>
-      </div>
-
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.72em;color:#00C896;margin-bottom:.5rem">Estás invitada a mis</p>
-      <h1 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:10rem;line-height:.78;letter-spacing:.04em">15</h1>
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.6em;color:rgba(240,212,116,.7);margin-bottom:.5rem">AÑOS</p>
-      <p style="font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;letter-spacing:.22em;color:rgba(255,255,255,.4);margin:.25rem 0">de</p>
-      <p style="font-family:'Great Vibes',cursive;font-size:3.2rem;color:rgba(255,255,255,.95);margin-bottom:2rem">{{NOMBRE_PROTAGONISTAS}}</p>
-
-      <!-- Tarjeta de datos del evento -->
-      <div class="glow-card" style="width:100%;max-width:340px;position:relative;overflow:hidden;margin-bottom:2.5rem;padding:1.75rem;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.35);backdrop-filter:blur(24px)">
-        <div style="position:absolute;top:0;left:10%;right:10%;height:1.5px;background:linear-gradient(to right,transparent,#C9A84C,transparent)"></div>
-        <p style="font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.55em;color:rgba(201,168,76,.65);margin-bottom:.5rem">Invitación Oficial</p>
-        <p style="font-family:'Great Vibes',cursive;font-size:2.2rem;color:#F0D474;margin-bottom:.75rem">{{NOMBRE_PROTAGONISTAS}}</p>
-        <div style="height:1px;margin:.75rem 0;background:linear-gradient(to right,transparent,rgba(201,168,76,.35),transparent)"></div>
-        <div style="display:flex;justify-content:center;gap:1.25rem;flex-wrap:wrap">
-          <div style="text-align:center">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:.46rem;letter-spacing:.42em;color:rgba(201,168,76,.55);margin-bottom:2px">Fecha</div>
-            <div style="font-family:'Bodoni Moda',serif;font-size:.88rem;font-weight:700;color:rgba(255,255,255,.9)">{{FECHA_DISPLAY}}</div>
-          </div>
-          <div style="width:1px;background:rgba(201,168,76,.2)"></div>
-          <div style="text-align:center">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:.46rem;letter-spacing:.42em;color:rgba(201,168,76,.55);margin-bottom:2px">Hora</div>
-            <div style="font-family:'Bodoni Moda',serif;font-size:.88rem;font-weight:700;color:rgba(255,255,255,.9)">{{HORA_DISPLAY}}</div>
-          </div>
-          <div style="width:1px;background:rgba(201,168,76,.2)"></div>
-          <div style="text-align:center">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:.46rem;letter-spacing:.42em;color:rgba(201,168,76,.55);margin-bottom:2px">Lugar</div>
-            <div style="font-family:'Bodoni Moda',serif;font-size:.88rem;font-weight:700;color:rgba(255,255,255,.9)">{{CIUDAD_EVENTO}}</div>
-          </div>
-        </div>
-      </div>
+  <!-- SPLASH -->
+  <div id="splash" onclick="closeSplash()">
+    <img class="splash-bg" src="https://images.unsplash.com/photo-1613909671501-f9678ffc1d33?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800" alt="" />
+    <div class="vignette"></div>
+    <div class="diag"></div>
+    <svg class="diamond-svg diamond-tl" viewBox="0 0 36 36" fill="none"><polygon points="18,2 34,18 18,34 2,18" fill="rgba(201,168,76,0.18)" stroke="rgba(201,168,76,0.9)" stroke-width="1.5"/><polygon points="18,8 28,18 18,28 8,18" fill="rgba(201,168,76,0.10)" stroke="rgba(201,168,76,0.5)" stroke-width="1"/></svg>
+    <svg class="diamond-svg diamond-tr" viewBox="0 0 36 36" fill="none"><polygon points="18,2 34,18 18,34 2,18" fill="rgba(201,168,76,0.18)" stroke="rgba(201,168,76,0.9)" stroke-width="1.5"/><polygon points="18,8 28,18 18,28 8,18" fill="rgba(201,168,76,0.10)" stroke="rgba(201,168,76,0.5)" stroke-width="1"/></svg>
+    <svg class="diamond-svg diamond-bl" viewBox="0 0 36 36" fill="none"><polygon points="18,2 34,18 18,34 2,18" fill="rgba(201,168,76,0.18)" stroke="rgba(201,168,76,0.9)" stroke-width="1.5"/><polygon points="18,8 28,18 18,28 8,18" fill="rgba(201,168,76,0.10)" stroke="rgba(201,168,76,0.5)" stroke-width="1"/></svg>
+    <svg class="diamond-svg diamond-br" viewBox="0 0 36 36" fill="none"><polygon points="18,2 34,18 18,34 2,18" fill="rgba(201,168,76,0.18)" stroke="rgba(201,168,76,0.9)" stroke-width="1.5"/><polygon points="18,8 28,18 18,28 8,18" fill="rgba(201,168,76,0.10)" stroke="rgba(201,168,76,0.5)" stroke-width="1"/></svg>
+    <div class="content">
+      <p class="fashion-tag">Fashion Edition · XV Años</p>
+      <h1 class="gold-shimmer-text">15</h1>
+      <p class="xv-label">Años de</p>
+      <p class="splash-script">Sofía Valentina</p>
+      <div class="date-strip">15 · NOV · 2026 &nbsp;|&nbsp; 7:00 PM</div>
+      <button class="open-btn">✦ Abrir Invitación ✦</button>
+      <p class="tap-hint">Toca en cualquier lugar para abrir</p>
     </div>
-
-    <svg viewBox="0 0 480 48" preserveAspectRatio="none" style="display:block;width:100%;position:relative;z-index:10;margin-top:auto">
-      <path d="M0,0 C18,36 54,36 72,18 C90,0 108,0 126,18 C144,36 180,36 198,18 C216,0 234,0 252,18 C270,36 306,36 324,18 C342,0 360,0 378,18 C396,36 432,36 450,18 C468,0 474,12 480,18 L480,48 L0,48 Z" fill="#0d0d0d"/>
-    </svg>
-  </header>
-
-  <!-- Ticker decorativo -->
-  <div data-plan="CLASSIC,PREMIUM,DELUXE"
-       style="background:linear-gradient(90deg,#006B4A,#00C896,#006B4A);overflow:hidden;padding:8px 0">
-    <div class="ticker-inner" id="ticker"></div>
   </div>
 
-  <!-- ══ BLOQUE HISTORIA ═════════════════════════════════════════
-       data-plan: PREMIUM y DELUXE solamente
-       ══════════════════════════════════════════════════════════ -->
-  <section data-plan="PREMIUM,DELUXE" style="padding:3.5rem 1.5rem 4rem;background:#0d0d0d">
-    <div style="text-align:center;margin-bottom:2rem">
-      <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:#00C896;margin-bottom:.5rem">Quién soy</span>
-      <h2 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">Mi Historia</h2>
-    </div>
-    <div class="glow-card" style="border:1px solid rgba(201,168,76,.2);background:#0c1810">
-      <div style="position:relative;height:220px;overflow:hidden">
-        <img src="{{FOTO_HISTORIA_BG}}" alt=""
-             style="width:100%;height:100%;object-fit:cover;filter:grayscale(20%);opacity:.6" />
-        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(17,17,17,1) 0%,rgba(17,17,17,.3) 60%,transparent 100%)"></div>
-        <p style="position:absolute;bottom:16px;left:20px;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.55em;color:#00C896">{{SUBTITULO_EVENTO}}</p>
-      </div>
-      <div style="padding:1.75rem">
-        <!-- ▼▼ VARIABLE: texto narrativo completo ▼▼ -->
-        <p style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;color:rgba(255,255,255,.7);line-height:1.9;margin-bottom:1.25rem">{{TEXTO_HISTORIA}}</p>
-        <div style="height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,.3),transparent);margin-bottom:1.25rem"></div>
-        <p style="font-size:.85rem;color:rgba(255,255,255,.4);line-height:1.8">{{BIO_CORTA}}</p>
-      </div>
-    </div>
-  </section>
+  <!-- MAIN -->
+  <div id="main">
 
-  <!-- ══ BLOQUE CUENTA REGRESIVA ════════════════════════════════
-       data-plan: todos los planes
-       La lógica JS usa FECHA_EVENTO_ISO para calcular el tiempo.
-       ══════════════════════════════════════════════════════════ -->
-  <section data-plan="CLASSIC,PREMIUM,DELUXE"
-           style="padding:5rem 1.5rem;text-align:center;position:relative;overflow:hidden;background:#060f0c">
-    <div class="scanlines"></div>
-    <div style="position:relative;z-index:10">
-      <div style="text-align:center;margin-bottom:2rem">
-        <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:rgba(0,200,150,.75);margin-bottom:.5rem">Cuenta regresiva</span>
-        <h2 class="fuchsia-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">¡Falta poco!</h2>
-      </div>
-      <!-- Nodos de tiempo actualizados por JS -->
-      <div style="display:flex;align-items:flex-start;justify-content:center;gap:10px;margin-top:1rem">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-          <div class="glow-card" style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:72px;height:84px;background:#0c1810;border:1px solid rgba(201,168,76,.25)">
-            <div class="shimmer-box"></div>
-            <span id="cd-days" style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.04em;background:linear-gradient(180deg,#F0D474 0%,#C9A84C 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;position:relative;z-index:1">000</span>
+    <!-- HERO -->
+    <section id="hero">
+      <img class="hero-bg" src="https://images.unsplash.com/photo-1571924849183-a68a3879348d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800" alt="" />
+      <div class="diag"></div>
+      <div class="hero-veil"></div>
+      <div class="inner">
+        <!-- FOTO de la quinceañera (nueva sección de Esmeralda Noir) -->
+        <div class="hero-photo-wrap">
+          <img src="https://images.unsplash.com/photo-1652928722394-e806c14b1c21?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600" alt="Sofía Valentina" />
+          <div class="hero-photo-shimmer"></div>
+          <div class="hero-photo-corner hero-photo-tl"></div>
+          <div class="hero-photo-corner hero-photo-tr"></div>
+          <div class="hero-photo-corner hero-photo-bl"></div>
+          <div class="hero-photo-corner hero-photo-br"></div>
+        </div>
+        <p class="kicker">Estás invitada a mis</p>
+        <h1 class="gold-shimmer-text">15</h1>
+        <p class="anos">AÑOS</p>
+        <p class="de">de</p>
+        <p class="name">Sofía Valentina</p>
+        <div style="margin-bottom:2rem">
+          <svg width="230" height="14" viewBox="0 0 230 14" fill="none">
+            <line x1="0" y1="7" x2="88" y2="7" stroke="url(#hLf)" stroke-width=".8"/>
+            <rect x="109" y="4" width="12" height="6" fill="#FF2D78" opacity=".9" transform="rotate(45 115 7)"/>
+            <circle cx="100" cy="7" r="1.8" fill="rgba(201,168,76,.5)"/>
+            <circle cx="130" cy="7" r="1.8" fill="rgba(201,168,76,.5)"/>
+            <line x1="142" y1="7" x2="230" y2="7" stroke="url(#hRf)" stroke-width=".8"/>
+            <defs>
+              <linearGradient id="hLf" x1="0" y1="0" x2="88" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient>
+              <linearGradient id="hRf" x1="142" y1="0" x2="230" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="invite-card">
+          <div class="top-line"></div>
+          <p class="inv-kicker">Invitación Oficial</p>
+          <p class="inv-name">Sofía Valentina</p>
+          <div class="div"></div>
+          <div class="facts">
+            <div class="fact"><div class="fact-label">Fecha</div><div class="fact-value">15 Nov 2026</div></div>
+            <div class="fact-sep"></div>
+            <div class="fact"><div class="fact-label">Hora</div><div class="fact-value">7:00 PM</div></div>
+            <div class="fact-sep"></div>
+            <div class="fact"><div class="fact-label">Lugar</div><div class="fact-value">Bogotá</div></div>
           </div>
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.38em;color:rgba(201,168,76,.45)">DÍAS</span>
-        </div>
-        <span class="cd-colon" style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:rgba(0,200,150,.45);padding-bottom:2.2rem">:</span>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-          <div class="glow-card" style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:72px;height:84px;background:#0c1810;border:1px solid rgba(201,168,76,.25)">
-            <div class="shimmer-box"></div>
-            <span id="cd-hours" style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.04em;background:linear-gradient(180deg,#F0D474 0%,#C9A84C 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;position:relative;z-index:1">00</span>
-          </div>
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.38em;color:rgba(201,168,76,.45)">HORAS</span>
-        </div>
-        <span class="cd-colon" style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:rgba(0,200,150,.45);padding-bottom:2.2rem">:</span>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-          <div class="glow-card" style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:72px;height:84px;background:#0c1810;border:1px solid rgba(201,168,76,.25)">
-            <div class="shimmer-box"></div>
-            <span id="cd-mins" style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.04em;background:linear-gradient(180deg,#F0D474 0%,#C9A84C 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;position:relative;z-index:1">00</span>
-          </div>
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.38em;color:rgba(201,168,76,.45)">MIN</span>
-        </div>
-        <span class="cd-colon" style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:rgba(0,200,150,.45);padding-bottom:2.2rem">:</span>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-          <div class="glow-card" style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:72px;height:84px;background:#0c1810;border:1px solid rgba(201,168,76,.25)">
-            <div class="shimmer-box"></div>
-            <span id="cd-secs" style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.04em;background:linear-gradient(180deg,#F0D474 0%,#C9A84C 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;position:relative;z-index:1">00</span>
-          </div>
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.38em;color:rgba(201,168,76,.45)">SEG</span>
+          <div class="bottom-line"></div>
         </div>
       </div>
-      <!-- Mensaje que aparece cuando el evento ya ocurrió -->
-      <p id="cd-expired"
-         style="display:none;font-family:'Great Vibes',cursive;font-size:2rem;color:#F0D474;margin-top:1.5rem">
-        ✨ ¡El gran momento ha llegado! ✨
-      </p>
-    </div>
-  </section>
+      <svg class="wave-svg" viewBox="0 0 480 48" preserveAspectRatio="none">
+        <path d="M0,0 C18,36 54,36 72,18 C90,0 108,0 126,18 C144,36 180,36 198,18 C216,0 234,0 252,18 C270,36 306,36 324,18 C342,0 360,0 378,18 C396,36 432,36 450,18 C468,0 474,12 480,18 L480,48 L0,48 Z" fill="#0d0d0d"/>
+      </svg>
+    </section>
 
-  <!-- ══ BLOQUE GALERÍA ══════════════════════════════════════════
-       data-plan: todos los planes
-       Sub-bloques controlados por JS según el plan:
-         CLASSIC  → galería-classic  (4 fotos en grid)
-         PREMIUM  → galería-premium  (slider de 8 fotos)
-         DELUXE   → galería-deluxe   (álbum de 12 fotos con tabs)
-       ══════════════════════════════════════════════════════════ -->
-  <section data-plan="CLASSIC,PREMIUM,DELUXE" style="padding:3.5rem 1.5rem 4rem;background:#0d0d0d">
-    <div style="text-align:center;margin-bottom:2rem">
-      <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:#00C896;margin-bottom:.5rem">Memorias y momentos</span>
-      <h2 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">Galería</h2>
+    <!-- TICKER -->
+    <div class="ticker-wrap">
+      <div class="ticker-inner" id="ticker-inner"></div>
     </div>
 
-    <!-- Sub-bloque CLASSIC: 4 fotos en grid estático -->
-    <div id="galeria-classic" style="display:none;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div class="glow-card" style="height:150px;overflow:hidden"><img src="{{FOTO_1}}" alt="" style="width:100%;height:100%;object-fit:cover" /></div>
-      <div class="glow-card" style="height:150px;overflow:hidden"><img src="{{FOTO_2}}" alt="" style="width:100%;height:100%;object-fit:cover" /></div>
-      <div class="glow-card" style="height:150px;overflow:hidden"><img src="{{FOTO_3}}" alt="" style="width:100%;height:100%;object-fit:cover" /></div>
-      <div class="glow-card" style="height:150px;overflow:hidden"><img src="{{FOTO_4}}" alt="" style="width:100%;height:100%;object-fit:cover" /></div>
-    </div>
-
-    <!-- Sub-bloque PREMIUM: slider/carrusel de 8 fotos -->
-    <div id="galeria-premium" style="display:none">
-      <div class="glow-card" style="position:relative;height:300px;border:1px solid rgba(201,168,76,.2)">
-        <div id="gal-prem-images" style="position:absolute;inset:0;overflow:hidden">
-          <!-- JS inyecta los <img> con clase gal-img -->
-        </div>
-        <div style="position:absolute;inset:0;z-index:2;background:linear-gradient(to top,rgba(8,8,8,.8) 0%,transparent 55%)"></div>
-        <p id="gal-prem-caption" style="position:absolute;bottom:16px;left:0;right:0;text-align:center;z-index:3;font-family:'Great Vibes',cursive;font-size:1.5rem;color:rgba(255,255,255,.95)"></p>
-        <div id="gal-prem-counter" style="position:absolute;top:14px;right:14px;z-index:10;border-radius:1px;padding:5px 14px;background:#00C896;font-family:'Bebas Neue',sans-serif;font-size:.6rem;font-weight:700;color:white;letter-spacing:.2em"></div>
-        <button onclick="premGalPrev()" style="position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:10;width:42px;height:42px;border-radius:1px;background:rgba(8,8,8,.85);border:1px solid rgba(201,168,76,.3);font-size:1.4rem;color:#C9A84C">‹</button>
-        <button onclick="premGalNext()" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);z-index:10;width:42px;height:42px;border-radius:1px;background:rgba(8,8,8,.85);border:1px solid rgba(201,168,76,.3);font-size:1.4rem;color:#C9A84C">›</button>
+    <!-- MI HISTORIA (nueva — de Esmeralda Noir) -->
+    <section id="historia-sec">
+      <div class="sec-header">
+        <span class="sec-kicker">Quién soy</span>
+        <h2 class="sec-title gold-shimmer-text">Mi Historia</h2>
+        <div class="orn-div"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLh)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#FF2D78" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRh)" stroke-width=".7"/><defs><linearGradient id="oLh" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRh" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
       </div>
-      <div id="gal-prem-dots" style="display:flex;gap:6px;justify-content:center;margin-top:12px"></div>
-    </div>
-
-    <!-- Sub-bloque DELUXE: 12 fotos con tabs de álbum -->
-    <div id="galeria-deluxe" style="display:none">
-      <div id="gal-dlx-tabs" style="display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:4px"></div>
-      <div class="glow-card" style="position:relative;height:300px;border:1px solid rgba(201,168,76,.2)">
-        <div id="gal-dlx-images" style="position:absolute;inset:0;overflow:hidden"></div>
-        <div style="position:absolute;inset:0;z-index:2;background:linear-gradient(to top,rgba(8,8,8,.8) 0%,transparent 55%)"></div>
-        <p id="gal-dlx-caption" style="position:absolute;bottom:16px;left:0;right:0;text-align:center;z-index:3;font-family:'Great Vibes',cursive;font-size:1.5rem;color:rgba(255,255,255,.95)"></p>
-        <div id="gal-dlx-counter" style="position:absolute;top:14px;right:14px;z-index:10;border-radius:1px;padding:5px 14px;background:#00C896;font-family:'Bebas Neue',sans-serif;font-size:.6rem;font-weight:700;color:white;letter-spacing:.2em"></div>
-        <button onclick="dlxGalPrev()" style="position:absolute;top:50%;left:10px;transform:translateY(-50%);z-index:10;width:42px;height:42px;border-radius:1px;background:rgba(8,8,8,.85);border:1px solid rgba(201,168,76,.3);font-size:1.4rem;color:#C9A84C">‹</button>
-        <button onclick="dlxGalNext()" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);z-index:10;width:42px;height:42px;border-radius:1px;background:rgba(8,8,8,.85);border:1px solid rgba(201,168,76,.3);font-size:1.4rem;color:#C9A84C">›</button>
+      <div class="historia-card">
+        <div class="historia-img">
+          <img src="https://images.unsplash.com/photo-1571924849183-a68a3879348d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800" alt="" />
+          <div class="overlay"></div>
+          <p class="tag">Fashion Edition · 2026</p>
+        </div>
+        <div class="historia-body">
+          <p class="historia-quote">"Desde muy pequeña tuve dos grandes pasiones: la moda y el baile. Hoy, a mis 15 años, quiero celebrar cada uno de esos sueños rodeada de las personas que más quiero..."</p>
+          <div class="historia-div"></div>
+          <p class="historia-text">Sofía Valentina nació el 15 de noviembre de 2011 en Bogotá, Colombia. Creció entre vestidos, tacones y pasarelas imaginarias. Hoy da un paso al mundo siendo la joven increíble que siempre fue destinada a ser.</p>
+        </div>
       </div>
-      <div id="gal-dlx-thumbs" style="display:flex;gap:8px;margin-top:14px;justify-content:center;flex-wrap:wrap"></div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ══ BLOQUE ITINERARIO ═══════════════════════════════════════
-       data-plan: todos los planes
-       DELUXE activa además una línea de tiempo con horas detalladas.
-       ══════════════════════════════════════════════════════════ -->
-  <section data-plan="CLASSIC,PREMIUM,DELUXE" style="padding:3.5rem 1.5rem 4rem;background:#080808">
-    <div style="text-align:center;margin-bottom:2rem">
-      <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:#00C896;margin-bottom:.5rem">La noche perfecta</span>
-      <h2 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">Programa</h2>
-    </div>
+    <!-- LA FECHA -->
+    <section id="date-sec">
+      <div class="sec-header">
+        <span class="sec-kicker">La noche más especial</span>
+        <h2 class="sec-title gold-shimmer-text">La Fecha</h2>
+        <div class="orn-div"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLd)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#FF2D78" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRd)" stroke-width=".7"/><defs><linearGradient id="oLd" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRd" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
+      </div>
+      <div class="date-cards">
+        <div class="date-card"><div class="top-bar"></div><div class="card-label">DÍA</div><div class="card-big">15</div></div>
+        <div class="date-card"><div class="top-bar"></div><div class="card-label">MES · AÑO</div><div class="card-sub">Nov&#10;2026</div></div>
+        <div class="date-card"><div class="top-bar"></div><div class="card-label">HORA</div><div class="card-big">7</div><div class="card-sub">PM</div></div>
+      </div>
+    </section>
 
-    <!-- Cronograma base (CLASSIC y PREMIUM) -->
-    <div id="itin-base" class="glow-card" style="padding:1.5rem;background:#0c1810;border:1px solid rgba(201,168,76,.2)">
-      <!-- ▼▼ VARIABLE: texto del cronograma básico ▼▼ -->
-      <p style="font-size:.9rem;color:rgba(255,255,255,.65);line-height:2;white-space:pre-line">{{TEXTO_CRONOGRAMA}}</p>
-    </div>
-
-    <!-- Línea de tiempo extendida solo para DELUXE -->
-    <div id="itin-deluxe" data-plan="DELUXE"
-         style="position:relative;margin-top:2rem;display:none">
-      <div id="itin-line"></div>
-      <!-- JS construye los items desde ITIN_ITEMS_DELUXE -->
-    </div>
-  </section>
-
-  <!-- ══ BLOQUE MAPA Y LOGÍSTICA ════════════════════════════════
-       data-plan: todos los planes
-       ══════════════════════════════════════════════════════════ -->
-  <section data-plan="CLASSIC,PREMIUM,DELUXE" style="padding:3.5rem 1.5rem 4rem;background:#060f0c">
-    <div style="text-align:center;margin-bottom:2rem">
-      <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:#00C896;margin-bottom:.5rem">¿Dónde será la magia?</span>
-      <h2 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">El Lugar</h2>
-    </div>
-    <div id="lugar-box" class="glow-card" style="border:1px solid rgba(201,168,76,.2);background:#0c1810">
-      <button onclick="toggleLugar()"
-              style="display:flex;align-items:center;gap:18px;padding:1.5rem;width:100%;text-align:left;border:none;background:transparent">
-        <div style="flex-shrink:0;border-radius:2px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#00C896,#006B4A);box-shadow:0 8px 28px rgba(0,200,150,.4)">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.95)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+    <!-- COUNTDOWN -->
+    <section id="countdown-sec">
+      <div class="scanlines"></div>
+      <div style="position:relative;z-index:10">
+        <div class="sec-header">
+          <span class="sec-kicker sec-kicker-light">Cuenta regresiva</span>
+          <h2 class="sec-title fuchsia-shimmer-text">¡Falta poco!</h2>
         </div>
-        <div style="flex:1">
-          <!-- ▼▼ VARIABLE: nombre del salón ▼▼ -->
-          <div style="font-family:'Bodoni Moda',serif;font-size:1.05rem;font-weight:700;color:rgba(255,255,255,.95);margin-bottom:3px">{{NOMBRE_LUGAR}}</div>
-          <!-- ▼▼ VARIABLE: dirección ▼▼ -->
-          <div style="font-size:.76rem;color:rgba(255,255,255,.4);line-height:1.5">{{DIRECCION_LUGAR}}</div>
+        <div class="cd-grid">
+          <div class="cd-col"><div class="cd-box"><div class="top-gloss"></div><div class="shimmer"></div><span class="cd-num" id="cd-days">000</span></div><span class="cd-label">DÍAS</span></div>
+          <span class="cd-colon">:</span>
+          <div class="cd-col"><div class="cd-box"><div class="top-gloss"></div><div class="shimmer"></div><span class="cd-num" id="cd-hours">00</span></div><span class="cd-label">HORAS</span></div>
+          <span class="cd-colon">:</span>
+          <div class="cd-col"><div class="cd-box"><div class="top-gloss"></div><div class="shimmer"></div><span class="cd-num" id="cd-mins">00</span></div><span class="cd-label">MIN</span></div>
+          <span class="cd-colon">:</span>
+          <div class="cd-col"><div class="cd-box"><div class="top-gloss"></div><div class="shimmer"></div><span class="cd-num" id="cd-secs">00</span></div><span class="cd-label">SEG</span></div>
         </div>
-        <span id="lugar-chevron" class="gift-chevron">▾</span>
-      </button>
-      <div id="lugar-body" class="gift-body">
-        <div style="border-top:1px solid rgba(201,168,76,.1)">
-          <div style="height:220px">
-            <!-- ▼▼ VARIABLE: URL del embed de Google Maps ▼▼ -->
-            <iframe title="Mapa" src="{{LINK_MAPS_EMBED}}"
-                    style="width:100%;height:100%;border:none;display:block" loading="lazy"></iframe>
+      </div>
+    </section>
+
+    <!-- EL LUGAR (colapsable — de Esmeralda Noir) -->
+    <section id="location-sec">
+      <div class="sec-header">
+        <span class="sec-kicker">¿Dónde será la magia?</span>
+        <h2 class="sec-title gold-shimmer-text">El Lugar</h2>
+        <div class="orn-div"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLl)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#FF2D78" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRl)" stroke-width=".7"/><defs><linearGradient id="oLl" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRl" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
+      </div>
+      <div class="loc-card">
+        <button class="loc-toggle" onclick="toggleLugar()">
+          <div class="loc-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.95)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
           </div>
-          <div style="padding:1.25rem">
-            <!-- ▼▼ VARIABLE: URL directa de Google Maps para abrir en app ▼▼ -->
-            <a href="{{LINK_MAPS}}" target="_blank" rel="noopener noreferrer"
-               style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border-radius:2px;color:#030d09;border:none;padding:1rem;background:linear-gradient(135deg,#00C896 0%,#7FFFD4 50%,#00C896 100%);font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.4em;font-weight:700;text-decoration:none">
+          <div>
+            <div class="loc-name">Salón de Eventos</div>
+            <div class="loc-addr">Calle de los Sueños 123<br>Bogotá, Colombia</div>
+          </div>
+          <span class="loc-chevron" id="loc-chevron">▾</span>
+        </button>
+        <div class="loc-body" id="loc-body">
+          <div class="loc-map">
+            <iframe title="Mapa" src="https://maps.google.com/maps?q=Bogot%C3%A1,+Colombia&output=embed" loading="lazy"></iframe>
+          </div>
+          <div class="loc-btn-wrap">
+            <a class="loc-btn" href="https://maps.google.com/maps?q=Bogotá,+Colombia" target="_blank" rel="noopener noreferrer">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
               Cómo Llegar
             </a>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ══ BLOQUE HOSPEDAJE Y BUSES ═══════════════════════════════
-       data-plan: solo DELUXE
-       ══════════════════════════════════════════════════════════ -->
-  <section data-plan="DELUXE" style="padding:3.5rem 1.5rem 4rem;background:#080808">
-    <div style="text-align:center;margin-bottom:2rem">
-      <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:rgba(0,200,150,.75);margin-bottom:.5rem">Tu comodidad es nuestra prioridad</span>
-      <h2 class="fuchsia-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">Logística</h2>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <!-- Hoteles -->
-      <div class="glow-card" style="background:#0c1810;border:1px solid rgba(201,168,76,.2)">
-        <button onclick="toggleAccordion('hotel')"
-                style="display:flex;align-items:center;gap:14px;padding:1.25rem;width:100%;text-align:left;border:none;background:transparent">
-          <span style="font-size:1.6rem">🏨</span>
-          <div style="flex:1;font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.2em;color:rgba(255,255,255,.85)">Hospedaje Recomendado</div>
-          <span class="gift-chevron" id="chev-hotel">▾</span>
-        </button>
-        <div class="gift-body" id="body-hotel">
-          <div style="padding:0 1.25rem 1.25rem;border-top:1px solid rgba(201,168,76,.1);padding-top:1rem">
-            <!-- ▼▼ VARIABLE: información de hoteles ▼▼ -->
-            <p style="font-size:.85rem;color:rgba(255,255,255,.5);line-height:1.9;white-space:pre-line">{{INFO_HOTELES}}</p>
+    <!-- GALERÍA con tabs (de Esmeralda Noir) -->
+    <section id="gallery-sec">
+      <div class="sec-header">
+        <span class="sec-kicker">Memorias y momentos</span>
+        <h2 class="sec-title gold-shimmer-text">Galería</h2>
+        <div class="orn-div"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLg)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#FF2D78" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRg)" stroke-width=".7"/><defs><linearGradient id="oLg" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRg" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
+      </div>
+      <div class="gallery-tabs" id="gallery-tabs"></div>
+      <div class="gallery-main" id="gallery-main">
+        <div class="grad-overlay"></div>
+        <div class="gallery-caption"><p id="gallery-caption-text"></p></div>
+        <div class="gallery-badge" id="gallery-badge"></div>
+        <button class="gallery-arrow prev" onclick="galPrev()">‹</button>
+        <button class="gallery-arrow next" onclick="galNext()">›</button>
+      </div>
+      <div class="gallery-thumbs" id="gallery-thumbs"></div>
+      <div class="gallery-dots" id="gallery-dots"></div>
+    </section>
+
+    <!-- ITINERARIO -->
+    <section id="itinerary-sec">
+      <div class="sec-header">
+        <span class="sec-kicker">La noche perfecta</span>
+        <h2 class="sec-title gold-shimmer-text">Programa</h2>
+        <div class="orn-div"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLi)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#FF2D78" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRi)" stroke-width=".7"/><defs><linearGradient id="oLi" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRi" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
+      </div>
+      <div class="itin-list" id="itin-list">
+        <div class="itin-line" id="itin-line"></div>
+      </div>
+    </section>
+
+    <!-- PADRINOS (nueva — de Esmeralda Noir) -->
+    <section id="padrinos-sec">
+      <div class="sec-header">
+        <span class="sec-kicker">Con todo su apoyo</span>
+        <h2 class="sec-title gold-shimmer-text">Los Padrinos</h2>
+        <div class="orn-div"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLp)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#FF2D78" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRp)" stroke-width=".7"/><defs><linearGradient id="oLp" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRp" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
+      </div>
+      <div class="padrinos-grid" id="padrinos-grid"></div>
+    </section>
+
+    <!-- REGALOS -->
+    <section id="gifts-sec">
+      <div class="sec-header">
+        <span class="sec-kicker sec-kicker-light">Con cariño</span>
+        <h2 class="sec-title fuchsia-shimmer-text">Regalos</h2>
+        <div class="orn-div"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLr)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#FF2D78" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRr)" stroke-width=".7"/><defs><linearGradient id="oLr" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRr" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
+      </div>
+      <div id="gifts-container"></div>
+    </section>
+
+    <!-- INFO EXTRA (nueva — de Esmeralda Noir) -->
+    <section id="extra-sec">
+      <div class="sec-header">
+        <span class="sec-kicker sec-kicker-light">Todo lo que necesitas saber</span>
+        <h2 class="sec-title fuchsia-shimmer-text">Info Extra</h2>
+        <div class="orn-div"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLe)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#FF2D78" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRe)" stroke-width=".7"/><defs><linearGradient id="oLe" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRe" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
+      </div>
+      <div id="extra-container"></div>
+    </section>
+
+    <!-- HASHTAG (nueva — de Esmeralda Noir) -->
+    <section id="hashtag-sec">
+      <div class="sec-header">
+        <span class="sec-kicker">Comparte el momento</span>
+        <h2 class="sec-title gold-shimmer-text">Etiqueta tus Fotos</h2>
+        <div class="orn-div"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLht)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#FF2D78" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRht)" stroke-width=".7"/><defs><linearGradient id="oLht" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRht" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
+      </div>
+      <div class="hashtag-box">
+        <span class="hashtag-text">#SofíaValentina15</span>
+        <p class="hashtag-sub">Usa el hashtag en todas tus fotos y videos para que no perdamos ningún momento especial de esta noche única.</p>
+        <ul class="hashtag-social">
+          <li class="ig"><a href="#"><i class="fa-brands fa-instagram"></i><span>Instagram</span></a></li>
+          <li class="wa"><a href="#"><i class="fa-brands fa-whatsapp"></i><span>WhatsApp</span></a></li>
+          <li class="tt"><a href="#"><i class="fa-brands fa-tiktok"></i><span>TikTok</span></a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- RSVP -->
+    <section id="rsvp-sec">
+      <div class="rsvp-inner">
+        <div class="sec-header">
+          <span class="sec-kicker">Confirma tu asistencia</span>
+          <h2 class="sec-title gold-shimmer-text">RSVP</h2>
+          <div class="orn-div"><svg width="180" height="14" viewBox="0 0 180 14" fill="none"><line x1="0" y1="7" x2="66" y2="7" stroke="url(#oLrsvp)" stroke-width=".7"/><rect x="85" y="4" width="10" height="6" fill="#FF2D78" opacity=".85" transform="rotate(45 90 7)"/><circle cx="76" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><circle cx="104" cy="7" r="1.6" fill="rgba(201,168,76,.5)"/><line x1="114" y1="7" x2="180" y2="7" stroke="url(#oRrsvp)" stroke-width=".7"/><defs><linearGradient id="oLrsvp" x1="0" y1="0" x2="66" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="rgba(201,168,76,.7)"/></linearGradient><linearGradient id="oRrsvp" x1="114" y1="0" x2="180" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,.7)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
+        </div>
+        <p class="rsvp-sub">Tu confirmación es muy importante.<br>Por favor responde antes del <strong style="color:rgba(240,212,116,.85)">01 de noviembre de 2026</strong></p>
+        <div class="rsvp-card" id="rsvp-form-wrap">
+          <input class="rsvp-input" id="rsvp-name" type="text" placeholder="Tu nombre completo" />
+          <input class="rsvp-input" id="rsvp-phone" type="tel" placeholder="Tu número de WhatsApp" />
+          <div class="rsvp-toggle">
+            <button class="rsvp-btn active" id="rsvp-yes" onclick="setAttend(true)">✓ Asistiré</button>
+            <button class="rsvp-btn" id="rsvp-no" onclick="setAttend(false)">✗ No podré ir</button>
           </div>
+          <div class="rsvp-error" id="rsvp-error" style="display:none"></div>
+          <button class="rsvp-submit" onclick="submitRSVP()">Confirmar Asistencia</button>
+          <p class="rsvp-hint">★ Tu respuesta llegará por WhatsApp al instante ★</p>
         </div>
       </div>
-      <!-- Transporte -->
-      <div class="glow-card" style="background:#0c1810;border:1px solid rgba(201,168,76,.2)">
-        <button onclick="toggleAccordion('bus')"
-                style="display:flex;align-items:center;gap:14px;padding:1.25rem;width:100%;text-align:left;border:none;background:transparent">
-          <span style="font-size:1.6rem">🚌</span>
-          <div style="flex:1;font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.2em;color:rgba(255,255,255,.85)">Buses y Transporte</div>
-          <span class="gift-chevron" id="chev-bus">▾</span>
-        </button>
-        <div class="gift-body" id="body-bus">
-          <div style="padding:0 1.25rem 1.25rem;border-top:1px solid rgba(201,168,76,.1);padding-top:1rem">
-            <!-- ▼▼ VARIABLE: información de transporte ▼▼ -->
-            <p style="font-size:.85rem;color:rgba(255,255,255,.5);line-height:1.9;white-space:pre-line">{{INFO_TRANSPORTE}}</p>
-          </div>
-        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="footer-sec">
+      <div class="top-line"></div>
+      <div class="seal">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><polygon points="18,2 34,18 18,34 2,18" fill="rgba(201,168,76,.18)" stroke="rgba(201,168,76,.9)" stroke-width="1.5"/><polygon points="18,8 28,18 18,28 8,18" fill="rgba(201,168,76,.1)" stroke="rgba(201,168,76,.5)" stroke-width="1"/></svg>
       </div>
-    </div>
-  </section>
-
-  <!-- ══ BLOQUE PADRINOS ════════════════════════════════════════
-       data-plan: solo DELUXE
-       ══════════════════════════════════════════════════════════ -->
-  <section data-plan="DELUXE" style="padding:3.5rem 1.5rem 4rem;background:#0d0d0d">
-    <div style="text-align:center;margin-bottom:2rem">
-      <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:#00C896;margin-bottom:.5rem">Con todo su apoyo</span>
-      <h2 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">Los Padrinos</h2>
-    </div>
-    <!-- ▼▼ VARIABLE: texto enriquecido de padrinos (nombres y roles)
-         Tu sistema puede inyectar aquí un bloque HTML formateado ▼▼ -->
-    <div id="padrinos-container" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <!-- JS renderiza desde PADRINOS_DATA -->
-    </div>
-  </section>
-
-  <!-- ══ BLOQUE SOCIALES / HASHTAG ══════════════════════════════
-       data-plan: PREMIUM y DELUXE
-       ══════════════════════════════════════════════════════════ -->
-  <section data-plan="PREMIUM,DELUXE" style="padding:3.5rem 1.5rem 4rem;background:#060f0c;text-align:center">
-    <div style="text-align:center;margin-bottom:2rem">
-      <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:rgba(0,200,150,.75);margin-bottom:.5rem">Comparte el momento</span>
-      <h2 class="fuchsia-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">Etiqueta tus Fotos</h2>
-    </div>
-    <p style="font-size:.88rem;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:1.75rem">¡Etiquétame con mi hashtag en todas tus fotos y videos del evento!</p>
-    <div style="display:inline-block;padding:1.25rem 2.5rem;border-radius:2px;background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.25);box-shadow:0 0 40px rgba(0,200,150,.1);margin-bottom:2.5rem">
-      <!-- ▼▼ VARIABLE: hashtag del evento ▼▼ -->
-      <p class="fuchsia-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.06em">{{HASHTAG_REDES}}</p>
-    </div>
-    <ul class="social-list">
-      <!-- ▼▼ VARIABLE: URLs de redes sociales ▼▼ -->
-      <li class="social-li ig"><a href="{{URL_INSTAGRAM}}" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a></li>
-      <li class="social-li wa"><a href="{{URL_WHATSAPP_STATUS}}" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a></li>
-      <li class="social-li tw"><a href="{{URL_TIKTOK}}" aria-label="TikTok"><i class="fa-brands fa-x-twitter"></i></a></li>
-    </ul>
-  </section>
-
-  <!-- ══ BLOQUE PLAYLIST / SUGERENCIAS ══════════════════════════
-       data-plan: PREMIUM y DELUXE
-       DELUXE incluye además el reproductor iframe de Spotify.
-       ══════════════════════════════════════════════════════════ -->
-  <section data-plan="PREMIUM,DELUXE" style="padding:3.5rem 1.5rem 4rem;background:#080808">
-    <div style="text-align:center;margin-bottom:2rem">
-      <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:#00C896;margin-bottom:.5rem">Cuéntame</span>
-      <h2 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">La Música</h2>
-    </div>
-
-    <!-- Spotify embed (solo DELUXE) -->
-    <div id="spotify-embed" data-plan="DELUXE"
-         style="display:none;margin-bottom:1.75rem;border-radius:12px;overflow:hidden">
-      <!-- ▼▼ VARIABLE: URL de la playlist de Spotify para incrustar ▼▼ -->
-      <iframe src="{{LINK_SPOTIFY_PLAYLIST}}"
-              width="100%" height="152" frameborder="0"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              loading="lazy"
-              style="border-radius:12px;display:block"></iframe>
-    </div>
-
-    <!-- Formulario de sugerencia de canciones -->
-    <p style="text-align:center;font-size:.88rem;font-style:italic;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:1.75rem">¿Qué canciones son infaltables?<br>Ayúdame con la selección musical de la noche.</p>
-    <div class="glow-card" style="padding:1.75rem;background:#0c1810;border:1px solid rgba(201,168,76,.2)">
-      <div id="song-success" style="display:none;text-align:center;padding:1.5rem 0" class="scale-in">
-        <p style="font-family:'Great Vibes',cursive;font-size:2rem;color:#F0D474">¡Gracias!</p>
-        <p style="font-size:.85rem;color:rgba(255,255,255,.4);margin-top:8px">Tu canción fue agregada a la lista.</p>
+      <p class="poem">
+        "La vida comienza<br>
+        donde termina el miedo.<br>
+        Hoy es sólo el primer paso<br>
+        de todo lo que está por venir."
+      </p>
+      <div class="signature-pill">
+        <p class="signature-text">Con amor, Sofía Valentina</p>
       </div>
-      <div id="song-form">
-        <p style="font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.5em;color:rgba(201,168,76,.55);margin-bottom:.75rem">Nombre de la canción y artista</p>
-        <input id="song-input" type="text"
-               placeholder="ej: Tusa — Karol G & Nicki Minaj"
-               style="width:100%;border-radius:2px;display:block;margin-bottom:.75rem;padding:.95rem 1.2rem;border:1px solid rgba(0,200,150,.2);background:rgba(0,200,150,.03);color:rgba(255,255,255,.88);font-size:.9rem;font-family:inherit;outline:none" />
-        <button onclick="submitSong()"
-                style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border-radius:2px;color:#030d09;border:none;padding:1rem;background:linear-gradient(135deg,#00C896 0%,#7FFFD4 50%,#00C896 100%);box-shadow:0 10px 32px rgba(0,200,150,.35);font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.4em;font-weight:700">
-          Sugerir Canción
-        </button>
-      </div>
-    </div>
-  </section>
+      <p style="font-size:.7rem;color:rgba(255,255,255,.2);letter-spacing:.1em;font-family:'Bebas Neue',sans-serif">XV AÑOS · FASHION EDITION · 2026</p>
+    </footer>
 
-  <!-- ══ BLOQUE REGALOS ══════════════════════════════════════════
-       data-plan: todos los planes
-       ══════════════════════════════════════════════════════════ -->
-  <section data-plan="CLASSIC,PREMIUM,DELUXE" style="padding:3.5rem 1.5rem 4rem;background:#0d0d0d">
-    <div style="text-align:center;margin-bottom:2rem">
-      <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:#00C896;margin-bottom:.5rem">Con todo el amor</span>
-      <h2 class="gold-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">Regalos</h2>
-    </div>
-    <div class="glow-card" style="padding:1.75rem;background:#0c1810;border:1px solid rgba(201,168,76,.2)">
-      <!-- ▼▼ VARIABLE: instrucciones bancarias / lluvia de sobres ▼▼ -->
-      <p style="font-size:.9rem;color:rgba(255,255,255,.55);line-height:1.9;white-space:pre-line">{{INFO_REGALOS}}</p>
-    </div>
-  </section>
+  </div><!-- /main -->
+</div><!-- /app -->
 
-  <!-- ══ BLOQUE FORMULARIO RSVP ══════════════════════════════════
-       data-plan: todos los planes
-       Campos visibles se controlan por JS según el plan:
-         CLASSIC  → Asistencia + Dieta
-         PREMIUM  → + Nombre completo + Cupos (PASES_MAXIMOS)
-         DELUXE   → + Número de mesa (NUMERO_MESA)
-       ══════════════════════════════════════════════════════════ -->
-  <section data-plan="CLASSIC,PREMIUM,DELUXE" style="padding:3.5rem 1.5rem 4rem;background:#080808">
-    <div style="text-align:center;margin-bottom:2rem">
-      <span style="display:block;font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.72em;color:rgba(0,200,150,.75);margin-bottom:.5rem">Confirma tu asistencia</span>
-      <h2 class="fuchsia-shimmer-text" style="font-family:'Bebas Neue',sans-serif;font-size:3.4rem;letter-spacing:.06em">RSVP</h2>
-    </div>
-    <p style="font-size:.76rem;color:rgba(255,255,255,.3);text-align:center;margin-top:-.5rem;margin-bottom:1.5rem;font-style:italic">
-      Por favor confirma antes del {{DEADLINE_RSVP}}
-    </p>
-    <div class="glow-card" style="padding:1.75rem;background:#0c1810;border:1px solid rgba(201,168,76,.2)">
-      <div id="rsvp-success" style="display:none;text-align:center;padding:2rem 0" class="scale-in">
-        <p style="font-family:'Great Vibes',cursive;font-size:2.4rem;color:#F0D474">¡Gracias!</p>
-        <p style="font-size:.88rem;color:rgba(255,255,255,.45);margin-top:8px;line-height:1.7">Tu confirmación fue registrada.<br>¡Te esperamos!</p>
-      </div>
-
-      <!-- El formulario se construye dinámicamente por JS -->
-      <form id="rsvp-form" onsubmit="submitRSVP(event)"></form>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer data-plan="CLASSIC,PREMIUM,DELUXE"
-          style="padding:4rem 1.5rem 5rem;text-align:center;background:#04100c;border-top:1px solid rgba(201,168,76,.1)">
-    <div style="font-size:2rem;margin-bottom:1rem">👑</div>
-    <!-- ▼▼ VARIABLE: cita final ▼▼ -->
-    <p style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:rgba(255,255,255,.55);line-height:1.8;margin-bottom:1.25rem;max-width:280px;margin-left:auto;margin-right:auto">{{CITA_FOOTER}}</p>
-    <p style="font-family:'Great Vibes',cursive;font-size:1.8rem;color:rgba(201,168,76,.8)">{{NOMBRE_PROTAGONISTAS}}</p>
-    <div style="height:1px;margin:2rem auto;max-width:200px;background:linear-gradient(to right,transparent,rgba(201,168,76,.3),transparent)"></div>
-    <p style="font-family:'Bebas Neue',sans-serif;font-size:.46rem;letter-spacing:.38em;color:rgba(255,255,255,.22)">{{COPYRIGHT_TEXTO}}</p>
-  </footer>
-
-</div><!-- /#app -->
-
-<!-- ════════════════════════════════════════════════════════════════
-     ██  MOTOR DE CONTROL — JavaScript
-     ════════════════════════════════════════════════════════════════
-
-  CÓMO FUNCIONA EL SISTEMA:
-  1. Make / GitHub API sobreescribe los marcadores {{...}} en este
-     archivo antes de servírselo al usuario final.
-  2. Las 3 constantes globales son los "parámetros de entrada":
-       PLAN_CONTRATADO      → qué plan pagó el cliente
-       FECHA_EVENTO_ISO     → cuándo es el evento (para countdown)
-       TEL_WHATSAPP_ORGANIZADOR → número destino para RSVP y canciones
-  3. initPlanEngine() corre al cargar y oculta todo lo que el plan
-     actual NO tiene permitido ver.
-  4. Cada función de inicialización solo corre si su bloque está
-     visible (no fue ocultado por el motor de planes).
-
-════════════════════════════════════════════════════════════════ -->
 <script>
+/* ─────────────────────────────────────────
+   DATA — edita aquí tus datos personales
+───────────────────────────────────────── */
+const EVENT_DATE = new Date('2026-11-15T19:00:00');
 
-// ══════════════════════════════════════════════════════════════════
-// PARÁMETROS DE ENTRADA — Tu sistema de automatización sobreescribe
-// estos valores usando la sintaxis {{VARIABLE_NAME}}.
-// ══════════════════════════════════════════════════════════════════
-
-/** Plan contratado: "CLASSIC" | "PREMIUM" | "DELUXE" */
-const PLAN_CONTRATADO = "{{PLAN_CONTRATADO}}";
-
-/** ISO 8601 de la fecha/hora del evento. Ej: "2026-11-15T19:00:00" */
-const FECHA_EVENTO_ISO = "{{FECHA_EVENTO_ISO}}";
-
-/** Número de WhatsApp con código de país, sin espacios ni guiones. Ej: "573001234567" */
-const TEL_WHATSAPP_ORGANIZADOR = "{{TEL_WHATSAPP_ORGANIZADOR}}";
-
-/** Número máximo de pases por invitado (solo PREMIUM / DELUXE) */
-const PASES_MAXIMOS = parseInt("{{PASES_MAXIMOS}}", 10) || 2;
-
-/** Número de mesa asignada al invitado (solo DELUXE) */
-const NUMERO_MESA = "{{NUMERO_MESA}}";
-
-/** Nombre de la protagonista (se usa en varios mensajes) */
-const NOMBRE_PROTAGONISTAS = "{{NOMBRE_PROTAGONISTAS}}";
-
-// ──────────────────────────────────────────────────────────────────
-// GALERÍA: arrays de imágenes por plan
-// Tu sistema reemplaza cada {{FOTO_N}} con la URL real.
-// ──────────────────────────────────────────────────────────────────
-
-/** Fotos para CLASSIC (4 imágenes) */
-const FOTOS_CLASSIC = [
-  { url: "{{FOTO_1}}", caption: "{{CAP_1}}" },
-  { url: "{{FOTO_2}}", caption: "{{CAP_2}}" },
-  { url: "{{FOTO_3}}", caption: "{{CAP_3}}" },
-  { url: "{{FOTO_4}}", caption: "{{CAP_4}}" }
+const TICKER_ITEMS = [
+  'XV Años', '★', 'Sofía Valentina', '★', 'Fashion Edition', '★',
+  '15 · Nov · 2026', '★', '7:00 PM', '★', 'Bogotá', '★'
 ];
 
-/** Fotos para PREMIUM (8 imágenes) — incluye las 4 anteriores */
-const FOTOS_PREMIUM = [
-  ...FOTOS_CLASSIC,
-  { url: "{{FOTO_5}}", caption: "{{CAP_5}}" },
-  { url: "{{FOTO_6}}", caption: "{{CAP_6}}" },
-  { url: "{{FOTO_7}}", caption: "{{CAP_7}}" },
-  { url: "{{FOTO_8}}", caption: "{{CAP_8}}" }
-];
-
-/**
- * Fotos para DELUXE (12 imágenes agrupadas en álbumes / tabs).
- * Cada tab tiene { name, images[] }
- */
-const FOTOS_DELUXE_TABS = [
+const GALLERY_CATEGORIES = [
   {
-    name: "Toda",
+    label: 'Todas',
     images: [
-      ...FOTOS_PREMIUM,
-      { url: "{{FOTO_9}}",  caption: "{{CAP_9}}"  },
-      { url: "{{FOTO_10}}", caption: "{{CAP_10}}" },
-      { url: "{{FOTO_11}}", caption: "{{CAP_11}}" },
-      { url: "{{FOTO_12}}", caption: "{{CAP_12}}" }
+      { src: 'https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=800', caption: 'Un sueño hecho realidad' },
+      { src: 'https://images.unsplash.com/photo-1571924849183-a68a3879348d?w=800', caption: 'Mi momento favorito' },
+      { src: 'https://images.unsplash.com/photo-1613909671501-f9678ffc1d33?w=800', caption: 'La noche que nunca olvidaré' },
     ]
   },
   {
-    name: "Familia",
+    label: 'Niñez',
     images: [
-      { url: "{{FOTO_FAM_1}}", caption: "{{CAP_FAM_1}}" },
-      { url: "{{FOTO_FAM_2}}", caption: "{{CAP_FAM_2}}" }
+      { src: 'https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=800', caption: 'Mis primeros pasos' },
+      { src: 'https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=800', caption: 'Años de risas' },
     ]
   },
   {
-    name: "Amigas",
+    label: 'Fashion',
     images: [
-      { url: "{{FOTO_AMI_1}}", caption: "{{CAP_AMI_1}}" },
-      { url: "{{FOTO_AMI_2}}", caption: "{{CAP_AMI_2}}" }
+      { src: 'https://images.unsplash.com/photo-1613909671501-f9678ffc1d33?w=800', caption: 'Mi pasión: la moda' },
+      { src: 'https://images.unsplash.com/photo-1571924849183-a68a3879348d?w=800', caption: 'Siempre lista para brillar' },
     ]
   }
 ];
 
-/** Pistas de audio (PREMIUM / DELUXE). Cada elemento: { title, src } */
-const AUDIO_TRACKS = [
-  { title: "{{TITULO_AUDIO_1}}", src: "{{LINK_AUDIO_1}}" },
-  { title: "{{TITULO_AUDIO_2}}", src: "{{LINK_AUDIO_2}}" },
-  { title: "{{TITULO_AUDIO_3}}", src: "{{LINK_AUDIO_3}}" }
+const ITINERARY = [
+  { icon: '✦', time: '7:00 PM', name: 'Recepción de invitados', desc: 'Bienvenida con cocktail y música ambiental' },
+  { icon: '👑', time: '8:00 PM', name: 'Entrada de la quinceañera', desc: 'El gran momento que todos esperan' },
+  { icon: '🌹', time: '8:20 PM', name: 'Vals y baile sorpresa', desc: 'Coreografía especial con los chambelanes' },
+  { icon: '🍽', time: '9:00 PM', name: 'Cena', desc: 'Menú gourmet para todos los invitados' },
+  { icon: '🎂', time: '10:00 PM', name: 'Brindis y pastel', desc: 'Celebración del momento más dulce' },
+  { icon: '🎵', time: '10:30 PM', name: 'Fiesta y baile', desc: 'DJ en vivo · ¡A bailar toda la noche!' },
 ];
 
-/**
- * Items del itinerario detallado (solo DELUXE).
- * Cada item: { time, icon, title, desc }
- */
-const ITIN_ITEMS_DELUXE = [
-  { time: "{{ITIN_T1}}", icon: "{{ITIN_I1}}", title: "{{ITIN_N1}}", desc: "{{ITIN_D1}}" },
-  { time: "{{ITIN_T2}}", icon: "{{ITIN_I2}}", title: "{{ITIN_N2}}", desc: "{{ITIN_D2}}" },
-  { time: "{{ITIN_T3}}", icon: "{{ITIN_I3}}", title: "{{ITIN_N3}}", desc: "{{ITIN_D3}}" },
-  { time: "{{ITIN_T4}}", icon: "{{ITIN_I4}}", title: "{{ITIN_N4}}", desc: "{{ITIN_D4}}" },
-  { time: "{{ITIN_T5}}", icon: "{{ITIN_I5}}", title: "{{ITIN_N5}}", desc: "{{ITIN_D5}}" }
+const PADRINOS = [
+  { cat: 'Vestido', name: 'Familia García', icon: '👗' },
+  { cat: 'Corona', name: 'Familia López', icon: '👑' },
+  { cat: 'Música', name: 'Familia Martínez', icon: '🎵' },
+  { cat: 'Pastel', name: 'Familia Rodríguez', icon: '🎂' },
+  { cat: 'Flores', name: 'Familia Torres', icon: '🌹' },
+  { cat: 'Fotografía', name: 'Familia Pérez', icon: '📸' },
 ];
 
-/** Padrinos (solo DELUXE). Cada item: { categoria, nombres, foto } */
-const PADRINOS_DATA = [
-  { categoria: "{{PAD_CAT_1}}", nombres: "{{PAD_NOM_1}}", foto: "{{PAD_FOTO_1}}" },
-  { categoria: "{{PAD_CAT_2}}", nombres: "{{PAD_NOM_2}}", foto: "{{PAD_FOTO_2}}" },
-  { categoria: "{{PAD_CAT_3}}", nombres: "{{PAD_NOM_3}}", foto: "{{PAD_FOTO_3}}" },
-  { categoria: "{{PAD_CAT_4}}", nombres: "{{PAD_NOM_4}}", foto: "{{PAD_FOTO_4}}" }
-];
-
-// ══════════════════════════════════════════════════════════════════
-// MOTOR DE PLANES — initPlanEngine()
-//
-// RESPONSABILIDAD:
-//   Escanea todos los elementos con atributo [data-plan] y oculta
-//   los que no corresponden al plan contratado, aplicando la clase
-//   CSS .plan-hidden (display:none !important).
-//
-// REGLA: El valor de data-plan es una cadena de planes separados
-//   por coma. El elemento es visible si PLAN_CONTRATADO está
-//   incluido en esa lista.
-//
-// ORDEN DE PLANES: CLASSIC ⊂ PREMIUM ⊂ DELUXE
-//   Un plan DELUXE ve TODO; un CLASSIC solo ve lo marcado CLASSIC.
-// ══════════════════════════════════════════════════════════════════
-function initPlanEngine() {
-  // Validamos que el plan sea uno de los tres valores válidos.
-  const PLANES_VALIDOS = ["CLASSIC", "PREMIUM", "DELUXE"];
-  const planNormalizado = (PLAN_CONTRATADO || "").trim().toUpperCase();
-
-  if (!PLANES_VALIDOS.includes(planNormalizado)) {
-    // Plan inválido: mostramos un mensaje de error y detenemos la ejecución.
-    document.body.innerHTML = `
-      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#04100c;font-family:'Cormorant Garamond',serif">
-        <div style="text-align:center;padding:2rem;max-width:360px">
-          <p style="font-family:'Bebas Neue',sans-serif;font-size:4rem;color:#00C896;letter-spacing:.04em">ERROR</p>
-          <p style="color:rgba(255,255,255,.6);margin-top:1rem">Plan no reconocido: <strong style="color:#F0D474">"${PLAN_CONTRATADO}"</strong></p>
-          <p style="color:rgba(255,255,255,.35);font-size:.85rem;margin-top:.75rem">Valores válidos: CLASSIC · PREMIUM · DELUXE</p>
-        </div>
-      </div>`;
-    return; // Detenemos todo.
+const GIFTS = [
+  {
+    label: 'Transferencia bancaria',
+    sub: 'Envío directo a mi cuenta',
+    iconBg: 'linear-gradient(145deg,#C9A84C,#7A5C1E)',
+    icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.95)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    type: 'bank',
+    bank: { name: 'Sofía Valentina García', account: '1234 5678 9012 3456', bank: 'Bancolombia', type: 'Cuenta de Ahorros' }
+  },
+  {
+    label: 'Nequi / Daviplata',
+    sub: 'Envío rápido por app',
+    iconBg: 'linear-gradient(145deg,#FF2D78,#B30050)',
+    icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.95)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+    type: 'nequi',
+    number: '300 123 4567',
+    qrData: 'NEQUI:3001234567'
+  },
+  {
+    label: 'Amazon / Lista de deseos',
+    sub: 'Elige el regalo perfecto',
+    iconBg: 'linear-gradient(145deg,#7A5C1E,#C9A84C)',
+    icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.95)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>',
+    type: 'wishlist',
+    url: '#'
   }
+];
 
-  // Seleccionamos todos los elementos que tienen el atributo data-plan.
-  const elementosConPlan = document.querySelectorAll("[data-plan]");
+const EXTRA_INFO = [
+  {
+    title: 'Código de vestimenta',
+    iconBg: 'linear-gradient(145deg,#FF2D78,#B30050)',
+    icon: '👗',
+    content: 'Formal / Semi-formal. Colores sugeridos: negro, dorado, vino, esmeralda. Evitar blanco y rojo encendido, ya que son los colores de la quinceañera.'
+  },
+  {
+    title: 'Estacionamiento',
+    iconBg: 'linear-gradient(145deg,#C9A84C,#7A5C1E)',
+    icon: '🚗',
+    content: 'Hay estacionamiento gratuito disponible en el salón para hasta 80 vehículos. También puedes llegar en Uber o taxi. La dirección para el GPS es: Calle de los Sueños 123, Bogotá.'
+  },
+  {
+    title: 'Menú y alergias',
+    iconBg: 'linear-gradient(145deg,#7A5C1E,#C9A84C)',
+    icon: '🍽',
+    content: 'Se servirá cena buffet con opciones de carne, pollo y vegetariano. Si tienes alguna alergia o restricción alimentaria, por favor indícalo en tu RSVP o contáctanos al 300 123 4567.'
+  },
+  {
+    title: 'Fotografías y redes',
+    iconBg: 'linear-gradient(145deg,#B30050,#FF2D78)',
+    icon: '📸',
+    content: 'Habrá un fotógrafo oficial y una cabina de fotos disponible toda la noche. ¡No olvides usar el hashtag #SofíaValentina15 en tus publicaciones!'
+  }
+];
 
-  elementosConPlan.forEach(function(elemento) {
-    // Leemos la lista de planes permitidos para este elemento.
-    const planesPermitidos = elemento
-      .getAttribute("data-plan")
-      .split(",")
-      .map(function(p) { return p.trim().toUpperCase(); });
+const SONGS = [
+  { title: '♫ Mi Canción Favorita', src: '' },
+  { title: '♫ Quinceañera Vibes', src: '' },
+];
 
-    // Si el plan actual NO está en la lista → ocultamos el elemento.
-    if (!planesPermitidos.includes(planNormalizado)) {
-      elemento.classList.add("plan-hidden");
-    }
-  });
+/* ─────────────────────────────────────────
+   INIT
+───────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  buildTicker();
+  buildItinerary();
+  buildPadrinos();
+  buildGifts();
+  buildExtraInfo();
+  buildGallery();
+  startCountdown();
+  startPetals();
+  initMusic();
+  // Observe itinerary line
+  const itinLine = document.getElementById('itin-line');
+  if (itinLine) {
+    new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) { itinLine.classList.add('visible'); }
+    }, { threshold: 0.2 }).observe(itinLine);
+  }
+});
 
-  // Guardamos el plan normalizado en una variable global para usarlo
-  // en el resto del código.
-  window.PLAN = planNormalizado;
-}
-
-// ══════════════════════════════════════════════════════════════════
-// APERTURA — closeSplash()
-// Oculta la pantalla de splash y muestra el contenido principal.
-// Inicia todas las funcionalidades que dependen del DOM visible.
-// ══════════════════════════════════════════════════════════════════
+/* ── SPLASH ── */
 function closeSplash() {
-  document.getElementById("splash").classList.add("plan-hidden");
-  document.getElementById("app").style.display = "block";
-
-  // Iniciamos en orden las diferentes funcionalidades.
-  initCountdown();     // Cuenta regresiva
-  initGallery();       // Galería según el plan
-  initItinerary();     // Itinerario (timeline DELUXE)
-  initPadrinos();      // Padrinos (DELUXE)
-  initRSVPForm();      // Formulario RSVP dinámico
-  initAudio();         // FAB de música + audio
-  initSpotify();       // Embed de Spotify (DELUXE)
-  initTicker();        // Banda de texto animada
-  initPetals();        // Partículas decorativas
-
-  // Animamos la línea del itinerario con un pequeño retraso.
-  setTimeout(function() {
-    var line = document.getElementById("itin-line");
-    if (line) line.classList.add("visible");
-  }, 800);
+  const s = document.getElementById('splash');
+  const m = document.getElementById('main');
+  s.classList.add('closing');
+  setTimeout(() => {
+    s.style.display = 'none';
+    m.style.display = 'block';
+  }, 850);
 }
 
-// ══════════════════════════════════════════════════════════════════
-// CUENTA REGRESIVA — initCountdown()
-//
-// Usa FECHA_EVENTO_ISO para calcular la diferencia con el momento
-// actual. Se ejecuta cada 1 segundo con setInterval.
-// Si el evento ya pasó, muestra el mensaje de expiración.
-// ══════════════════════════════════════════════════════════════════
-function initCountdown() {
-  // Verificamos que el bloque esté visible (no oculto por el motor de planes).
-  var cdDays = document.getElementById("cd-days");
-  if (!cdDays || cdDays.closest(".plan-hidden")) return;
+/* ── TICKER ── */
+function buildTicker() {
+  const inner = document.getElementById('ticker-inner');
+  const doubled = [...TICKER_ITEMS, ...TICKER_ITEMS];
+  inner.innerHTML = doubled.map(t =>
+    `<span class="ticker-item">${t}</span>`
+  ).join('');
+}
 
-  // Parseamos la fecha del evento desde la constante global.
-  var fechaEvento = new Date(FECHA_EVENTO_ISO);
-
-  // Función interna que actualiza los nodos de texto en el DOM.
-  function actualizarContador() {
-    var ahora = new Date();
-    var diferencia = fechaEvento - ahora; // milisegundos restantes
-
-    if (diferencia <= 0) {
-      // El evento ya ocurrió: ocultamos los dígitos y mostramos el mensaje.
-      document.getElementById("cd-days").textContent  = "000";
-      document.getElementById("cd-hours").textContent = "00";
-      document.getElementById("cd-mins").textContent  = "00";
-      document.getElementById("cd-secs").textContent  = "00";
-      var expired = document.getElementById("cd-expired");
-      if (expired) expired.style.display = "block";
-      clearInterval(intervalo); // Detenemos el setInterval.
+/* ── COUNTDOWN ── */
+function startCountdown() {
+  function update() {
+    const now = new Date();
+    const diff = EVENT_DATE - now;
+    if (diff <= 0) {
+      ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id => { document.getElementById(id).textContent = '00'; });
       return;
     }
-
-    // Calculamos cada unidad de tiempo.
-    var dias    = Math.floor(diferencia / (1000 * 60 * 60 * 24));
-    var horas   = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    var minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
-    var segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
-
-    // Actualizamos los nodos de texto con padding de ceros a la izquierda.
-    document.getElementById("cd-days").textContent  = String(dias).padStart(3, "0");
-    document.getElementById("cd-hours").textContent = String(horas).padStart(2, "0");
-    document.getElementById("cd-mins").textContent  = String(minutos).padStart(2, "0");
-    document.getElementById("cd-secs").textContent  = String(segundos).padStart(2, "0");
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cd-days').textContent = String(d).padStart(3,'0');
+    document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+    document.getElementById('cd-mins').textContent = String(m).padStart(2,'0');
+    document.getElementById('cd-secs').textContent = String(s).padStart(2,'0');
   }
-
-  actualizarContador(); // Ejecutamos inmediatamente para evitar el parpadeo inicial.
-  var intervalo = setInterval(actualizarContador, 1000); // Luego cada segundo.
+  update();
+  setInterval(update, 1000);
 }
 
-// ══════════════════════════════════════════════════════════════════
-// GALERÍA — initGallery()
-//
-// Muestra el sub-bloque correcto según el plan y lo inicializa.
-//   CLASSIC  → grid estático de 4 fotos (ya está en el HTML)
-//   PREMIUM  → slider/carrusel de 8 fotos (inyecta imágenes por JS)
-//   DELUXE   → álbum de 12 fotos con tabs (inyecta por JS)
-// ══════════════════════════════════════════════════════════════════
-
-// Estado del slider PREMIUM
-var premGalIdx = 0;
-// Estado del álbum DELUXE
-var dlxGalTab = FOTOS_DELUXE_TABS[0] ? FOTOS_DELUXE_TABS[0].name : "";
-var dlxGalIdx = 0;
-
-function initGallery() {
-  if (window.PLAN === "CLASSIC") {
-    // Para CLASSIC el grid ya está en el HTML, solo lo mostramos.
-    var gc = document.getElementById("galeria-classic");
-    if (gc) gc.style.display = "grid";
-
-  } else if (window.PLAN === "PREMIUM") {
-    // Mostramos el contenedor del slider.
-    var gp = document.getElementById("galeria-premium");
-    if (!gp) return;
-    gp.style.display = "block";
-
-    // Inyectamos las imágenes dentro del contenedor gal-prem-images.
-    var container = document.getElementById("gal-prem-images");
-    FOTOS_PREMIUM.forEach(function(foto, i) {
-      var img = document.createElement("img");
-      img.src = foto.url;
-      img.alt = foto.caption;
-      img.className = "gal-img" + (i === 0 ? " active" : "");
-      container.appendChild(img);
-    });
-
-    // Creamos los dots de navegación.
-    var dotsContainer = document.getElementById("gal-prem-dots");
-    FOTOS_PREMIUM.forEach(function(_, i) {
-      var btn = document.createElement("button");
-      btn.className = "gallery-dot" + (i === 0 ? " active" : "");
-      btn.dataset.idx = String(i);
-      btn.onclick = function() { premGalGoTo(i); };
-      dotsContainer.appendChild(btn);
-    });
-
-    renderPremGal(); // Renderizamos el estado inicial.
-
-  } else if (window.PLAN === "DELUXE") {
-    // Mostramos el contenedor del álbum.
-    var gd = document.getElementById("galeria-deluxe");
-    if (!gd) return;
-    gd.style.display = "block";
-    buildDlxTabs(); // Construimos los tabs de álbum.
-  }
+/* ── LOCATION collapsible ── */
+function toggleLugar() {
+  const body = document.getElementById('loc-body');
+  const chevron = document.getElementById('loc-chevron');
+  body.classList.toggle('open');
+  chevron.classList.toggle('open');
 }
 
-// ── Helpers PREMIUM slider ────────────────────────────────────
-function renderPremGal() {
-  var imgs = document.querySelectorAll("#gal-prem-images .gal-img");
-  imgs.forEach(function(img, i) {
-    img.style.opacity = i === premGalIdx ? "1" : "0";
-    img.style.zIndex  = i === premGalIdx ? "1" : "0";
+/* ── GALLERY with tabs ── */
+let galCategoryIdx = 0;
+let galIdx = 0;
+
+function buildGallery() {
+  const tabsEl = document.getElementById('gallery-tabs');
+  tabsEl.innerHTML = GALLERY_CATEGORIES.map((cat, i) =>
+    `<button class="gallery-tab${i===0?' active':''}" onclick="switchGalCategory(${i})">${cat.label}</button>`
+  ).join('');
+  renderGallery();
+}
+
+function switchGalCategory(i) {
+  galCategoryIdx = i;
+  galIdx = 0;
+  document.querySelectorAll('.gallery-tab').forEach((t, idx) => t.classList.toggle('active', idx === i));
+  renderGallery();
+}
+
+function renderGallery() {
+  const images = GALLERY_CATEGORIES[galCategoryIdx].images;
+  const mainEl = document.getElementById('gallery-main');
+
+  // Remove old images
+  mainEl.querySelectorAll('img').forEach(el => el.remove());
+  // Add images
+  images.forEach((img, i) => {
+    const el = document.createElement('img');
+    el.src = img.src;
+    el.alt = img.caption;
+    if (i === galIdx) el.classList.add('active');
+    mainEl.insertBefore(el, mainEl.firstChild);
   });
-  var cap = document.getElementById("gal-prem-caption");
-  if (cap) cap.textContent = FOTOS_PREMIUM[premGalIdx] ? FOTOS_PREMIUM[premGalIdx].caption : "";
-  var ctr = document.getElementById("gal-prem-counter");
-  if (ctr) ctr.textContent = (premGalIdx + 1) + " / " + FOTOS_PREMIUM.length;
-  document.querySelectorAll("#gal-prem-dots .gallery-dot").forEach(function(btn) {
-    btn.classList.toggle("active", Number(btn.dataset.idx) === premGalIdx);
+
+  // Caption
+  document.getElementById('gallery-caption-text').textContent = images[galIdx].caption;
+  // Badge
+  document.getElementById('gallery-badge').textContent = `${galIdx + 1} / ${images.length}`;
+
+  // Thumbs
+  const thumbsEl = document.getElementById('gallery-thumbs');
+  thumbsEl.innerHTML = images.map((img, i) =>
+    `<div class="gallery-thumb${i===galIdx?' active':''}" onclick="galGoTo(${i})"><img src="${img.src}" alt="" /></div>`
+  ).join('');
+
+  // Dots
+  const dotsEl = document.getElementById('gallery-dots');
+  dotsEl.innerHTML = images.map((_, i) =>
+    `<button class="gallery-dot${i===galIdx?' active':''}" onclick="galGoTo(${i})"></button>`
+  ).join('');
+}
+
+function galGoTo(i) {
+  const images = GALLERY_CATEGORIES[galCategoryIdx].images;
+  galIdx = (i + images.length) % images.length;
+  renderGallery();
+}
+function galPrev() { galGoTo(galIdx - 1); }
+function galNext() { galGoTo(galIdx + 1); }
+
+/* ── ITINERARY ── */
+function buildItinerary() {
+  const list = document.getElementById('itin-list');
+  ITINERARY.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'itin-item';
+    div.innerHTML = `
+      <div class="itin-circle" style="font-size:1.4rem">${item.icon}</div>
+      <div class="itin-card">
+        <div class="left-bar"></div>
+        <div class="row">
+          <span class="itin-name">${item.name}</span>
+          <span class="itin-time">${item.time}</span>
+        </div>
+        <p class="itin-desc">${item.desc}</p>
+      </div>`;
+    list.appendChild(div);
   });
 }
-function premGalGoTo(idx) { premGalIdx = idx; renderPremGal(); }
-function premGalNext()    { premGalIdx = (premGalIdx + 1) % FOTOS_PREMIUM.length; renderPremGal(); }
-function premGalPrev()    { premGalIdx = (premGalIdx - 1 + FOTOS_PREMIUM.length) % FOTOS_PREMIUM.length; renderPremGal(); }
 
-// ── Helpers DELUXE álbum ──────────────────────────────────────
-function buildDlxTabs() {
-  var tabsEl = document.getElementById("gal-dlx-tabs");
-  if (!tabsEl) return;
-  FOTOS_DELUXE_TABS.forEach(function(tab) {
-    var btn = document.createElement("button");
-    btn.textContent = tab.name;
-    btn.style.cssText = "flex-shrink:0;border-radius:1px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.58rem;letter-spacing:.28em;padding:.6rem 1.1rem;border:1px solid rgba(201,168,76,0.25);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.45);transition:all .25s;white-space:nowrap";
-    btn.onclick = function() {
-      dlxGalTab = tab.name;
-      dlxGalIdx = 0;
-      renderDlxGal(true); // true = reconstruir imágenes
-      // Actualizamos estilos de tabs
-      tabsEl.querySelectorAll("button").forEach(function(b) {
-        b.style.borderColor = "rgba(201,168,76,0.25)";
-        b.style.background  = "rgba(255,255,255,0.03)";
-        b.style.color       = "rgba(255,255,255,0.45)";
-      });
-      btn.style.borderColor = "#00C896";
-      btn.style.background  = "rgba(0,200,150,0.12)";
-      btn.style.color       = "rgba(255,255,255,0.95)";
-    };
-    // Marcamos el primer tab como activo.
-    if (tab.name === dlxGalTab) {
-      btn.style.borderColor = "#00C896";
-      btn.style.background  = "rgba(0,200,150,0.12)";
-      btn.style.color       = "rgba(255,255,255,0.95)";
+/* ── PADRINOS ── */
+function buildPadrinos() {
+  const grid = document.getElementById('padrinos-grid');
+  grid.innerHTML = PADRINOS.map(p => `
+    <div class="padrino-card">
+      <div class="padrino-icon" style="font-size:1.4rem">${p.icon}</div>
+      <div class="padrino-cat">${p.cat}</div>
+      <div class="padrino-name">${p.name}</div>
+    </div>`).join('');
+}
+
+/* ── GIFTS ── */
+function buildGifts() {
+  const container = document.getElementById('gifts-container');
+  GIFTS.forEach((g, i) => {
+    const card = document.createElement('div');
+    card.className = 'gift-card';
+    card.id = `gift-${i}`;
+
+    let bodyHTML = '';
+    if (g.type === 'bank') {
+      bodyHTML = `
+        <div class="gift-inner">
+          <div class="gift-box">
+            <p class="gift-box-title">Datos Bancarios</p>
+            <p style="font-size:.82rem;color:rgba(255,255,255,.5);text-align:center;line-height:1.9">
+              <strong style="color:rgba(240,212,116,.8)">${g.bank.name}</strong><br>
+              ${g.bank.bank} · ${g.bank.type}<br>
+              <strong style="color:rgba(255,255,255,.8);font-size:1rem;letter-spacing:.12em">${g.bank.account}</strong>
+            </p>
+          </div>
+        </div>`;
+    } else if (g.type === 'nequi') {
+      bodyHTML = `
+        <div class="gift-inner">
+          <div class="gift-box">
+            <p class="gift-box-title">Número de Nequi</p>
+            <p style="text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.22em;color:#F0D474;margin-bottom:1.25rem">${g.number}</p>
+            <input class="gift-input" id="gift-amount-${i}" type="number" placeholder="Monto a enviar (opcional)" />
+            <button class="gift-qr-btn" onclick="genQR(${i},'${g.qrData}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h.01M18 14h.01M14 18h.01M18 18h.01M18 21h.01"/></svg>
+              Generar código QR
+            </button>
+            <div class="gift-qr-img" id="qr-${i}"></div>
+          </div>
+        </div>`;
+    } else if (g.type === 'wishlist') {
+      bodyHTML = `
+        <div class="gift-inner">
+          <div class="gift-box" style="text-align:center">
+            <p class="gift-box-title">Lista de deseos</p>
+            <p style="font-size:.82rem;color:rgba(255,255,255,.45);margin-bottom:1.25rem;line-height:1.7">Elige algo especial de mi lista en Amazon.</p>
+            <a href="${g.url}" target="_blank" rel="noopener noreferrer" class="gift-qr-btn" style="display:flex;text-decoration:none;color:#080808">
+              Ver lista de deseos →
+            </a>
+          </div>
+        </div>`;
     }
-    tabsEl.appendChild(btn);
-  });
-  renderDlxGal(true); // Renderizado inicial.
-}
 
-function getDlxTabImages() {
-  var tab = FOTOS_DELUXE_TABS.find(function(t) { return t.name === dlxGalTab; });
-  return tab ? tab.images : [];
-}
-
-function renderDlxGal(rebuild) {
-  var imgs = getDlxTabImages();
-  var container = document.getElementById("gal-dlx-images");
-  var thumbsEl  = document.getElementById("gal-dlx-thumbs");
-
-  if (rebuild) {
-    // Limpiamos y reconstruimos.
-    container.innerHTML  = "";
-    thumbsEl.innerHTML   = "";
-    imgs.forEach(function(foto, i) {
-      // Imagen principal del slider.
-      var img = document.createElement("img");
-      img.src = foto.url; img.alt = foto.caption;
-      img.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:" + (i === dlxGalIdx ? "1" : "0") + ";transition:opacity .35s;filter:grayscale(15%);z-index:" + (i === dlxGalIdx ? "1" : "0");
-      container.appendChild(img);
-      // Miniatura.
-      var thumb = document.createElement("div");
-      thumb.className = "gallery-thumb" + (i === dlxGalIdx ? " active" : "");
-      thumb.dataset.idx = String(i);
-      thumb.onclick = function() { dlxGalIdx = i; renderDlxGal(false); };
-      thumb.innerHTML = '<img src="' + foto.url + '" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover" />';
-      thumbsEl.appendChild(thumb);
-    });
-  } else {
-    // Solo actualizamos opacidades.
-    container.querySelectorAll("img").forEach(function(img, i) {
-      img.style.opacity = i === dlxGalIdx ? "1" : "0";
-      img.style.zIndex  = i === dlxGalIdx ? "1" : "0";
-    });
-    thumbsEl.querySelectorAll(".gallery-thumb").forEach(function(d) {
-      d.classList.toggle("active", Number(d.dataset.idx) === dlxGalIdx);
-    });
-  }
-
-  var cap = document.getElementById("gal-dlx-caption");
-  if (cap) cap.textContent = imgs[dlxGalIdx] ? imgs[dlxGalIdx].caption : "";
-  var ctr = document.getElementById("gal-dlx-counter");
-  if (ctr) ctr.textContent = (dlxGalIdx + 1) + " / " + imgs.length;
-}
-function dlxGalNext() {
-  var imgs = getDlxTabImages();
-  dlxGalIdx = (dlxGalIdx + 1) % imgs.length;
-  renderDlxGal(false);
-}
-function dlxGalPrev() {
-  var imgs = getDlxTabImages();
-  dlxGalIdx = (dlxGalIdx - 1 + imgs.length) % imgs.length;
-  renderDlxGal(false);
-}
-
-// ══════════════════════════════════════════════════════════════════
-// ITINERARIO DELUXE — initItinerary()
-// Construye la línea de tiempo detallada solo para DELUXE.
-// CLASSIC y PREMIUM usan el texto plano {{TEXTO_CRONOGRAMA}}.
-// ══════════════════════════════════════════════════════════════════
-function initItinerary() {
-  if (window.PLAN !== "DELUXE") return;
-
-  var container = document.getElementById("itin-deluxe");
-  if (!container) return;
-  container.style.display = "block"; // Lo hacemos visible.
-
-  ITIN_ITEMS_DELUXE.forEach(function(item) {
-    var div = document.createElement("div");
-    div.className = "itin-card";
-    div.style.cssText = "display:flex;align-items:flex-start;gap:18px;padding:0 0 1.75rem 0";
-    div.innerHTML =
-      '<div style="position:relative;z-index:2;flex-shrink:0;width:56px;height:56px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:#0c1810;border:1px solid rgba(201,168,76,.25)">' + item.icon + '</div>' +
-      '<div style="flex:1;padding-top:.4rem">' +
-        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:.5rem;letter-spacing:.45em;color:#00C896;margin-bottom:.2rem">' + item.time + '</div>' +
-        '<div style="font-family:\'Bodoni Moda\',serif;font-size:1rem;font-weight:700;color:rgba(255,255,255,.9);margin-bottom:.25rem">' + item.title + '</div>' +
-        '<div style="font-size:.82rem;color:rgba(255,255,255,.4);line-height:1.6">' + item.desc + '</div>' +
-      '</div>';
-    container.appendChild(div);
+    card.innerHTML = `
+      <button class="gift-toggle" onclick="toggleGift(${i})">
+        <div class="gift-icon" style="background:${g.iconBg}">${g.icon}</div>
+        <div class="gift-label-wrap">
+          <div class="gift-label">${g.label}</div>
+          <div class="gift-sub">${g.sub}</div>
+        </div>
+        <svg class="gift-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="gift-body">${bodyHTML}</div>`;
+    container.appendChild(card);
   });
 }
 
-// ══════════════════════════════════════════════════════════════════
-// PADRINOS — initPadrinos()
-// Solo para DELUXE. Renderiza las tarjetas de padrinos.
-// ══════════════════════════════════════════════════════════════════
-function initPadrinos() {
-  if (window.PLAN !== "DELUXE") return;
-  var grid = document.getElementById("padrinos-container");
-  if (!grid) return;
-
-  PADRINOS_DATA.forEach(function(p, i) {
-    var d = document.createElement("div");
-    d.style.cssText = "border-radius:12px;padding:1.5rem 1rem 1.25rem;background:#0c1810;border:1px solid rgba(201,168,76,.18);text-align:center;animation:cardGlowPulse 3s ease-in-out infinite;animation-delay:" + (i * 0.4) + "s";
-    d.innerHTML =
-      '<div style="width:72px;height:72px;border-radius:50%;overflow:hidden;margin:0 auto 1rem;border:2px solid rgba(0,200,150,.45);box-shadow:0 0 18px rgba(0,200,150,.22)">' +
-        '<img src="' + p.foto + '" alt="' + p.nombres + '" style="width:100%;height:100%;object-fit:cover" loading="lazy" />' +
-      '</div>' +
-      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:.48rem;letter-spacing:.45em;color:rgba(201,168,76,.6);margin-bottom:.35rem">' + p.categoria + '</div>' +
-      '<div style="font-family:\'Cormorant Garamond\',serif;font-size:.95rem;color:rgba(255,255,255,.85)">' + p.nombres + '</div>';
-    grid.appendChild(d);
-  });
+function toggleGift(i) {
+  const card = document.getElementById(`gift-${i}`);
+  card.classList.toggle('open');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// FORMULARIO RSVP — initRSVPForm()
-//
-// Construye dinámicamente los campos del formulario según el plan:
-//   CLASSIC  → Asistencia + Dieta
-//   PREMIUM  → + Nombre completo + Cupos
-//   DELUXE   → + Número de mesa
-//
-// El submit intercepta el evento, extrae los valores activos,
-// construye un mensaje de texto y abre WhatsApp.
-// ══════════════════════════════════════════════════════════════════
-var rsvpAsistencia = null; // Estado del botón Sí/No
-
-function initRSVPForm() {
-  var form = document.getElementById("rsvp-form");
-  if (!form) return;
-
-  var html = "";
-
-  // ── Campo común a TODOS los planes: Asistencia (Sí/No) ──────
-  html += '<p style="font-family:\'Bebas Neue\',sans-serif;font-size:.55rem;letter-spacing:.45em;color:rgba(201,168,76,.55);margin-bottom:.75rem">¿Asistirás?</p>';
-  html += '<div style="display:flex;gap:10px;margin-bottom:1.5rem">' +
-    '<button type="button" class="attend-btn" id="btn-yes" onclick="selectAttend(\'yes\')">✓ Asistiré</button>' +
-    '<button type="button" class="attend-btn" id="btn-no"  onclick="selectAttend(\'no\')">✗ No podré</button>' +
-  '</div>';
-
-  // ── Campo común a TODOS los planes: Restricción dietaria ────
-  html += '<p style="font-family:\'Bebas Neue\',sans-serif;font-size:.55rem;letter-spacing:.45em;color:rgba(201,168,76,.55);margin-bottom:.75rem">¿Restricción alimentaria?</p>';
-  html += '<select id="rsvp-food" style="width:100%;border-radius:2px;padding:.85rem 1.1rem;border:1px solid rgba(0,200,150,.2);background:rgba(0,200,150,.03);color:rgba(255,255,255,.75);font-family:inherit;font-size:.88rem;outline:none;margin-bottom:1.5rem;appearance:none">' +
-    '<option value="no">No</option>' +
-    '<option value="celiaco">Celíaco / Sin gluten</option>' +
-    '<option value="vegano">Vegano</option>' +
-    '<option value="vegetariano">Vegetariano</option>' +
-    '<option value="otra">Otra restricción</option>' +
-  '</select>';
-
-  // ── PREMIUM y DELUXE: Nombre completo + Cupos asignados ─────
-  if (window.PLAN === "PREMIUM" || window.PLAN === "DELUXE") {
-    html += '<p style="font-family:\'Bebas Neue\',sans-serif;font-size:.55rem;letter-spacing:.45em;color:rgba(201,168,76,.55);margin-bottom:.75rem">Nombre completo del invitado</p>';
-    html += '<input id="rsvp-name" type="text" placeholder="Ej: María García" style="width:100%;border-radius:2px;display:block;margin-bottom:1.5rem;padding:.95rem 1.2rem;border:1px solid rgba(0,200,150,.2);background:rgba(0,200,150,.03);color:rgba(255,255,255,.88);font-size:.9rem;font-family:inherit;outline:none" />';
-
-    html += '<p style="font-family:\'Bebas Neue\',sans-serif;font-size:.55rem;letter-spacing:.45em;color:rgba(201,168,76,.55);margin-bottom:.75rem">¿Cuántos asistirán? (máximo ' + PASES_MAXIMOS + ')</p>';
-    html += '<select id="rsvp-cupos" style="width:100%;border-radius:2px;padding:.85rem 1.1rem;border:1px solid rgba(0,200,150,.2);background:rgba(0,200,150,.03);color:rgba(255,255,255,.75);font-family:inherit;font-size:.88rem;outline:none;margin-bottom:1.5rem;appearance:none">';
-    for (var i = 1; i <= PASES_MAXIMOS; i++) {
-      html += '<option value="' + i + '">' + i + ' persona' + (i > 1 ? 's' : '') + '</option>';
+function genQR(i, data) {
+  const wrap = document.getElementById(`qr-${i}`);
+  wrap.innerHTML = '<div class="qr-wrap" id="qr-canvas-'+i+'"></div>';
+  QRCode.toCanvas(document.createElement('canvas'), data, { width: 180, margin: 2, color: { dark: '#080808', light: '#F0D474' } }, (err, canvas) => {
+    if (!err) {
+      canvas.style.borderRadius = '2px';
+      document.getElementById('qr-canvas-'+i).appendChild(canvas);
     }
-    html += '</select>';
-  }
-
-  // ── Solo DELUXE: Número de mesa ──────────────────────────────
-  if (window.PLAN === "DELUXE") {
-    html += '<p style="font-family:\'Bebas Neue\',sans-serif;font-size:.55rem;letter-spacing:.45em;color:rgba(201,168,76,.55);margin-bottom:.75rem">Tu número de mesa</p>';
-    // El campo muestra el número asignado; el invitado puede consultarlo pero está pre-llenado.
-    html += '<input id="rsvp-mesa" type="text" value="' + NUMERO_MESA + '" placeholder="Número de mesa" style="width:100%;border-radius:2px;display:block;margin-bottom:1.5rem;padding:.95rem 1.2rem;border:1px solid rgba(0,200,150,.2);background:rgba(0,200,150,.03);color:rgba(255,255,255,.88);font-size:.9rem;font-family:inherit;outline:none" />';
-  }
-
-  // ── Botón de envío ───────────────────────────────────────────
-  html += '<button type="submit" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border-radius:2px;color:#030d09;border:none;padding:1.1rem;background:linear-gradient(135deg,#C9A84C 0%,#F0D474 50%,#C9A84C 100%);box-shadow:0 10px 32px rgba(201,168,76,.3);font-family:\'Bebas Neue\',sans-serif;font-size:.8rem;letter-spacing:.45em;font-weight:700">Confirmar Asistencia</button>';
-  html += '<p style="font-size:.48rem;letter-spacing:.18em;color:rgba(255,255,255,.2);margin-top:.75rem;text-align:center;font-family:\'Bebas Neue\',sans-serif">Tu información es privada y confidencial</p>';
-
-  form.innerHTML = html;
-}
-
-function selectAttend(val) {
-  rsvpAsistencia = val;
-  var y = document.getElementById("btn-yes");
-  var n = document.getElementById("btn-no");
-  if (y) y.classList.toggle("selected", val === "yes");
-  if (n) n.classList.toggle("selected", val === "no");
-}
-
-/**
- * submitRSVP(event)
- * Intercepta el submit del formulario (preventDefault), extrae los
- * campos visibles según el plan, construye una cadena de texto
- * formateada y abre la API de WhatsApp con encodeURIComponent.
- */
-function submitRSVP(event) {
-  event.preventDefault(); // Evitamos el comportamiento por defecto del formulario.
-
-  // Validación mínima: asistencia requerida.
-  if (!rsvpAsistencia) {
-    alert("Por favor indica si asistirás.");
-    return;
-  }
-
-  // Construimos las líneas del mensaje.
-  var asistenciaLabel = rsvpAsistencia === "yes"
-    ? "✅ Asistiré con gusto"
-    : "❌ Lamentablemente no podré asistir";
-
-  var foodMap = { no: "Sin restricción", celiaco: "Celíaco / Sin gluten", vegano: "Vegano", vegetariano: "Vegetariano", otra: "Otra restricción" };
-  var comida  = document.getElementById("rsvp-food") ? document.getElementById("rsvp-food").value : "no";
-
-  var lineas = [
-    "🎉 *RSVP — XV Años " + NOMBRE_PROTAGONISTAS + "*",
-    "",
-    "*Asistencia:* " + asistenciaLabel,
-    "*Restricción alimentaria:* " + (foodMap[comida] || comida)
-  ];
-
-  // Campos adicionales para PREMIUM y DELUXE.
-  if (window.PLAN === "PREMIUM" || window.PLAN === "DELUXE") {
-    var nombre = document.getElementById("rsvp-name") ? document.getElementById("rsvp-name").value.trim() : "";
-    var cupos  = document.getElementById("rsvp-cupos") ? document.getElementById("rsvp-cupos").value : "1";
-    if (nombre) lineas.push("*Nombre del invitado:* " + nombre);
-    lineas.push("*Cupos:* " + cupos + " persona" + (Number(cupos) > 1 ? "s" : ""));
-  }
-
-  // Campo adicional para DELUXE.
-  if (window.PLAN === "DELUXE") {
-    var mesa = document.getElementById("rsvp-mesa") ? document.getElementById("rsvp-mesa").value.trim() : NUMERO_MESA;
-    lineas.push("*Número de mesa:* " + mesa);
-  }
-
-  // Unimos todas las líneas con salto de línea.
-  var mensaje = lineas.join("\n");
-
-  // Abrimos la API de WhatsApp con el número y mensaje codificado.
-  window.open(
-    "https://wa.me/" + TEL_WHATSAPP_ORGANIZADOR + "?text=" + encodeURIComponent(mensaje),
-    "_blank"
-  );
-
-  // Ocultamos el formulario y mostramos el mensaje de éxito.
-  document.getElementById("rsvp-form").style.display = "none";
-  document.getElementById("rsvp-success").style.display = "block";
-}
-
-// ══════════════════════════════════════════════════════════════════
-// SUGERENCIA DE CANCIONES — submitSong()
-// Abre WhatsApp con el texto de la sugerencia.
-// ══════════════════════════════════════════════════════════════════
-function submitSong() {
-  var input = document.getElementById("song-input");
-  var valor = input ? input.value.trim() : "";
-  if (!valor) { if (input) input.focus(); return; }
-
-  var msg = "🎵 *Sugerencia de canción — XV Años " + NOMBRE_PROTAGONISTAS + "*\n\n*Canción sugerida:* " + valor;
-  window.open("https://wa.me/" + TEL_WHATSAPP_ORGANIZADOR + "?text=" + encodeURIComponent(msg), "_blank");
-
-  document.getElementById("song-form").style.display = "none";
-  document.getElementById("song-success").style.display = "block";
-}
-
-// ══════════════════════════════════════════════════════════════════
-// AUDIO / MÚSICA — initAudio(), togglePlay(), nextTrack(), prevTrack()
-//
-// Solo disponible para PREMIUM y DELUXE.
-// Protege el autoplay con try/catch y sincroniza el estado del FAB.
-// ══════════════════════════════════════════════════════════════════
-var audioIdx = 0;
-var isPlaying = false;
-var isMuted   = false;
-var audio     = document.getElementById("bg-audio");
-var fabMainBtn = document.getElementById("fab-main-btn");
-var fabPlayIcon = document.getElementById("fab-play-icon");
-var songStrip   = document.getElementById("song-strip");
-
-function initAudio() {
-  // Si el plan no tiene música, no hacemos nada.
-  if (window.PLAN !== "PREMIUM" && window.PLAN !== "DELUXE") return;
-  if (!AUDIO_TRACKS.length || !AUDIO_TRACKS[0].src) return;
-
-  // Mostramos el FAB de música.
-  var fab = document.getElementById("music-fab");
-  if (fab) fab.style.display = "flex";
-
-  // Cargamos la primera pista.
-  loadTrack(0);
-
-  // Actualizamos la barra de progreso inline si existe.
-  audio.addEventListener("timeupdate", function() {
-    if (!audio.duration) return;
-    var pct = (audio.currentTime / audio.duration) * 100;
-    var bar = document.getElementById("ip-progress-bar");
-    var cur = document.getElementById("ip-cur");
-    var dur = document.getElementById("ip-dur");
-    if (bar) bar.style.width = pct + "%";
-    if (cur) cur.textContent = fmtTime(audio.currentTime);
-    if (dur) dur.textContent = fmtTime(audio.duration);
-  });
-
-  audio.addEventListener("ended", function() { nextTrack(); });
-}
-
-function fmtTime(s) {
-  if (!s || isNaN(s)) return "--:--";
-  var m  = Math.floor(s / 60);
-  var ss = Math.floor(s % 60);
-  return m + ":" + (ss < 10 ? "0" : "") + ss;
-}
-
-function loadTrack(idx) {
-  if (!AUDIO_TRACKS[idx]) return;
-  audio.src = AUDIO_TRACKS[idx].src;
-  showStrip(AUDIO_TRACKS[idx].title);
-  var titleEl = document.getElementById("ip-title");
-  if (titleEl) titleEl.textContent = AUDIO_TRACKS[idx].title;
-  // Actualizamos dots del reproductor inline si existen.
-  AUDIO_TRACKS.slice(0, 10).forEach(function(_, i) {
-    var dot = document.getElementById("ip-dot-" + i);
-    if (dot) dot.style.background = i === idx ? "#00C896" : "rgba(255,255,255,.18)";
   });
 }
 
-function showStrip(title) {
-  songStrip.textContent = "♪ " + title;
-  songStrip.classList.add("visible");
-  clearTimeout(songStrip._t);
-  songStrip._t = setTimeout(function() { songStrip.classList.remove("visible"); }, 3500);
+/* ── INFO EXTRA ── */
+function buildExtraInfo() {
+  const container = document.getElementById('extra-container');
+  EXTRA_INFO.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'extra-card';
+    card.id = `extra-${i}`;
+    card.innerHTML = `
+      <button class="extra-toggle" onclick="toggleExtra(${i})">
+        <div class="extra-icon" style="background:${item.iconBg};font-size:1.3rem">${item.icon}</div>
+        <div class="extra-title">${item.title}</div>
+        <svg class="extra-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="extra-body">
+        <div class="extra-content">${item.content}</div>
+      </div>`;
+    container.appendChild(card);
+  });
 }
 
-function syncPlayState() {
-  if (fabPlayIcon) fabPlayIcon.textContent = isPlaying ? "⏸" : "▶";
-  if (fabMainBtn)  fabMainBtn.classList.toggle("playing", isPlaying);
-  var ipIcon = document.getElementById("ip-play-icon");
-  if (ipIcon) {
-    ipIcon.innerHTML = isPlaying
-      ? '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>'
-      : '<polygon points="5,3 19,12 5,21"/>';
+function toggleExtra(i) {
+  const card = document.getElementById(`extra-${i}`);
+  card.classList.toggle('open');
+}
+
+/* ── RSVP ── */
+let rsvpAttend = true;
+function setAttend(val) {
+  rsvpAttend = val;
+  document.getElementById('rsvp-yes').classList.toggle('active', val);
+  document.getElementById('rsvp-no').classList.toggle('active', !val);
+}
+function submitRSVP() {
+  const name = document.getElementById('rsvp-name').value.trim();
+  const phone = document.getElementById('rsvp-phone').value.trim();
+  const err = document.getElementById('rsvp-error');
+  if (!name) { err.style.display = 'block'; err.textContent = '★ Por favor escribe tu nombre'; return; }
+  if (!phone) { err.style.display = 'block'; err.textContent = '★ Por favor escribe tu número de WhatsApp'; return; }
+  err.style.display = 'none';
+  const msg = rsvpAttend
+    ? `¡Hola! Soy *${name}* y confirmo mi asistencia a los XV Años de Sofía Valentina el 15 de noviembre de 2026. 🎉`
+    : `Hola, soy *${name}*. Lamentablemente no podré asistir a los XV Años de Sofía Valentina.`;
+  const url = `https://wa.me/${phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+  document.getElementById('rsvp-form-wrap').innerHTML = `
+    <div class="rsvp-thanks">
+      <div class="rsvp-thanks-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.95)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3>¡Gracias!</h3>
+      <p>Tu confirmación ha sido enviada. ¡Nos vemos el <strong style="color:rgba(240,212,116,.8)">15 de noviembre</strong>!</p>
+    </div>`;
+}
+
+/* ── MUSIC FAB ── */
+let songIdx = 0;
+let isPlaying = false;
+const audio = document.getElementById('bg-audio');
+
+function initMusic() {
+  if (SONGS[0].src) {
+    audio.src = SONGS[0].src;
   }
 }
-
-/**
- * togglePlay([event])
- * Protege contra el error de autoplay del navegador:
- * Si audio.play() rechaza la promesa, simplemente la ignoramos.
- */
-function togglePlay(event) {
-  if (event && event.stopPropagation) event.stopPropagation();
-  if (!AUDIO_TRACKS.length) return;
-  if (!isPlaying) {
-    if (!audio.src) loadTrack(audioIdx);
-    audio.play().catch(function() {}); // Capturamos silenciosamente la restricción de autoplay.
-    isPlaying = true;
-    showStrip(AUDIO_TRACKS[audioIdx] ? AUDIO_TRACKS[audioIdx].title : "");
-  } else {
+function togglePlay(e) {
+  e.stopPropagation();
+  if (!audio.src || !SONGS[songIdx].src) { showSongStrip('♪ Agrega una URL de audio en SONGS'); return; }
+  if (isPlaying) {
     audio.pause();
     isPlaying = false;
-  }
-  syncPlayState();
-}
-
-function nextTrack(event) {
-  if (event && event.stopPropagation) event.stopPropagation();
-  audioIdx = (audioIdx + 1) % AUDIO_TRACKS.length;
-  loadTrack(audioIdx);
-  if (isPlaying) audio.play().catch(function() {});
-}
-
-function prevTrack(event) {
-  if (event && event.stopPropagation) event.stopPropagation();
-  audioIdx = (audioIdx - 1 + AUDIO_TRACKS.length) % AUDIO_TRACKS.length;
-  loadTrack(audioIdx);
-  if (isPlaying) audio.play().catch(function() {});
-}
-
-function seekMusic(e) {
-  var track = document.getElementById("ip-progress-track");
-  if (!track || !audio.duration) return;
-  var rect = track.getBoundingClientRect();
-  audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
-}
-
-// ══════════════════════════════════════════════════════════════════
-// SPOTIFY EMBED — initSpotify()
-// Solo para DELUXE. Muestra el iframe si la URL es válida.
-// ══════════════════════════════════════════════════════════════════
-function initSpotify() {
-  if (window.PLAN !== "DELUXE") return;
-  var embed = document.getElementById("spotify-embed");
-  if (!embed) return;
-  // Mostramos el embed solo si la URL no es el marcador sin reemplazar.
-  var iframe = embed.querySelector("iframe");
-  if (iframe && iframe.src && !iframe.src.includes("{{")) {
-    embed.style.display = "block";
+    document.getElementById('fab-play-icon').textContent = '▶';
+    document.getElementById('fab-main-btn').classList.remove('playing');
+  } else {
+    audio.play().then(() => {
+      isPlaying = true;
+      document.getElementById('fab-play-icon').textContent = '⏸';
+      document.getElementById('fab-main-btn').classList.add('playing');
+      showSongStrip(SONGS[songIdx].title);
+    }).catch(() => {});
   }
 }
-
-// ══════════════════════════════════════════════════════════════════
-// TICKER DECORATIVO — initTicker()
-// Banda de texto animada con nombre y fecha del evento.
-// ══════════════════════════════════════════════════════════════════
-function initTicker() {
-  var el = document.getElementById("ticker");
-  if (!el) return;
-  var texto = "✦ XV AÑOS · " + NOMBRE_PROTAGONISTAS.toUpperCase() + " · {{FECHA_DISPLAY}} · {{CIUDAD_EVENTO}} · {{SUBTITULO_EVENTO}} · ";
-  el.innerHTML = '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:.62rem;letter-spacing:.3em;color:rgba(8,8,8,.85);font-weight:700">' + texto.repeat(12) + '</span>';
+function toggleFab(e) {
+  e.stopPropagation();
+  togglePlay(e);
 }
-
-// ══════════════════════════════════════════════════════════════════
-// ACORDEÓN GENÉRICO — toggleAccordion(id)
-// Abre/cierra un bloque identificado por el sufijo del id.
-// ══════════════════════════════════════════════════════════════════
-function toggleAccordion(id) {
-  var body = document.getElementById("body-" + id);
-  var chev = document.getElementById("chev-" + id);
-  if (!body) return;
-  var open = body.classList.contains("gift-body-open");
-  // Cerramos todos los acordeones abiertos del mismo grupo.
-  document.querySelectorAll(".gift-body").forEach(function(b) { b.classList.remove("gift-body-open"); });
-  document.querySelectorAll(".gift-chevron").forEach(function(c) { c.classList.remove("gift-chevron-open"); });
-  if (!open) {
-    body.classList.add("gift-body-open");
-    if (chev) chev.classList.add("gift-chevron-open");
+function prevSong(e) {
+  e.stopPropagation();
+  songIdx = (songIdx - 1 + SONGS.length) % SONGS.length;
+  changeSong();
+}
+function nextSong(e) {
+  e.stopPropagation();
+  songIdx = (songIdx + 1) % SONGS.length;
+  changeSong();
+}
+function changeSong() {
+  if (SONGS[songIdx].src) {
+    audio.src = SONGS[songIdx].src;
+    if (isPlaying) { audio.play().catch(() => {}); }
+    showSongStrip(SONGS[songIdx].title);
   }
 }
+function showSongStrip(text) {
+  const strip = document.getElementById('song-strip');
+  strip.textContent = text;
+  strip.classList.add('visible');
+  setTimeout(() => strip.classList.remove('visible'), 3000);
+}
 
-// Lugar (acordeón independiente).
-function toggleLugar() { toggleAccordion("lugar"); }
-
-// ══════════════════════════════════════════════════════════════════
-// PARTÍCULAS DECORATIVAS — initPetals()
-// Canvas con pequeñas partículas animadas (esmeraldas y dorados).
-// ══════════════════════════════════════════════════════════════════
-function initPetals() {
-  var canvas = document.getElementById("petal-canvas");
-  if (!canvas) return;
-  var ctx = canvas.getContext("2d");
-  var W, H, petals = [];
-  var COLORS = ["rgba(0,200,150,.55)","rgba(201,168,76,.45)","rgba(127,255,212,.4)","rgba(240,212,116,.35)"];
+/* ── PETALS ── */
+function startPetals() {
+  const canvas = document.getElementById('petal-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, petals = [];
+  const COLORS = ['rgba(201,168,76,', 'rgba(255,45,120,', 'rgba(240,212,116,'];
 
   function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
   resize();
-  window.addEventListener("resize", resize);
+  window.addEventListener('resize', resize);
 
-  function spawn() {
-    return { x: Math.random() * W, y: -12, r: Math.random() * 5 + 2, vy: Math.random() * 1.2 + 0.5,
-             vx: (Math.random() - 0.5) * 0.8, rot: Math.random() * 360, vr: (Math.random() - 0.5) * 2,
-             color: COLORS[Math.floor(Math.random() * COLORS.length)], alpha: Math.random() * 0.5 + 0.3 };
+  function Petal() {
+    this.x = Math.random() * W;
+    this.y = -10;
+    this.r = 2 + Math.random() * 4;
+    this.speedY = .5 + Math.random() * 1.5;
+    this.speedX = (Math.random() - .5) * .8;
+    this.opacity = .15 + Math.random() * .4;
+    this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    this.angle = Math.random() * Math.PI * 2;
+    this.spin = (Math.random() - .5) * .04;
   }
-  for (var i = 0; i < 28; i++) { var p = spawn(); p.y = Math.random() * H; petals.push(p); }
+  Petal.prototype.update = function() {
+    this.y += this.speedY; this.x += this.speedX; this.angle += this.spin;
+  };
+  Petal.prototype.draw = function() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+    ctx.globalAlpha = this.opacity;
+    ctx.fillStyle = this.color + this.opacity + ')';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, this.r * 1.5, this.r, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  };
 
-  function frame() {
+  for (let i = 0; i < 35; i++) {
+    const p = new Petal();
+    p.y = Math.random() * H;
+    petals.push(p);
+  }
+
+  function loop() {
     ctx.clearRect(0, 0, W, H);
-    if (Math.random() < 0.04) petals.push(spawn());
-    petals = petals.filter(function(p) { return p.y < H + 20; });
-    petals.forEach(function(p) {
-      p.y += p.vy; p.x += p.vx; p.rot += p.vr;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot * Math.PI / 180);
-      ctx.globalAlpha = p.alpha;
-      ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, p.r, p.r * 1.7, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    });
-    requestAnimationFrame(frame);
+    petals.forEach(p => { p.update(); p.draw(); });
+    petals = petals.filter(p => p.y < H + 20);
+    if (petals.length < 35) petals.push(new Petal());
+    requestAnimationFrame(loop);
   }
-  frame();
+  loop();
 }
-
-// ══════════════════════════════════════════════════════════════════
-// ARRANQUE — DOMContentLoaded
-//
-// Todo se inicia aquí en el momento en que el DOM está listo.
-// Orden de ejecución:
-//   1. initPlanEngine()  → oculta secciones según el plan
-//   2. No abrimos el app todavía: esperamos que el usuario
-//      toque el splash. closeSplash() hace el resto.
-// ══════════════════════════════════════════════════════════════════
-document.addEventListener("DOMContentLoaded", function() {
-  // ① Primero ejecutamos el motor de planes para ocultar lo que no corresponde.
-  initPlanEngine();
-
-  // ② Si el plan resultó inválido, initPlanEngine ya mostró el error y salimos.
-  if (!window.PLAN) return;
-
-  // ③ Todo lo demás lo inicia closeSplash() cuando el usuario abre la invitación.
-});
-
 </script>
 </body>
 </html>
