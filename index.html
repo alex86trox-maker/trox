@@ -333,7 +333,7 @@
     .footer-signature { display:inline-block;border-radius:999px;padding:0.95rem 2.5rem;background:rgba(255,255,255,0.05);border:1px solid rgba(201,149,58,0.25);backdrop-filter:blur(20px);box-shadow:0 8px 40px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.08); }
     .footer-sig-text { font-family:'Great Vibes',cursive;font-size:2.4rem;color:rgba(255,220,232,0.96);filter:drop-shadow(0 1px 8px rgba(192,81,106,0.3)); }
     .footer-brand { margin-top:3rem;padding-top:2rem;border-top:1px solid rgba(201,149,58,0.1); }
-    .footer-brand img { height:72px;opacity:0.85;filter:brightness(0) invert(1) opacity(0.65);display:block;margin:0 auto 14px; }
+    .footer-brand img { height:110px;opacity:0.85;filter:brightness(0) invert(1) opacity(0.65);display:block;margin:0 auto 14px; }
     .footer-brand-text { font-size:0.7rem;color:rgba(220,160,190,0.5);max-width:300px;margin:0 auto;line-height:1.7;letter-spacing:0.02em; }
     .footer-copyright { margin-top:14px;font-size:0.65rem;color:rgba(220,160,190,0.35);letter-spacing:0.1em; }
 
@@ -667,24 +667,20 @@
           ha estado conmigo desde antes de nacer y estará para siempre."<br>
           <span style="font-family:'Great Vibes',cursive;font-size:1.3rem;color:rgba(240,180,200,0.9);display:block;margin-top:0.5rem">— Sofía Valentina</span>
         </div>
-        <!-- Spotify embed — reproduce la canción de verdad -->
-        <iframe
-          id="spotify-embed"
-          style="border-radius:14px;width:100%;margin-top:0.5rem;"
-          src="https://open.spotify.com/embed/track/6lanRgr6wXibZr8KgzXxBl?utm_source=generator&theme=0"
-          width="100%"
-          height="152"
-          frameBorder="0"
-          allowfullscreen=""
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"
-        ></iframe>
-        <div style="margin-top:1.25rem">
-          <a href="https://open.spotify.com/track/6lanRgr6wXibZr8KgzXxBl" target="_blank" rel="noopener"
-             style="display:inline-flex;align-items:center;gap:8px;color:rgba(240,190,210,0.6);font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;font-weight:700;border:1px solid rgba(255,200,215,0.15);border-radius:999px;padding:0.5rem 1.2rem;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-            Abrir en Spotify
-          </a>
+        <!-- Reproductor de audio personalizado -->
+        <audio id="song-audio" preload="none"
+          src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
+        </audio>
+        <button class="song-play-btn" id="song-play-btn" onclick="toggleSong()">
+          <svg id="song-play-icon" width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="none"><polygon points="5,3 19,12 5,21"/></svg>
+          <span id="song-play-text">Escuchar canción</span>
+        </button>
+        <div class="song-progress" id="song-progress" style="display:block;margin-top:1.25rem">
+          <div class="song-progress-bar" id="song-progress-bar" style="width:0%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:0.4rem">
+          <span id="song-current-time" style="font-size:0.7rem;color:rgba(240,190,210,0.55)">0:00</span>
+          <span id="song-duration" style="font-size:0.7rem;color:rgba(240,190,210,0.55)">--:--</span>
         </div>
       </div>
     </div>
@@ -1100,33 +1096,48 @@
   }
 
   // ── CANCIÓN DEDICADA
-  var songPlaying = false;
-  var songTimer = null;
-  var songProgress = 0;
+  var songAudio = null;
   function toggleSong(){
-    songPlaying = !songPlaying;
+    if(!songAudio){
+      songAudio = document.getElementById('song-audio');
+      songAudio.addEventListener('timeupdate', function(){
+        if(!songAudio.duration) return;
+        var pct = (songAudio.currentTime / songAudio.duration) * 100;
+        document.getElementById('song-progress-bar').style.width = pct + '%';
+        document.getElementById('song-current-time').textContent = fmtTime(songAudio.currentTime);
+      });
+      songAudio.addEventListener('loadedmetadata', function(){
+        document.getElementById('song-duration').textContent = fmtTime(songAudio.duration);
+      });
+      songAudio.addEventListener('ended', function(){
+        document.getElementById('song-disc').classList.remove('playing');
+        document.getElementById('song-play-icon').innerHTML = '<polygon points="5,3 19,12 5,21" fill="white"/>';
+        document.getElementById('song-play-text').textContent = 'Escuchar canción';
+        document.getElementById('song-progress-bar').style.width = '0%';
+        document.getElementById('song-current-time').textContent = '0:00';
+        songAudio.currentTime = 0;
+      });
+    }
     var disc = document.getElementById('song-disc');
     var icon = document.getElementById('song-play-icon');
     var text = document.getElementById('song-play-text');
-    var progressWrap = document.getElementById('song-progress');
-    var bar = document.getElementById('song-progress-bar');
-    if(songPlaying){
+    if(songAudio.paused){
+      songAudio.play();
       disc.classList.add('playing');
       icon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/>';
       text.textContent = 'Pausar';
-      progressWrap.style.display = 'block';
-      songTimer = setInterval(function(){
-        songProgress = Math.min(100, songProgress + 0.25);
-        bar.style.width = songProgress + '%';
-        if(songProgress >= 100){ clearInterval(songTimer); songPlaying=false; disc.classList.remove('playing'); icon.innerHTML='<polygon points="5,3 19,12 5,21" fill="white"/>'; text.textContent='Escuchar en Spotify'; songProgress=0; bar.style.width='0%'; }
-      }, 100);
-      showToast('♪ A Thousand Years — Christina Perri');
+      showToast('♪ Reproduciendo canción dedicada');
     } else {
+      songAudio.pause();
       disc.classList.remove('playing');
       icon.innerHTML = '<polygon points="5,3 19,12 5,21" fill="white"/>';
-      text.textContent = 'Escuchar en Spotify';
-      clearInterval(songTimer);
+      text.textContent = 'Escuchar canción';
     }
+  }
+  function fmtTime(s){
+    var m = Math.floor(s/60);
+    var sec = Math.floor(s%60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
   }
 
   // ── CARRUSEL DE INFANCIA
