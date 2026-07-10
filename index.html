@@ -283,12 +283,15 @@
     .song-vinyl-dot { width:14px;height:14px;border-radius:999px;background:radial-gradient(circle,#f0c0c8 30%,#c0516a 100%);box-shadow:0 2px 8px rgba(192,81,106,0.5); }
     .song-title-text { font-family:'Great Vibes',cursive;font-size:1.85rem;color:rgba(255,235,242,0.97);filter:drop-shadow(0 1px 8px rgba(0,0,0,0.3)); }
     .song-artist { font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,220,230,0.65);margin-top:4px; }
-    .song-controls { display:flex;align-items:center;justify-content:center;gap:14px;padding:1.25rem 1.5rem;border-bottom:1px solid rgba(212,160,170,0.1); }
-    .song-bar { flex:1;height:4px;border-radius:999px;background:rgba(212,160,170,0.2);position:relative;overflow:hidden;cursor:pointer; }
-    .song-progress { height:100%;border-radius:999px;background:linear-gradient(to right,#c0516a,#8b2040);width:0%;transition:width 0.5s linear; }
-    .song-play-btn { width:50px;height:50px;border-radius:999px;background:linear-gradient(145deg,#c0516a,#8b2040);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(139,32,64,0.4);flex-shrink:0;transition:transform 0.2s,box-shadow 0.2s; }
-    .song-play-btn:hover { transform:scale(1.08);box-shadow:0 10px 30px rgba(139,32,64,0.55); }
-    .song-time { font-size:0.62rem;color:#c088a0;letter-spacing:0.06em;width:36px;text-align:center;flex-shrink:0; }
+    /* YouTube embed */
+    .song-yt-wrap { position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000; }
+    .song-yt-wrap iframe { position:absolute;top:0;left:0;width:100%;height:100%;border:none; }
+    /* open-links row */
+    .song-links { display:flex;gap:10px;padding:1rem 1.5rem;border-bottom:1px solid rgba(212,160,170,0.1);justify-content:center;flex-wrap:wrap; }
+    .song-link-btn { display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:0.6rem 1.25rem;font-size:0.58rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;border:1.5px solid;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;font-family:inherit;text-decoration:none; }
+    .song-link-btn:hover { transform:scale(1.04); }
+    .song-link-yt { background:#ff0000;color:#fff;border-color:#cc0000;box-shadow:0 4px 16px rgba(255,0,0,0.3); }
+    .song-link-sp { background:#1DB954;color:#fff;border-color:#17a84a;box-shadow:0 4px 16px rgba(29,185,84,0.3); }
     .song-lyrics { padding:1.5rem;max-height:240px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(192,81,106,0.3) transparent; }
     .song-lyrics::-webkit-scrollbar { width:4px; }
     .song-lyrics::-webkit-scrollbar-thumb { background:rgba(192,81,106,0.3);border-radius:999px; }
@@ -662,17 +665,23 @@
     </div>
     <div class="song-player reveal">
       <div class="song-header">
-        <div class="song-vinyl" id="song-vinyl"><div class="song-vinyl-dot"></div></div>
+        <div class="song-vinyl" style="animation-play-state:running"><div class="song-vinyl-dot"></div></div>
         <div class="song-title-text">A Thousand Years</div>
         <div class="song-artist">Christina Perri</div>
       </div>
-      <div class="song-controls">
-        <span class="song-time" id="song-elapsed">0:00</span>
-        <div class="song-bar" id="song-bar" onclick="songSeek(event)"><div class="song-progress" id="song-progress"></div></div>
-        <span class="song-time" id="song-duration">4:45</span>
-        <button class="song-play-btn" id="song-play-btn" onclick="toggleSong()">
-          <svg id="song-play-icon" width="18" height="18" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
-        </button>
+      <!-- Reproductor YouTube real -->
+      <div class="song-yt-wrap">
+        <iframe src="https://www.youtube.com/embed/rtOvBOTyX00?rel=0&color=white" title="A Thousand Years – Christina Perri" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="song-links">
+        <a class="song-link-btn song-link-yt" href="https://www.youtube.com/watch?v=rtOvBOTyX00" target="_blank" rel="noopener">
+          <svg width="14" height="10" viewBox="0 0 24 17" fill="white"><path d="M23.5 2.6A3 3 0 0 0 21.4.5C19.5 0 12 0 12 0S4.5 0 2.6.5A3 3 0 0 0 .5 2.6C0 4.5 0 8.5 0 8.5s0 4 .5 5.9a3 3 0 0 0 2.1 2.1C4.5 17 12 17 12 17s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.9.5-5.9s0-4-.5-5.9zM9.5 12V5l6.3 3.5L9.5 12z"/></svg>
+          Abrir en YouTube
+        </a>
+        <a class="song-link-btn song-link-sp" href="https://open.spotify.com/track/6lanRgr6wXibZr8KgzXxBl" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          Abrir en Spotify
+        </a>
       </div>
       <div class="song-lyrics">
         <div class="song-lyrics-title">✦ Letra ✦</div>
@@ -769,20 +778,7 @@
     </div>
   </section>
 
-  <!-- FOOTER ORIGINAL -->
-  <footer id="footer">
-    <div class="top-line"></div>
-    <div class="inner reveal">
-      <div class="footer-seal"><div class="footer-seal-inner"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="rgba(240,180,200,0.7)" stroke-width="1.2" stroke-linecap="round"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></div></div>
-      <p class="footer-poem">Hoy comienzas a escribir<br>el capítulo más hermoso<br>de tu historia.</p>
-      <div class="footer-signature"><p class="footer-sig-text">Con amor, Sofía</p></div>
-      <div class="footer-brand">
-        <img src="https://hercules-cdn.com/file_x8AJ8yxg5mdZjNvN0dVAShzO" alt="Gueka Ideas" />
-        <p class="footer-brand-text">Esta plantilla digital es propiedad exclusiva de <strong style="color:rgba(240,200,215,0.75)">Gueka Ideas</strong>. Su uso está permitido únicamente para fines personales. Queda prohibida la reproducción, distribución, modificación o reventa total o parcial sin autorización escrita.</p>
-        <p class="footer-copyright">© <span id="year"></span> Gueka Ideas · Todos los derechos reservados</p>
-      </div>
-    </div>
-  </footer>
+
 
   <!-- WATERMARK GUEKA IDEAS -->
   <div class="gueka-watermark">
@@ -982,38 +978,6 @@
   })();
 
   // ══ NUEVAS SECCIONES ══
-
-  // ── Song Player (demo visual)
-  var songPlaying = false, songTimer = null, songElapsed = 0, songTotal = 285;
-  function pad2(n){ return String(n).padStart(2,'0'); }
-  function fmtTime(s){ return Math.floor(s/60)+':'+pad2(s%60|0); }
-  window.toggleSong = function(){
-    songPlaying = !songPlaying;
-    var vinyl = document.getElementById('song-vinyl');
-    var icon = document.getElementById('song-play-icon');
-    if(songPlaying){
-      vinyl.classList.add('playing');
-      icon.innerHTML = '<rect x="6" y="4" width="4" height="16" rx="1" fill="white"/><rect x="14" y="4" width="4" height="16" rx="1" fill="white"/>';
-      songTimer = setInterval(function(){
-        if(songElapsed < songTotal){ songElapsed++; updateSongUI(); }
-        else { songElapsed=0; songPlaying=false; window.toggleSong(); }
-      }, 1000);
-    } else {
-      vinyl.classList.remove('playing');
-      icon.innerHTML = '<polygon points="5,3 19,12 5,21" fill="white"/>';
-      clearInterval(songTimer);
-    }
-  };
-  window.songSeek = function(e){
-    var bar = document.getElementById('song-bar');
-    var r = bar.getBoundingClientRect();
-    songElapsed = Math.floor(Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*songTotal);
-    updateSongUI();
-  };
-  function updateSongUI(){
-    document.getElementById('song-progress').style.width = (songElapsed/songTotal*100).toFixed(1)+'%';
-    document.getElementById('song-elapsed').textContent = fmtTime(songElapsed);
-  }
 
   // ── Carrusel Infancia
   (function(){
