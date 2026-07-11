@@ -9,11 +9,26 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:#1a1008;color:#fff;font-family:system-ui,sans-serif;overflow-x:hidden}
+body{
+  background:#060402;
+  background-image:
+    radial-gradient(rgba(255,215,0,.025) 1px, transparent 1px),
+    radial-gradient(rgba(232,67,147,.012) 1px, transparent 1px);
+  background-size:32px 32px, 64px 64px;
+  background-position:0 0, 16px 16px;
+  color:#fff;
+  font-family:system-ui,sans-serif;
+  overflow-x:hidden;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:24px 12px 48px;
+}
 button{cursor:pointer;border:none;background:none}
 
 /* ── SPLASH ── */
-#splash{position:fixed;inset:0;z-index:9999;background:#1a1008;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity .4s}
+#splash{position:fixed;inset:0;z-index:9999;background:#1a1008;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity .4s;width:100%;height:100%}
 #splash.hide{opacity:0;pointer-events:none}
 .film-strip{position:absolute;left:0;right:0;height:28px;background:#0d0800;display:flex;align-items:center;gap:4px;padding:0 4px;overflow:hidden}
 .film-strip.top{top:0;border-bottom:1px solid rgba(255,220,100,.12)}
@@ -52,8 +67,52 @@ button{cursor:pointer;border:none;background:none}
 #shutter-circle{width:0;height:0;border-radius:50%;background:#000;transition:width .5s ease-in,height .5s ease-in}
 #shutter.active{display:flex}
 
-/* ── MAIN ── */
-#main{opacity:0;transition:opacity .3s}
+/* ── CARD WRAPPER ── */
+#card-wrapper{
+  position:relative;
+  width:100%;
+  max-width:480px;
+  margin:0 auto;
+  z-index:1;
+}
+
+/* Glowing animated border */
+#card-wrapper::before,
+#card-wrapper::after{
+  content:'';
+  position:absolute;
+  inset:-2px;
+  border-radius:4px;
+  background:conic-gradient(
+    from var(--angle,0deg),
+    transparent 0deg,
+    rgba(232,67,147,.8) 60deg,
+    rgba(255,215,0,1) 120deg,
+    rgba(255,255,255,.6) 150deg,
+    rgba(255,215,0,1) 180deg,
+    rgba(232,67,147,.8) 240deg,
+    transparent 300deg,
+    transparent 360deg
+  );
+  animation:border-spin 4s linear infinite;
+  z-index:-1;
+}
+#card-wrapper::after{
+  filter:blur(8px);
+  opacity:.55;
+  animation:border-spin 4s linear infinite reverse;
+}
+@property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes border-spin{to{--angle:360deg}}
+
+/* Inner card surface */
+#main{
+  position:relative;
+  background:#1a1008;
+  opacity:0;
+  transition:opacity .3s;
+  overflow:hidden;
+}
 #main.show{opacity:1}
 
 /* film edge */
@@ -66,7 +125,7 @@ button{cursor:pointer;border:none;background:none}
 #hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background:#1a1008}
 .hero-vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 90% 90% at 50% 50%,transparent 30%,rgba(0,0,0,.7) 100%)}
 .hero-grain{position:absolute;inset:0;pointer-events:none;opacity:.2;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");background-size:128px}
-.hero-content{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;text-align:center;padding:96px 32px;width:100%;max-width:360px;margin:0 auto}
+.hero-content{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;text-align:center;padding:96px 32px;width:100%;max-width:440px;margin:0 auto}
 .frame-num{font-family:monospace;font-size:.55rem;color:rgba(255,215,0,.4);letter-spacing:.2em;align-self:flex-end;margin-bottom:16px}
 .exposure-line{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.5),transparent);margin-bottom:24px}
 .hero-kicker{font-family:monospace;font-size:.45rem;color:rgba(255,215,0,.7);letter-spacing:.45em;text-transform:uppercase;margin-bottom:16px}
@@ -89,7 +148,7 @@ button{cursor:pointer;border:none;background:none}
 /* DATE */
 #date-section{position:relative;padding:64px 24px;overflow:hidden;background:#120e06}
 .film-strip-top{position:absolute;top:0;left:0;right:0;height:16px;background:#0d0800;display:flex;align-items:center;gap:2px;padding:0 4px;overflow:hidden}
-.date-cards{display:flex;gap:12px;max-width:360px;margin:0 auto}
+.date-cards{display:flex;gap:12px;max-width:440px;margin:0 auto}
 .date-card{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;padding:28px 8px}
 .date-card-label{font-family:monospace;font-size:.35rem;letter-spacing:.3em;text-transform:uppercase;margin-bottom:8px}
 .date-card-big{font-family:'Bebas Neue',Impact,'Arial Black',sans-serif;font-size:2.5rem;line-height:1}
@@ -125,7 +184,7 @@ button{cursor:pointer;border:none;background:none}
 /* LOCATION */
 #location{padding:64px 24px;position:relative;overflow:hidden;background:#120e06}
 .sep-line{height:1px;margin-bottom:32px;background:linear-gradient(90deg,transparent,rgba(232,67,147,.4),transparent)}
-.location-card{background:#fdf8ee;box-shadow:0 12px 50px rgba(0,0,0,.6),0 2px 8px rgba(0,0,0,.4);transform:rotate(.5deg);max-width:360px;margin:0 auto;overflow:hidden}
+.location-card{background:#fdf8ee;box-shadow:0 12px 50px rgba(0,0,0,.6),0 2px 8px rgba(0,0,0,.4);transform:rotate(.5deg);max-width:440px;margin:0 auto;overflow:hidden}
 .loc-top-edge{height:6px;background:#e8e0cc}
 .loc-map{height:200px}
 .loc-map iframe{width:100%;height:100%;border:none;display:block;filter:sepia(.3) contrast(.9)}
@@ -138,7 +197,7 @@ button{cursor:pointer;border:none;background:none}
 
 /* GALLERY */
 #gallery{padding:64px 16px;background:#1a1008}
-.camera-body{background:linear-gradient(160deg,#2a2218 0%,#1a1510 40%,#120e08 100%);border-radius:18px 18px 12px 12px;box-shadow:0 20px 60px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);border:1px solid rgba(255,215,0,.08);padding:12px 12px 16px;position:relative;max-width:360px;margin:0 auto}
+.camera-body{background:linear-gradient(160deg,#2a2218 0%,#1a1510 40%,#120e08 100%);border-radius:18px 18px 12px 12px;box-shadow:0 20px 60px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);border:1px solid rgba(255,215,0,.08);padding:12px 12px 16px;position:relative;max-width:440px;margin:0 auto}
 .cam-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:0 4px}
 .mode-dial{display:flex;align-items:center;gap:6px}
 .mode-btn{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:.3rem;font-family:monospace;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.05em}
@@ -192,7 +251,7 @@ button{cursor:pointer;border:none;background:none}
 /* ITINERARY */
 #itinerary{padding:64px 24px;position:relative;overflow:hidden;background:#0d0800}
 .itin-sep{height:1px;margin-bottom:32px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.3),transparent)}
-.itin-list{position:relative;max-width:360px;margin:0 auto;display:flex;flex-direction:column;gap:0}
+.itin-list{position:relative;max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:0}
 .itin-line{position:absolute;left:26px;top:0;bottom:0;width:2px;background:repeating-linear-gradient(to bottom,rgba(255,215,0,.4) 0px,rgba(255,215,0,.4) 6px,transparent 6px,transparent 12px);transform:scaleY(0);transform-origin:top;transition:transform 2s cubic-bezier(.22,1,.36,1)}
 .itin-line.visible{transform:scaleY(1)}
 .itin-item{display:flex;align-items:flex-start;gap:16px;padding-bottom:20px;opacity:0;transform:translateX(20px);transition:opacity .5s,transform .5s}
@@ -210,7 +269,7 @@ button{cursor:pointer;border:none;background:none}
 
 /* GIFTS */
 #gifts{padding:64px 24px;position:relative;overflow:hidden;background:#120e06}
-.gift-list{max-width:360px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.gift-list{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
 .gift-card{background:#fdf8ee;box-shadow:2px 2px 10px rgba(0,0,0,.35);overflow:hidden;transform:rotate(-.3deg)}
 .gift-strip{height:4px}
 .gift-header{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:16px;background:none;border:none;cursor:pointer}
@@ -233,7 +292,7 @@ button{cursor:pointer;border:none;background:none}
 /* RSVP */
 #rsvp{padding:80px 24px;position:relative;overflow:hidden;background:#0d0800}
 .rsvp-subtitle{text-align:center;margin-bottom:24px;font-style:italic;color:rgba(255,255,255,.35);font-size:.82rem;line-height:1.8}
-.rsvp-ticket{background:#fdf8ee;box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden;max-width:360px;margin:0 auto}
+.rsvp-ticket{background:#fdf8ee;box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden;max-width:440px;margin:0 auto}
 .ticket-head{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#3d2c0e}
 .ticket-kicker{font-family:monospace;font-size:.4rem;color:rgba(255,215,0,.6);letter-spacing:.3em;text-transform:uppercase}
 .ticket-name{font-family:'Dancing Script',cursive;font-size:1.1rem;color:#FFD700}
@@ -270,14 +329,14 @@ button{cursor:pointer;border:none;background:none}
 /* DRESS CODE */
 #dresscode{padding:64px 24px;position:relative;overflow:hidden;background:#120e06}
 .dc-sep{height:1px;margin-bottom:32px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.3),transparent)}
-.dc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:360px;margin:0 auto}
+.dc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:440px;margin:0 auto}
 .dc-card{background:#fdf8ee;box-shadow:2px 2px 8px rgba(0,0,0,.3);overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:20px 12px 14px}
 .dc-card:nth-child(even){transform:rotate(.3deg)}
 .dc-card:nth-child(odd){transform:rotate(-.2deg)}
 .dc-icon-wrap{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
 .dc-label{font-weight:700;color:#3d2c0e;font-size:.7rem;text-align:center;line-height:1.3}
 .dc-sub{color:rgba(61,44,14,.45);font-size:.5rem;text-align:center;font-family:monospace;margin-top:3px;letter-spacing:.05em}
-.dc-hint{max-width:360px;margin:20px auto 0;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.15);padding:14px 16px;text-align:center}
+.dc-hint{max-width:440px;margin:20px auto 0;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.15);padding:14px 16px;text-align:center}
 .dc-hint-txt{color:rgba(255,215,0,.65);font-family:monospace;font-size:.42rem;letter-spacing:.1em;line-height:1.9}
 
 /* CHILDHOOD CAROUSEL */
@@ -301,7 +360,7 @@ button{cursor:pointer;border:none;background:none}
 /* MENSAJE PAPÁS */
 #parents{padding:64px 24px;position:relative;overflow:hidden;background:#0d0800}
 .parents-sep{height:1px;margin-bottom:32px;background:linear-gradient(90deg,transparent,rgba(232,67,147,.4),transparent)}
-.parents-letter{background:#fdf8ee;max-width:360px;margin:0 auto;box-shadow:0 8px 40px rgba(0,0,0,.5);transform:rotate(-.5deg)}
+.parents-letter{background:#fdf8ee;max-width:440px;margin:0 auto;box-shadow:0 8px 40px rgba(0,0,0,.5);transform:rotate(-.5deg)}
 .parents-letter-top{height:6px;background:linear-gradient(90deg,#E84393,#FFD700,#E84393)}
 .parents-letter-perfs{display:flex;gap:4px;padding:4px 12px;background:#e8e0cc}
 .parents-letter-perf{width:5px;height:5px;border-radius:50%;background:#fdf8ee}
@@ -316,7 +375,7 @@ button{cursor:pointer;border:none;background:none}
 /* CANCIÓN ESPECIAL */
 #song{padding:64px 24px;position:relative;overflow:hidden;background:#120e06}
 .song-sep{height:1px;margin-bottom:32px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.3),transparent)}
-.vinyl-card{background:#fdf8ee;max-width:360px;margin:0 auto;box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden;transform:rotate(.4deg)}
+.vinyl-card{background:#fdf8ee;max-width:440px;margin:0 auto;box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden;transform:rotate(.4deg)}
 .vinyl-card-top{height:6px;background:linear-gradient(90deg,#1a1008,#3d2c0e,#1a1008)}
 .vinyl-card-body{padding:20px}
 .vinyl-disc-wrap{display:flex;justify-content:center;margin-bottom:16px;position:relative}
@@ -340,13 +399,13 @@ button{cursor:pointer;border:none;background:none}
 /* LISTA CANCIONES */
 #songlist{padding:64px 24px;position:relative;overflow:hidden;background:#0d0800}
 .songlist-sep{height:1px;margin-bottom:32px;background:linear-gradient(90deg,transparent,rgba(232,67,147,.4),transparent)}
-.songlist-form{background:#fdf8ee;max-width:360px;margin:0 auto 16px;box-shadow:2px 2px 10px rgba(0,0,0,.35);overflow:hidden}
+.songlist-form{background:#fdf8ee;max-width:440px;margin:0 auto 16px;box-shadow:2px 2px 10px rgba(0,0,0,.35);overflow:hidden}
 .songlist-form-top{height:4px;background:linear-gradient(90deg,#E84393,#FFD700)}
 .songlist-form-body{padding:16px}
 .songlist-form-title{font-family:'Dancing Script',cursive;font-size:1.1rem;color:#3d2c0e;margin-bottom:10px;text-align:center}
 .songlist-input{width:100%;display:block;margin-bottom:8px;padding:10px 12px;background:rgba(61,44,14,.05);border:1px solid rgba(61,44,14,.2);color:#3d2c0e;font-size:.82rem;outline:none}
 .songlist-submit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#3d2c0e;color:#FFD700;padding:11px;font-size:.42rem;letter-spacing:.25em;font-family:monospace;font-weight:700;text-transform:uppercase;border:none;cursor:pointer;margin-top:4px}
-.songlist-items{max-width:360px;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+.songlist-items{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:6px}
 .songlist-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,215,0,.1);padding:10px 14px;display:flex;align-items:center;gap:12px;animation:fadeUp .4s both}
 .songlist-num{font-family:monospace;font-size:.55rem;color:rgba(255,215,0,.35);flex-shrink:0;width:22px;text-align:right}
 .songlist-info{flex:1;min-width:0}
@@ -355,9 +414,62 @@ button{cursor:pointer;border:none;background:none}
 .songlist-note{font-size:.62rem;color:rgba(255,255,255,.2);font-style:italic;margin-top:4px}
 .songlist-empty{text-align:center;font-family:monospace;font-size:.4rem;color:rgba(255,255,255,.18);letter-spacing:.12em;padding:24px 0}
 
+/* ── ENHANCED ANIMATIONS ── */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes glow-pulse{0%,100%{box-shadow:0 0 10px rgba(255,215,0,.15),0 0 30px rgba(255,215,0,.05)}50%{box-shadow:0 0 20px rgba(255,215,0,.35),0 0 60px rgba(255,215,0,.1)}}
+@keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.12)}28%{transform:scale(1)}42%{transform:scale(1.08)}70%{transform:scale(1)}}
+@keyframes scanline{0%{top:-10%}100%{top:110%}}
+@keyframes particle-float{0%{transform:translateY(0) rotate(0deg);opacity:.7}100%{transform:translateY(-120px) rotate(360deg);opacity:0}}
+
+/* floating lens on hero */
+.lens-float{animation:float 5s ease-in-out infinite}
+
+/* shimmer on XV text */
+.hero-xv{position:relative}
+.hero-xv::after{
+  content:'XV';
+  position:absolute;
+  inset:0;
+  font-family:'Bebas Neue',Impact,'Arial Black',sans-serif;
+  font-size:inherit;
+  line-height:inherit;
+  letter-spacing:.05em;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.6) 50%,transparent 100%);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shimmer 3s linear infinite;
+  pointer-events:none;
+}
+
+/* scanline effect on camera viewfinder */
+.vf-scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.25),transparent);animation:scanline 3.5s linear infinite;pointer-events:none;z-index:20}
+
+/* floating particles */
+.particles{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.particle{position:absolute;width:4px;height:4px;border-radius:50%;animation:particle-float linear infinite}
+
+/* glow on countdown boxes */
+.cdown-window{animation:glow-pulse 3s ease-in-out infinite}
+
+/* heartbeat on parents hearts */
+.parents-heart{display:inline-block;animation:heartbeat 1.5s ease-in-out infinite}
+.parents-heart:nth-child(2){animation-delay:.2s}
+.parents-heart:nth-child(3){animation-delay:.4s}
+
 /* scroll reveal */
-.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
 .reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-left{opacity:0;transform:translateX(-30px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{opacity:0;transform:translateX(30px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+
+/* section entrance overlay lines */
+.section-accent-line{height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.6),rgba(232,67,147,.6),transparent);margin-bottom:0;opacity:0;transition:opacity .8s .3s}
+.section-accent-line.visible{opacity:1}
 </style>
 </head>
 <body>
@@ -396,11 +508,13 @@ button{cursor:pointer;border:none;background:none}
 </div>
 
 <!-- ══ MAIN ══ -->
+<div id="card-wrapper">
 <div id="main">
 
   <!-- HERO -->
   <section id="hero">
     <div class="hero-vignette"></div>
+    <div class="particles" id="hero-particles"></div>
     <div class="film-edge left" id="edge-left"></div>
     <div class="film-edge right" id="edge-right"></div>
     <div class="hero-grain"></div>
@@ -419,7 +533,7 @@ button{cursor:pointer;border:none;background:none}
       <div class="polaroid">
         <div class="polaroid-photo">
           <img src="https://hercules-cdn.com/file_X39lKEOzk3L7sGiIN6Jvixve"
-               alt="Lente" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(255,180,50,.25))" />
+               alt="Lente" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(255,180,50,.25))" class="lens-float" />
         </div>
         <div class="polaroid-body">
           <div class="polaroid-title">Sofía Valentina</div>
@@ -545,6 +659,7 @@ button{cursor:pointer;border:none;background:none}
       </div>
       <div class="viewfinder">
         <div class="vf-photo-wrap">
+          <div class="vf-scanline"></div>
           <div class="vf-flash" id="vf-flash"></div>
           <img id="gallery-img" src="" alt="" />
           <div class="vf-corner tl"></div><div class="vf-corner tr"></div><div class="vf-corner bl"></div><div class="vf-corner br"></div>
@@ -846,6 +961,7 @@ button{cursor:pointer;border:none;background:none}
   </footer>
 
 </div><!-- /main -->
+</div><!-- /card-wrapper -->
 
 <script>
 // ── DATA ──
@@ -912,6 +1028,25 @@ function buildEdge(id) {
   for(let i=0;i<22;i++) { const h=document.createElement('div'); h.className='film-hole'; el.appendChild(h); }
 }
 buildEdge('edge-left'); buildEdge('edge-right');
+
+// ── HERO PARTICLES ──
+const particlesEl = document.getElementById('hero-particles');
+const pColors = ['rgba(255,215,0,.6)','rgba(232,67,147,.5)','rgba(255,255,255,.3)'];
+for(let i=0;i<20;i++){
+  const p=document.createElement('div');
+  p.className='particle';
+  const size=(Math.random()*3+2)+'px';
+  p.style.cssText=`
+    left:${Math.random()*100}%;
+    bottom:${Math.random()*30}%;
+    width:${size};height:${size};
+    background:${pColors[Math.floor(Math.random()*pColors.length)]};
+    animation-duration:${3+Math.random()*5}s;
+    animation-delay:${Math.random()*4}s;
+    border-radius:50%;
+  `;
+  particlesEl.appendChild(p);
+}
 
 // ── DATE & GIFTS STRIPS ──
 function buildFilmStrip(id) {
@@ -1240,6 +1375,10 @@ function renderSongList(){
 
 // ── SCROLL REVEAL for new sections ──
 document.querySelectorAll('#dresscode .reveal, #childhood .reveal, #parents .reveal, #song .reveal, #songlist .reveal').forEach(el => observer.observe(el));
+
+// Itinerary observe
+const itinSection = document.getElementById('itinerary');
+if(itinSection) itinObserver.observe(itinSection);
 </script>
 </body>
 </html>
