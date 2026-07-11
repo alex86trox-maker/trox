@@ -6,7 +6,7 @@
   <title>XV Años · Sofía Valentina · Versión Clara</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bangers&family=Dancing+Script:wght@400..700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bangers&family=Permanent+Marker&family=Dancing+Script:wght@400..700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -416,7 +416,6 @@
     /* ══════════════════════════════════════════
        HERO — ESTILO MANGA / SCRAPBOOK
     ══════════════════════════════════════════ */
-    @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Bangers&display=swap');
 
     @keyframes wiggle {
       0%,100% { transform: rotate(var(--rot,0deg)) }
@@ -2112,6 +2111,29 @@
     .footer-sig:hover { box-shadow: 6px 6px 0 #3d7fd4 !important; }
     .footer-sig p { color: #1a1a1a !important; }
     .footer-copy { color: #555 !important; }
+    .footer-watermark {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(26,26,26,0.08);
+    }
+    .footer-watermark img {
+      width: 140px;
+      opacity: 0.55;
+      filter: grayscale(20%);
+      transition: opacity 0.3s;
+    }
+    .footer-watermark img:hover { opacity: 0.85; }
+    .footer-watermark span {
+      font-size: 0.5rem;
+      letter-spacing: 0.22em;
+      color: rgba(26,26,26,0.35);
+      text-transform: uppercase;
+      font-family: Arial, sans-serif;
+    }
     #footer-sec .top-line { background: linear-gradient(90deg, transparent, #e0547a, #3d7fd4, transparent) !important; height: 3px !important; }
   </style>
 </head>
@@ -2511,12 +2533,12 @@
       </div>
       <div class="gallery-main reveal-scale" id="gallery-main">
         <div class="top-bar-g"></div>
-        <div class="gallery-badge" id="gallery-badge">1 / 5</div>
+        <div class="gallery-badge" id="gallery-badge">1 / 12</div>
         <button class="gallery-arrow prev" onclick="galleryPrev()" aria-label="Anterior">&#8249;</button>
         <button class="gallery-arrow next" onclick="galleryNext()" aria-label="Siguiente">&#8250;</button>
         <div class="grad-overlay"></div>
         <div class="gallery-caption" id="gallery-caption">
-          <p>Una sonrisa que ilumina el mundo</p>
+          <p>Un vestido que conquistó la noche</p>
         </div>
       </div>
       <div class="gallery-thumbs" id="gallery-thumbs"></div>
@@ -2921,6 +2943,10 @@
           Diseño personalizado · 2026
         </div>
         <p class="footer-copy">© 2026 · XV AÑOS · SOFÍA VALENTINA · BOGOTÁ, COLOMBIA</p>
+        <div class="footer-watermark">
+          <img src="https://hercules-cdn.com/file_eLFxuTmfT1e5igF8pLRy8J9w" alt="Gueka Ideas" />
+          <span>Invitación creada por Gueka Ideas</span>
+        </div>
       </div>
     </section>
 
@@ -2937,6 +2963,7 @@ const YT_VIDEO_ID = 'dQw4w9WgXcQ'; // ← Reemplaza con el ID de YouTube real
 /* ══════════════════════════════════════════════════════════════════
    PÉTALOS ANIMADOS EN SPLASH
 ══════════════════════════════════════════════════════════════════ */
+let petalInterval = null;
 function spawnPetals() {
   const splash = document.getElementById('splash');
   const colors = [
@@ -2962,9 +2989,9 @@ function spawnPetals() {
     `;
     splash.appendChild(p);
     count++;
-    setTimeout(() => { p.remove(); count--; }, 12000);
+    setTimeout(() => { if (p.parentNode) p.remove(); count--; }, 12000);
   }
-  setInterval(spawn, 600);
+  petalInterval = setInterval(spawn, 600);
 }
 spawnPetals();
 
@@ -2974,6 +3001,8 @@ spawnPetals();
 function closeSplash() {
   const splash = document.getElementById('splash');
   const main   = document.getElementById('main');
+  // Detener pétalos
+  if (petalInterval) { clearInterval(petalInterval); petalInterval = null; }
   splash.classList.add('closing');
   setTimeout(() => {
     splash.style.display = 'none';
@@ -3065,7 +3094,7 @@ const galleryData = [
   { src: 'https://images.unsplash.com/photo-1565630818262-65cd5df24407?w=600&q=80', caption: 'Sofía Valentina, nuestra estrella' },
   { src: 'https://images.unsplash.com/photo-1776013113750-9d3f165ff5b3?w=600&q=80', caption: 'La magia de los quince años' },
 ];
-let galleryIdx = 0;
+let galleryIdx   = 0;
 let galleryTimer = null;
 
 function initGallery() {
@@ -3078,27 +3107,44 @@ function initGallery() {
     const el = document.createElement('img');
     el.src = img.src;
     el.alt = img.caption;
-    el.style.opacity = i === 0 ? '1' : '0';
-    el.style.zIndex  = i === 0 ? '1' : '0';
+    el.style.opacity  = i === 0 ? '1' : '0';
+    el.style.zIndex   = i === 0 ? '1' : '0';
+    el.style.transition = 'opacity 0.55s cubic-bezier(0.4,0,0.2,1)';
     container.appendChild(el);
 
     // Thumbnail
     const thumb = document.createElement('div');
     thumb.className = 'gallery-thumb' + (i === 0 ? ' active' : '');
-    thumb.innerHTML = `<img src="${img.src}" alt="" loading="lazy">`;
-    thumb.onclick = () => goToSlide(i);
+    const tImg = document.createElement('img');
+    tImg.src = img.src;
+    tImg.alt = '';
+    tImg.loading = 'lazy';
+    thumb.appendChild(tImg);
+    thumb.addEventListener('click', () => goToSlide(i));
     thumbsEl.appendChild(thumb);
 
     // Dot
     const dot = document.createElement('button');
     dot.className = 'gallery-dot' + (i === 0 ? ' active' : '');
     dot.setAttribute('aria-label', `Imagen ${i + 1}`);
-    dot.onclick = () => goToSlide(i);
+    dot.addEventListener('click', () => goToSlide(i));
     dotsEl.appendChild(dot);
   });
 
   // Autoplay
-  galleryTimer = setInterval(() => galleryNext(), 4000);
+  galleryTimer = setInterval(() => galleryNext(), 4500);
+
+  // Swipe táctil
+  let touchStartX = 0;
+  container.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].clientX;
+  }, { passive: true });
+  container.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 40) {
+      dx < 0 ? galleryNext() : galleryPrev();
+    }
+  }, { passive: true });
 }
 
 function goToSlide(idx) {
@@ -3109,9 +3155,11 @@ function goToSlide(idx) {
 
   imgs[galleryIdx].style.opacity = '0';
   imgs[galleryIdx].style.zIndex  = '0';
-  galleryIdx = (idx + galleryData.length) % galleryData.length;
-  imgs[galleryIdx].style.opacity = '1';
+
+  galleryIdx = ((idx % galleryData.length) + galleryData.length) % galleryData.length;
+
   imgs[galleryIdx].style.zIndex  = '1';
+  imgs[galleryIdx].style.opacity = '1';
 
   document.getElementById('gallery-caption').querySelector('p').textContent = galleryData[galleryIdx].caption;
   document.getElementById('gallery-badge').textContent = `${galleryIdx + 1} / ${galleryData.length}`;
@@ -3119,7 +3167,7 @@ function goToSlide(idx) {
   thumbs.forEach((t, i) => t.classList.toggle('active', i === galleryIdx));
   dots.forEach((d, i)   => d.classList.toggle('active', i === galleryIdx));
 
-  galleryTimer = setInterval(() => galleryNext(), 4000);
+  galleryTimer = setInterval(() => galleryNext(), 4500);
 }
 
 function galleryNext() { goToSlide(galleryIdx + 1); }
