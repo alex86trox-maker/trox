@@ -613,16 +613,17 @@
     }
     .song-player .sp-bar { height: 2px; background: linear-gradient(90deg, #D4AF37, #E84393, #D4AF37); }
     .song-player .sp-inner { padding: 1.5rem; }
-    .song-cover-wrap { position: relative; margin: 0 auto 1.25rem; width: 100px; height: 100px; }
+    .song-cover-wrap { position: relative; margin: 0 auto 1.25rem; width: 140px; height: 140px; }
     .song-cover {
-      width: 100px; height: 100px;
+      width: 140px; height: 140px;
       display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-      border: 2px solid rgba(212,175,55,0.3);
+      background: transparent; border: none;
+      border-radius: 50%;
     }
+    .song-cover svg.vinyl-disc { width: 140px; height: 140px; display: block; }
     .song-cover.spinning { animation: spinRecord 4s linear infinite; }
     @keyframes spinRecord { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
-    .song-vinyl-dot { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 18px; height: 18px; background: #0a0a0a; border-radius: 50%; border: 2px solid rgba(212,175,55,0.4); z-index: 2; }
+    .song-vinyl-dot { display: none; }
     .song-title { font-family: 'Dancing Script', cursive; font-size: 1.6rem; color: #fff; text-align: center; margin-bottom: 4px; }
     .song-artist { text-align: center; font-size: 0.65rem; letter-spacing: 0.2em; color: rgba(212,175,55,0.65); text-transform: uppercase; margin-bottom: 1.25rem; }
     .song-progress { position: relative; height: 3px; background: rgba(255,255,255,0.08); margin-bottom: 6px; cursor: pointer; }
@@ -1154,28 +1155,77 @@
         <div class="sp-inner">
           <div class="song-cover-wrap">
             <div class="song-cover" id="song-cover">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(212,175,55,0.6)" stroke-width="1.2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              <!-- Vinyl record SVG -->
+              <svg class="vinyl-disc" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <radialGradient id="vg1" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stop-color="#2a2a2a"/>
+                    <stop offset="40%"  stop-color="#111111"/>
+                    <stop offset="70%"  stop-color="#1c1c1c"/>
+                    <stop offset="100%" stop-color="#0a0a0a"/>
+                  </radialGradient>
+                  <radialGradient id="vg-label" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stop-color="#1a0a10"/>
+                    <stop offset="60%"  stop-color="#0d0508"/>
+                    <stop offset="100%" stop-color="#1a0a10"/>
+                  </radialGradient>
+                  <radialGradient id="vg-shine" cx="35%" cy="30%" r="65%">
+                    <stop offset="0%"   stop-color="rgba(255,255,255,0.06)"/>
+                    <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+                  </radialGradient>
+                </defs>
+                <!-- Outer disc -->
+                <circle cx="70" cy="70" r="69" fill="url(#vg1)" stroke="rgba(212,175,55,0.15)" stroke-width="1"/>
+                <!-- Groove rings -->
+                <circle cx="70" cy="70" r="65" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.7"/>
+                <circle cx="70" cy="70" r="61" fill="none" stroke="rgba(255,255,255,0.035)" stroke-width="0.6"/>
+                <circle cx="70" cy="70" r="57" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.6"/>
+                <circle cx="70" cy="70" r="53" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.6"/>
+                <circle cx="70" cy="70" r="49" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+                <circle cx="70" cy="70" r="45" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+                <circle cx="70" cy="70" r="41" fill="none" stroke="rgba(255,255,255,0.025)" stroke-width="0.5"/>
+                <circle cx="70" cy="70" r="37" fill="none" stroke="rgba(212,175,55,0.12)" stroke-width="0.8"/>
+                <!-- Label circle -->
+                <circle cx="70" cy="70" r="32" fill="url(#vg-label)" stroke="rgba(212,175,55,0.3)" stroke-width="0.8"/>
+                <!-- Label inner ring -->
+                <circle cx="70" cy="70" r="28" fill="none" stroke="rgba(212,175,55,0.15)" stroke-width="0.5"/>
+                <!-- Label decoration: subtle gold lines -->
+                <line x1="44" y1="58" x2="96" y2="58" stroke="rgba(212,175,55,0.12)" stroke-width="0.5"/>
+                <line x1="44" y1="82" x2="96" y2="82" stroke="rgba(212,175,55,0.12)" stroke-width="0.5"/>
+                <!-- Label text: XV -->
+                <text x="70" y="66" text-anchor="middle" fill="rgba(212,175,55,0.8)" font-size="14" font-weight="700" font-family="'Bebas Neue',sans-serif" letter-spacing="3">XV</text>
+                <text x="70" y="76" text-anchor="middle" fill="rgba(232,67,147,0.7)" font-size="5.5" font-family="ui-sans-serif,sans-serif" letter-spacing="2">AÑOS</text>
+                <text x="70" y="84" text-anchor="middle" fill="rgba(255,255,255,0.25)" font-size="4.5" font-family="'Dancing Script',cursive">Sofía Valentina</text>
+                <!-- Shine overlay -->
+                <circle cx="70" cy="70" r="69" fill="url(#vg-shine)"/>
+                <!-- Center hole -->
+                <circle cx="70" cy="70" r="4" fill="#0a0a0a" stroke="rgba(212,175,55,0.4)" stroke-width="0.8"/>
+              </svg>
             </div>
             <div class="song-vinyl-dot"></div>
           </div>
-          <p class="song-title">Quinceañera</p>
-          <p class="song-artist">Canción especial · Sofía Valentina</p>
+          <!-- YouTube IFrame (hidden, audio only) -->
+          <div id="yt-player-wrap" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;left:-9999px;top:-9999px;">
+            <div id="yt-player"></div>
+          </div>
+          <p class="song-title" id="song-title-text">Quinceañera</p>
+          <p class="song-artist" id="song-artist-text">Frankie J · Sofía Valentina</p>
           <div class="song-progress" id="song-progress" onclick="seekSong(event)">
             <div class="song-progress-fill" id="song-fill"></div>
           </div>
           <div class="song-times">
             <span id="song-current">0:00</span>
-            <span id="song-total">3:45</span>
+            <span id="song-total">0:00</span>
           </div>
           <div class="song-controls">
-            <button class="song-btn" onclick="prevSong()" title="Anterior">
+            <button class="song-btn" onclick="restartSong()" title="Reiniciar">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
             </button>
             <button class="song-play-btn" id="song-play-btn" onclick="toggleSong()">
               <svg id="song-play-icon" width="22" height="22" viewBox="0 0 24 24" fill="#0a0a0a" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             </button>
-            <button class="song-btn" onclick="nextSong()" title="Siguiente">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+            <button class="song-btn" onclick="muteToggle()" title="Silenciar" id="song-mute-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
             </button>
           </div>
           <div class="song-msg">
@@ -1487,48 +1537,110 @@ CHILDHOOD.forEach(c => {
   }
 })();
 
-// ── SONG PLAYER (simulated) ──
+// ── SONG PLAYER — YouTube IFrame API ──
+// Cambia este ID de YouTube por el de tu canción favorita
+const YT_VIDEO_ID = 'EkHTsc9Z3Eg'; // Frankie J - Quinceañera
+
+let ytPlayer = null;
 let songPlaying = false;
-let songProgress = 0;
-let songInterval = null;
-const SONG_DURATION = 225; // 3:45 in seconds
+let songMuted = false;
+let songProgressInterval = null;
 
-function fmtTime(s){
-  return Math.floor(s/60)+':'+(String(s%60).padStart(2,'0'));
-}
-document.getElementById('song-total').textContent = fmtTime(SONG_DURATION);
-
-function updateSongUI(){
-  const pct = (songProgress / SONG_DURATION) * 100;
-  document.getElementById('song-fill').style.width = pct + '%';
-  document.getElementById('song-current').textContent = fmtTime(Math.floor(songProgress));
+function fmtTime(s) {
+  if (isNaN(s) || s < 0) return '0:00';
+  return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 }
 
-function toggleSong(){
-  songPlaying = !songPlaying;
+// Load YouTube IFrame API
+const ytScript = document.createElement('script');
+ytScript.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(ytScript);
+
+function onYouTubeIframeAPIReady() {
+  ytPlayer = new YT.Player('yt-player', {
+    height: '1', width: '1',
+    videoId: YT_VIDEO_ID,
+    playerVars: { autoplay: 0, controls: 0, rel: 0, modestbranding: 1 },
+    events: {
+      onReady: function(e) {
+        const dur = e.target.getDuration();
+        document.getElementById('song-total').textContent = fmtTime(dur);
+      },
+      onStateChange: function(e) {
+        if (e.data === YT.PlayerState.ENDED) {
+          songPlaying = false;
+          updatePlayIcon(false);
+          document.getElementById('song-cover').classList.remove('spinning');
+          clearInterval(songProgressInterval);
+          document.getElementById('song-current').textContent = '0:00';
+          document.getElementById('song-fill').style.width = '0%';
+        }
+      }
+    }
+  });
+}
+
+function updatePlayIcon(playing) {
   const icon = document.getElementById('song-play-icon');
-  const cover = document.getElementById('song-cover');
-  if(songPlaying){
-    icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
-    cover.classList.add('spinning');
-    songInterval = setInterval(()=>{
-      songProgress += 0.5;
-      if(songProgress >= SONG_DURATION){ songProgress = 0; }
-      updateSongUI();
-    }, 500);
+  if (playing) {
+    icon.setAttribute('viewBox', '0 0 24 24');
+    icon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="#0a0a0a"/><rect x="14" y="4" width="4" height="16" fill="#0a0a0a"/>';
   } else {
-    icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
-    cover.classList.remove('spinning');
-    clearInterval(songInterval);
+    icon.setAttribute('viewBox', '0 0 24 24');
+    icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3" fill="#0a0a0a"/>';
   }
 }
-function prevSong(){ songProgress = 0; updateSongUI(); }
-function nextSong(){ songProgress = 0; updateSongUI(); }
-function seekSong(e){
+
+function startProgressTracker() {
+  clearInterval(songProgressInterval);
+  songProgressInterval = setInterval(() => {
+    if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+    const cur = ytPlayer.getCurrentTime();
+    const dur = ytPlayer.getDuration();
+    if (dur > 0) {
+      document.getElementById('song-fill').style.width = (cur / dur * 100) + '%';
+      document.getElementById('song-current').textContent = fmtTime(cur);
+      document.getElementById('song-total').textContent = fmtTime(dur);
+    }
+  }, 500);
+}
+
+function toggleSong() {
+  if (!ytPlayer || typeof ytPlayer.playVideo !== 'function') return;
+  if (songPlaying) {
+    ytPlayer.pauseVideo();
+    songPlaying = false;
+    clearInterval(songProgressInterval);
+    document.getElementById('song-cover').classList.remove('spinning');
+  } else {
+    ytPlayer.playVideo();
+    songPlaying = true;
+    startProgressTracker();
+    document.getElementById('song-cover').classList.add('spinning');
+  }
+  updatePlayIcon(songPlaying);
+}
+
+function restartSong() {
+  if (!ytPlayer || typeof ytPlayer.seekTo !== 'function') return;
+  ytPlayer.seekTo(0, true);
+  document.getElementById('song-current').textContent = '0:00';
+  document.getElementById('song-fill').style.width = '0%';
+}
+
+function muteToggle() {
+  if (!ytPlayer) return;
+  songMuted = !songMuted;
+  songMuted ? ytPlayer.mute() : ytPlayer.unMute();
+  const btn = document.getElementById('song-mute-btn');
+  btn.style.color = songMuted ? 'rgba(212,175,55,0.4)' : '';
+}
+
+function seekSong(e) {
+  if (!ytPlayer || typeof ytPlayer.getDuration !== 'function') return;
   const rect = document.getElementById('song-progress').getBoundingClientRect();
   const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-  songProgress = pct * SONG_DURATION;
-  updateSongUI();
+  ytPlayer.seekTo(pct * ytPlayer.getDuration(), true);
 }
 
 // ── SONG REQUESTS ──
