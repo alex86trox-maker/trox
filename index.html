@@ -1538,38 +1538,39 @@ CHILDHOOD.forEach(c => {
 })();
 
 // ── SONG PLAYER — YouTube IFrame API ──
-// Cambia este ID de YouTube por el de tu canción favorita
+// Cambia este ID por el de tu canción favorita de YouTube
 const YT_VIDEO_ID = 'EkHTsc9Z3Eg'; // Frankie J - Quinceañera
 
-let ytPlayer = null;
-let songPlaying = false;
-let songMuted = false;
+let ytPlayer     = null;
+let ytReady      = false;
+let ytAPILoaded  = false;
+let songPlaying  = false;
+let songMuted    = false;
 let songProgressInterval = null;
+let pendingPlay  = false; // play requested before player was ready
 
 function fmtTime(s) {
-  if (isNaN(s) || s < 0) return '0:00';
+  if (!s || isNaN(s) || s < 0) return '0:00';
   return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 }
 
-// Load YouTube IFrame API
-const ytScript = document.createElement('script');
-ytScript.src = 'https://www.youtube.com/iframe_api';
-document.head.appendChild(ytScript);
-
-function onYouTubeIframeAPIReady() {
+// Called by YouTube IFrame API once loaded
+window.onYouTubeIframeAPIReady = function() {
   ytPlayer = new YT.Player('yt-player', {
     height: '1', width: '1',
     videoId: YT_VIDEO_ID,
-    playerVars: { autoplay: 0, controls: 0, rel: 0, modestbranding: 1 },
+    playerVars: { autoplay: 0, controls: 0, rel: 0, modestbranding: 1, playsinline: 1 },
     events: {
-      onReady: function(e) {
-        const dur = e.target.getDuration();
+      onReady: function(evt) {
+        ytReady = true;
+        const dur = evt.target.getDuration();
         document.getElementById('song-total').textContent = fmtTime(dur);
+        if (pendingPlay) { pendingPlay = false; _doPlay(); }
       },
-      onStateChange: function(e) {
-        if (e.data === YT.PlayerState.ENDED) {
+      onStateChange: function(evt) {
+        if (evt.data === YT.PlayerState.ENDED) {
           songPlaying = false;
-          updatePlayIcon(false);
+          _updatePlayIcon(false);
           document.getElementById('song-cover').classList.remove('spinning');
           clearInterval(songProgressInterval);
           document.getElementById('song-current').textContent = '0:00';
@@ -1578,68 +1579,84 @@ function onYouTubeIframeAPIReady() {
       }
     }
   });
+};
+
+function _loadYTAPI() {
+  if (ytAPILoaded) return;
+  ytAPILoaded = true;
+  const s = document.createElement('script');
+  s.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(s);
 }
 
-function updatePlayIcon(playing) {
+function _updatePlayIcon(playing) {
   const icon = document.getElementById('song-play-icon');
-  if (playing) {
-    icon.setAttribute('viewBox', '0 0 24 24');
-    icon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="#0a0a0a"/><rect x="14" y="4" width="4" height="16" fill="#0a0a0a"/>';
-  } else {
-    icon.setAttribute('viewBox', '0 0 24 24');
-    icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3" fill="#0a0a0a"/>';
-  }
+  icon.setAttribute('viewBox', '0 0 24 24');
+  icon.innerHTML = playing
+    ? '<rect x="6" y="4" width="4" height="16" fill="#0a0a0a"/><rect x="14" y="4" width="4" height="16" fill="#0a0a0a"/>'
+    : '<polygon points="5 3 19 12 5 21 5 3" fill="#0a0a0a"/>';
 }
 
-function startProgressTracker() {
+function _startProgressTracker() {
   clearInterval(songProgressInterval);
   songProgressInterval = setInterval(() => {
-    if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+    if (!ytReady || typeof ytPlayer.getCurrentTime !== 'function') return;
     const cur = ytPlayer.getCurrentTime();
     const dur = ytPlayer.getDuration();
     if (dur > 0) {
       document.getElementById('song-fill').style.width = (cur / dur * 100) + '%';
       document.getElementById('song-current').textContent = fmtTime(cur);
-      document.getElementById('song-total').textContent = fmtTime(dur);
+      document.getElementById('song-total').textContent   = fmtTime(dur);
     }
   }, 500);
 }
 
+function _doPlay() {
+  ytPlayer.playVideo();
+  songPlaying = true;
+  _startProgressTracker();
+  document.getElementById('song-cover').classList.add('spinning');
+  _updatePlayIcon(true);
+}
+
 function toggleSong() {
-  if (!ytPlayer || typeof ytPlayer.playVideo !== 'function') return;
+  // First press: load API lazily then play
+  if (!ytAPILoaded) {
+    _loadYTAPI();
+    pendingPlay = true;
+    return;
+  }
+  if (!ytReady) { pendingPlay = true; return; }
+
   if (songPlaying) {
     ytPlayer.pauseVideo();
     songPlaying = false;
     clearInterval(songProgressInterval);
     document.getElementById('song-cover').classList.remove('spinning');
+    _updatePlayIcon(false);
   } else {
-    ytPlayer.playVideo();
-    songPlaying = true;
-    startProgressTracker();
-    document.getElementById('song-cover').classList.add('spinning');
+    _doPlay();
   }
-  updatePlayIcon(songPlaying);
 }
 
 function restartSong() {
-  if (!ytPlayer || typeof ytPlayer.seekTo !== 'function') return;
+  if (!ytReady) return;
   ytPlayer.seekTo(0, true);
   document.getElementById('song-current').textContent = '0:00';
   document.getElementById('song-fill').style.width = '0%';
 }
 
 function muteToggle() {
-  if (!ytPlayer) return;
+  if (!ytReady) return;
   songMuted = !songMuted;
   songMuted ? ytPlayer.mute() : ytPlayer.unMute();
-  const btn = document.getElementById('song-mute-btn');
-  btn.style.color = songMuted ? 'rgba(212,175,55,0.4)' : '';
+  document.getElementById('song-mute-btn').style.color = songMuted ? 'rgba(212,175,55,0.4)' : '';
 }
 
 function seekSong(e) {
-  if (!ytPlayer || typeof ytPlayer.getDuration !== 'function') return;
+  if (!ytReady) return;
   const rect = document.getElementById('song-progress').getBoundingClientRect();
-  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
   ytPlayer.seekTo(pct * ytPlayer.getDuration(), true);
 }
 
