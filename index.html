@@ -617,8 +617,7 @@
     .song-cover {
       width: 140px; height: 140px;
       display: flex; align-items: center; justify-content: center;
-      background: transparent; border: none;
-      border-radius: 50%;
+      background: transparent; border: none; border-radius: 50%;
     }
     .song-cover svg.vinyl-disc { width: 140px; height: 140px; display: block; }
     .song-cover.spinning { animation: spinRecord 4s linear infinite; }
@@ -626,23 +625,21 @@
     .song-vinyl-dot { display: none; }
     .song-title { font-family: 'Dancing Script', cursive; font-size: 1.6rem; color: #fff; text-align: center; margin-bottom: 4px; }
     .song-artist { text-align: center; font-size: 0.65rem; letter-spacing: 0.2em; color: rgba(212,175,55,0.65); text-transform: uppercase; margin-bottom: 1.25rem; }
-    .song-progress { position: relative; height: 3px; background: rgba(255,255,255,0.08); margin-bottom: 6px; cursor: pointer; }
-    .song-progress-fill { height: 100%; background: linear-gradient(90deg, #E84393, #D4AF37); width: 0%; transition: width 0.5s linear; }
-    .song-times { display: flex; justify-content: space-between; font-size: 0.42rem; color: rgba(255,255,255,0.3); margin-bottom: 1.25rem; }
-    .song-controls { display: flex; align-items: center; justify-content: center; gap: 20px; }
-    .song-btn {
-      border: none; cursor: pointer; background: transparent; color: rgba(255,255,255,0.5);
-      display: flex; align-items: center; justify-content: center;
-      transition: color 0.2s;
+    /* YouTube embed styled to match */
+    .yt-embed-wrap {
+      position: relative; width: 100%; padding-bottom: 56.25%;
+      border: 1px solid rgba(212,175,55,0.15); margin-bottom: 0.75rem;
     }
-    .song-btn:hover { color: #D4AF37; }
-    .song-play-btn {
-      width: 52px; height: 52px;
-      background: linear-gradient(135deg, #D4AF37, #F0C040);
-      border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: transform 0.15s;
+    .yt-embed-wrap iframe {
+      position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block;
     }
+    .song-yt-label {
+      text-align: center; font-size: 0.5rem; letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.2); padding-bottom: 1rem;
+    }
+    .song-msg { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(212,175,55,0.1); text-align: center; }
+    .song-msg p { font-size: 0.75rem; color: rgba(255,255,255,0.35); line-height: 1.7; font-style: italic; }
+    .song-msg strong { color: rgba(212,175,55,0.65); font-style: normal; }
     .song-play-btn:hover { transform: scale(1.05); }
     .song-msg { margin-top: 1.25rem; padding: 1rem; background: rgba(212,175,55,0.04); border: 1px solid rgba(212,175,55,0.1); }
     .song-msg p { font-size: 0.72rem; font-style: italic; color: rgba(255,255,255,0.35); text-align: center; line-height: 1.7; }
@@ -1205,26 +1202,19 @@
             <div class="song-vinyl-dot"></div>
           </div>
 
-          <p class="song-title" id="song-title-text">Quinceañera</p>
-          <p class="song-artist" id="song-artist-text">Frankie J · Sofía Valentina</p>
-          <div class="song-progress" id="song-progress" onclick="seekSong(event)">
-            <div class="song-progress-fill" id="song-fill"></div>
+          <p class="song-title">Quinceañera</p>
+          <p class="song-artist">Frankie J · Sofía Valentina</p>
+          <!-- Iframe YouTube directo: única forma garantizada de reproducir audio -->
+          <div class="yt-embed-wrap">
+            <iframe
+              src="https://www.youtube.com/embed/EkHTsc9Z3Eg?rel=0&modestbranding=1&playsinline=1"
+              allow="autoplay; encrypted-media"
+              allowfullscreen
+              loading="lazy"
+              title="Nuestra canción">
+            </iframe>
           </div>
-          <div class="song-times">
-            <span id="song-current">0:00</span>
-            <span id="song-total">0:00</span>
-          </div>
-          <div class="song-controls">
-            <button class="song-btn" onclick="restartSong()" title="Reiniciar">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
-            </button>
-            <button class="song-play-btn" id="song-play-btn" onclick="toggleSong()">
-              <svg id="song-play-icon" width="22" height="22" viewBox="0 0 24 24" fill="#0a0a0a" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </button>
-            <button class="song-btn" onclick="muteToggle()" title="Silenciar" id="song-mute-btn">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-            </button>
-          </div>
+          <p class="song-yt-label">▶ PRESIONA PLAY PARA ESCUCHAR</p>
           <div class="song-msg">
             <p>Esta canción fue elegida especialmente para esta noche.<br><strong>Que cada nota lleve tu corazón a bailar.</strong></p>
           </div>
@@ -1534,128 +1524,7 @@ CHILDHOOD.forEach(c => {
   }
 })();
 
-// ── SONG PLAYER — YouTube IFrame API ──
-// Cambia este ID por el de tu canción favorita de YouTube
-const YT_VIDEO_ID = 'EkHTsc9Z3Eg'; // Frankie J - Quinceañera
-
-let ytPlayer     = null;
-let ytReady      = false;
-let ytAPILoaded  = false;
-let songPlaying  = false;
-let songMuted    = false;
-let songProgressInterval = null;
-let pendingPlay  = false; // play requested before player was ready
-
-function fmtTime(s) {
-  if (!s || isNaN(s) || s < 0) return '0:00';
-  return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
-}
-
-// Called by YouTube IFrame API once loaded
-window.onYouTubeIframeAPIReady = function() {
-  ytPlayer = new YT.Player('yt-player', {
-    height: '1', width: '1',
-    videoId: YT_VIDEO_ID,
-    playerVars: { autoplay: 0, controls: 0, rel: 0, modestbranding: 1, playsinline: 1 },
-    events: {
-      onReady: function(evt) {
-        ytReady = true;
-        const dur = evt.target.getDuration();
-        document.getElementById('song-total').textContent = fmtTime(dur);
-        if (pendingPlay) { pendingPlay = false; _doPlay(); }
-      },
-      onStateChange: function(evt) {
-        if (evt.data === YT.PlayerState.ENDED) {
-          songPlaying = false;
-          _updatePlayIcon(false);
-          document.getElementById('song-cover').classList.remove('spinning');
-          clearInterval(songProgressInterval);
-          document.getElementById('song-current').textContent = '0:00';
-          document.getElementById('song-fill').style.width = '0%';
-        }
-      }
-    }
-  });
-};
-
-function _loadYTAPI() {
-  if (ytAPILoaded) return;
-  ytAPILoaded = true;
-  const s = document.createElement('script');
-  s.src = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(s);
-}
-
-function _updatePlayIcon(playing) {
-  const icon = document.getElementById('song-play-icon');
-  icon.setAttribute('viewBox', '0 0 24 24');
-  icon.innerHTML = playing
-    ? '<rect x="6" y="4" width="4" height="16" fill="#0a0a0a"/><rect x="14" y="4" width="4" height="16" fill="#0a0a0a"/>'
-    : '<polygon points="5 3 19 12 5 21 5 3" fill="#0a0a0a"/>';
-}
-
-function _startProgressTracker() {
-  clearInterval(songProgressInterval);
-  songProgressInterval = setInterval(() => {
-    if (!ytReady || typeof ytPlayer.getCurrentTime !== 'function') return;
-    const cur = ytPlayer.getCurrentTime();
-    const dur = ytPlayer.getDuration();
-    if (dur > 0) {
-      document.getElementById('song-fill').style.width = (cur / dur * 100) + '%';
-      document.getElementById('song-current').textContent = fmtTime(cur);
-      document.getElementById('song-total').textContent   = fmtTime(dur);
-    }
-  }, 500);
-}
-
-function _doPlay() {
-  ytPlayer.playVideo();
-  songPlaying = true;
-  _startProgressTracker();
-  document.getElementById('song-cover').classList.add('spinning');
-  _updatePlayIcon(true);
-}
-
-function toggleSong() {
-  // First press: load API lazily then play
-  if (!ytAPILoaded) {
-    _loadYTAPI();
-    pendingPlay = true;
-    return;
-  }
-  if (!ytReady) { pendingPlay = true; return; }
-
-  if (songPlaying) {
-    ytPlayer.pauseVideo();
-    songPlaying = false;
-    clearInterval(songProgressInterval);
-    document.getElementById('song-cover').classList.remove('spinning');
-    _updatePlayIcon(false);
-  } else {
-    _doPlay();
-  }
-}
-
-function restartSong() {
-  if (!ytReady) return;
-  ytPlayer.seekTo(0, true);
-  document.getElementById('song-current').textContent = '0:00';
-  document.getElementById('song-fill').style.width = '0%';
-}
-
-function muteToggle() {
-  if (!ytReady) return;
-  songMuted = !songMuted;
-  songMuted ? ytPlayer.mute() : ytPlayer.unMute();
-  document.getElementById('song-mute-btn').style.color = songMuted ? 'rgba(212,175,55,0.4)' : '';
-}
-
-function seekSong(e) {
-  if (!ytReady) return;
-  const rect = document.getElementById('song-progress').getBoundingClientRect();
-  const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-  ytPlayer.seekTo(pct * ytPlayer.getDuration(), true);
-}
+// ── SONG PLAYER — el reproductor usa iframe de YouTube directamente en el HTML ──
 
 // ── SONG REQUESTS ──
 const songRequests = [];
@@ -1707,9 +1576,5 @@ function submitRsvp(){
   document.getElementById('rsvp-thanks').style.display='block';
 }
 </script>
-<!-- YouTube player: fixed off-screen but NOT hidden/overflow so browser allows audio -->
-<div id="yt-player-wrap" style="position:fixed;bottom:0;right:0;width:1px;height:1px;pointer-events:none;z-index:-1;">
-  <div id="yt-player"></div>
-</div>
 </body>
 </html>
