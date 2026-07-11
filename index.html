@@ -627,15 +627,41 @@
     .song-artist { text-align: center; font-size: 0.65rem; letter-spacing: 0.2em; color: rgba(212,175,55,0.65); text-transform: uppercase; margin-bottom: 1.25rem; }
     /* YouTube embed styled to match */
     .yt-embed-wrap {
-      position: relative; width: 100%; padding-bottom: 56.25%;
-      border: 1px solid rgba(212,175,55,0.15); margin-bottom: 0.75rem;
+      position: relative; width: 100%;
+      margin-bottom: 0.75rem;
     }
+    /* Iframe técnicamente visible (1px) para que el browser permita audio */
     .yt-embed-wrap iframe {
-      position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block;
+      position: absolute; left: -9999px; width: 1px; height: 1px;
+      border: none; pointer-events: none;
     }
+    /* Reproductor custom */
+    .yt-custom-player {
+      display: flex; flex-direction: column; align-items: center; gap: 1rem;
+      padding: 0.5rem 0 1rem;
+    }
+    .yt-play-btn {
+      width: 64px; height: 64px; border-radius: 50%; border: none; cursor: pointer;
+      background: linear-gradient(135deg, #D4AF37, #F0C040);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 0 0 0 rgba(212,175,55,0.4);
+    }
+    .yt-play-btn:hover { transform: scale(1.08); box-shadow: 0 0 20px rgba(212,175,55,0.3); }
+    .yt-play-btn.playing { animation: pulse-ring 2s ease-out infinite; }
+    @keyframes pulse-ring {
+      0%   { box-shadow: 0 0 0 0 rgba(212,175,55,0.45); }
+      70%  { box-shadow: 0 0 0 14px rgba(212,175,55,0); }
+      100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
+    }
+    .yt-status {
+      font-size: 0.55rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.3);
+      text-transform: uppercase; text-align: center;
+    }
+    .yt-status.active { color: rgba(212,175,55,0.7); }
     .song-yt-label {
       text-align: center; font-size: 0.5rem; letter-spacing: 0.15em;
-      color: rgba(255,255,255,0.2); padding-bottom: 1rem;
+      color: rgba(255,255,255,0.2); padding-bottom: 0.5rem;
     }
     .song-msg { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(212,175,55,0.1); text-align: center; }
     .song-msg p { font-size: 0.75rem; color: rgba(255,255,255,0.35); line-height: 1.7; font-style: italic; }
@@ -1204,17 +1230,24 @@
 
           <p class="song-title">Tiempo de Vals</p>
           <p class="song-artist">Chayanne · Sofía Valentina</p>
-          <!-- Iframe YouTube directo: única forma garantizada de reproducir audio -->
+          <!-- iframe fuera de pantalla: activo para audio, invisible para el usuario -->
           <div class="yt-embed-wrap">
-            <iframe
-              src="https://www.youtube.com/embed/j3ObHjm1fAE?rel=0&modestbranding=1&playsinline=1"
+            <iframe id="yt-iframe"
+              src="https://www.youtube.com/embed/j3ObHjm1fAE?rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
               allow="autoplay; encrypted-media"
               allowfullscreen
-              loading="lazy"
               title="Nuestra canción">
             </iframe>
           </div>
-          <p class="song-yt-label">▶ PRESIONA PLAY PARA ESCUCHAR</p>
+          <!-- Reproductor visual custom -->
+          <div class="yt-custom-player">
+            <button class="yt-play-btn" id="yt-play-btn" onclick="ytToggle()">
+              <svg id="yt-play-icon" width="26" height="26" viewBox="0 0 24 24" fill="#0a0a0a" stroke="none">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+            </button>
+            <div class="yt-status" id="yt-status">PRESIONA PLAY</div>
+          </div>
           <div class="song-msg">
             <p>Esta canción fue elegida especialmente para esta noche.<br><strong>Que cada nota lleve tu corazón a bailar.</strong></p>
           </div>
@@ -1524,7 +1557,42 @@ CHILDHOOD.forEach(c => {
   }
 })();
 
-// ── SONG PLAYER — el reproductor usa iframe de YouTube directamente en el HTML ──
+// ── SONG PLAYER — YouTube audio via postMessage ──
+(function() {
+  let playing = false;
+  const iframe = document.getElementById('yt-iframe');
+  const btn    = document.getElementById('yt-play-btn');
+  const icon   = document.getElementById('yt-play-icon');
+  const status = document.getElementById('yt-status');
+  const cover  = document.getElementById('song-cover');
+
+  function ytCmd(func, args) {
+    if (!iframe) return;
+    iframe.contentWindow.postMessage(
+      JSON.stringify({ event: 'command', func, args: args || [] }),
+      '*'
+    );
+  }
+
+  window.ytToggle = function() {
+    playing = !playing;
+    if (playing) {
+      ytCmd('playVideo');
+      btn.classList.add('playing');
+      icon.innerHTML = '<rect x="5" y="3" width="4" height="18" fill="#0a0a0a"/><rect x="15" y="3" width="4" height="18" fill="#0a0a0a"/>';
+      status.textContent = '♪ REPRODUCIENDO · TIEMPO DE VALS';
+      status.classList.add('active');
+      cover.classList.add('spinning');
+    } else {
+      ytCmd('pauseVideo');
+      btn.classList.remove('playing');
+      icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3" fill="#0a0a0a"/>';
+      status.textContent = 'PRESIONA PLAY';
+      status.classList.remove('active');
+      cover.classList.remove('spinning');
+    }
+  };
+})();
 
 // ── SONG REQUESTS ──
 const songRequests = [];
