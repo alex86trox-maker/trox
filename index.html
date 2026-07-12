@@ -647,10 +647,10 @@
   .footer-sign { display:inline-block;margin-bottom:32px;padding:16px 40px;background:rgba(255,255,255,.55);border:1.5px solid rgba(255,140,200,.35);box-shadow:0 6px 28px rgba(140,180,220,.18);border-radius:16px; }
   .footer-sign p { font-family:'Great Vibes',cursive;font-size:2.4rem;color:#B05090;filter:drop-shadow(0 1px 6px rgba(255,140,200,.35)); }
   .footer-sep { border:none;border-top:1px solid rgba(255,140,200,.2);margin-bottom:16px; }
-  .footer-logo { height:96px;display:block;margin:0 auto 16px;filter:drop-shadow(0 2px 8px rgba(176,80,144,.25));opacity:1; }
-  .footer-legal { font-size:.75rem;line-height:1.7;color:rgba(61,43,86,.4);max-width:300px;margin:0 auto; }
-  .footer-legal strong { color:rgba(61,43,86,.6); }
-  .footer-copy { margin-top:8px;font-size:.65rem;letter-spacing:.12em;color:rgba(61,43,86,.3);font-family:'Nunito',sans-serif;font-weight:700; }
+  .footer-logo { height:96px;display:block;margin:0 auto 16px;filter:drop-shadow(0 2px 12px rgba(176,80,144,.5));opacity:1; }
+  .footer-legal { font-size:.75rem;line-height:1.7;color:#B05090;max-width:300px;margin:0 auto; }
+  .footer-legal strong { color:#3D2B56;font-weight:800; }
+  .footer-copy { margin-top:8px;font-size:.65rem;letter-spacing:.14em;color:#B05090;font-family:'Nunito',sans-serif;font-weight:800; }
 </style>
 </head>
 <body>
@@ -1014,8 +1014,7 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3z"/></svg>
         </div>
       </div>
-      <!-- iframe oculto de YouTube (1×1px, solo audio) -->
-      <div id="yt-player" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;"></div>
+      <!-- audio manejado por JS nativo -->
       <p class="song-title" id="song-title">A Thousand Years</p>
       <p class="song-artist" id="song-artist">Christina Perri</p>
       <div class="song-bar-wrap" onclick="songSeek(event)" style="cursor:pointer;"><div class="song-bar" id="song-bar"></div></div>
@@ -1217,140 +1216,144 @@ function buildChildhoodCarousel() {
 }
 
 /* ─────────────────────────────────────
-   SPECIAL SONG — YouTube IFrame API
+   SPECIAL SONG — Audio nativo
 ───────────────────────────────────── */
 const SONGS = [
-  { title:"A Thousand Years",        artist:"Christina Perri",     ytId:"ZkN_uqgS1Oo" },
-  { title:"Perfect",                 artist:"Ed Sheeran",          ytId:"2Vv-BfVoq4g"  },
-  { title:"Recuérdame",              artist:"Coco Soundtrack",     ytId:"_Dn8_nqSWpY"  },
-  { title:"Quiero",                  artist:"Alicia Keys",         ytId:"A__vilvljhA"  },
-  { title:"Un Millón de Primaveras", artist:"Vicente Fernández",   ytId:"LKFDm-5cxk8"  },
+  {
+    title:  "Clair de Lune",
+    artist: "Debussy",
+    url:    "https://archive.org/download/ClairDeLune_278/Debussy_Clair_de_Lune.mp3"
+  },
+  {
+    title:  "Vals Sentimental",
+    artist: "Tchaikovsky",
+    url:    "https://archive.org/download/TchaikovskyValsSentimental/Tchaikovsky_-_Vals_Sentimental.mp3"
+  },
+  {
+    title:  "Gymnopédie No.1",
+    artist: "Erik Satie",
+    url:    "https://archive.org/download/ErikSatieGymnopedie1/Erik_Satie_-_Gymnopedie_No._1.mp3"
+  },
+  {
+    title:  "Comptine d'un Autre Été",
+    artist: "Yann Tiersen",
+    url:    "https://archive.org/download/YannTiersenComptineDUnAutreEte/Yann_Tiersen_-_Comptine_d_un_autre_ete_-_L_apres_midi.mp3"
+  },
+  {
+    title:  "Experience",
+    artist: "Ludovico Einaudi",
+    url:    "https://archive.org/download/LudovicoEinaudiExperience/Ludovico_Einaudi_-_Experience.mp3"
+  },
 ];
 
-let songIdx      = 0;
-let songPlaying  = false;
-let ytPlayer     = null;
-let ytReady      = false;
-let ytProgTimer  = null;
+let songIdx     = 0;
+let songPlaying = false;
+let songAudio   = null;
+let songProgTimer = null;
 
-/* ── Carga el script de YouTube IFrame API una vez ── */
-(function loadYT() {
-  if (window.YT) return;
-  const tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(tag);
-})();
-
-/* ── Callback que llama YouTube cuando su API está lista ── */
-window.onYouTubeIframeAPIReady = function() {
-  ytReady = true;
-  ytCreatePlayer(SONGS[songIdx].ytId, false);
-};
-
-function ytCreatePlayer(videoId, autoplay) {
-  if (!window.YT || !window.YT.Player) {
-    setTimeout(() => ytCreatePlayer(videoId, autoplay), 300);
-    return;
-  }
-  if (ytPlayer) { ytPlayer.destroy(); ytPlayer = null; }
-  clearInterval(ytProgTimer);
-
-  ytPlayer = new YT.Player('yt-player', {
-    height: '1',
-    width:  '1',
-    videoId: videoId,
-    playerVars: { autoplay: autoplay ? 1 : 0, controls: 0, rel: 0, playsinline: 1 },
-    events: {
-      onReady(e) {
-        if (autoplay) e.target.playVideo();
-        document.getElementById('song-dur').textContent =
-          fmtTime(e.target.getDuration());
-      },
-      onStateChange(e) {
-        if (e.data === YT.PlayerState.PLAYING) {
-          songPlaying = true;
-          document.getElementById('song-vinyl').classList.add('playing');
-          document.getElementById('song-play-icon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-          startYtProgress();
-        } else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
-          if (e.data === YT.PlayerState.ENDED) {
-            songIdx = (songIdx + 1) % SONGS.length;
-            songRender();
-            ytCreatePlayer(SONGS[songIdx].ytId, true);
-          } else {
-            songPlaying = false;
-            document.getElementById('song-vinyl').classList.remove('playing');
-            document.getElementById('song-play-icon').innerHTML = '<path d="M8 5v14l11-7z"/>';
-            clearInterval(ytProgTimer);
-          }
-        }
-      }
-    }
-  });
-}
-
-function startYtProgress() {
-  clearInterval(ytProgTimer);
-  ytProgTimer = setInterval(() => {
-    if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
-    const cur = ytPlayer.getCurrentTime();
-    const dur = ytPlayer.getDuration();
-    if (dur > 0) {
-      document.getElementById('song-bar').style.width = (cur / dur * 100) + '%';
-      document.getElementById('song-cur').textContent = fmtTime(cur);
-      document.getElementById('song-dur').textContent = fmtTime(dur);
-    }
-  }, 500);
-}
-
-/* ── utilidad: formatea segundos a mm:ss ── */
 function fmtTime(s) {
   if (!isFinite(s) || s < 0) return '0:00';
   return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+}
+
+function songBuild(autoplay) {
+  /* detener y limpiar audio anterior */
+  if (songAudio) {
+    songAudio.pause();
+    songAudio.src = '';
+    songAudio = null;
+  }
+  clearInterval(songProgTimer);
+
+  const s = SONGS[songIdx];
+  songAudio = new Audio(s.url);
+  songAudio.preload = 'auto';
+
+  songAudio.addEventListener('loadedmetadata', () => {
+    document.getElementById('song-dur').textContent = fmtTime(songAudio.duration);
+  });
+
+  songAudio.addEventListener('timeupdate', () => {
+    const pct = songAudio.duration ? (songAudio.currentTime / songAudio.duration) * 100 : 0;
+    document.getElementById('song-bar').style.width = pct + '%';
+    document.getElementById('song-cur').textContent = fmtTime(songAudio.currentTime);
+    if (songAudio.duration > 0)
+      document.getElementById('song-dur').textContent = fmtTime(songAudio.duration);
+  });
+
+  songAudio.addEventListener('ended', () => {
+    songStop();
+    songIdx = (songIdx + 1) % SONGS.length;
+    songRender();
+    setTimeout(() => songBuild(true), 300);
+  });
+
+  songAudio.addEventListener('error', () => {
+    document.getElementById('song-artist').textContent = '⚠ Reemplaza con tu propia canción';
+    songStop();
+  });
+
+  if (autoplay) {
+    songAudio.play().then(() => songStartUI()).catch(() => songStop());
+  }
+}
+
+function songStartUI() {
+  songPlaying = true;
+  document.getElementById('song-vinyl').classList.add('playing');
+  document.getElementById('song-play-icon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+}
+
+function songStop() {
+  if (songAudio) songAudio.pause();
+  songPlaying = false;
+  document.getElementById('song-vinyl').classList.remove('playing');
+  document.getElementById('song-play-icon').innerHTML = '<path d="M8 5v14l11-7z"/>';
 }
 
 function songRender() {
   const s = SONGS[songIdx];
   document.getElementById('song-title').textContent  = s.title;
   document.getElementById('song-artist').textContent = s.artist;
-  document.getElementById('song-dur').textContent    = '—:——';
+  document.getElementById('song-dur').textContent    = '0:00';
   document.getElementById('song-cur').textContent    = '0:00';
   document.getElementById('song-bar').style.width    = '0%';
 }
 
 function toggleSong() {
-  if (!ytPlayer || !ytReady) return;
+  if (!songAudio) {
+    songBuild(true);
+    return;
+  }
   if (songPlaying) {
-    ytPlayer.pauseVideo();
+    songStop();
   } else {
-    ytPlayer.playVideo();
+    songAudio.play().then(() => songStartUI()).catch(() => songStop());
   }
 }
 
 function songNext() {
+  songStop();
   songIdx = (songIdx + 1) % SONGS.length;
   songRender();
-  ytCreatePlayer(SONGS[songIdx].ytId, true);
+  songBuild(true);
 }
 
 function songPrev() {
+  songStop();
   songIdx = (songIdx - 1 + SONGS.length) % SONGS.length;
   songRender();
-  ytCreatePlayer(SONGS[songIdx].ytId, true);
+  songBuild(true);
 }
 
-/* saltar a posición al hacer clic en la barra */
 function songSeek(e) {
-  if (!ytPlayer || typeof ytPlayer.getDuration !== 'function') return;
+  if (!songAudio || !songAudio.duration) return;
   const rect = e.currentTarget.getBoundingClientRect();
-  const pct  = (e.clientX - rect.left) / rect.width;
-  ytPlayer.seekTo(pct * ytPlayer.getDuration(), true);
+  songAudio.currentTime = ((e.clientX - rect.left) / rect.width) * songAudio.duration;
 }
 
-/* ajustar volumen (0–100 en YouTube API) */
 function songVolume(v) {
-  if (ytPlayer && typeof ytPlayer.setVolume === 'function')
-    ytPlayer.setVolume(Math.round(parseFloat(v) * 100));
+  if (songAudio) songAudio.volume = parseFloat(v);
 }
 
 /* ─────────────────────────────────────
