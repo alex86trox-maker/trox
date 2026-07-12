@@ -1014,9 +1014,10 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3z"/></svg>
         </div>
       </div>
-      <!-- audio manejado por JS nativo -->
-      <p class="song-title" id="song-title">A Thousand Years</p>
-      <p class="song-artist" id="song-artist">Christina Perri</p>
+      <!-- audio nativo -->
+      <audio id="song-audio" preload="none" style="display:none"></audio>
+      <p class="song-title" id="song-title">Clair de Lune</p>
+      <p class="song-artist" id="song-artist">Debussy</p>
       <div class="song-bar-wrap" onclick="songSeek(event)" style="cursor:pointer;"><div class="song-bar" id="song-bar"></div></div>
       <div class="song-time">
         <span id="song-cur">0:00</span>
@@ -1216,144 +1217,116 @@ function buildChildhoodCarousel() {
 }
 
 /* ─────────────────────────────────────
-   SPECIAL SONG — Audio nativo
+   SPECIAL SONG — <audio> nativo
 ───────────────────────────────────── */
 const SONGS = [
-  {
-    title:  "Clair de Lune",
-    artist: "Debussy",
-    url:    "https://archive.org/download/ClairDeLune_278/Debussy_Clair_de_Lune.mp3"
-  },
-  {
-    title:  "Vals Sentimental",
-    artist: "Tchaikovsky",
-    url:    "https://archive.org/download/TchaikovskyValsSentimental/Tchaikovsky_-_Vals_Sentimental.mp3"
-  },
-  {
-    title:  "Gymnopédie No.1",
-    artist: "Erik Satie",
-    url:    "https://archive.org/download/ErikSatieGymnopedie1/Erik_Satie_-_Gymnopedie_No._1.mp3"
-  },
-  {
-    title:  "Comptine d'un Autre Été",
-    artist: "Yann Tiersen",
-    url:    "https://archive.org/download/YannTiersenComptineDUnAutreEte/Yann_Tiersen_-_Comptine_d_un_autre_ete_-_L_apres_midi.mp3"
-  },
-  {
-    title:  "Experience",
-    artist: "Ludovico Einaudi",
-    url:    "https://archive.org/download/LudovicoEinaudiExperience/Ludovico_Einaudi_-_Experience.mp3"
-  },
+  { title:"Clair de Lune",              artist:"Debussy",           url:"https://archive.org/download/ClairDeLune_278/Debussy_Clair_de_Lune.mp3" },
+  { title:"Vals Sentimental",           artist:"Tchaikovsky",       url:"https://archive.org/download/TchaikovskyValsSentimental/Tchaikovsky_-_Vals_Sentimental.mp3" },
+  { title:"Gymnopédie No.1",            artist:"Erik Satie",        url:"https://archive.org/download/ErikSatieGymnopedie1/Erik_Satie_-_Gymnopedie_No._1.mp3" },
+  { title:"Comptine d'un Autre Été",    artist:"Yann Tiersen",      url:"https://archive.org/download/YannTiersenComptineDUnAutreEte/Yann_Tiersen_-_Comptine_d_un_autre_ete_-_L_apres_midi.mp3" },
+  { title:"Experience",                 artist:"Ludovico Einaudi",  url:"https://archive.org/download/LudovicoEinaudiExperience/Ludovico_Einaudi_-_Experience.mp3" },
 ];
 
 let songIdx     = 0;
 let songPlaying = false;
-let songAudio   = null;
-let songProgTimer = null;
+
+function getAudio() { return document.getElementById('song-audio'); }
 
 function fmtTime(s) {
   if (!isFinite(s) || s < 0) return '0:00';
   return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 }
 
-function songBuild(autoplay) {
-  /* detener y limpiar audio anterior */
-  if (songAudio) {
-    songAudio.pause();
-    songAudio.src = '';
-    songAudio = null;
-  }
-  clearInterval(songProgTimer);
-
-  const s = SONGS[songIdx];
-  songAudio = new Audio(s.url);
-  songAudio.preload = 'auto';
-
-  songAudio.addEventListener('loadedmetadata', () => {
-    document.getElementById('song-dur').textContent = fmtTime(songAudio.duration);
-  });
-
-  songAudio.addEventListener('timeupdate', () => {
-    const pct = songAudio.duration ? (songAudio.currentTime / songAudio.duration) * 100 : 0;
-    document.getElementById('song-bar').style.width = pct + '%';
-    document.getElementById('song-cur').textContent = fmtTime(songAudio.currentTime);
-    if (songAudio.duration > 0)
-      document.getElementById('song-dur').textContent = fmtTime(songAudio.duration);
-  });
-
-  songAudio.addEventListener('ended', () => {
-    songStop();
-    songIdx = (songIdx + 1) % SONGS.length;
-    songRender();
-    setTimeout(() => songBuild(true), 300);
-  });
-
-  songAudio.addEventListener('error', () => {
-    document.getElementById('song-artist').textContent = '⚠ Reemplaza con tu propia canción';
-    songStop();
-  });
-
-  if (autoplay) {
-    songAudio.play().then(() => songStartUI()).catch(() => songStop());
-  }
-}
-
-function songStartUI() {
-  songPlaying = true;
-  document.getElementById('song-vinyl').classList.add('playing');
-  document.getElementById('song-play-icon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-}
-
-function songStop() {
-  if (songAudio) songAudio.pause();
-  songPlaying = false;
-  document.getElementById('song-vinyl').classList.remove('playing');
-  document.getElementById('song-play-icon').innerHTML = '<path d="M8 5v14l11-7z"/>';
-}
-
 function songRender() {
   const s = SONGS[songIdx];
   document.getElementById('song-title').textContent  = s.title;
   document.getElementById('song-artist').textContent = s.artist;
-  document.getElementById('song-dur').textContent    = '0:00';
   document.getElementById('song-cur').textContent    = '0:00';
+  document.getElementById('song-dur').textContent    = '0:00';
   document.getElementById('song-bar').style.width    = '0%';
 }
 
+function songSetUI(playing) {
+  songPlaying = playing;
+  document.getElementById('song-vinyl').classList.toggle('playing', playing);
+  document.getElementById('song-play-icon').innerHTML = playing
+    ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'
+    : '<path d="M8 5v14l11-7z"/>';
+}
+
+/* Conectar eventos al elemento <audio> una sola vez */
+document.addEventListener('DOMContentLoaded', function() {
+  const a = getAudio();
+  if (!a) return;
+
+  a.addEventListener('timeupdate', () => {
+    if (!a.duration) return;
+    document.getElementById('song-bar').style.width = (a.currentTime / a.duration * 100) + '%';
+    document.getElementById('song-cur').textContent = fmtTime(a.currentTime);
+  });
+  a.addEventListener('loadedmetadata', () => {
+    document.getElementById('song-dur').textContent = fmtTime(a.duration);
+  });
+  a.addEventListener('playing', () => songSetUI(true));
+  a.addEventListener('pause',   () => songSetUI(false));
+  a.addEventListener('ended',   () => {
+    songSetUI(false);
+    songIdx = (songIdx + 1) % SONGS.length;
+    songRender();
+    songLoad(true);
+  });
+  a.addEventListener('error', () => {
+    document.getElementById('song-artist').textContent = '⚠ No se pudo cargar';
+    songSetUI(false);
+  });
+});
+
+function songLoad(autoplay) {
+  const a = getAudio();
+  const s = SONGS[songIdx];
+  a.src = s.url;
+  a.load();
+  if (autoplay) {
+    const p = a.play();
+    if (p && p.catch) p.catch(() => songSetUI(false));
+  }
+}
+
 function toggleSong() {
-  if (!songAudio) {
-    songBuild(true);
+  const a = getAudio();
+  if (!a.src || a.src === window.location.href) {
+    songLoad(true);
     return;
   }
-  if (songPlaying) {
-    songStop();
+  if (a.paused) {
+    const p = a.play();
+    if (p && p.catch) p.catch(() => songSetUI(false));
   } else {
-    songAudio.play().then(() => songStartUI()).catch(() => songStop());
+    a.pause();
   }
 }
 
 function songNext() {
-  songStop();
   songIdx = (songIdx + 1) % SONGS.length;
   songRender();
-  songBuild(true);
+  songLoad(true);
 }
 
 function songPrev() {
-  songStop();
   songIdx = (songIdx - 1 + SONGS.length) % SONGS.length;
   songRender();
-  songBuild(true);
+  songLoad(true);
 }
 
 function songSeek(e) {
-  if (!songAudio || !songAudio.duration) return;
+  const a = getAudio();
+  if (!a.duration) return;
   const rect = e.currentTarget.getBoundingClientRect();
-  songAudio.currentTime = ((e.clientX - rect.left) / rect.width) * songAudio.duration;
+  a.currentTime = ((e.clientX - rect.left) / rect.width) * a.duration;
 }
 
 function songVolume(v) {
-  if (songAudio) songAudio.volume = parseFloat(v);
+  getAudio().volume = parseFloat(v);
 }
 
 /* ─────────────────────────────────────
