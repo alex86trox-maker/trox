@@ -1026,7 +1026,7 @@
         <button class="song-btn" onclick="songPrev()" title="Anterior">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
         </button>
-        <button class="song-btn play" id="song-play-btn" onclick="toggleSong()">
+        <button class="song-btn play" id="song-play-btn" onclick="toggleSong(event)">
           <svg id="song-play-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         </button>
         <button class="song-btn" onclick="songNext()" title="Siguiente">
@@ -1216,96 +1216,84 @@ function buildChildhoodCarousel() {
 }
 
 /* ─────────────────────────────────────
-   SPECIAL SONG — <audio> nativo
+   SPECIAL SONG — Audio directo
 ───────────────────────────────────── */
-const SONGS = [
+var SONGS = [
   { title:"Clair de Lune",           artist:"Debussy",          url:"https://archive.org/download/ClairDeLune_278/Debussy_Clair_de_Lune.mp3" },
   { title:"Vals Sentimental",        artist:"Tchaikovsky",      url:"https://archive.org/download/TchaikovskyValsSentimental/Tchaikovsky_-_Vals_Sentimental.mp3" },
   { title:"Gymnopédie No.1",         artist:"Erik Satie",       url:"https://archive.org/download/ErikSatieGymnopedie1/Erik_Satie_-_Gymnopedie_No._1.mp3" },
   { title:"Comptine d'un Autre Été", artist:"Yann Tiersen",     url:"https://archive.org/download/YannTiersenComptineDUnAutreEte/Yann_Tiersen_-_Comptine_d_un_autre_ete_-_L_apres_midi.mp3" },
   { title:"Experience",              artist:"Ludovico Einaudi", url:"https://archive.org/download/LudovicoEinaudiExperience/Ludovico_Einaudi_-_Experience.mp3" },
 ];
+var songIdx = 0;
+var AUDIO   = new Audio(); /* creado en tiempo de carga, antes de cualquier click */
 
-let songIdx = 0;
-let _sa = null; /* instancia única de Audio */
-
-function sa() {
-  if (_sa) return _sa;
-  _sa = new Audio();
-  _sa.addEventListener('timeupdate', function() {
-    if (!_sa.duration) return;
-    document.getElementById('song-bar').style.width = (_sa.currentTime / _sa.duration * 100) + '%';
-    document.getElementById('song-cur').textContent = fmtTime(_sa.currentTime);
-    document.getElementById('song-dur').textContent = fmtTime(_sa.duration);
-  });
-  _sa.addEventListener('playing', function() { _saUI(true); });
-  _sa.addEventListener('pause',   function() { _saUI(false); });
-  _sa.addEventListener('ended',   function() {
-    _saUI(false);
-    songIdx = (songIdx + 1) % SONGS.length;
-    songRender();
-    saPlay();
-  });
-  return _sa;
-}
+AUDIO.addEventListener('timeupdate', function() {
+  if (!AUDIO.duration) return;
+  document.getElementById('song-bar').style.width = (AUDIO.currentTime / AUDIO.duration * 100) + '%';
+  document.getElementById('song-cur').textContent = fmtTime(AUDIO.currentTime);
+  document.getElementById('song-dur').textContent = fmtTime(AUDIO.duration);
+});
+AUDIO.addEventListener('playing', function() { _songUI(true);  });
+AUDIO.addEventListener('pause',   function() { _songUI(false); });
+AUDIO.addEventListener('ended',   function() {
+  _songUI(false);
+  songIdx = (songIdx + 1) % SONGS.length;
+  songRender();
+  _songLoad();
+  AUDIO.play();
+});
 
 function fmtTime(s) {
   if (!isFinite(s) || s < 0) return '0:00';
   return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0');
 }
-
-function _saUI(on) {
+function _songUI(on) {
   var v = document.getElementById('song-vinyl');
   var i = document.getElementById('song-play-icon');
-  if (!v || !i) return;
-  if (on) { v.classList.add('playing');    i.innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; }
-  else     { v.classList.remove('playing'); i.innerHTML='<path d="M8 5v14l11-7z"/>'; }
+  if (v) v.classList[on ? 'add' : 'remove']('playing');
+  if (i) i.innerHTML = on ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
 }
-
-function saPlay() {
-  var a = sa();
-  var s = SONGS[songIdx];
-  a.src = s.url;
-  var p = a.play();
-  if (p) p.catch(function(){});
+function _songLoad() {
+  AUDIO.src = SONGS[songIdx].url;
+  AUDIO.load();
 }
-
 function songRender() {
-  var s = SONGS[songIdx];
-  document.getElementById('song-title').textContent  = s.title;
-  document.getElementById('song-artist').textContent = s.artist;
+  document.getElementById('song-title').textContent  = SONGS[songIdx].title;
+  document.getElementById('song-artist').textContent = SONGS[songIdx].artist;
   document.getElementById('song-cur').textContent    = '0:00';
   document.getElementById('song-dur').textContent    = '—:——';
   document.getElementById('song-bar').style.width    = '0%';
 }
-
-function toggleSong() {
-  var a = sa();
-  if (a.paused || !a.src) { saPlay(); } else { a.pause(); }
+/* ── toggleSong recibe el event para que play() quede en el mismo stack del click ── */
+function toggleSong(e) {
+  if (AUDIO.paused) {
+    if (!AUDIO.src || AUDIO.src === location.href) _songLoad();
+    AUDIO.play();          /* directamente aquí, mismo frame del click */
+  } else {
+    AUDIO.pause();
+  }
 }
-
 function songNext() {
-  sa().pause();
+  AUDIO.pause();
   songIdx = (songIdx + 1) % SONGS.length;
   songRender();
-  saPlay();
+  _songLoad();
+  AUDIO.play();
 }
-
 function songPrev() {
-  sa().pause();
+  AUDIO.pause();
   songIdx = (songIdx - 1 + SONGS.length) % SONGS.length;
   songRender();
-  saPlay();
+  _songLoad();
+  AUDIO.play();
 }
-
 function songSeek(e) {
-  var a = sa();
-  if (!a.duration) return;
+  if (!AUDIO.duration) return;
   var r = e.currentTarget.getBoundingClientRect();
-  a.currentTime = ((e.clientX - r.left) / r.width) * a.duration;
+  AUDIO.currentTime = ((e.clientX - r.left) / r.width) * AUDIO.duration;
 }
-
-function songVolume(v) { sa().volume = parseFloat(v); }
+function songVolume(v) { AUDIO.volume = parseFloat(v); }
 
 /* ─────────────────────────────────────
    SONG REQUESTS
