@@ -951,10 +951,10 @@
             </div>
           </div>
         </div>
-        <!-- YouTube player invisible: solo audio -->
-        <div id="song-yt-wrap" style="position:fixed;left:-9999px;top:-9999px;width:200px;height:200px;pointer-events:none;">
-          <div id="song-yt"></div>
-        </div>
+        <!-- Audio player HTML5 nativo -->
+        <audio id="song-audio" preload="auto" playsinline>
+          <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3" type="audio/mpeg" />
+        </audio>
         <p class="song-quote">"Amor es estar presente en cada momento que importa."</p>
       </div>
     </section>
@@ -1347,90 +1347,64 @@ chTrack.addEventListener('touchend', e => {
 // Auto-advance
 setInterval(() => chGoTo((chIdx + 1) % CHILDHOOD.length), 3500);
 
-// ── SONG PLAYER (YouTube IFrame API – invisible, solo audio) ──
-let ytPlayer = null;
+// ── SONG PLAYER (HTML5 Audio nativo) ──
+const songAudio = document.getElementById('song-audio');
 let songPlaying = false;
 let songBarTimer = null;
-let songPlayPending = false; // play pedido antes de que la API esté lista
 
-// Inyectar script de la API de YouTube
-const ytScript = document.createElement('script');
-ytScript.src = 'https://www.youtube.com/iframe_api';
-document.head.appendChild(ytScript);
+// Cuando el audio está listo para reproducir
+songAudio.addEventListener('canplay', function() {
+  document.getElementById('song-play-hint').textContent = 'Reproducir';
+});
 
-window.onYouTubeIframeAPIReady = function() {
-    ytPlayer = new YT.Player('song-yt', {
-    height: '200',
-    width: '200',
-    videoId: 'APCZJtsiXpY', // A Thousand Years – Christina Perri
-    playerVars: {
-      autoplay: 0,
-      controls: 0,
-      disablekb: 1,
-      fs: 0,
-      iv_load_policy: 3,
-      modestbranding: 1,
-      playsinline: 1,
-      rel: 0,
-      enablejsapi: 1,
-    },
-    events: {
-      onReady: function() {
-        document.getElementById('song-play-hint').textContent = 'Reproducir';
-        if (songPlayPending) {
-          songPlayPending = false;
-          doPlay();
-        }
-      },
-      onStateChange: function(e) {
-        if (e.data === YT.PlayerState.PLAYING) {
-          startBarAnim();
-        }
-        if (e.data === YT.PlayerState.ENDED) {
-          pauseSongUI();
-        }
-      }
-    }
-  });
-};
+// Actualizar barra de progreso
+songAudio.addEventListener('timeupdate', function() {
+  if (songAudio.duration > 0) {
+    document.getElementById('song-bar').style.width = ((songAudio.currentTime / songAudio.duration) * 100) + '%';
+  }
+});
 
-function startBarAnim() {
-  clearInterval(songBarTimer);
-  songBarTimer = setInterval(function() {
-    if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
-    const dur = ytPlayer.getDuration();
-    const cur = ytPlayer.getCurrentTime();
-    if (dur > 0) {
-      document.getElementById('song-bar').style.width = ((cur / dur) * 100) + '%';
-    }
-  }, 500);
-}
+// Al terminar la canción
+songAudio.addEventListener('ended', function() {
+  pauseSongUI();
+});
+
+// Si hay error al cargar (CORS, etc)
+songAudio.addEventListener('error', function() {
+  document.getElementById('song-play-hint').textContent = 'No disponible';
+});
 
 function doPlay() {
-  ytPlayer.playVideo();
-  document.getElementById('song-vinyl').classList.add('spinning');
-  document.getElementById('song-play-icon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
-  document.getElementById('song-play-hint').textContent = 'Pausar';
-  songPlaying = true;
+  const p = songAudio.play();
+  if (p !== undefined) {
+    p.then(function() {
+      document.getElementById('song-vinyl').classList.add('spinning');
+      document.getElementById('song-play-icon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+      document.getElementById('song-play-hint').textContent = 'Pausar';
+      songPlaying = true;
+    }).catch(function(err) {
+      console.warn('Audio play blocked:', err);
+      document.getElementById('song-play-hint').textContent = 'Reproducir';
+      songPlaying = false;
+    });
+  } else {
+    document.getElementById('song-vinyl').classList.add('spinning');
+    document.getElementById('song-play-icon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    document.getElementById('song-play-hint').textContent = 'Pausar';
+    songPlaying = true;
+  }
 }
 
 function pauseSongUI() {
+  songAudio.pause();
   songPlaying = false;
-  clearInterval(songBarTimer);
   document.getElementById('song-vinyl').classList.remove('spinning');
   document.getElementById('song-play-icon').innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
   document.getElementById('song-play-hint').textContent = 'Reproducir';
 }
 
 function toggleSong() {
-  if (!ytPlayer || typeof ytPlayer.playVideo !== 'function') {
-    // API no lista aún — encolar el play
-    songPlayPending = true;
-    document.getElementById('song-play-hint').textContent = 'Cargando…';
-    return;
-  }
   if (songPlaying) {
-    ytPlayer.pauseVideo();
     pauseSongUI();
   } else {
     doPlay();
