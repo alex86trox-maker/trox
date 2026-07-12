@@ -73,21 +73,23 @@
   #splash.out { opacity: 0; transform: scale(1.06) translateY(-20px); pointer-events: none; }
   #splash img.bg {
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-    object-position: center 15%;
-    opacity: 1; filter: saturate(1.1) brightness(0.9);
+    object-position: center top;
+    opacity: 1; filter: saturate(1.15) brightness(0.95);
+    animation: kenBurns 18s ease-in-out infinite alternate;
+  }
+  @keyframes kenBurns {
+    from { transform: scale(1.0) translateY(0); }
+    to   { transform: scale(1.06) translateY(-2%); }
   }
   #splash .overlay {
     position: absolute; inset: 0;
     background: linear-gradient(to bottom,
-      rgba(61,43,86,.15) 0%,
-      transparent 30%,
-      rgba(176,80,144,.25) 65%,
-      rgba(61,43,86,.6) 100%);
+      rgba(61,43,86,.30) 0%,
+      rgba(0,0,0,.0) 25%,
+      rgba(0,0,0,.0) 55%,
+      rgba(61,43,86,.70) 100%);
   }
-  #splash .pattern {
-    position: absolute; inset: 0;
-    background: repeating-linear-gradient(45deg,transparent,transparent 38px,rgba(255,140,200,.04) 38px,rgba(255,140,200,.04) 39px);
-  }
+  #splash .pattern { display: none; }
   #splash .inner {
     position: relative; z-index: 10;
     display: flex; flex-direction: column; align-items: center; text-align: center;
@@ -541,7 +543,7 @@
   .parents-sign { margin-top:20px; font-family:'Great Vibes',cursive; font-size:1.8rem; color:#3D2B56; }
 
   /* ── Canción especial ── */
-  #song-section { background:linear-gradient(160deg,#3D2B56 0%,#5A3878 100%); }
+  #song-section { background:linear-gradient(160deg,#3D2B56 0%,#5A3878 100%); position:relative; }
   #song-section .section-kicker { color:rgba(255,214,235,.6); }
   .song-card {
     background:rgba(255,255,255,.07); border:1.5px solid rgba(255,140,200,.3);
@@ -658,7 +660,7 @@
 
 <!-- ── Splash ── -->
 <div id="splash" onclick="closeSplash()">
-  <img class="bg" src="https://images.unsplash.com/photo-1565630818262-65cd5df24407?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080" alt="" />
+  <img class="bg" src="https://hercules-cdn.com/file_j5Mh56pA63tHhPtvJ5KFWOLH" alt="" />
   <div class="overlay"></div>
   <div class="pattern"></div>
 
@@ -1012,6 +1014,8 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3z"/></svg>
         </div>
       </div>
+      <!-- iframe oculto de YouTube (1×1px, solo audio) -->
+      <div id="yt-player" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;"></div>
       <p class="song-title" id="song-title">A Thousand Years</p>
       <p class="song-artist" id="song-artist">Christina Perri</p>
       <div class="song-bar-wrap" onclick="songSeek(event)" style="cursor:pointer;"><div class="song-bar" id="song-bar"></div></div>
@@ -1213,156 +1217,140 @@ function buildChildhoodCarousel() {
 }
 
 /* ─────────────────────────────────────
-   SPECIAL SONG (visual player, no audio)
+   SPECIAL SONG — YouTube IFrame API
 ───────────────────────────────────── */
-/* ── canciones con URL real de audio ── */
 const SONGS = [
-  {
-    title:  "Fly Me Away",
-    artist: "Jahzzar",
-    dur:    "3:20",
-    url:    "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Jahzzar/Travellers_Guide/Jahzzar_-_Fly_Me_Away.mp3"
-  },
-  {
-    title:  "Dawn",
-    artist: "Kai Engel",
-    dur:    "2:42",
-    url:    "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Kai_Engel/Satin/Kai_Engel_-_02_-_Dawn.mp3"
-  },
-  {
-    title:  "Sweet (Lo-fi)",
-    artist: "Olexy",
-    dur:    "2:17",
-    url:    "https://pixabay.com/music/download/sweet-lo-fi-background-music-110736.mp3"
-  },
-  {
-    title:  "Dreamy Memories",
-    artist: "Lesfm",
-    dur:    "2:54",
-    url:    "https://pixabay.com/music/download/dreamy-memories-163854.mp3"
-  },
-  {
-    title:  "Cute & Kawaii",
-    artist: "Phat Phrog Studio",
-    dur:    "2:03",
-    url:    "https://pixabay.com/music/download/cute-background-music-315862.mp3"
-  },
+  { title:"A Thousand Years",        artist:"Christina Perri",     ytId:"ZkN_uqgS1Oo" },
+  { title:"Perfect",                 artist:"Ed Sheeran",          ytId:"2Vv-BfVoq4g"  },
+  { title:"Recuérdame",              artist:"Coco Soundtrack",     ytId:"_Dn8_nqSWpY"  },
+  { title:"Quiero",                  artist:"Alicia Keys",         ytId:"A__vilvljhA"  },
+  { title:"Un Millón de Primaveras", artist:"Vicente Fernández",   ytId:"LKFDm-5cxk8"  },
 ];
 
-let songIdx     = 0;
-let songPlaying = false;
-let songAudio   = null; /* instancia de Audio activa */
+let songIdx      = 0;
+let songPlaying  = false;
+let ytPlayer     = null;
+let ytReady      = false;
+let ytProgTimer  = null;
+
+/* ── Carga el script de YouTube IFrame API una vez ── */
+(function loadYT() {
+  if (window.YT) return;
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+})();
+
+/* ── Callback que llama YouTube cuando su API está lista ── */
+window.onYouTubeIframeAPIReady = function() {
+  ytReady = true;
+  ytCreatePlayer(SONGS[songIdx].ytId, false);
+};
+
+function ytCreatePlayer(videoId, autoplay) {
+  if (!window.YT || !window.YT.Player) {
+    setTimeout(() => ytCreatePlayer(videoId, autoplay), 300);
+    return;
+  }
+  if (ytPlayer) { ytPlayer.destroy(); ytPlayer = null; }
+  clearInterval(ytProgTimer);
+
+  ytPlayer = new YT.Player('yt-player', {
+    height: '1',
+    width:  '1',
+    videoId: videoId,
+    playerVars: { autoplay: autoplay ? 1 : 0, controls: 0, rel: 0, playsinline: 1 },
+    events: {
+      onReady(e) {
+        if (autoplay) e.target.playVideo();
+        document.getElementById('song-dur').textContent =
+          fmtTime(e.target.getDuration());
+      },
+      onStateChange(e) {
+        if (e.data === YT.PlayerState.PLAYING) {
+          songPlaying = true;
+          document.getElementById('song-vinyl').classList.add('playing');
+          document.getElementById('song-play-icon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+          startYtProgress();
+        } else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
+          if (e.data === YT.PlayerState.ENDED) {
+            songIdx = (songIdx + 1) % SONGS.length;
+            songRender();
+            ytCreatePlayer(SONGS[songIdx].ytId, true);
+          } else {
+            songPlaying = false;
+            document.getElementById('song-vinyl').classList.remove('playing');
+            document.getElementById('song-play-icon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+            clearInterval(ytProgTimer);
+          }
+        }
+      }
+    }
+  });
+}
+
+function startYtProgress() {
+  clearInterval(ytProgTimer);
+  ytProgTimer = setInterval(() => {
+    if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+    const cur = ytPlayer.getCurrentTime();
+    const dur = ytPlayer.getDuration();
+    if (dur > 0) {
+      document.getElementById('song-bar').style.width = (cur / dur * 100) + '%';
+      document.getElementById('song-cur').textContent = fmtTime(cur);
+      document.getElementById('song-dur').textContent = fmtTime(dur);
+    }
+  }, 500);
+}
 
 /* ── utilidad: formatea segundos a mm:ss ── */
 function fmtTime(s) {
-  if (!isFinite(s)) return '0:00';
+  if (!isFinite(s) || s < 0) return '0:00';
   return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
-}
-
-/* ── crea / recicla el objeto Audio para la canción actual ── */
-function songLoad(autoplay) {
-  if (songAudio) {
-    songAudio.pause();
-    songAudio.src = '';
-  }
-  const s = SONGS[songIdx];
-  songAudio = new Audio();
-  songAudio.crossOrigin = 'anonymous';
-  songAudio.preload = 'metadata';
-  songAudio.src = s.url;
-
-  /* actualizar barra y tiempo en tiempo real */
-  songAudio.addEventListener('timeupdate', () => {
-    const pct = songAudio.duration ? (songAudio.currentTime / songAudio.duration) * 100 : 0;
-    document.getElementById('song-bar').style.width = pct + '%';
-    document.getElementById('song-cur').textContent = fmtTime(songAudio.currentTime);
-  });
-
-  /* actualizar duración real cuando esté disponible */
-  songAudio.addEventListener('loadedmetadata', () => {
-    document.getElementById('song-dur').textContent = fmtTime(songAudio.duration);
-  });
-
-  /* al terminar la canción, pasar a la siguiente */
-  songAudio.addEventListener('ended', () => {
-    songStop();
-    songIdx = (songIdx + 1) % SONGS.length;
-    songRender();
-    setTimeout(() => songStart(), 300);
-  });
-
-  /* manejar errores de carga */
-  songAudio.addEventListener('error', () => {
-    document.getElementById('song-title').textContent = '⚠ Error al cargar';
-    songStop();
-  });
-
-  if (autoplay) songAudio.play().catch(() => {});
-}
-
-function songStart() {
-  if (!songAudio) songLoad(true);
-  else songAudio.play().catch(() => {});
-  songPlaying = true;
-  document.getElementById('song-vinyl').classList.add('playing');
-  document.getElementById('song-play-icon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-}
-
-function songStop() {
-  if (songAudio) songAudio.pause();
-  songPlaying = false;
-  document.getElementById('song-vinyl').classList.remove('playing');
-  document.getElementById('song-play-icon').innerHTML = '<path d="M8 5v14l11-7z"/>';
 }
 
 function songRender() {
   const s = SONGS[songIdx];
   document.getElementById('song-title').textContent  = s.title;
   document.getElementById('song-artist').textContent = s.artist;
-  document.getElementById('song-dur').textContent    = s.dur;
+  document.getElementById('song-dur').textContent    = '—:——';
   document.getElementById('song-cur').textContent    = '0:00';
   document.getElementById('song-bar').style.width    = '0%';
 }
 
 function toggleSong() {
+  if (!ytPlayer || !ytReady) return;
   if (songPlaying) {
-    songStop();
+    ytPlayer.pauseVideo();
   } else {
-    if (!songAudio || songAudio.src !== SONGS[songIdx].url) {
-      songLoad(true);
-    } else {
-      songStart();
-    }
+    ytPlayer.playVideo();
   }
 }
 
 function songNext() {
-  const wasPlaying = songPlaying;
-  songStop();
   songIdx = (songIdx + 1) % SONGS.length;
   songRender();
-  if (wasPlaying) songLoad(true);
+  ytCreatePlayer(SONGS[songIdx].ytId, true);
 }
 
 function songPrev() {
-  const wasPlaying = songPlaying;
-  songStop();
   songIdx = (songIdx - 1 + SONGS.length) % SONGS.length;
   songRender();
-  if (wasPlaying) songLoad(true);
+  ytCreatePlayer(SONGS[songIdx].ytId, true);
 }
 
 /* saltar a posición al hacer clic en la barra */
 function songSeek(e) {
-  if (!songAudio || !songAudio.duration) return;
+  if (!ytPlayer || typeof ytPlayer.getDuration !== 'function') return;
   const rect = e.currentTarget.getBoundingClientRect();
   const pct  = (e.clientX - rect.left) / rect.width;
-  songAudio.currentTime = pct * songAudio.duration;
+  ytPlayer.seekTo(pct * ytPlayer.getDuration(), true);
 }
 
-/* ajustar volumen */
+/* ajustar volumen (0–100 en YouTube API) */
 function songVolume(v) {
-  if (songAudio) songAudio.volume = parseFloat(v);
+  if (ytPlayer && typeof ytPlayer.setVolume === 'function')
+    ytPlayer.setVolume(Math.round(parseFloat(v) * 100));
 }
 
 /* ─────────────────────────────────────
