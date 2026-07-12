@@ -1071,12 +1071,14 @@
     .gallery-arrow.prev { left: 10px; }
     .gallery-arrow.next { right: 10px; }
     .gallery-thumbs {
-      display: flex; gap: 8px; margin-top: 14px;
-      justify-content: center; flex-wrap: wrap;
+      display: flex; gap: 6px; margin-top: 14px;
+      justify-content: center; flex-wrap: nowrap;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
       max-width: 400px; margin-left: auto; margin-right: auto;
+      padding-bottom: 4px;
     }
     .gallery-thumb {
-      width: 46px; height: 46px; cursor: pointer;
+      width: 28px; height: 28px; cursor: pointer; flex-shrink: 0;
       border: 2px solid rgba(26,26,26,0.1); overflow: hidden; flex-shrink: 0;
       opacity: 0.45; transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
     }
@@ -2222,7 +2224,7 @@
       <div class="date-badge">
         <p>15 DE NOVIEMBRE &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; 7:00 PM</p>
       </div>
-      <button class="open-btn" onclick="closeSplash()">
+      <button class="open-btn" onclick="event.stopPropagation(); closeSplash()">
         ★ &nbsp; Abrir invitación &nbsp; ★
       </button>
       <p class="tap-hint">toca para abrir</p>
@@ -2967,10 +2969,6 @@
         <p>Sofía Valentina</p>
       </div>
       <div class="footer-brand reveal">
-        <div class="footer-brand-notice">
-          Esta tarjeta digital es propiedad exclusiva de <strong>Gueka Ideas</strong><br>
-          Uso permitido únicamente para fines personales.
-        </div>
         <div class="footer-watermark">
           <img src="https://hercules-cdn.com/file_rTfmZTEJgJfdFf54Juz7B1kj" alt="Gueka Ideas" />
           <p class="footer-legal">Esta tarjeta digital es propiedad exclusiva de Gueka Ideas<br>Uso permitido únicamente para fines personales.<br>© 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</p>
@@ -2983,8 +2981,7 @@
 
 <!-- MÚSICA DE FONDO -->
 <audio id="bg-music" loop preload="auto">
-  <source src="https://incompetech.com/music/royalty-free/mp3-royaltyfree/Waltz%20Primordial.mp3" type="audio/mpeg">
-  <source src="https://incompetech.com/music/royalty-free/mp3-royaltyfree/Waltzing%20Matilda.mp3" type="audio/mpeg">
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
 </audio>
 <button id="music-btn" aria-label="Música" data-tip="Música">
   <span class="mi">♪</span>
@@ -3019,9 +3016,10 @@
   });
 
   function startMusic() {
+    if (audio.readyState === 0) { audio.load(); }
     if (audio.ended) audio.currentTime = 0;
     var p = audio.play();
-    if (p && p.catch) p.catch(function() {});
+    if (p && p.catch) p.catch(function(err) { console.warn('Audio blocked:', err); });
   }
 
   btn.addEventListener('click', function(e) {
@@ -3080,6 +3078,8 @@ spawnPetals();
    SPLASH — CERRAR
 ══════════════════════════════════════════════════════════════════ */
 function closeSplash() {
+  if (closeSplash._done) return;
+  closeSplash._done = true;
   const splash = document.getElementById('splash');
   const main   = document.getElementById('main');
   // Detener pétalos
@@ -3184,6 +3184,12 @@ function initGallery() {
   const container = document.getElementById('gallery-main');
   const thumbsEl  = document.getElementById('gallery-thumbs');
   const dotsEl    = document.getElementById('gallery-dots');
+
+  // Limpiar para evitar duplicados si se llama más de una vez
+  const existingImgs = container.querySelectorAll('img');
+  existingImgs.forEach(el => el.remove());
+  thumbsEl.innerHTML = '';
+  dotsEl.innerHTML = '';
 
   // Crear imágenes
   galleryData.forEach((img, i) => {
