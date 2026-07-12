@@ -608,7 +608,7 @@
 
     /* ── SONG ── */
     #song-sec { padding: 4rem 1.5rem; background: #0a0a0a; }
-    .song-card { max-width: 400px; margin: 0 auto; border: 1px solid rgba(0,204,221,0.25); background: rgba(0,204,221,0.03); overflow: hidden; }
+    .song-card { max-width: 400px; margin: 0 auto; border: 1px solid rgba(0,204,221,0.25); background: rgba(0,204,221,0.03); overflow: visible; position: relative; }
     .song-top-bar { height: 3px; background: linear-gradient(90deg, #00CCDD, #FFE000, #FF3CAC); }
     .song-inner { display: flex; gap: 16px; align-items: center; padding: 1.2rem 1.2rem 0.8rem; }
     .song-cover-wrap { position: relative; flex-shrink: 0; width: 80px; height: 80px; }
@@ -683,7 +683,7 @@
       </div>
       <div class="inner">
         <p class="kicker">Estás invitad@ a mis</p>
-        <div class="xv gold-text">XV</div>
+        <div class="xv">XV</div>
         <div class="anos-row">
           <span class="line"></span>
           <span class="anos-txt">AÑOS</span>
@@ -942,26 +942,18 @@
             <span class="song-kicker">Dedicada con amor</span>
             <p class="song-title" id="song-title-el">A Thousand Years</p>
             <p class="song-artist" id="song-artist-el">Christina Perri</p>
+            <div class="song-bar-wrap"><div class="song-bar" id="song-bar"></div></div>
             <div class="song-controls">
               <button class="song-ctrl" id="song-play-btn" onclick="toggleSong()">
                 <svg id="song-play-icon" width="20" height="20" viewBox="0 0 24 24" fill="#0a0a0a" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               </button>
-              <span class="song-play-hint" id="song-play-hint">Reproducir</span>
+              <span class="song-play-hint" id="song-play-hint">···</span>
             </div>
           </div>
         </div>
-        <!-- YouTube embed oculto, se activa al dar play -->
-        <div id="song-yt-wrap" style="display:none; padding: 0 1.2rem 1rem;">
-          <iframe
-            id="song-yt"
-            width="100%"
-            height="80"
-            src="https://www.youtube.com/embed/APCZJtsiXpY?autoplay=0&controls=1&rel=0&modestbranding=1&color=white"
-            allow="autoplay; encrypted-media"
-            allowfullscreen
-            style="border:none; display:block; border-top: 1px solid rgba(0,204,221,0.15);"
-            title="A Thousand Years - Christina Perri">
-          </iframe>
+        <!-- YouTube player invisible: solo audio -->
+        <div id="song-yt-wrap" style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;">
+          <div id="song-yt" style="width:1px;height:1px;"></div>
         </div>
         <p class="song-quote">"Amor es estar presente en cada momento que importa."</p>
       </div>
@@ -977,7 +969,7 @@
       </div>
       <div class="songreq-form-wrap">
         <input class="songreq-input" type="text" id="sr-name" placeholder="Tu nombre" />
-        <input class="songreq-input" type="text" id="sr-song" placeholder="Canción · Artista" />
+        <input class="songreq-input" type="text" id="sr-song" placeholder="Canción · Artista" onkeydown="if(event.key==='Enter')addSongReq()" />
         <button class="songreq-btn" onclick="addSongReq()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Agregar al playlist
@@ -1180,6 +1172,14 @@ GALLERY.forEach((g,i)=>{
 renderGallery();
 // Auto-advance gallery
 setInterval(()=>galleryGo(1), 4500);
+// Swipe en galería
+let gTouchX = 0;
+const gMain = document.querySelector('.gallery-main');
+gMain.addEventListener('touchstart', e=>{ gTouchX = e.touches[0].clientX; },{passive:true});
+gMain.addEventListener('touchend', e=>{
+  const dx = e.changedTouches[0].clientX - gTouchX;
+  if(Math.abs(dx)>40) galleryGo(dx<0?1:-1);
+},{passive:true});
 
 // ── ITINERARY ──
 const itinList = document.getElementById('itin-list');
@@ -1215,12 +1215,14 @@ const itinObs = new IntersectionObserver(entries=>{
   entries.forEach(e=>{
     if(e.isIntersecting){
       itinLine.classList.add('visible');
-      document.querySelectorAll('.itin-item').forEach(el=>el.classList.add('visible'));
+      document.querySelectorAll('.itin-item').forEach((el,i)=>{
+        setTimeout(()=>el.classList.add('visible'), i*80);
+      });
       itinObs.unobserve(e.target);
     }
   });
-},{rootMargin:'-40px'});
-itinObs.observe(itinLine);
+},{threshold:0.1});
+itinObs.observe(document.getElementById('itin-list'));
 
 // ── GIFTS ──
 const giftsList = document.getElementById('gifts-list');
@@ -1345,28 +1347,93 @@ chTrack.addEventListener('touchend', e => {
 // Auto-advance
 setInterval(() => chGoTo((chIdx + 1) % CHILDHOOD.length), 3500);
 
-// ── SONG PLAYER ──
+// ── SONG PLAYER (YouTube IFrame API – invisible, solo audio) ──
+let ytPlayer = null;
 let songPlaying = false;
+let songBarTimer = null;
+let songPlayPending = false; // play pedido antes de que la API esté lista
+
+// Inyectar script de la API de YouTube
+const ytScript = document.createElement('script');
+ytScript.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(ytScript);
+
+window.onYouTubeIframeAPIReady = function() {
+  ytPlayer = new YT.Player('song-yt', {
+    height: '1',
+    width: '1',
+    videoId: 'APCZJtsiXpY', // A Thousand Years – Christina Perri
+    playerVars: {
+      autoplay: 0,
+      controls: 0,
+      disablekb: 1,
+      fs: 0,
+      iv_load_policy: 3,
+      modestbranding: 1,
+      playsinline: 1,
+      rel: 0,
+      enablejsapi: 1,
+    },
+    events: {
+      onReady: function() {
+        document.getElementById('song-play-hint').textContent = 'Reproducir';
+        if (songPlayPending) {
+          songPlayPending = false;
+          doPlay();
+        }
+      },
+      onStateChange: function(e) {
+        if (e.data === YT.PlayerState.PLAYING) {
+          startBarAnim();
+        }
+        if (e.data === YT.PlayerState.ENDED) {
+          pauseSongUI();
+        }
+      }
+    }
+  });
+};
+
+function startBarAnim() {
+  clearInterval(songBarTimer);
+  songBarTimer = setInterval(function() {
+    if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+    const dur = ytPlayer.getDuration();
+    const cur = ytPlayer.getCurrentTime();
+    if (dur > 0) {
+      document.getElementById('song-bar').style.width = ((cur / dur) * 100) + '%';
+    }
+  }, 500);
+}
+
+function doPlay() {
+  ytPlayer.playVideo();
+  document.getElementById('song-vinyl').classList.add('spinning');
+  document.getElementById('song-play-icon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+  document.getElementById('song-play-hint').textContent = 'Pausar';
+  songPlaying = true;
+}
+
+function pauseSongUI() {
+  songPlaying = false;
+  clearInterval(songBarTimer);
+  document.getElementById('song-vinyl').classList.remove('spinning');
+  document.getElementById('song-play-icon').innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+  document.getElementById('song-play-hint').textContent = 'Reproducir';
+}
+
 function toggleSong() {
-  songPlaying = !songPlaying;
-  const icon  = document.getElementById('song-play-icon');
-  const vinyl = document.getElementById('song-vinyl');
-  const wrap  = document.getElementById('song-yt-wrap');
-  const hint  = document.getElementById('song-play-hint');
-  const frame = document.getElementById('song-yt');
+  if (!ytPlayer || typeof ytPlayer.playVideo !== 'function') {
+    // API no lista aún — encolar el play
+    songPlayPending = true;
+    document.getElementById('song-play-hint').textContent = 'Cargando…';
+    return;
+  }
   if (songPlaying) {
-    // Mostrar iframe con autoplay activado
-    frame.src = 'https://www.youtube.com/embed/APCZJtsiXpY?autoplay=1&controls=1&rel=0&modestbranding=1&color=white';
-    wrap.style.display = 'block';
-    vinyl.classList.add('spinning');
-    icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
-    hint.textContent = 'Pausar';
+    ytPlayer.pauseVideo();
+    pauseSongUI();
   } else {
-    // Detener cargando el embed sin autoplay
-    frame.src = 'https://www.youtube.com/embed/APCZJtsiXpY?autoplay=0&controls=1&rel=0&modestbranding=1&color=white';
-    vinyl.classList.remove('spinning');
-    icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
-    hint.textContent = 'Reproducir';
+    doPlay();
   }
 }
 
