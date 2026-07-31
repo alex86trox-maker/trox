@@ -63,6 +63,23 @@ body{font-family:'Montserrat',system-ui,sans-serif;background:var(--e-bg);color:
 .sidebar::before{content:'';position:absolute;top:0;bottom:0;left:0;width:2px;background:linear-gradient(180deg,var(--e-pink),var(--e-cyan),var(--e-gold),#5dff5e,#d06bff,var(--e-pink));background-size:100% 300%;animation:rail 9s linear infinite;opacity:.65;pointer-events:none}
 @keyframes rail{to{background-position:0 300%}}
 .panel-head{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:11px;padding:14px 18px 13px 20px;background:rgba(14,14,22,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--e-line)}
+.panel-toolbar{display:flex;flex-direction:column;gap:8px;padding:10px 14px;background:rgba(14,14,22,.7);border-bottom:1px solid var(--e-line)}
+.panel-search{font-size:10px!important;padding:7px 11px!important;border-radius:7px!important}
+.panel-toolbar-btns{display:flex;gap:7px}
+.ptb{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 10px;background:rgba(255,255,255,.04);border:1px solid var(--e-line);border-radius:7px;color:var(--e-ink);font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;cursor:pointer;transition:background .15s,border-color .15s}
+.ptb:hover{background:rgba(34,224,214,.08);border-color:rgba(34,224,214,.35);color:var(--e-cyan)}
+.sec-modified .sec-num{background:rgba(34,224,214,.15);color:var(--e-cyan);border:1px solid rgba(34,224,214,.4)}
+/* Reset confirm modal */
+.reset-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center}
+.reset-modal.show{display:flex}
+.reset-box{background:#0e0e16;border:1px solid rgba(255,61,127,.4);border-radius:14px;padding:28px 26px;max-width:320px;width:90%;text-align:center;box-shadow:0 0 48px rgba(255,61,127,.2)}
+.reset-box h3{font-family:var(--sans,sans-serif);font-size:1rem;font-weight:900;letter-spacing:.12em;color:var(--e-pink,#ff3d7f);margin-bottom:8px}
+.reset-box p{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:20px}
+.reset-box-btns{display:flex;gap:10px;justify-content:center}
+.rbtn{flex:1;padding:9px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;cursor:pointer;transition:.15s}
+.rbtn.cancel{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6)}
+.rbtn.confirm{background:rgba(255,61,127,.15);border:1px solid rgba(255,61,127,.5);color:#ff3d7f}
+.rbtn.confirm:hover{background:rgba(255,61,127,.3)}
 .ph-dot{width:9px;height:9px;border-radius:50%;background:var(--e-cyan);box-shadow:0 0 0 0 rgba(34,224,214,.6);animation:liveDot 1.8s ease-out infinite;flex:0 0 auto}
 @keyframes liveDot{0%{box-shadow:0 0 0 0 rgba(34,224,214,.55)}70%{box-shadow:0 0 0 9px rgba(34,224,214,0)}100%{box-shadow:0 0 0 0 rgba(34,224,214,0)}}
 .panel-head strong{display:block;font-size:11px;font-weight:800;letter-spacing:.16em}
@@ -857,6 +874,21 @@ html,body{background:var(--e-bg)}
       <div><strong>PANEL DE EDICIÓN</strong><span class="ph-sub">cada cambio · en vivo</span></div>
       <span class="ph-count" id="secCount">15 secciones</span>
     </div>
+    <!-- Panel toolbar: Export / Import / Search -->
+    <div class="panel-toolbar">
+      <input id="panel-search" class="in panel-search" placeholder="🔍  Buscar sección…" autocomplete="off">
+      <div class="panel-toolbar-btns">
+        <button class="ptb" id="btnExport" title="Exportar proyecto como JSON">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar
+        </button>
+        <label class="ptb" title="Importar proyecto desde JSON" style="cursor:pointer">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Importar
+          <input type="file" id="btnImport" accept=".json" style="display:none">
+        </label>
+      </div>
+    </div>
 
     <!-- 01 CONTENIDO -->
     <section class="sec open">
@@ -1029,7 +1061,13 @@ html,body{background:var(--e-bg)}
       <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
         <div class="field"><label>Nombre del salón</label><input class="in" data-bind="venue"></div>
         <div class="field"><label>Dirección</label><textarea class="in" data-bind="address"></textarea></div>
-        <div class="field" style="margin-bottom:0"><label>Enlace de mapa</label><input class="in" data-bind="mapUrl"></div>
+        <div class="field" style="margin-bottom:0">
+          <label style="display:flex;align-items:center;justify-content:space-between">
+            Enlace de mapa
+            <a id="map-preview-link" href="#" target="_blank" rel="noopener" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--e-cyan);letter-spacing:.1em;text-decoration:none;opacity:0;pointer-events:none;transition:.2s">VER MAPA →</a>
+          </label>
+          <input class="in" data-bind="mapUrl" id="inp-mapUrl" placeholder="https://maps.google.com/maps?q=…">
+        </div>
       </div></div></div>
     </section>
 
@@ -1107,6 +1145,14 @@ html,body{background:var(--e-bg)}
           <input class="in" data-bind="waOrganizer" placeholder="ej: 573001234567 (código país + número, sin +)" style="margin-top:6px">
           <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.25);margin-top:5px;line-height:1.6">Al confirmar asistencia, el invitado abrirá WhatsApp con sus datos.<br>Formato: código de país + número, sin espacios ni + (ej: 573001234567)</div>
         </div>
+        <div class="field" style="margin-bottom:0;padding-top:14px;border-top:1px solid rgba(255,255,255,.07);margin-top:14px">
+          <label style="display:flex;align-items:center;gap:6px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--e-cyan);flex-shrink:0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Aforo máximo (0 = sin límite)
+          </label>
+          <input class="in" type="number" min="0" data-bind="rsvpCapacity" placeholder="ej: 150" style="margin-top:6px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.25);margin-top:5px;line-height:1.6">Si se supera el aforo, el invitado verá una advertencia de cupo lleno.<br>El número también se incluye en el mensaje de WhatsApp.</div>
+        </div>
       </div></div></div>
     </section>
 
@@ -1138,6 +1184,18 @@ html,body{background:var(--e-bg)}
 </div>
 
 <div class="toasts" id="toasts"></div>
+
+<!-- Reset confirm modal -->
+<div class="reset-modal" id="resetModal">
+  <div class="reset-box">
+    <h3>¿RESTABLECER PLANTILLA?</h3>
+    <p>Se perderán todos los cambios que hayas hecho.<br>Esta acción no se puede deshacer.</p>
+    <div class="reset-box-btns">
+      <button class="rbtn cancel" id="resetCancel">Cancelar</button>
+      <button class="rbtn confirm" id="resetConfirm">Sí, restablecer</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const $ = s => document.querySelector(s);
@@ -1231,6 +1289,7 @@ function makeDefaults(){
     rsvpIntro:'Tu presencia hará esta noche aún más especial.', rsvpDeadline:'1 de Junio',
     rsvpNote:'CONFIRMA ANTES DEL 1 DE JUN · CUPOS LIMITADOS',
     waOrganizer:'',
+    rsvpCapacity:0,
     poem:'Hoy comienzas a escribir\nel capítulo más hermoso\nde tu historia.', signature:'Con amor, Sofía',
     palette:'neon', particles:true,
     galCategories:[
@@ -1727,7 +1786,15 @@ function applyZoom(){ const st=$('#preview-stage'); if(st) st.style.transform='s
 function openCard(){ state.showSplash=false; updateSplash(); }
 
 let saveTimer;
-function markSave(){ const s=$('#saveState'); s.classList.add('saving'); $('#saveTxt').textContent='Guardando…'; clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ s.classList.remove('saving'); $('#saveTxt').textContent='Guardado'; },650); }
+function markSave(){
+  const s=$('#saveState'); s.classList.add('saving'); $('#saveTxt').textContent='Guardando…';
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    s.classList.remove('saving'); $('#saveTxt').textContent='Guardado';
+    // Persist to localStorage
+    try{ localStorage.setItem('quinceeditor_v1', JSON.stringify(state)); }catch(e){}
+  },650);
+}
 function toast(html){ const t=document.createElement('div'); t.className='toast'; t.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span>'+html+'</span>'; $('#toasts').appendChild(t); requestAnimationFrame(()=>t.classList.add('show')); setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),350); },2700); }
 
 let revealObs;
@@ -1782,6 +1849,18 @@ function submitRSVP(){
   const name=$('#rsvp-name').value.trim();
   const err=$('#rsvp-error');
   if(!name){ err.textContent='⚠ Por favor ingresa tu nombre'; err.style.display='block'; return; }
+  // Check capacity if set
+  const cap=state.rsvpCapacity||0;
+  if(cap>0){
+    // Track confirmed count in sessionStorage (demo — resets on refresh)
+    const count=parseInt(sessionStorage.getItem('rsvp_count')||'0',10);
+    const attend=$('#btn-yes').classList.contains('active');
+    if(attend && count>=cap){
+      err.textContent='⚠ Lo sentimos, el aforo está completo ('+cap+' personas). Contacta a la organizadora.';
+      err.style.display='block'; return;
+    }
+    if(attend) sessionStorage.setItem('rsvp_count', String(count+1));
+  }
   err.style.display='none';
   const btn=$('#rsvp-submit'); btn.textContent='ENVIANDO...'; btn.disabled=true;
   // Build WhatsApp message
@@ -1793,6 +1872,7 @@ function submitRSVP(){
     const transport=$('#rsvp-transport')?$('#rsvp-transport').value:'no';
     const msg=$('#rsvp-msg')?$('#rsvp-msg').value.trim():'';
     const quinc=state.name||'la quinceañera';
+    const capLine=cap>0?'\n🎟 Aforo: '+cap+' personas max':'';
     const lines=[
       '🎀 *CONFIRMACIÓN DE ASISTENCIA*',
       '👤 Nombre: '+name,
@@ -1801,9 +1881,10 @@ function submitRSVP(){
       '🍽 Dieta: '+(food==='no'?'Sin restricción':food),
       '🚌 Transporte: '+(transport==='no'?'Por cuenta propia':'Necesita bus'),
       msg?'💬 Mensaje: '+msg:'',
+      capLine,
       '',
       '— Enviado desde la invitación de '+quinc
-    ].filter(l=>l!==undefined);
+    ].filter(l=>l!==undefined&&l!=='');
     const url='https://wa.me/'+wa+'?text='+encodeURIComponent(lines.join('\n'));
     setTimeout(()=>{ window.open(url,'_blank'); },400);
   }
@@ -1829,19 +1910,81 @@ function bindEditor(){
     el.addEventListener('input',()=>{
       const k=el.dataset.bind; let v=el.type==='checkbox'?el.checked:el.value;
       if(k==='likeCount') v=parseInt(v,10)||0;
+      if(k==='rsvpCapacity') v=parseInt(v,10)||0;
       state[k]=v;
       if(k==='showSplash') updateSplash();
       if(k==='particles') updateCanvas();
+      // Map URL live preview link
+      if(k==='mapUrl'){
+        const link=$('#map-preview-link');
+        if(link){ const valid=v&&v.startsWith('http'); link.href=valid?v:'#'; link.style.opacity=valid?'1':'0'; link.style.pointerEvents=valid?'auto':'none'; }
+      }
       renderStatic(); markSave();
     });
   });
+  // Init map preview link if value already set
+  const mapInp=$('#inp-mapUrl');
+  if(mapInp){ const link=$('#map-preview-link'); if(link&&state.mapUrl&&state.mapUrl.startsWith('http')){ link.href=state.mapUrl; link.style.opacity='1'; link.style.pointerEvents='auto'; } }
+
   $$('.sec-head').forEach(h=>h.addEventListener('click',()=>{ const s=h.parentElement; const o=s.classList.toggle('open'); h.setAttribute('aria-expanded',o); }));
-  $('#btnReset').onclick=()=>{ state=makeDefaults(); zoom=1; fullRender(); toast('Plantilla restablecida'); };
+
+  // Reset with confirmation modal
+  $('#btnReset').onclick=()=>{ $('#resetModal').classList.add('show'); };
+  $('#resetCancel').onclick=()=>{ $('#resetModal').classList.remove('show'); };
+  $('#resetConfirm').onclick=()=>{
+    $('#resetModal').classList.remove('show');
+    try{ localStorage.removeItem('quinceeditor_v1'); }catch(e){}
+    state=makeDefaults(); zoom=1; fullRender(); toast('Plantilla restablecida');
+  };
+  $('#resetModal').addEventListener('click',e=>{ if(e.target===$('#resetModal')) $('#resetModal').classList.remove('show'); });
+
   $('#btnPrint').onclick=()=>window.print();
   $('#btnShare').onclick=()=>{ const slug=(state.name||'invitacion').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); const url='https://xv.invitio.events/'+(slug||'mi-xv'); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(()=>toast('Enlace copiado · <b>'+url.replace('https://','')+'</b>')).catch(()=>toast('Enlace: '+url)); else toast('Enlace: '+url); };
   $('#zoomIn').onclick=()=>{ zoom=Math.min(1.4,+(zoom+0.1).toFixed(2)); applyZoom(); };
   $('#zoomOut').onclick=()=>{ zoom=Math.max(0.6,+(zoom-0.1).toFixed(2)); applyZoom(); };
   $('#toolSplash').onclick=()=>{ state.showSplash=!state.showSplash; updateSplash(); markSave(); };
+
+  // Export project as JSON
+  $('#btnExport').onclick=()=>{
+    const json=JSON.stringify(state,null,2);
+    const blob=new Blob([json],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='invitacion-'+(state.name||'xv').toLowerCase().replace(/\s+/g,'-')+'.json';
+    a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    toast('Proyecto exportado como JSON');
+  };
+
+  // Import project from JSON
+  $('#btnImport').onchange=function(){
+    const file=this.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const imported=JSON.parse(e.target.result);
+        // Merge with defaults so new fields always exist
+        state=Object.assign(makeDefaults(), imported);
+        zoom=1; fullRender(); markSave();
+        toast('Proyecto importado correctamente');
+      } catch(err){ toast('Error al leer el archivo JSON'); }
+    };
+    reader.readAsText(file); this.value='';
+  };
+
+  // Panel search — filter sections by title
+  $('#panel-search').addEventListener('input',function(){
+    const q=this.value.trim().toLowerCase();
+    $$('.sec').forEach(sec=>{
+      const title=(sec.querySelector('.sec-title')||sec).textContent.toLowerCase();
+      if(!q||title.includes(q)){ sec.style.display=''; }
+      else { sec.style.display='none'; }
+    });
+    // Show "no results" hint if all hidden
+    const visible=$$('.sec').filter(s=>s.style.display!=='none');
+    let hint=$('#search-no-results');
+    if(visible.length===0&&q){
+      if(!hint){ hint=document.createElement('div'); hint.id='search-no-results'; hint.style.cssText='font-family:\'JetBrains Mono\',monospace;font-size:9px;color:rgba(255,255,255,.3);text-align:center;padding:18px 0;letter-spacing:.1em'; hint.textContent='Sin resultados para "'+q+'"'; const aside=$('#sidebar'); aside.appendChild(hint); } else hint.textContent='Sin resultados para "'+q+'"';
+    } else { if(hint) hint.remove(); }
+  });
 }
 
 function fullRender(){
@@ -1855,6 +1998,13 @@ function fullRender(){
 }
 
 // ── Init ──────────────────────────────────────────────────────
+// Load persisted state from localStorage if available
+(function(){
+  try{
+    const saved=localStorage.getItem('quinceeditor_v1');
+    if(saved){ const parsed=JSON.parse(saved); state=Object.assign(makeDefaults(),parsed); }
+  }catch(e){}
+})();
 syncInputs();
 renderStatic();
 buildAllEditors();
