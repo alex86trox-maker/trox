@@ -479,22 +479,173 @@ html,body{background:var(--e-bg)}
 #preview-scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 #preview-stage{width:430px;max-width:100%;margin:0 auto;transform-origin:top center}
 
-@media(max-width:1000px){
-  body{overflow:auto}
-  .workspace{display:flex;flex-direction:column}
-  .preview-wrap{height:84vh}
-  .sidebar{border-left:0;border-top:1px solid var(--e-line)}
+/* ============ RESPONSIVE ============ */
+
+/* --- Tablet (≤1024px): drawer lateral sobre la preview --- */
+@media(max-width:1024px){
+  body{overflow:hidden}
+  .workspace{display:block;position:relative;height:100%}
+  .preview-wrap{position:absolute;inset:0;height:100%}
+  .event-pill{display:none}
+
+  /* Sidebar becomes a right drawer */
+  .sidebar{
+    position:absolute;
+    top:0;bottom:0;right:0;
+    width:340px;
+    border-left:1px solid var(--e-line);
+    transform:translateX(100%);
+    transition:transform .35s cubic-bezier(.4,0,.2,1);
+    z-index:200;
+    box-shadow:-8px 0 40px rgba(0,0,0,.6);
+  }
+  .sidebar.mob-open{transform:translateX(0)}
+
+  /* Backdrop for drawer */
+  .sidebar-backdrop{
+    display:none;
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:199;
+    backdrop-filter:blur(2px);
+    cursor:pointer;
+  }
+  .sidebar-backdrop.show{display:block}
+
+  /* Floating toggle button */
+  .mob-drawer-toggle{
+    display:flex!important;
+    position:fixed;
+    bottom:24px;
+    right:24px;
+    width:54px;height:54px;
+    border-radius:50%;
+    background:linear-gradient(135deg,var(--e-pink),var(--e-cyan));
+    border:none;
+    color:#0a0a11;
+    cursor:pointer;
+    align-items:center;justify-content:center;
+    box-shadow:0 6px 24px rgba(255,61,127,.45),0 2px 8px rgba(0,0,0,.5);
+    z-index:201;
+    transition:transform .2s,box-shadow .2s;
+    font-size:20px;
+  }
+  .mob-drawer-toggle:hover{transform:scale(1.08);box-shadow:0 8px 30px rgba(255,61,127,.6)}
+  .mob-drawer-toggle.open{background:linear-gradient(135deg,#2a2a3e,#1a1a2e);color:var(--e-ink);box-shadow:0 4px 16px rgba(0,0,0,.5)}
+
+  /* Sidebar rail becomes top */
   .sidebar::before{top:0;left:0;right:0;bottom:auto;width:auto;height:2px;background:linear-gradient(90deg,var(--e-pink),var(--e-cyan),var(--e-gold),#5dff5e,#d06bff,var(--e-pink));background-size:300% 100%;animation:railH 9s linear infinite}
   @keyframes railH{to{background-position:300% 0}}
-  .event-pill{display:none}
 }
-@media(max-width:560px){
-  .topbar{padding:0 12px;gap:8px}
+
+/* --- Mobile (≤640px): full tabs UI --- */
+@media(max-width:640px){
+  body{overflow:hidden}
+  .topbar{height:52px;padding:0 12px;gap:8px}
   .brand-text span{display:none}
   .save-dot{display:none}
   .btn .lbl{display:none}
   .stage-tag{display:none}
+  .event-pill{display:none}
+
+  /* Topbar buttons smaller */
+  .btn{padding:6px 10px;font-size:10px}
+  .btn svg{width:14px;height:14px}
+
+  /* Bottom tab bar */
+  .mob-tabbar{
+    display:flex!important;
+    position:fixed;
+    bottom:0;left:0;right:0;
+    height:58px;
+    background:rgba(10,10,17,.97);
+    border-top:1px solid var(--e-line);
+    backdrop-filter:blur(16px);
+    z-index:300;
+    align-items:stretch;
+    box-shadow:0 -4px 20px rgba(0,0,0,.4);
+  }
+  .mob-tab{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+    border:none;
+    background:transparent;
+    color:var(--e-muted);
+    font-family:'JetBrains Mono',monospace;
+    font-size:8px;
+    letter-spacing:.1em;
+    cursor:pointer;
+    transition:color .2s;
+    padding:0;
+    position:relative;
+  }
+  .mob-tab svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
+  .mob-tab span{font-size:7.5px;letter-spacing:.08em}
+  .mob-tab.active{color:var(--e-cyan)}
+  .mob-tab.active::after{
+    content:'';
+    position:absolute;
+    top:0;left:50%;
+    transform:translateX(-50%);
+    width:28px;height:2px;
+    background:linear-gradient(90deg,var(--e-pink),var(--e-cyan));
+    border-radius:0 0 4px 4px;
+    box-shadow:0 0 8px var(--e-cyan);
+  }
+
+  /* Workspace becomes tabbed */
+  .workspace{
+    display:block!important;
+    position:fixed;
+    top:52px;
+    left:0;right:0;
+    bottom:58px;
+    overflow:hidden;
+  }
+  .preview-wrap{
+    position:absolute;
+    inset:0;
+    height:100%!important;
+    display:block;
+    transition:opacity .25s,transform .25s;
+  }
+  .preview-wrap.mob-hidden{opacity:0;pointer-events:none;transform:translateX(-12px)}
+
+  /* Sidebar becomes bottom sheet / full panel */
+  .sidebar{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    border-left:none!important;
+    transform:translateX(100%);
+    transition:transform .35s cubic-bezier(.4,0,.2,1);
+    z-index:100;
+    box-shadow:none;
+  }
+  .sidebar.mob-open{transform:translateX(0)!important}
+
+  /* Hide sidebar top rail */
+  .sidebar::before{display:none}
+
+  /* Remove floating toggle on mobile (we use tabbar instead) */
+  .mob-drawer-toggle{display:none!important}
+  .sidebar-backdrop{display:none!important}
+
+  /* Sidebar panel head fixed inside */
+  .panel-head{padding:12px 14px 11px 14px}
+  .sec-head{padding:13px 14px 13px 16px}
+  .sec-pad{padding:6px 14px 18px 16px}
 }
+
+/* Desktop: hide mobile-only elements */
+.mob-tabbar{display:none}
+.mob-drawer-toggle{display:none}
+.sidebar-backdrop{display:none}
 @media print{
   @page{margin:0}
   .topbar,.sidebar,.preview-tools,.toasts,#splash,#petal-canvas,.music-fab,#song-strip,.stage-tag{display:none!important}
@@ -505,9 +656,66 @@ html,body{background:var(--e-bg)}
   #preview-stage{transform:none!important;width:100%!important;max-width:480px;margin:0 auto}
   #card-wrapper{box-shadow:none!important}
 }
+
+/* ============ ONBOARDING OVERLAY ============ */
+#onboarding-overlay{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .4s}
+#onboarding-overlay.visible{opacity:1}
+.ob-box{background:#0e0e16;border:1px solid rgba(255,61,127,.45);border-radius:18px;padding:36px 32px;max-width:380px;width:90%;text-align:center;box-shadow:0 0 60px rgba(255,61,127,.18)}
+.ob-logo{font-weight:900;font-size:2.5rem;color:#fff;letter-spacing:-.02em;margin-bottom:4px;text-shadow:2px 2px 0 #22e0d6,-2px -2px 0 #ff3d7f}
+.ob-sub{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.28em;color:#8a8597;margin-bottom:28px}
+.ob-steps{display:flex;flex-direction:column;gap:14px;margin-bottom:32px;text-align:left}
+.ob-step{display:flex;align-items:flex-start;gap:14px}
+.ob-step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;flex-shrink:0}
+.ob-step:nth-child(1) .ob-step-num{background:rgba(255,61,127,.15);border:1px solid rgba(255,61,127,.5);color:#ff3d7f}
+.ob-step:nth-child(2) .ob-step-num{background:rgba(34,224,214,.12);border:1px solid rgba(34,224,214,.4);color:#22e0d6}
+.ob-step:nth-child(3) .ob-step-num{background:rgba(255,210,74,.12);border:1px solid rgba(255,210,74,.4);color:#ffd24a}
+.ob-step-text strong{display:block;font-size:.8rem;font-weight:800;color:#f2eef8;margin-bottom:2px}
+.ob-step-text span{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#8a8597;line-height:1.5}
+.ob-cta{width:100%;font-family:'Montserrat',sans-serif;font-weight:900;font-size:.85rem;letter-spacing:.16em;padding:14px;background:linear-gradient(135deg,#ff3d7f,#22e0d6);color:#0a0a11;border:none;border-radius:8px;cursor:pointer;box-shadow:0 4px 20px rgba(255,61,127,.35);transition:transform .15s,box-shadow .15s}
+.ob-cta:hover{transform:translateY(-2px);box-shadow:0 6px 26px rgba(255,61,127,.5)}
+
+/* Progress bar */
+.prog-wrap{padding:10px 14px 6px;border-bottom:1px solid var(--e-line);background:rgba(14,14,22,.7)}
+.prog-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.prog-label span{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.16em;color:var(--e-muted)}
+.prog-label strong{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--e-cyan)}
+.prog-bar-bg{height:3px;background:rgba(255,255,255,.06);border-radius:9999px;overflow:hidden}
+.prog-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--e-pink),var(--e-cyan));border-radius:9999px;transition:width .4s cubic-bezier(.4,0,.2,1);box-shadow:0 0 6px var(--e-cyan)}
 </style>
 </head>
 <body>
+
+<!-- ONBOARDING OVERLAY -->
+<div id="onboarding-overlay">
+  <div class="ob-box">
+    <div class="ob-logo">XV</div>
+    <div class="ob-sub">EDITOR DE INVITACIÓN</div>
+    <div class="ob-steps">
+      <div class="ob-step">
+        <div class="ob-step-num">1</div>
+        <div class="ob-step-text">
+          <strong>Cambia el nombre</strong>
+          <span>Abre la sección 01 · Portada y escribe el nombre de la quinceañera</span>
+        </div>
+      </div>
+      <div class="ob-step">
+        <div class="ob-step-num">2</div>
+        <div class="ob-step-text">
+          <strong>Agrega tus fotos</strong>
+          <span>Pega URLs de fotos en las secciones de galería y portada</span>
+        </div>
+      </div>
+      <div class="ob-step">
+        <div class="ob-step-num">3</div>
+        <div class="ob-step-text">
+          <strong>Comparte la invitación</strong>
+          <span>Exporta el archivo HTML y compártelo por WhatsApp o redes sociales</span>
+        </div>
+      </div>
+    </div>
+    <button class="ob-cta" id="ob-start-btn">EMPEZAR A EDITAR →</button>
+  </div>
+</div>
 
 <header class="topbar">
   <div class="brand">
@@ -522,6 +730,29 @@ html,body{background:var(--e-bg)}
     <button class="btn solid" id="btnShare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span class="lbl">Compartir</span></button>
   </div>
 </header>
+
+<!-- Backdrop for tablet drawer -->
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobDrawer()"></div>
+<!-- Floating edit button (tablet only) -->
+<button class="mob-drawer-toggle" id="mobDrawerToggle" onclick="toggleMobDrawer()" title="Editar invitación">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+</button>
+
+<!-- Mobile bottom tab bar -->
+<nav class="mob-tabbar" id="mobTabbar">
+  <button class="mob-tab active" id="mob-tab-preview" onclick="mobSwitchTab('preview')">
+    <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    <span>VISTA</span>
+  </button>
+  <button class="mob-tab" id="mob-tab-edit" onclick="mobSwitchTab('edit')">
+    <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    <span>EDITAR</span>
+  </button>
+  <button class="mob-tab" id="mob-tab-export" onclick="handleShare()">
+    <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    <span>EXPORTAR</span>
+  </button>
+</nav>
 
 <div class="workspace">
 
@@ -812,12 +1043,12 @@ html,body{background:var(--e-bg)}
                 <select class="rsvp-select" id="rsvp-food"><option value="no">Ninguna</option><option value="celiaco">Celíaco</option><option value="vegano">Vegano</option><option value="vegetariano">Vegetariano</option><option value="otra">Otra</option></select>
                 <div class="rsvp-field-label">¿NECESITAS TRANSPORTE?</div>
                 <select class="rsvp-select" id="rsvp-transport"><option value="no">No, iré por mi cuenta</option><option value="bus">Sí, reservar asiento en el bus</option></select>
-                <textarea class="rsvp-textarea" id="rsvp-msg" rows="2" placeholder="Mensaje para Sofía (opcional)"></textarea>
+                <textarea class="rsvp-textarea" id="rsvpMsgInput" rows="2" placeholder="Mensaje para la quinceañera (opcional)"></textarea>
                 <p class="rsvp-error" id="rsvp-error"></p>
                 <button class="rsvp-submit" id="rsvp-submit" onclick="submitRSVP()">CONFIRMAR ASISTENCIA ▶</button>
                 <p class="rsvp-note" id="rv-note">CONFIRMA ANTES DEL 1 DE JUN · CUPOS LIMITADOS</p>
               </div>
-              <div class="rsvp-done" id="rsvp-done"><div class="rsvp-done-circle">✓</div><div class="rsvp-gracias">¡GRACIAS!</div><p class="rsvp-gracias-sub">Tu respuesta ha sido registrada.<br>¡Te esperamos con todo el amor!</p></div>
+              <div class="rsvp-done" id="rsvp-done"><div class="rsvp-done-circle">✓</div><div class="rsvp-gracias">¡GRACIAS!</div><p class="rsvp-gracias-sub">Tu respuesta ha sido registrada.<br>¡Te esperamos con todo el amor!</p><button class="rsvp-reset-btn" onclick="resetRsvpForm()" style="margin-top:20px;font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.14em;padding:10px 20px;background:rgba(255,0,80,.1);border:1px solid rgba(255,0,80,.4);color:rgba(255,0,80,.7);border-radius:4px;cursor:pointer;transition:background .2s;">↩ VER FORMULARIO OTRA VEZ</button></div>
             </div>
           </section>
           <div class="neon-bar" style="background:linear-gradient(to right,transparent,var(--pink) 30%,#fff 50%,var(--pink) 70%,transparent);box-shadow:0 0 16px var(--pink),0 0 32px var(--pink)"></div>
@@ -860,7 +1091,7 @@ html,body{background:var(--e-bg)}
 
     <div class="preview-tools">
       <button class="tool" id="zoomOut" title="Alejar">−</button>
-      <span id="zoomVal">100%</span>
+      <span id="zoomVal" style="cursor:pointer;user-select:none" title="Clic para restablecer al 100%">100%</span>
       <button class="tool" id="zoomIn" title="Acercar">+</button>
       <span class="tsep"></span>
       <button class="tool on" id="toolSplash" title="Pantalla de bienvenida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
@@ -878,16 +1109,24 @@ html,body{background:var(--e-bg)}
     <div class="panel-toolbar">
       <input id="panel-search" class="in panel-search" placeholder="🔍  Buscar sección…" autocomplete="off">
       <div class="panel-toolbar-btns">
-        <button class="ptb" id="btnExport" title="Exportar proyecto como JSON">
+        <button class="ptb" id="btnExport" title="Exportar: descarga el archivo HTML con todos tus cambios">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Exportar
         </button>
-        <label class="ptb" title="Importar proyecto desde JSON" style="cursor:pointer">
+        <label class="ptb" title="Importar: carga un archivo HTML exportado anteriormente" style="cursor:pointer">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           Importar
           <input type="file" id="btnImport" accept=".json" style="display:none">
         </label>
+        <button class="ptb" id="btnResetPtb" title="Restablecer: vuelve a los valores por defecto (no se puede deshacer)" onclick="document.getElementById('resetModal').classList.add('show')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M20 9a8 8 0 0 0-14.5-3.5L4 10M4 15a8 8 0 0 0 14.5 3.5L20 14"/></svg>
+          Restablecer
+        </button>
       </div>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-label"><span>PERSONALIZACIÓN</span><strong id="progPct">0%</strong></div>
+      <div class="prog-bar-bg"><div class="prog-bar-fill" id="progBar"></div></div>
     </div>
 
     <!-- 01 CONTENIDO -->
@@ -1085,7 +1324,12 @@ html,body{background:var(--e-bg)}
     <!-- 09 INFO EXTRA -->
     <section class="sec">
       <button class="sec-head" aria-expanded="false"><span class="sec-num">09</span><span class="sec-title">Info extra</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
-      <div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-extra"></div></div></div></div>
+      <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.28);margin-bottom:10px;line-height:1.6;">
+          💡 Para el emoji, copia uno de <a href="https://emojipedia.org" target="_blank" style="color:rgba(34,224,214,.6);text-decoration:none;">emojipedia.org</a> y pégalo en el campo Emoji
+        </div>
+        <div id="ed-extra"></div>
+      </div></div></div>
     </section>
 
     <!-- 10 GALERÍA TÍTULOS -->
@@ -1370,7 +1614,11 @@ function buildPhotosEditor(){
       const url = inp.value.trim();
       if(url){
         state.imgs[key] = url;
-        if(prev){ prev.src = url; }
+        if(prev){
+          prev.src = url;
+          prev.onerror = function(){ prev.style.opacity='0.15'; };
+          prev.onload  = function(){ prev.style.opacity='1'; };
+        }
         updatePhotos();
         markSave();
       }
@@ -1870,7 +2118,7 @@ function submitRSVP(){
     const attend=$('#btn-yes').classList.contains('active')?'SÍ ASISTE':'NO ASISTE';
     const food=$('#rsvp-food')?$('#rsvp-food').value:'no';
     const transport=$('#rsvp-transport')?$('#rsvp-transport').value:'no';
-    const msg=$('#rsvp-msg')?$('#rsvp-msg').value.trim():'';
+    const msg=$('#rsvpMsgInput')?$('#rsvpMsgInput').value.trim():'';
     const quinc=state.name||'la quinceañera';
     const capLine=cap>0?'\n🎟 Aforo: '+cap+' personas max':'';
     const lines=[
@@ -2021,6 +2269,157 @@ updateSplash();
 applyZoom();
 $('#footer-year').textContent='© '+new Date().getFullYear()+' GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS';
 const sc=$('#secCount'); if(sc) sc.textContent=$$('.sec').length+' secciones';
+
+// ─── IMPROVEMENT 1: ONBOARDING ──────────────────────────────────
+(function(){
+  const overlay=document.getElementById('onboarding-overlay');
+  if(!overlay) return;
+  if(!localStorage.getItem('xv-onboarding-done')){
+    requestAnimationFrame(()=>{ overlay.classList.add('visible'); });
+    document.getElementById('ob-start-btn').addEventListener('click',function(){
+      overlay.style.opacity='0';
+      setTimeout(()=>{ overlay.style.display='none'; },400);
+      localStorage.setItem('xv-onboarding-done','1');
+    });
+  } else {
+    overlay.style.display='none';
+  }
+})();
+
+// ─── IMPROVEMENT 2: DYNAMIC RSVP PLACEHOLDER ────────────────────
+(function(){
+  function updateRsvpPlaceholder(){
+    const rsvpMsg=document.getElementById('rsvpMsgInput');
+    if(rsvpMsg) rsvpMsg.placeholder='Mensaje para '+(state.name||'la quinceañera')+' (opcional)';
+  }
+  // Patch bindEditor to also update placeholder on name change
+  const nameInputs=$$('[data-bind="name"]');
+  nameInputs.forEach(el=>{
+    el.addEventListener('input',function(){ updateRsvpPlaceholder(); });
+  });
+  updateRsvpPlaceholder();
+})();
+
+// ─── IMPROVEMENT 4: HONEST SHARE BUTTON ─────────────────────────
+function handleShare(){
+  showToast('💾 Para compartir: usa "Exportar" para descargar el archivo HTML y envíalo por WhatsApp, Drive o correo.');
+}
+function showToast(msg){ toast(msg); }
+$('#btnShare').onclick=handleShare;
+
+// ─── IMPROVEMENT 5: PROGRESS BAR ────────────────────────────────
+function updateProgress(){
+  const total=document.querySelectorAll('.sec').length||15;
+  const done=document.querySelectorAll('.sec-modified').length;
+  const pct=Math.round((done/total)*100);
+  const bar=document.getElementById('progBar');
+  const lbl=document.getElementById('progPct');
+  if(bar) bar.style.width=pct+'%';
+  if(lbl) lbl.textContent=pct+'%';
+}
+// Mark sections modified when any input changes inside them
+document.addEventListener('input',function(e){
+  const sec=e.target.closest('.sec');
+  if(sec && !sec.classList.contains('sec-modified')){
+    sec.classList.add('sec-modified');
+    updateProgress();
+  }
+});
+
+// ─── IMPROVEMENT 6: EXCLUSIVE ACCORDION ─────────────────────────
+$$('.sec-head').forEach(h=>{
+  h.addEventListener('click',function(){
+    const sec=h.parentElement;
+    const isOpen=sec.classList.contains('open');
+    if(!isOpen){
+      // close all others
+      document.querySelectorAll('.sec.open').forEach(function(s){
+        if(s!==sec){ s.classList.remove('open'); const sh=s.querySelector('.sec-head'); if(sh) sh.setAttribute('aria-expanded','false'); }
+      });
+    }
+  });
+});
+
+// ─── IMPROVEMENT 7: RSVP RESET FUNCTION ─────────────────────────
+function resetRsvpForm(){
+  const done=document.querySelector('.rsvp-done');
+  const form=document.querySelector('.rsvp-form-inner');
+  if(done) done.classList.remove('show');
+  if(form) form.classList.remove('hide');
+}
+
+// ─── IMPROVEMENT 9: ZOOM 100% CLICK RESET ───────────────────────
+document.getElementById('zoomVal').addEventListener('click',function(){
+  zoom=1;
+  applyZoom();
+});
+
+// ─── RESPONSIVE MOBILE/TABLET CONTROLS ─────────────────────────────────────
+(function(){
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  const drawerToggle = document.getElementById('mobDrawerToggle');
+  const previewWrap = document.querySelector('.preview-wrap');
+
+  // --- Tablet drawer ---
+  window.toggleMobDrawer = function(){
+    const isOpen = sidebar && sidebar.classList.contains('mob-open');
+    if(isOpen){ closeMobDrawer(); }
+    else { openMobDrawer(); }
+  };
+  window.openMobDrawer = function(){
+    if(sidebar) sidebar.classList.add('mob-open');
+    if(backdrop) backdrop.classList.add('show');
+    if(drawerToggle) drawerToggle.classList.add('open');
+    // Update toggle icon to X
+    if(drawerToggle) drawerToggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  };
+  window.closeMobDrawer = function(){
+    if(sidebar) sidebar.classList.remove('mob-open');
+    if(backdrop) backdrop.classList.remove('show');
+    if(drawerToggle) drawerToggle.classList.remove('open');
+    if(drawerToggle) drawerToggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+  };
+
+  // --- Mobile tab switching ---
+  window.mobSwitchTab = function(tab){
+    const tabPreview = document.getElementById('mob-tab-preview');
+    const tabEdit = document.getElementById('mob-tab-edit');
+    [tabPreview, tabEdit].forEach(t=>{ if(t) t.classList.remove('active'); });
+
+    if(tab === 'edit'){
+      if(tabEdit) tabEdit.classList.add('active');
+      if(previewWrap) previewWrap.classList.add('mob-hidden');
+      if(sidebar) sidebar.classList.add('mob-open');
+    } else {
+      if(tabPreview) tabPreview.classList.add('active');
+      if(previewWrap) previewWrap.classList.remove('mob-hidden');
+      if(sidebar) sidebar.classList.remove('mob-open');
+    }
+  };
+
+  // Close drawer on swipe right on tablet (touch gesture)
+  let touchStartX = 0;
+  document.addEventListener('touchstart', function(e){ touchStartX = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const isMobile = window.matchMedia('(max-width:640px)').matches;
+    const isTablet = !isMobile && window.matchMedia('(max-width:1024px)').matches;
+    if(isTablet && dx > 60 && sidebar && sidebar.classList.contains('mob-open')){
+      closeMobDrawer();
+    }
+    // On mobile swipe right to go to preview, left to go to edit
+    if(isMobile){
+      if(dx > 70) mobSwitchTab('preview');
+      if(dx < -70) mobSwitchTab('edit');
+    }
+  }, {passive:true});
+
+  // Keyboard ESC closes drawer
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeMobDrawer();
+  });
+})();
 </script>
 </body>
 </html>
