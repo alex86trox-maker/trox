@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Editor de invitación digital de XV años estilo TikTok · Gueka Ideas">
+<meta name="description" content="Editor de invitación digital estilo TikTok · Gueka Ideas · Carga cualquier plantilla y edítala">
 <title>Estudio XV · Editor de invitación TikTok</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/montserrat@latest/400.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/montserrat@latest/700.css">
@@ -18,7 +18,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-/* ============ EDITOR CHROME ============ */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--e-bg:#0a0a11;--e-panel:#12121c;--e-panel2:#0e0e16;--e-line:rgba(255,255,255,.07);--e-ink:#f2eef8;--e-muted:#8a8597;--e-pink:#ff3d7f;--e-cyan:#22e0d6;--e-gold:#ffd24a}
 html,body{height:100%}
@@ -39,6 +38,13 @@ body{font-family:'Montserrat',system-ui,sans-serif;background:var(--e-bg);color:
 .proj-btn{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--e-line);border-radius:7px;background:transparent;color:var(--e-muted);cursor:pointer;font-size:12px;transition:.2s;flex:0 0 auto}
 .proj-btn:hover{color:var(--e-cyan);border-color:rgba(34,224,214,.4);background:rgba(34,224,214,.06)}
 .proj-btn.danger:hover{color:var(--e-pink);border-color:rgba(255,61,127,.4);background:rgba(255,61,127,.06)}
+/* Template selector + badge */
+.tpl-select-wrap{display:flex;align-items:center;gap:6px;min-width:0}
+.tpl-select{background:#0a0a12;color:var(--e-ink);border:1px solid var(--e-gold);border-radius:8px;font:inherit;font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:7px 9px;max-width:170px;cursor:pointer;transition:border-color .2s}
+.tpl-select:hover,.tpl-select:focus{border-color:var(--e-gold);outline:none;box-shadow:0 0 8px rgba(255,210,74,.2)}
+.tpl-badge{display:flex;align-items:center;gap:7px;padding:6px 14px;border:1px solid rgba(255,210,74,.4);border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--e-gold);background:rgba(255,210,74,.06);white-space:nowrap}
+.tpl-badge i{width:6px;height:6px;border-radius:50%;background:var(--e-gold);box-shadow:0 0 8px var(--e-gold)}
+.tpl-badge .tpl-cat{opacity:.6;margin-left:4px}
 .event-pill{display:flex;align-items:center;gap:7px;padding:6px 14px;border:1px solid var(--e-line);border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--e-cyan);background:rgba(34,224,214,.05)}
 .event-pill i{width:6px;height:6px;border-radius:50%;background:var(--e-pink);box-shadow:0 0 8px var(--e-pink)}
 .plan-top-pill{cursor:pointer;transition:.2s}
@@ -55,7 +61,6 @@ body{font-family:'Montserrat',system-ui,sans-serif;background:var(--e-bg);color:
 .btn.solid:hover{box-shadow:0 6px 22px rgba(255,61,127,.45)}
 .btn.small{padding:6px 11px;font-size:10.5px}
 .workspace{flex:1;display:grid;grid-template-columns:1fr 372px;min-height:0}
-/* ---------- PREVIEW (left) ---------- */
 .preview-wrap{position:relative;overflow:hidden;background:radial-gradient(720px 520px at 18% 8%,rgba(255,61,127,.07),transparent 60%),radial-gradient(720px 520px at 82% 92%,rgba(34,224,214,.06),transparent 60%),#070709}
 .preview-wrap::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:30px 30px;pointer-events:none;mask-image:radial-gradient(ellipse 90% 80% at 50% 40%,#000 30%,transparent 85%)}
 .preview-tools{position:absolute;top:14px;right:16px;display:flex;align-items:center;gap:4px;padding:5px;background:rgba(10,10,17,.85);border:1px solid var(--e-line);border-radius:10px;backdrop-filter:blur(8px);z-index:9600}
@@ -67,7 +72,6 @@ body{font-family:'Montserrat',system-ui,sans-serif;background:var(--e-bg);color:
 #zoomVal{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--e-muted);min-width:38px;text-align:center}
 .stage-tag{position:absolute;top:16px;left:18px;z-index:9600;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.22em;color:var(--e-muted);text-transform:uppercase;pointer-events:none}
 .stage-tag i{width:6px;height:6px;border-radius:50%;background:var(--e-cyan);box-shadow:0 0 8px var(--e-cyan);animation:pulse 1.6s infinite}
-/* ---------- SIDEBAR (right) ---------- */
 .sidebar{overflow-y:auto;border-left:1px solid var(--e-line);background:var(--e-panel2);position:relative}
 .sidebar::before{content:'';position:absolute;top:0;bottom:0;left:0;width:2px;background:linear-gradient(180deg,var(--e-pink),var(--e-cyan),var(--e-gold),#5dff5e,#d06bff,var(--e-pink));background-size:100% 300%;animation:rail 9s linear infinite;opacity:.65;pointer-events:none}
 @keyframes rail{to{background-position:0 300%}}
@@ -78,7 +82,6 @@ body{font-family:'Montserrat',system-ui,sans-serif;background:var(--e-bg);color:
 .ptb{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 8px;background:rgba(255,255,255,.04);border:1px solid var(--e-line);border-radius:7px;color:var(--e-ink);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.06em;cursor:pointer;transition:background .15s,border-color .15s;white-space:nowrap}
 .ptb:hover{background:rgba(34,224,214,.08);border-color:rgba(34,224,214,.35);color:var(--e-cyan)}
 .sec-modified .sec-num{background:rgba(34,224,214,.15);color:var(--e-cyan);border:1px solid rgba(34,224,214,.4)}
-/* ============ PLAN SYSTEM ============ */
 .plan-bar{padding:12px 14px;border-bottom:1px solid var(--e-line);background:rgba(14,14,22,.7)}
 .plan-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
 .plan-card{position:relative;border:1px solid var(--e-line);border-radius:9px;padding:10px 7px 8px;background:rgba(255,255,255,.02);cursor:pointer;text-align:center;transition:.2s;font:inherit;color:var(--e-ink)}
@@ -109,7 +112,6 @@ body{font-family:'Montserrat',system-ui,sans-serif;background:var(--e-bg);color:
 .gal-lock-note{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--e-gold);letter-spacing:.06em;margin:6px 0;display:flex;align-items:center;gap:5px;line-height:1.5}
 .photo-field.gal-beyond{opacity:.55}
 .photo-field.gal-beyond .photo-preview-wrap{filter:grayscale(.6)}
-/* Generic modal */
 .reset-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center}
 .reset-modal.show{display:flex}
 .reset-box{background:#0e0e16;border:1px solid rgba(255,61,127,.4);border-radius:14px;padding:28px 26px;max-width:320px;width:90%;text-align:center;box-shadow:0 0 48px rgba(255,61,127,.2)}
@@ -224,7 +226,6 @@ textarea.in{resize:vertical;min-height:52px;line-height:1.5}
 .guest-bar button{font:inherit;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;padding:7px 14px;border-radius:7px;border:1px solid rgba(255,61,127,.5);background:rgba(255,61,127,.12);color:var(--e-pink);cursor:pointer;transition:.2s}
 .guest-bar button:hover{background:rgba(255,61,127,.25)}
 #guestFrame{flex:1;width:100%;border:0;background:#080810}
-/* ============ CARD (TikTok XV) ============ */
 :root{--pink:#ff0050;--cyan:#00f2ea;--gold:#ffd700;--green:#39ff14;--purple:#bf00ff;--bg:#080810;--mono:'JetBrains Mono',monospace;--serif:'Noto Serif',serif;--sans:'Montserrat',sans-serif}
 html{background:var(--bg)}
 body{background:var(--bg);color:#fff;font-family:var(--sans);min-height:100vh}
@@ -296,13 +297,6 @@ body{background:var(--bg);color:#fff;font-family:var(--sans);min-height:100vh}
 .section-header{text-align:center}
 .section-header,.sec-reveal{opacity:0;transform:translateY(22px);transition:opacity .6s cubic-bezier(.4,0,.2,1),transform .6s cubic-bezier(.4,0,.2,1)}
 .section-header.visible,.sec-reveal.visible{opacity:1;transform:translateY(0)}
-.rsvp-full-overlay{display:none;position:absolute;inset:0;background:rgba(8,8,16,.97);border-radius:inherit;z-index:10;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px 24px;gap:16px}
-.rsvp-full-overlay.show{display:flex}
-.rsvp-full-icon{font-size:2.8rem;animation:heartBeat 2s ease-in-out infinite;margin-bottom:4px}
-.rsvp-full-title{font-family:var(--sans);font-weight:900;font-size:1.1rem;letter-spacing:.14em;color:var(--pink);text-shadow:0 0 16px var(--pink)}
-.rsvp-full-sub{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;color:rgba(255,255,255,.45);line-height:1.7;margin:0}
-.rsvp-full-wa{display:inline-flex;align-items:center;gap:8px;margin-top:8px;padding:11px 20px;background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.4);border-radius:6px;color:#25d366;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-decoration:none;transition:.2s}
-.rsvp-full-wa:hover{background:rgba(37,211,102,.22)}
 .section-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.32em;margin-bottom:.6rem}
 .section-title{font-family:var(--sans);font-weight:900;font-size:1.8rem;letter-spacing:.1em;color:#fff;text-shadow:0 2px 24px rgba(0,0,0,.8)}
 .neon-divider{position:relative;height:1px;max-width:200px;margin:12px auto 0;overflow:hidden}
@@ -365,11 +359,6 @@ body{background:var(--bg);color:#fff;font-family:var(--sans);min-height:100vh}
 .gallery-caption-title{font-family:var(--serif);font-size:1.3rem;font-style:italic;color:#fff;font-weight:700}
 .gallery-caption-line{margin-top:4px;width:36px;height:2px}
 .gallery-counter{position:absolute;top:12px;right:12px;padding:4px 10px;background:rgba(8,8,16,.9);border-radius:9999px;font-family:var(--mono);font-size:.62rem;border:1px solid var(--cyan);box-shadow:0 0 8px rgba(0,242,234,.4);color:var(--cyan)}
-.gallery-side-actions{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:16px;align-items:center}
-.gallery-side-actions svg{filter:drop-shadow(0 0 6px rgba(255,255,255,.5))}
-.gallery-arrow{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(8,8,16,.85);border:1px solid var(--pink);box-shadow:0 0 8px rgba(255,0,80,.4);color:#fff}
-.gallery-arrow.left{left:10px}
-.gallery-arrow.right{right:10px}
 .gallery-progress{height:2px;background:rgba(255,255,255,.05);margin-top:12px;border-radius:9999px;overflow:hidden}
 .gallery-progress-fill{height:100%;border-radius:9999px;background:linear-gradient(to right,var(--pink),var(--cyan));box-shadow:0 0 8px var(--pink);transition:width .3s}
 .gal-thumbs{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
@@ -385,9 +374,6 @@ body{background:var(--bg);color:#fff;font-family:var(--sans);min-height:100vh}
 .lightbox-inner img{width:100%;border:1px solid var(--pink);box-shadow:0 0 30px rgba(255,0,80,.5)}
 .lightbox-caption{text-align:center;margin-top:12px;font-family:var(--serif);font-size:1.6rem;font-style:italic;font-weight:700;color:#fff}
 .lightbox-close{position:absolute;top:-14px;right:-14px;width:32px;height:32px;border-radius:50%;background:rgba(8,8,16,.95);border:1px solid var(--cyan);color:var(--cyan);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px}
-.lightbox-arrow{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(8,8,16,.9);border:1px solid var(--pink);color:var(--pink);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px}
-.lightbox-arrow.left{left:-44px}
-.lightbox-arrow.right{right:-44px}
 #padrinos{padding:56px 20px;background:var(--bg)}
 .padrinos-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:28px;max-width:380px;margin-left:auto;margin-right:auto}
 .pad-card{border-radius:14px;padding:22px 12px 18px;text-align:center;border:1px solid rgba(255,0,80,.18);background:rgba(255,255,255,.02);animation:cardGlowNeon 3.4s ease-in-out infinite}
@@ -440,8 +426,6 @@ body{background:var(--bg);color:#fff;font-family:var(--sans);min-height:100vh}
 .social-ico{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.03);transition:all .3s}
 .social-ico svg{width:22px;height:22px;transition:all .3s}
 .social-li a:hover .social-ico{border-color:var(--cyan);box-shadow:0 0 20px rgba(0,242,234,.5);transform:translateY(-4px)}
-.social-li a:hover .social-ico svg{stroke:var(--cyan);fill:none;filter:drop-shadow(0 0 6px var(--cyan))}
-.social-li.tk a:hover .social-ico svg{fill:var(--cyan);stroke:none}
 .social-bar{width:0;height:2px;border-radius:2px;background:linear-gradient(to right,var(--pink),var(--cyan));box-shadow:0 0 8px var(--pink);transition:width .3s}
 .social-li a:hover .social-bar{width:100%}
 .social-name{font-family:var(--mono);font-size:.55rem;letter-spacing:.2em;color:rgba(255,255,255,.35)}
@@ -481,7 +465,7 @@ body{background:var(--bg);color:#fff;font-family:var(--sans);min-height:100vh}
 .rsvp-input,.rsvp-textarea{display:block;width:100%;padding:14px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,0,80,.3);color:#fff;font-size:.85rem;font-family:var(--mono);border-radius:0;margin-bottom:12px;outline:none;box-sizing:border-box}
 .rsvp-textarea{resize:none}
 .rsvp-field-label{font-family:var(--mono);font-size:.55rem;letter-spacing:.28em;color:rgba(255,0,80,.55);margin:6px 0 6px}
-.rsvp-select{display:block;width:100%;padding:14px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,0,80,.3);color:#fff;font-size:.82rem;font-family:var(--mono);border-radius:0;margin-bottom:14px;outline:none;box-sizing:border-box;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--pink) 50%),linear-gradient(135deg,var(--pink) 50%,transparent 50%);background-position:calc(100% - 18px) 19px,calc(100% - 13px) 19px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+.rsvp-select{display:block;width:100%;padding:14px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,0,80,.3);color:#fff;font-size:.82rem;font-family:var(--mono);border-radius:0;margin-bottom:14px;outline:none;box-sizing:border-box;appearance:none;-webkit-appearance:none}
 .rsvp-select option{background:#111118;color:#fff}
 .rsvp-toggles{display:flex;gap:12px;margin-bottom:16px}
 .rsvp-toggle{flex:1;font-family:var(--sans);font-weight:900;font-size:.72rem;letter-spacing:.08em;padding:12px;cursor:pointer;border:1px solid rgba(255,0,80,.3);background:transparent;color:rgba(255,0,80,.4);transition:all .2s}
@@ -508,19 +492,6 @@ footer{background:var(--bg);padding:56px 20px 40px;text-align:center;position:re
 .footer-poem{font-family:var(--serif);font-size:1rem;font-style:italic;color:rgba(255,255,255,.4);line-height:2;margin-bottom:28px}
 .footer-name-box{display:inline-block;margin-bottom:32px;padding:12px 36px;border:1px solid rgba(255,215,0,.6);box-shadow:0 0 16px rgba(255,215,0,.25)}
 .footer-name{font-family:var(--serif);font-size:2rem;font-weight:700;font-style:italic;color:#fff;text-shadow:0 0 20px rgba(255,215,0,.7)}
-.tiktok-brand{display:flex;flex-direction:column;align-items:center;gap:16px;margin-bottom:24px}
-.tiktok-logo-wrap{position:relative;width:52px;height:60px;animation:tkPulse 3s ease-in-out infinite}
-@keyframes tkPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
-.tiktok-logo-wrap svg{position:absolute}
-.tiktok-logo-wrap svg.main{position:relative;z-index:2}
-.tiktok-hashtags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:280px}
-.tiktok-tag{font-family:var(--mono);font-size:.6rem;font-weight:700;letter-spacing:.05em}
-.tiktok-fyp{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;background:rgba(255,0,80,.08);border:1px solid rgba(255,0,80,.25);border-radius:9999px;animation:fyPulse 2.5s ease-in-out infinite}
-@keyframes fyPulse{0%,100%{opacity:.5}50%{opacity:1}}
-.tiktok-fyp-dot{width:6px;height:6px;border-radius:50%;background:var(--pink);box-shadow:0 0 6px var(--pink)}
-.tiktok-fyp span{font-family:var(--mono);font-size:.58rem;color:var(--pink);letter-spacing:.12em}
-.footer-legal{padding-top:24px;border-top:1px solid rgba(255,0,80,.15)}
-.footer-logo-text{font-family:var(--sans);font-weight:900;letter-spacing:.3em;font-size:.8rem;color:#fff;opacity:.5;margin:0 auto 16px}
 .footer-text{font-family:var(--mono);font-size:.55rem;color:rgba(255,255,255,.22);letter-spacing:.02em;max-width:280px;margin:0 auto;line-height:2}
 .footer-text strong{color:rgba(255,255,255,.4)}
 .footer-copy{font-family:var(--mono);font-size:.55rem;letter-spacing:.1em;color:rgba(255,0,80,.3);margin-top:12px}
@@ -543,7 +514,6 @@ footer{background:var(--bg);padding:56px 20px 40px;text-align:center;position:re
 #song-strip{position:fixed;bottom:78px;right:18px;z-index:8999;max-width:210px;padding:6px 12px;border-radius:9999px;background:rgba(8,8,16,.9);border:1px solid rgba(0,242,234,.35);backdrop-filter:blur(10px);font-family:var(--mono);font-size:.55rem;letter-spacing:.06em;color:var(--cyan);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(6px);transition:all .3s;pointer-events:none}
 #song-strip.visible{opacity:1;transform:translateY(0)}
 input::placeholder,textarea::placeholder{color:rgba(255,255,255,.25)}
-/* ============ SCOPING OVERRIDES ============ */
 html,body{background:var(--e-bg)}
 .preview-wrap #splash{position:absolute;inset:0;min-height:0;height:100%}
 .preview-wrap #petal-canvas{position:absolute;inset:0;width:100%;height:100%}
@@ -552,12 +522,11 @@ html,body{background:var(--e-bg)}
 .preview-wrap #lightbox{position:absolute}
 #preview-scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 #preview-stage{width:430px;max-width:100%;margin:0 auto;transform-origin:top center}
-/* ============ RESPONSIVE ============ */
 @media(max-width:1024px){
 body{overflow:hidden}
 .workspace{display:block;position:relative;height:100%}
 .preview-wrap{position:absolute;inset:0;height:100%}
-.event-pill{display:none}
+.event-pill,.tpl-badge{display:none}
 .sidebar{position:absolute;top:0;bottom:0;right:0;width:340px;border-left:1px solid var(--e-line);transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);z-index:200;box-shadow:-8px 0 40px rgba(0,0,0,.6)}
 .sidebar.mob-open{transform:translateX(0)}
 .sidebar-backdrop{display:none;position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:199;backdrop-filter:blur(2px);cursor:pointer}
@@ -575,8 +544,8 @@ body{overflow:hidden}
 .save-dot{display:none}
 .btn .lbl{display:none}
 .stage-tag{display:none}
-.event-pill{display:none}
-.proj-btn.opt{display:none}
+.event-pill,.tpl-badge{display:none}
+.proj-btn.opt,.tpl-select-wrap{display:none}
 .proj-select{max-width:100px;font-size:9.5px;padding:6px 7px}
 .btn{padding:6px 10px;font-size:10px}
 .btn svg{width:14px;height:14px}
@@ -611,7 +580,6 @@ body{overflow:visible;background:#fff}
 #preview-stage{transform:none!important;width:100%!important;max-width:480px;margin:0 auto}
 #card-wrapper{box-shadow:none!important}
 }
-/* ============ ONBOARDING ============ */
 #onboarding-overlay{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
 #onboarding-overlay.visible{opacity:1;pointer-events:auto}
 .ob-box{background:#0e0e16;border:1px solid rgba(255,61,127,.45);border-radius:18px;padding:36px 32px;max-width:380px;width:90%;text-align:center;box-shadow:0 0 60px rgba(255,61,127,.18)}
@@ -636,7 +604,6 @@ body{overflow:visible;background:#fff}
 </style>
 </head>
 <body>
-<!-- ONBOARDING -->
 <div id="onboarding-overlay">
 <div class="ob-box">
 <div class="ob-logo">XV</div>
@@ -659,6 +626,10 @@ body{overflow:visible;background:#fff}
 <button class="proj-btn" id="projNew" title="Nuevo proyecto" aria-label="Nuevo proyecto">＋</button>
 <button class="proj-btn opt" id="projRename" title="Renombrar proyecto" aria-label="Renombrar proyecto">✎</button>
 <button class="proj-btn opt danger" id="projDel" title="Eliminar proyecto" aria-label="Eliminar proyecto">🗑</button>
+</div>
+<div class="tpl-badge" id="tplBadge" title="Plantilla cargada desde el flujo de compra" style="display:none"><i></i><span id="tplBadgeTxt"></span><span class="tpl-cat" id="tplBadgeCat"></span></div>
+<div class="tpl-select-wrap">
+<select class="tpl-select" id="tplSelect" title="Cambiar plantilla"></select>
 </div>
 <div class="event-pill"><i></i><span id="eventTitleTxt">Sofía Valentina · 15 Años</span></div>
 <div class="event-pill plan-top-pill" id="planPill" title="Cambiar plan de servicio"><i></i><span id="planPillTxt">PLAN CLASSIC</span></div>
@@ -724,14 +695,11 @@ body{overflow:visible;background:#fff}
 <img id="lb-img" src="" alt="">
 <div class="lightbox-caption" id="lb-cap"></div>
 <button class="lightbox-close" onclick="closeLightbox()" aria-label="Cerrar galería">✕</button>
-<button class="lightbox-arrow left" onclick="galleryGo(-1);updateLightbox()" aria-label="Anterior">&#8249;</button>
-<button class="lightbox-arrow right" onclick="galleryGo(1);updateLightbox()" aria-label="Siguiente">&#8250;</button>
 </div>
 </div>
 <div id="preview-scroll">
 <div id="preview-stage">
 <div id="card-wrapper">
-<!-- HERO -->
 <section id="hero">
 <div class="story-frame">
 <img class="story-photo" id="simg-hero" src="" alt="Foto principal">
@@ -780,7 +748,6 @@ body{overflow:visible;background:#fff}
 <div class="neon-bar" style="background:linear-gradient(to right,transparent,var(--pink) 30%,#fff 50%,var(--pink) 70%,transparent);box-shadow:0 0 16px var(--pink),0 0 32px var(--pink)"></div>
 <div id="ticker"><div class="ticker-track" id="ticker-track"></div></div>
 <div class="neon-bar" style="background:linear-gradient(to right,transparent,var(--cyan) 30%,#fff 50%,var(--cyan) 70%,transparent);box-shadow:0 0 16px var(--cyan),0 0 32px var(--cyan)"></div>
-<!-- COUNTDOWN -->
 <section id="countdown">
 <div class="section-header"><div class="section-label" style="color:var(--cyan)">CUENTA REGRESIVA</div><div class="section-title">¡FALTA POCO!</div><div class="neon-divider" style="--div-color:var(--gold)"></div></div>
 <div class="countdown-grid" id="countdown-grid">
@@ -791,7 +758,6 @@ body{overflow:visible;background:#fff}
 </div>
 </section>
 <div class="neon-bar" style="background:linear-gradient(to right,transparent,var(--gold) 30%,#fff 50%,var(--gold) 70%,transparent);box-shadow:0 0 16px var(--gold),0 0 32px var(--gold)"></div>
-<!-- DATE -->
 <section id="date-section">
 <div class="section-header"><div class="section-label" style="color:var(--cyan)">LA NOCHE MÁS ESPECIAL</div><div class="section-title">LA FECHA</div><div class="neon-divider" style="--div-color:var(--cyan)"></div></div>
 <div class="date-grid">
@@ -802,8 +768,7 @@ body{overflow:visible;background:#fff}
 </div>
 <div class="date-tz" id="d-tz"></div>
 </section>
-<div class="neon-bar" id="nb-date" style="background:linear-gradient(to right,transparent,var(--green) 30%,#fff 50%,var(--green) 70%,transparent);box-shadow:0 0 16px var(--green),0 0 32px var(--green)"></div>
-<!-- HISTORY (PREMIUM) -->
+<div class="neon-bar" style="background:linear-gradient(to right,transparent,var(--green) 30%,#fff 50%,var(--green) 70%,transparent);box-shadow:0 0 16px var(--green),0 0 32px var(--green)"></div>
 <section id="history">
 <div class="section-header"><div class="section-label" style="color:var(--purple)">QUIÉN SOY</div><div class="section-title">MI HISTORIA</div><div class="neon-divider" style="--div-color:var(--purple)"></div></div>
 <div class="history-card">
@@ -818,13 +783,11 @@ body{overflow:visible;background:#fff}
 </div>
 </section>
 <div class="neon-bar" id="nb-history" style="background:linear-gradient(to right,transparent,var(--purple) 30%,#fff 50%,var(--purple) 70%,transparent);box-shadow:0 0 16px var(--purple),0 0 32px var(--purple)"></div>
-<!-- ITINERARY (PREMIUM) -->
 <section id="itinerary">
 <div class="section-header" style="margin-bottom:36px"><div class="section-label" style="color:var(--cyan)">EL SHOW DE LA NOCHE</div><div class="section-title">PROGRAMA</div><div class="neon-divider" style="--div-color:var(--purple)"></div></div>
 <div class="itinerary-body"><div class="itinerary-spine"></div><div id="itinerary-items"></div></div>
 </section>
 <div class="neon-bar" id="nb-itinerary" style="background:linear-gradient(to right,transparent,var(--purple) 30%,#fff 50%,var(--purple) 70%,transparent);box-shadow:0 0 16px var(--purple),0 0 32px var(--purple)"></div>
-<!-- GALLERY -->
 <section id="gallery">
 <div class="section-header" style="margin-bottom:24px;padding:0 20px"><div class="section-label" style="color:var(--cyan)">MOMENTOS PARA RECORDAR</div><div class="section-title">GALERÍA</div><div class="neon-divider" style="--div-color:var(--gold)"></div></div>
 <div class="gallery-main">
@@ -834,10 +797,6 @@ body{overflow:visible;background:#fff}
 <div class="gallery-grad"></div>
 <div class="gallery-caption"><div class="gallery-caption-title" id="gallery-cap"></div><div class="gallery-caption-line" id="gallery-line" style="background:var(--gold);box-shadow:0 0 8px var(--gold)"></div></div>
 <div class="gallery-counter" id="gallery-counter"></div>
-<div class="gallery-side-actions"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
-<div class="scan-line"></div>
-<button class="gallery-arrow left" onclick="event.stopPropagation();galleryGo(-1)" aria-label="Foto anterior">&#8249;</button>
-<button class="gallery-arrow right" onclick="event.stopPropagation();galleryGo(1)" aria-label="Foto siguiente">&#8250;</button>
 </div>
 <div class="gallery-progress"><div class="gallery-progress-fill" id="gallery-prog"></div></div>
 <div class="gal-thumbs" id="gal-thumbs"></div>
@@ -845,13 +804,11 @@ body{overflow:visible;background:#fff}
 </div>
 </section>
 <div class="neon-bar" style="background:linear-gradient(to right,transparent,var(--pink) 30%,#fff 50%,var(--pink) 70%,transparent);box-shadow:0 0 16px var(--pink),0 0 32px var(--pink)"></div>
-<!-- PADRINOS (DELUXE) -->
 <section id="padrinos">
 <div class="section-header"><div class="section-label" style="color:var(--gold)">CON TODO SU APOYO</div><div class="section-title">LOS PADRINOS</div><div class="neon-divider" style="--div-color:var(--gold)"></div></div>
 <div class="padrinos-grid" id="padrinos-grid"></div>
 </section>
 <div class="neon-bar" id="nb-padrinos" style="background:linear-gradient(to right,transparent,var(--gold) 30%,#fff 50%,var(--gold) 70%,transparent);box-shadow:0 0 16px var(--gold),0 0 32px var(--gold)"></div>
-<!-- LOCATION (DELUXE) -->
 <section id="location">
 <img class="location-bg" id="simg-location" src="" alt="" loading="lazy">
 <div class="section-header"><div class="section-label" style="color:var(--cyan)">¿DÓNDE SERÁ LA MAGIA?</div><div class="section-title">EL LUGAR</div><div class="neon-divider" style="--div-color:var(--cyan)"></div></div>
@@ -864,13 +821,11 @@ body{overflow:visible;background:#fff}
 </div>
 </section>
 <div class="neon-bar" id="nb-location" style="background:linear-gradient(to right,transparent,var(--cyan) 30%,#fff 50%,var(--cyan) 70%,transparent);box-shadow:0 0 16px var(--cyan),0 0 32px var(--cyan)"></div>
-<!-- INFO EXTRA (DELUXE) -->
 <section id="info-extra">
 <div class="section-header" style="margin-bottom:28px"><div class="section-label" style="color:var(--cyan)">TODO LO QUE NECESITAS SABER</div><div class="section-title">INFO EXTRA</div><div class="neon-divider" style="--div-color:var(--cyan)"></div></div>
 <div id="extra-list" style="max-width:380px;margin:0 auto"></div>
 </section>
 <div class="neon-bar" id="nb-extra" style="background:linear-gradient(to right,transparent,var(--cyan) 30%,#fff 50%,var(--cyan) 70%,transparent);box-shadow:0 0 16px var(--cyan),0 0 32px var(--cyan)"></div>
-<!-- DRESS CODE -->
 <section id="dresscode">
 <div class="section-header" style="margin-bottom:28px"><div class="section-label" style="color:var(--pink)">VISTE PARA LA OCASIÓN</div><div class="section-title">DRESS CODE</div><div class="neon-divider" style="--div-color:var(--pink)"></div></div>
 <p class="dresscode-intro" id="dc-intro">Esta noche merece tu mejor versión.<br><span style="color:rgba(255,255,255,.6)">Etiqueta formal · Tema discoteca</span></p>
@@ -881,7 +836,6 @@ body{overflow:visible;background:#fff}
 </div>
 </section>
 <div class="neon-bar" style="background:linear-gradient(to right,transparent,var(--pink) 30%,#fff 50%,var(--pink) 70%,transparent);box-shadow:0 0 16px var(--pink),0 0 32px var(--pink)"></div>
-<!-- HASHTAG (PREMIUM) -->
 <section id="hashtag">
 <div class="section-header"><div class="section-label" style="color:var(--cyan)">COMPARTE EL MOMENTO</div><div class="section-title">ETIQUETA TUS FOTOS</div><div class="neon-divider" style="--div-color:var(--cyan)"></div></div>
 <p class="hashtag-intro">¡Prepárate para la fiesta! Etiquétame en tus fotos y videos con mi hashtag oficial.</p>
@@ -889,11 +843,9 @@ body{overflow:visible;background:#fff}
 <ul class="social-list">
 <li class="social-li ig"><a href="#" aria-label="Instagram" onclick="return false"><span class="social-ico"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="rgba(255,255,255,.55)" stroke="none"/></svg></span><span class="social-bar"></span><span class="social-name">INSTAGRAM</span></a></li>
 <li class="social-li wa"><a href="#" aria-label="WhatsApp" onclick="return false"><span class="social-ico"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span><span class="social-bar"></span><span class="social-name">WHATSAPP</span></a></li>
-<li class="social-li tk"><a href="#" aria-label="TikTok" onclick="return false"><span class="social-ico"><svg viewBox="0 0 60 68" fill="rgba(255,255,255,.55)" stroke="none"><path d="M44 0h-9v46a9 9 0 1 1-9-9v-9a18 18 0 1 0 18 18V23a30 30 0 0 0 18 6v-9a21 21 0 0 1-18-20Z"/></svg></span><span class="social-bar"></span><span class="social-name">TIKTOK</span></a></li>
 </ul>
 </section>
 <div class="neon-bar" id="nb-hashtag" style="background:linear-gradient(to right,transparent,var(--cyan) 30%,#fff 50%,var(--cyan) 70%,transparent);box-shadow:0 0 16px var(--cyan),0 0 32px var(--cyan)"></div>
-<!-- MUSIC (PREMIUM) -->
 <section id="music">
 <div class="section-header"><div class="section-label" style="color:var(--purple)">EL SOUNDTRACK DE LA NOCHE</div><div class="section-title">LA MÚSICA</div><div class="neon-divider" style="--div-color:var(--purple)"></div></div>
 <div class="inline-player">
@@ -910,7 +862,6 @@ body{overflow:visible;background:#fff}
 <button class="ip-ctrl" onclick="prevTrack(event)" aria-label="Anterior"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg></button>
 <button class="ip-play" id="ip-play-btn" onclick="togglePlay(event)" aria-label="Play"><svg id="ip-play-icon" width="22" height="22" viewBox="0 0 24 24" fill="#080810"><polygon points="5,3 19,12 5,21"/></svg></button>
 <button class="ip-ctrl" onclick="nextTrack(event)" aria-label="Siguiente"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6h2v12h-2z"/></svg></button>
-<button class="ip-ctrl" id="ip-vol-btn" onclick="toggleMuteMusic()" aria-label="Volumen"><svg id="ip-vol-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
 </div>
 <div class="ip-dots"><span class="ip-dot" id="ip-dot-0"></span><span class="ip-dot" id="ip-dot-1"></span><span class="ip-dot" id="ip-dot-2"></span></div>
 </div>
@@ -919,81 +870,47 @@ body{overflow:visible;background:#fff}
 <div id="suggest-form">
 <div class="suggest-label" id="mu-suggest-label">NOMBRE DE LA CANCIÓN Y ARTISTA</div>
 <input class="suggest-input" id="suggest-input" type="text" placeholder="ej: Tusa — Karol G & Nicki Minaj">
-<button class="suggest-btn" onclick="submitSong()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>SUGERIR CANCIÓN</button>
+<button class="suggest-btn" onclick="submitSong()">SUGERIR CANCIÓN</button>
 </div>
 <div class="suggest-done" id="suggest-done"><div class="big">¡Gracias!</div><div class="sub">Tu canción fue agregada a la lista ♪</div></div>
 </div>
 </section>
 <div class="neon-bar" id="nb-music" style="background:linear-gradient(to right,transparent,var(--purple) 30%,#fff 50%,var(--purple) 70%,transparent);box-shadow:0 0 16px var(--purple),0 0 32px var(--purple)"></div>
-<!-- GIFTS (DELUXE) -->
 <section id="gifts">
 <div class="section-header" style="margin-bottom:28px"><div class="section-label" style="color:var(--green)">SI DESEAS OBSEQUIAR</div><div class="section-title">REGALO</div><div class="neon-divider" style="--div-color:var(--green)"></div></div>
 <div id="gifts-list" style="max-width:380px;margin:0 auto"></div>
 </section>
 <div class="neon-bar" id="nb-gifts" style="background:linear-gradient(to right,transparent,var(--gold) 30%,#fff 50%,var(--gold) 70%,transparent);box-shadow:0 0 16px var(--gold),0 0 32px var(--gold)"></div>
-<!-- RSVP (PREMIUM) -->
 <section id="rsvp">
 <div class="section-header"><div class="section-label" style="color:var(--pink)">CONFIRMA TU PRESENCIA</div><div class="section-title">¿NOS ACOMPAÑAS?</div><div class="neon-divider" style="--div-color:var(--pink)"></div></div>
 <p class="rsvp-intro" id="rv-intro">Tu presencia hará esta noche aún más especial.<br>Confirma antes del <strong style="color:var(--gold);text-shadow:0 0 8px rgba(255,215,0,.7)">1 de Junio</strong></p>
 <div class="rsvp-box" style="position:relative">
-<div class="rsvp-full-overlay" id="rsvp-full-overlay">
-<div class="rsvp-full-icon">🎟️</div>
-<div class="rsvp-full-title">CUPO COMPLETO</div>
-<p class="rsvp-full-sub">Lo sentimos, el aforo está completo.<br>Si deseas ser considerado en lista<br>de espera, contáctanos por WhatsApp.</p>
-<a class="rsvp-full-wa" id="rsvp-full-wa-link" href="#" target="_blank" rel="noopener">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-UNIRME A LISTA DE ESPERA
-</a>
-</div>
 <div class="rsvp-top-bar"></div>
 <div class="rsvp-form-inner" id="rsvp-form">
 <div class="rsvp-field-label">¿ASISTIRÁS?</div>
 <div class="rsvp-toggles"><button class="rsvp-toggle active" id="btn-yes" onclick="setAttend(true)">SÍ ASISTIRÉ ✓</button><button class="rsvp-toggle" id="btn-no" onclick="setAttend(false)">NO PODRÉ IR ✗</button></div>
 <input class="rsvp-input" id="rsvp-name" placeholder="Tu nombre completo">
 <input class="rsvp-input" id="rsvp-guests" type="number" min="1" max="5" value="1" placeholder="¿Cuántos asistirán?">
-<div class="rsvp-field-label">RESTRICCIÓN ALIMENTARIA</div>
-<select class="rsvp-select" id="rsvp-food"><option value="no">Ninguna</option><option value="celiaco">Celíaco</option><option value="vegano">Vegano</option><option value="vegetariano">Vegetariano</option><option value="otra">Otra</option></select>
-<div class="rsvp-field-label">¿NECESITAS TRANSPORTE?</div>
-<select class="rsvp-select" id="rsvp-transport"><option value="no">No, iré por mi cuenta</option><option value="bus">Sí, reservar asiento en el bus</option></select>
 <textarea class="rsvp-textarea" id="rsvpMsgInput" rows="2" placeholder="Mensaje para la quinceañera (opcional)"></textarea>
 <p class="rsvp-error" id="rsvp-error"></p>
 <button class="rsvp-submit" id="rsvp-submit" onclick="submitRSVP()">CONFIRMAR ASISTENCIA ▶</button>
 <p class="rsvp-note" id="rv-note">CONFIRMA ANTES DEL 1 DE JUN · CUPOS LIMITADOS</p>
-<p style="font-family:var(--mono);font-size:.5rem;color:rgba(255,255,255,.2);margin-top:8px;text-align:center;letter-spacing:.06em">La confirmación se envía por WhatsApp a la organizadora</p>
 </div>
-<div class="rsvp-done" id="rsvp-done"><div class="rsvp-done-circle">✓</div><div class="rsvp-gracias">¡GRACIAS!</div><p class="rsvp-gracias-sub">Tu respuesta ha sido registrada.<br>¡Te esperamos con todo el amor!</p><button class="rsvp-reset-btn" onclick="resetRsvpForm()" style="margin-top:20px;font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.14em;padding:10px 20px;background:rgba(255,0,80,.1);border:1px solid rgba(255,0,80,.4);color:rgba(255,0,80,.7);border-radius:4px;cursor:pointer;transition:background .2s;">↩ VER FORMULARIO OTRA VEZ</button></div>
+<div class="rsvp-done" id="rsvp-done"><div class="rsvp-done-circle">✓</div><div class="rsvp-gracias">¡GRACIAS!</div><p class="rsvp-gracias-sub">Tu respuesta ha sido registrada.<br>¡Te esperamos con todo el amor!</p></div>
 </div>
 </section>
 <div class="neon-bar" id="nb-rsvp" style="background:linear-gradient(to right,transparent,var(--pink) 30%,#fff 50%,var(--pink) 70%,transparent);box-shadow:0 0 16px var(--pink),0 0 32px var(--pink)"></div>
-<!-- FOOTER -->
 <footer>
 <div class="footer-rainbow"></div>
 <div class="footer-heart">
 <button class="heart-btn liked" id="heart-btn" onclick="toggleFooterHeart()" title="Like" aria-label="Me gusta">
-<svg class="heart-svg" viewBox="0 0 64 64" width="64" height="64"><g id="heart-g" fill="none" stroke="var(--pink)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M32 48 C32 48 12 34 12 22 C12 14 18 8 26 8 C29.5 8 32 10 32 10 C32 10 34.5 8 38 8 C46 8 52 14 52 22 C52 34 32 48 32 48Z" id="heart-fill" fill="var(--pink)" opacity="1"/><g transform="translate(32, 32)"><line y1="-15" y2="-20" transform="rotate(0)" stroke-dasharray="4 6" stroke-dashoffset="4"/><line y1="-15" y2="-20" transform="rotate(45)" stroke-dasharray="4 6" stroke-dashoffset="4"/><line y1="-15" y2="-20" transform="rotate(90)" stroke-dasharray="4 6" stroke-dashoffset="4"/><line y1="-15" y2="-20" transform="rotate(135)" stroke-dasharray="4 6" stroke-dashoffset="4"/><line y1="-15" y2="-20" transform="rotate(180)" stroke-dasharray="4 6" stroke-dashoffset="4"/><line y1="-15" y2="-20" transform="rotate(225)" stroke-dasharray="4 6" stroke-dashoffset="4"/><line y1="-15" y2="-20" transform="rotate(270)" stroke-dasharray="4 6" stroke-dashoffset="4"/><line y1="-15" y2="-20" transform="rotate(315)" stroke-dasharray="4 6" stroke-dashoffset="4"/></g></g></svg>
+<svg class="heart-svg" viewBox="0 0 64 64" width="64" height="64"><g id="heart-g" fill="none" stroke="var(--pink)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M32 48 C32 48 12 34 12 22 C12 14 18 8 26 8 C29.5 8 32 10 32 10 C32 10 34.5 8 38 8 C46 8 52 14 52 22 C52 34 32 48 32 48Z" id="heart-fill" fill="var(--pink)" opacity="1"/></g></svg>
 </button>
 </div>
 <p class="footer-poem" id="ft-poem">Hoy comienzas a escribir<br>el capítulo más hermoso<br>de tu historia.</p>
 <div class="footer-name-box"><div class="footer-name" id="ft-sig">Con amor, Sofía</div></div>
-<div class="tiktok-brand">
-<div class="tiktok-logo-wrap">
-<svg width="52" height="60" viewBox="0 0 60 68" style="position:absolute;left:3px;top:3px;opacity:.7"><path d="M44 0h-9v46a9 9 0 1 1-9-9v-9a18 18 0 1 0 18 18V23a30 30 0 0 0 18 6v-9a21 21 0 0 1-18-20Z" fill="#00f2ea"/></svg>
-<svg width="52" height="60" viewBox="0 0 60 68" style="position:absolute;right:3px;top:3px;opacity:.7"><path d="M44 0h-9v46a9 9 0 1 1-9-9v-9a18 18 0 1 0 18 18V23a30 30 0 0 0 18 6v-9a21 21 0 0 1-18-20Z" fill="#ff0050"/></svg>
-<svg width="52" height="60" viewBox="0 0 60 68" class="main" style="position:relative;z-index:2"><path d="M44 0h-9v46a9 9 0 1 1-9-9v-9a18 18 0 1 0 18 18V23a30 30 0 0 0 18 6v-9a21 21 0 0 1-18-20Z" fill="white"/></svg>
-</div>
-<div class="tiktok-hashtags">
-<span class="tiktok-tag" style="color:var(--pink);text-shadow:0 0 8px rgba(255,0,80,.5)">#XVAños</span>
-<span class="tiktok-tag" id="ft-tag2" style="color:var(--cyan);text-shadow:0 0 8px rgba(0,242,234,.5)">#SofíaValentina</span>
-<span class="tiktok-tag" style="color:var(--pink);text-shadow:0 0 8px rgba(255,0,80,.5)">#ForYou</span>
-<span class="tiktok-tag" style="color:var(--cyan);text-shadow:0 0 8px rgba(0,242,234,.5)">#Quinceañera</span>
-<span class="tiktok-tag" style="color:var(--pink);text-shadow:0 0 8px rgba(255,0,80,.5)">#fyp</span>
-</div>
-<div class="tiktok-fyp"><div class="tiktok-fyp-dot"></div><span id="ft-fyp">EN TU FOR YOU PAGE ✦ #XVAños</span></div>
-</div>
-<div class="footer-legal">
-<p class="footer-text">Esta tarjeta digital es propiedad exclusiva de <strong>Gueka Ideas</strong>. Uso permitido únicamente para fines personales. © 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</p>
+<div class="footer-text">Esta tarjeta digital es propiedad exclusiva de <strong>Gueka Ideas</strong>. © 2026 GUEKA IDEAS</div>
 <p class="footer-copy" id="footer-year"></p>
-</div>
 </footer>
 </div>
 </div>
@@ -1007,7 +924,6 @@ UNIRME A LISTA DE ESPERA
 <button class="tool" id="toolGuest" title="Vista invitado (pantalla completa)" aria-label="Vista invitado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
 </div>
 </main>
-<!-- ============ SIDEBAR ============ -->
 <aside class="sidebar" id="sidebar">
 <div class="panel-head">
 <span class="ph-dot"></span>
@@ -1017,8 +933,8 @@ UNIRME A LISTA DE ESPERA
 <div class="panel-toolbar">
 <input id="panel-search" class="in panel-search" placeholder="🔍  Buscar sección…  (tecla /)" autocomplete="off">
 <div class="panel-toolbar-btns">
-<button class="ptb" id="btnExport" title="Descarga la invitación limpia (solo tarjeta) lista para compartir">⬇ HTML</button>
-<label class="ptb" title="Importar proyecto (.json o .html exportado)" style="cursor:pointer">⬆ Importar<input type="file" id="btnImport" accept=".json,.html" style="display:none"></label>
+<button class="ptb" id="btnExport" title="Descarga la invitación limpia lista para compartir">⬇ HTML</button>
+<label class="ptb" title="Importar proyecto" style="cursor:pointer">⬆ Importar<input type="file" id="btnImport" accept=".json,.html" style="display:none"></label>
 <button class="ptb" id="btnJSON" title="Descarga un backup editable del proyecto">💾 JSON</button>
 <button class="ptb" id="btnPNG" title="Descargar la tarjeta como imagen PNG">🖼 PNG</button>
 <button class="ptb" id="btnPDF" title="Descargar la tarjeta como PDF">📄 PDF</button>
@@ -1026,7 +942,6 @@ UNIRME A LISTA DE ESPERA
 <button class="ptb" id="btnResetPtb" title="Restablecer valores por defecto" onclick="document.getElementById('resetModal').classList.add('show')">↺ Reset</button>
 </div>
 </div>
-<!-- PLAN SELECTOR -->
 <div class="plan-bar">
 <div class="prog-label" style="margin-bottom:7px"><span>PLAN DEL SERVICIO</span><strong id="planBarName" title="Ver comparación de planes">COMPARAR ▸</strong></div>
 <div class="plan-cards" id="planCards"></div>
@@ -1035,7 +950,6 @@ UNIRME A LISTA DE ESPERA
 <div class="prog-label"><span>PERSONALIZACIÓN</span><strong id="progPct" style="cursor:default">0%</strong></div>
 <div class="prog-bar-bg"><div class="prog-bar-fill" id="progBar"></div></div>
 </div>
-<!-- 01 CONTENIDO -->
 <section class="sec open">
 <button class="sec-head" aria-expanded="true"><span class="sec-num">01</span><span class="sec-title">Contenido</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
@@ -1061,7 +975,6 @@ UNIRME A LISTA DE ESPERA
 <div class="field" style="margin-bottom:0"><label>Cita destacada</label><textarea class="in" data-bind="quote"></textarea></div>
 </div></div></div>
 </section>
-<!-- 02 FOTOS -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">02</span><span class="sec-title">Fotos</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
@@ -1090,7 +1003,6 @@ UNIRME A LISTA DE ESPERA
 <div id="gal-fields"></div>
 </div></div></div>
 </section>
-<!-- 03 BIENVENIDA -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">03</span><span class="sec-title">Bienvenida</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
@@ -1099,7 +1011,6 @@ UNIRME A LISTA DE ESPERA
 <div class="field" style="margin-bottom:0"><label>Pista inferior</label><input class="in" data-bind="splashHint"></div>
 </div></div></div>
 </section>
-<!-- 04 MI HISTORIA (PREMIUM) -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">04</span><span class="sec-title">Mi historia</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
@@ -1108,29 +1019,22 @@ UNIRME A LISTA DE ESPERA
 <div class="field" style="margin-bottom:0"><label>Biografía</label><textarea class="in" data-bind="historyText"></textarea></div>
 </div></div></div>
 </section>
-<!-- 05 PROGRAMA (PREMIUM) -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">05</span><span class="sec-title">Programa</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-itin"></div></div></div></div>
 </section>
-<!-- 06 PADRINOS (DELUXE) -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">06</span><span class="sec-title">Padrinos</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-padr"></div></div></div></div>
 </section>
-<!-- 07 EL LUGAR (DELUXE) -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">07</span><span class="sec-title">El lugar</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label>Nombre del salón</label><input class="in" data-bind="venue"></div>
 <div class="field"><label>Dirección</label><textarea class="in" data-bind="address"></textarea></div>
-<div class="field" style="margin-bottom:0">
-<label style="display:flex;align-items:center;justify-content:space-between">Enlace de mapa<a id="map-preview-link" href="#" target="_blank" rel="noopener" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--e-cyan);letter-spacing:.1em;text-decoration:none;opacity:0;pointer-events:none;transition:.2s">VER MAPA →</a></label>
-<input class="in" data-bind="mapUrl" id="inp-mapUrl" placeholder="https://maps.google.com/maps?q=…">
-</div>
+<div class="field" style="margin-bottom:0"><label>Enlace de mapa</label><input class="in" data-bind="mapUrl" placeholder="https://maps.google.com/maps?q=…"></div>
 </div></div></div>
 </section>
-<!-- 08 DRESS CODE -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">08</span><span class="sec-title">Dress code</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
@@ -1140,42 +1044,26 @@ UNIRME A LISTA DE ESPERA
 <div class="field" style="margin-bottom:0"><label>Advertencia</label><textarea class="in" data-bind="dressWarn"></textarea></div>
 </div></div></div>
 </section>
-<!-- 09 INFO EXTRA (DELUXE) -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">09</span><span class="sec-title">Info extra</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
-<div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.28);margin-bottom:10px;line-height:1.6;">💡 Copia un emoji de emojipedia.org y pégalo en el campo Emoji. Arrastra ⠿ para reordenar.</div>
-<div id="ed-extra"></div>
-</div></div></div>
+<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-extra"></div></div></div></div>
 </section>
-<!-- 10 GALERÍA -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">10</span><span class="sec-title">Galería</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
-<div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(34,224,214,.7);letter-spacing:.12em;margin-bottom:14px;padding:8px 10px;background:rgba(34,224,214,.05);border:1px solid rgba(34,224,214,.2);border-radius:6px;">✦ Los títulos aparecen al pie de cada imagen en la galería.</div>
-<div id="ed-gal"></div>
-<div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.07)">
-<div style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--e-muted);margin-bottom:10px;">Categorías (máx. 3)</div>
-<div id="ed-gal-cats"></div>
-</div>
-</div></div></div>
+<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-gal"></div></div></div></div>
 </section>
-<!-- 11 MÚSICA (PREMIUM) -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">11</span><span class="sec-title">Música</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label>Intro</label><textarea class="in" data-bind="musicIntro"></textarea></div>
 <div class="field"><label>Etiqueta sugerencia</label><input class="in" data-bind="suggestLabel"></div>
-<div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(191,0,255,.7);letter-spacing:.12em;margin-bottom:12px;padding:8px 10px;background:rgba(191,0,255,.05);border:1px solid rgba(191,0,255,.2);border-radius:6px;">✦ Añade hasta 3 canciones con URL directa de audio (mp3, ogg, wav).</div>
 <div id="ed-songs"></div>
 </div></div></div>
 </section>
-<!-- 12 REGALOS (DELUXE) -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">12</span><span class="sec-title">Regalos</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-gifts"></div></div></div></div>
 </section>
-<!-- 13 CONFIRMACIÓN (PREMIUM) -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">13</span><span class="sec-title">Confirmación</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
@@ -1186,27 +1074,11 @@ UNIRME A LISTA DE ESPERA
 </div>
 <div class="field"><label>Nota al pie</label><input class="in" data-bind="rsvpNote"></div>
 <div class="field" style="margin-bottom:0;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;margin-top:4px">
-<label style="display:flex;align-items:center;gap:6px">📱 WhatsApp de la organizadora</label>
-<input class="in" data-bind="waOrganizer" placeholder="ej: 573001234567 (código país + número, sin +)" style="margin-top:6px">
-<div id="wa-warn" style="display:none;font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--e-gold);margin-top:5px;line-height:1.5">⚠ Número inválido: usa código de país + número (10–15 dígitos, sin + ni espacios)</div>
-</div>
-<div class="field" style="margin-bottom:0;padding-top:14px;border-top:1px solid rgba(255,255,255,.07);margin-top:14px">
-<label>👥 Aforo máximo (0 = sin límite)</label>
-<input class="in" type="number" min="0" data-bind="rsvpCapacity" placeholder="ej: 150" style="margin-top:6px">
-</div>
-<div class="field" style="margin-bottom:0;padding-top:14px;border-top:1px solid rgba(255,255,255,.07);margin-top:14px">
-<label>📊 Google Sheets / Apps Script (opcional)</label>
-<input class="in" data-bind="sheetUrl" placeholder="https://script.google.com/macros/s/…/exec" style="margin-top:6px">
-<div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.25);margin-top:5px;line-height:1.6">Si se configura, cada confirmación también se registra en tu hoja de cálculo.</div>
-</div>
-<div class="field" style="margin-bottom:0;padding-top:14px;border-top:1px solid rgba(255,255,255,.07);margin-top:14px">
-<label>🔐 Código PIN de acceso (opcional)</label>
-<input class="in" data-bind="pin" maxlength="6" placeholder="ej: 1520 · vacío = sin protección" style="margin-top:6px">
-<div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.25);margin-top:5px;line-height:1.6">Protege la invitación exportada: el invitado deberá ingresar el PIN para abrirla.</div>
+<label>📱 WhatsApp de la organizadora</label>
+<input class="in" data-bind="waOrganizer" placeholder="ej: 573001234567" style="margin-top:6px">
 </div>
 </div></div></div>
 </section>
-<!-- 14 CIERRE -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">14</span><span class="sec-title">Cierre</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
@@ -1214,7 +1086,6 @@ UNIRME A LISTA DE ESPERA
 <div class="field" style="margin-bottom:0"><label>Firma</label><input class="in" data-bind="signature"></div>
 </div></div></div>
 </section>
-<!-- 15 ESTILO -->
 <section class="sec">
 <button class="sec-head" aria-expanded="false"><span class="sec-num">15</span><span class="sec-title">Estilo</span><svg class="chev" width="11" height="7" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
@@ -1225,7 +1096,7 @@ UNIRME A LISTA DE ESPERA
 </section>
 <div class="tip">
 <strong>✦ Consejo del estudio</strong>
-<span>El <b>plan contratado</b> define qué secciones se exportan y cuántas fotos muestra la galería (Classic 4 · Premium 8 · Deluxe 12). Usa <b>Vista invitado</b> para probar la experiencia final.</span>
+<span>El <b>plan contratado</b> define qué secciones se exportan y cuántas fotos muestra la galería (Classic 4 · Premium 8 · Deluxe 12). El editor carga automáticamente la plantilla escogida desde el flujo de compra.</span>
 </div>
 </aside>
 </div>
@@ -1267,7 +1138,6 @@ UNIRME A LISTA DE ESPERA
 <div class="reset-box-btns" style="margin-top:16px"><button class="rbtn cancel" id="verClose" style="width:100%">Cerrar</button></div>
 </div>
 </div>
-<!-- PLAN MODAL -->
 <div class="reset-modal" id="planModal">
 <div class="reset-box plan-modal-box">
 <h3 style="text-align:center">💠 PLANES GUEKA IDEAS</h3>
@@ -1281,32 +1151,136 @@ const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const IS_EDITOR = !!document.getElementById('sidebar');
 const esc = s => (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const escA = s => esc(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const nl2br = s => esc(s).replace(/\n/g,'<br>');
-const escA = s => (s==null?'':String(s)).replace(/"/g,'&quot;');
 const pad = n => String(n).padStart(2,'0');
 const slugify = s => (s||'xv').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'xv';
 const IMG_FALLBACK='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a1025"/><stop offset="1" stop-color="#0a0a14"/></linearGradient></defs><rect width="400" height="600" fill="url(#g)"/><text x="200" y="290" font-size="42" text-anchor="middle" fill="#ff0050">✦</text><text x="200" y="330" font-size="13" text-anchor="middle" fill="rgba(255,255,255,.4)" font-family="monospace">FOTO NO DISPONIBLE</text></svg>');
 function wireImgFallback(img){ if(!img||img._fb) return; img._fb=true; img.addEventListener('error',function(){ if(this.src!==IMG_FALLBACK) this.src=IMG_FALLBACK; }); }
-const DEFAULT_IMGS = {
-retrato:'https://image.qwenlm.ai/public_source/501fff7f-a609-4843-af5b-2ac3bc956c88/119aaf951-991f-48f5-bce6-7cf6bf499e4a.png',
-fashion:'https://image.qwenlm.ai/public_source/501fff7f-a609-4843-af5b-2ac3bc956c88/17d5b58f7-f052-4079-9919-eba1f0eb4faf.png',
-vals:'https://image.qwenlm.ai/public_source/501fff7f-a609-4843-af5b-2ac3bc956c88/1c47802b1-d5c7-42a2-b4e9-5760a7d1ad99.png',
-pista:'https://image.qwenlm.ai/public_source/501fff7f-a609-4843-af5b-2ac3bc956c88/1385e988c-a5df-4c1e-91cb-799172df6c05.png',
-pastel:'https://image.qwenlm.ai/public_source/501fff7f-a609-4843-af5b-2ac3bc956c88/1fe1911b5-6f9c-44d9-a7e4-501790d88989.png',
-corte:'https://image.qwenlm.ai/public_source/501fff7f-a609-4843-af5b-2ac3bc956c88/165e63c14-7d2d-4406-9482-bdee4fc07f7b.png',
-baile:'',brindis:'',decoracion:'',sorpresa:'',amigas:'',final:''
+const IMG_BASE='https://image.qwenlm.ai/public_source/9a965b8a-caf8-4a45-bb09-dce792791ca0/';
+const IMG_BASE2='https://image.qwenlm.ai/public_source/501fff7f-a609-4843-af5b-2ac3bc956c88/';
+/* ═══════════════════════════════════════
+REGISTRO DE PLANTILLAS POR CATEGORÍA
+Cada plantilla: slug, categoría, nombre, paleta, imágenes, defaults
+Cargadas desde el flujo de compra (?categoria=&modelo=&plan=)
+═══════════════════════════════════════ */
+const TEMPLATES={
+'matrimonio':{
+nombre:'Matrimonio',label:'Matrimonio',palette:'neon',age:'',ageSuffix:'',
+templates:[
+{slug:'cinema-boda',nombre:'Cinema Boda',img:IMG_BASE+'16390c866-cf9c-4673-b634-bc757d72bf2d.png',palette:'neon'},
+{slug:'jardin-romantico',nombre:'Jardín Romántico',img:IMG_BASE+'169abf264-8e77-4601-a1f7-186006cf7708.png',palette:'violeta'},
+{slug:'atardecer-dorado',nombre:'Atardecer Dorado',img:IMG_BASE+'177210be6-941a-4b37-b9df-db05c38a08ba.png',palette:'dorado'},
+{slug:'hacienda-clasica',nombre:'Hacienda Clásica',img:IMG_BASE+'1be97566a-7aa9-47f7-b6cd-9a689b1bd9f2.png',palette:'dorado'},
+{slug:'novios-amanecer',nombre:'Novios al Amanecer',img:IMG_BASE+'12da54590-3d74-4a2d-878a-796ca911ea01.png',palette:'oceano'},
+{slug:'salon-cristal',nombre:'Salón de Cristal',img:IMG_BASE+'19937ce88-8138-4e64-9a36-6dc7c184f06a.png',palette:'neon'},
+{slug:'playa-dorada',nombre:'Playa Dorada',img:IMG_BASE+'1ea12fd3c-7113-4f93-ba52-45841ea9f2a4.png',palette:'oceano'},
+{slug:'arco-floral',nombre:'Arco Floral',img:IMG_BASE+'102c4af95-9c1d-4819-a9c4-403f6fe909c9.png',palette:'violeta'},
+{slug:'ramo-novia',nombre:'Ramo de Novia',img:IMG_BASE+'1f28ffa85-381b-484f-91fa-991afc282877.png',palette:'violeta'},
+{slug:'orquideas-luz',nombre:'Orquídeas & Luz',img:IMG_BASE+'1669fd968-a57b-45b9-b609-a8c68c16d2a0.png',palette:'violeta'},
+{slug:'beso-atardecer',nombre:'Beso al Atardecer',img:IMG_BASE+'105d8449b-3349-42f0-bcca-9ccdeed55e06.png',palette:'dorado'},
+{slug:'lago-serenidad',nombre:'Lago & Serenidad',img:IMG_BASE+'124d93636-e23a-4c46-b85c-e1d3776e15a3.png',palette:'oceano'}
+]
+},
+'quince':{
+nombre:'Quince Años',label:'15 Años',palette:'neon',age:'15',ageSuffix:'AÑOS',
+templates:[
+{slug:'xv-tiktok-neon',nombre:'XV TikTok Neón',img:IMG_BASE2+'119aaf951-991f-48f5-bce6-7cf6bf499e4a.png',palette:'neon'},
+{slug:'xv-rosas',nombre:'XV Rosas',img:IMG_BASE+'15b3f35d7-f141-4673-8e5f-08fbf8765a28.png',palette:'violeta'},
+{slug:'xv-elegante',nombre:'XV Elegante',img:IMG_BASE+'124d93636-e23a-4c46-b85c-e1d3776e15a3.png',palette:'dorado'},
+{slug:'xv-moderna',nombre:'XV Moderna',img:IMG_BASE2+'17d5b58f7-f052-4079-9919-eba1f0eb4faf.png',palette:'neon'}
+]
+},
+'quince_full':{nombre:'Quince Años',label:'15 Años',palette:'neon',age:'15',ageSuffix:'AÑOS',templates:[]},
+'bautizo':{
+nombre:'Bautizo',label:'Bautizo',palette:'oceano',age:'1',ageSuffix:'AÑO',
+templates:[
+{slug:'angel-celeste',nombre:'Ángel Celeste',img:IMG_BASE+'193c73c47-3a8a-4be4-a87d-92bad916f2b0.png',palette:'oceano'},
+{slug:'flores-blancas',nombre:'Flores Blancas',img:IMG_BASE+'18307fc78-a63f-4c09-981f-6ced1a900792.png',palette:'violeta'},
+{slug:'cruz-dorada',nombre:'Cruz Dorada',img:IMG_BASE+'119b3ebbf-74ed-4dbf-9c21-a4081ec831e4.png',palette:'dorado'},
+{slug:'suave-pastel',nombre:'Suave Pastel',img:IMG_BASE+'113ac65b2-718a-4fcc-ad70-4b93725bcc10.png',palette:'violeta'},
+{slug:'nubes-algodon',nombre:'Nubes de Algodón',img:IMG_BASE+'17df84d32-73e7-4c87-81ad-1a793ddcc2a1.png',palette:'oceano'},
+{slug:'cielo-estrellado',nombre:'Cielo Estrellado',img:IMG_BASE+'10c1a277e-df77-452a-beb8-ba3eea0a0eb5.png',palette:'neon'},
+{slug:'jardin-encantado',nombre:'Jardín Encantado',img:IMG_BASE+'1fa60f11b-d8b6-471b-ac7e-fa53697628ba.png',palette:'violeta'},
+{slug:'primavera-divina',nombre:'Primavera Divina',img:IMG_BASE+'1f4ebe9d3-81c8-4968-8292-63250c7fe219.png',palette:'violeta'},
+{slug:'luz-luna',nombre:'Luz de Luna',img:IMG_BASE+'1312352ec-296c-48b2-93f0-fa1844f2c511.png',palette:'oceano'},
+{slug:'paloma-sagrada',nombre:'Paloma Sagrada',img:IMG_BASE+'17f4ce478-b784-4240-b12f-8fb8d329a634.png',palette:'oceano'},
+{slug:'rosas-perlas',nombre:'Rosas & Perlas',img:IMG_BASE+'15b3f35d7-f141-4673-8e5f-08fbf8765a28.png',palette:'violeta'},
+{slug:'suenos-dorados',nombre:'Sueños Dorados',img:IMG_BASE+'1ce3d8947-c1ba-48e7-81d2-0ba897f9215b.png',palette:'dorado'}
+]
+},
+'comunion':{
+nombre:'Comunión',label:'Comunión',palette:'oceano',age:'9',ageSuffix:'AÑOS',
+templates:[
+{slug:'primera-comunion',nombre:'Primera Comunión',img:IMG_BASE+'1aad1538a-a980-4d8d-8ded-98d749ff70cf.png',palette:'oceano'},
+{slug:'luz-divina',nombre:'Luz Divina',img:IMG_BASE+'193c73c47-3a8a-4be4-a87d-92bad916f2b0.png',palette:'oceano'},
+{slug:'fe-amor',nombre:'Fe y Amor',img:IMG_BASE+'18307fc78-a63f-4c09-981f-6ced1a900792.png',palette:'violeta'},
+{slug:'blanco-celestial',nombre:'Blanco Celestial',img:IMG_BASE+'17df84d32-73e7-4c87-81ad-1a793ddcc2a1.png',palette:'oceano'}
+]
+},
+'cumpleanos':{
+nombre:'Cumpleaños',label:'Cumpleaños',palette:'neon',age:'30',ageSuffix:'AÑOS',
+templates:[
+{slug:'fiesta-lujo',nombre:'Fiesta de Lujo',img:IMG_BASE+'1a21d1b81-6c24-42f0-9437-4c69b35f38f7.png',palette:'dorado'},
+{slug:'neon-party',nombre:'Neon Party',img:IMG_BASE+'1863cdc0e-8c91-4820-99df-93caf18027d0.png',palette:'neon'},
+{slug:'jardin-flor',nombre:'Jardín en Flor',img:IMG_BASE+'199d0a9e8-8dff-4cb9-b209-d63015551fbc.png',palette:'violeta'},
+{slug:'vintage-glam',nombre:'Vintage Glam',img:IMG_BASE+'1bb0ea7e6-b257-45ee-8580-cff2e093fe6b.png',palette:'dorado'},
+{slug:'tropical-vibes',nombre:'Tropical Vibes',img:IMG_BASE+'14f891804-3f58-489f-a168-f51344874a47.png',palette:'neon'},
+{slug:'rooftop-night',nombre:'Rooftop Night',img:IMG_BASE+'10ff505bb-7dca-4d79-b6af-c1ad547828f0.png',palette:'neon'},
+{slug:'pastel-dreams',nombre:'Pastel Dreams',img:IMG_BASE+'1172e1967-cc09-4667-9bc3-0b8a9f192070.png',palette:'violeta'},
+{slug:'golden-hour',nombre:'Golden Hour',img:IMG_BASE+'1a47d52f9-aac7-462a-83c5-974991379fd4.png',palette:'dorado'},
+{slug:'fiesta-boho',nombre:'Fiesta Boho',img:IMG_BASE+'1ccbd542a-3002-4852-8b17-b5c1fd8f785d.png',palette:'violeta'},
+{slug:'black-gold',nombre:'Black & Gold',img:IMG_BASE+'1a81066fe-cdc3-430a-bf73-e4f151d5ecfb.png',palette:'dorado'},
+{slug:'confetti-pop',nombre:'Confetti Pop',img:IMG_BASE+'120e6a422-eaca-4ff4-8686-cfa7855e9188.png',palette:'neon'},
+{slug:'luxury-soiree',nombre:'Luxury Soirée',img:IMG_BASE+'1b70f0522-8717-4084-ab5f-947be469aa89.png',palette:'dorado'}
+]
+},
+'graduacion':{
+nombre:'Graduación',label:'Graduación',palette:'dorado',age:'22',ageSuffix:'AÑOS',
+templates:[
+{slug:'toga-birrete',nombre:'Toga & Birrete',img:IMG_BASE+'193c73c47-3a8a-4be4-a87d-92bad916f2b0.png',palette:'dorado'},
+{slug:'exito-dorado',nombre:'Éxito Dorado',img:IMG_BASE+'119b3ebbf-74ed-4dbf-9c21-a4081ec831e4.png',palette:'dorado'},
+{slug:'futuro-brillante',nombre:'Futuro Brillante',img:IMG_BASE+'1ce3d8947-c1ba-48e7-81d2-0ba897f9215b.png',palette:'dorado'}
+]
+},
+'infantiles':{
+nombre:'Infantiles',label:'Infantiles',palette:'violeta',age:'5',ageSuffix:'AÑOS',
+templates:[
+{slug:'mundo-unicornios',nombre:'Mundo de Unicornios',img:IMG_BASE+'193c73c47-3a8a-4be4-a87d-92bad916f2b0.png',palette:'violeta'},
+{slug:'fiesta-dinosaurios',nombre:'Fiesta Dinosaurios',img:IMG_BASE+'18e9f8ede-9e1d-4b77-a43e-8bb37817341c.png',palette:'neon'},
+{slug:'princesas-castillos',nombre:'Princesas & Castillos',img:IMG_BASE+'184b9132b-b95b-4ac6-a283-f3027fc66187.png',palette:'violeta'},
+{slug:'safari-aventura',nombre:'Safari Aventura',img:IMG_BASE+'1c55bef1e-8334-4115-bb86-5d068407da6f.png',palette:'neon'},
+{slug:'superheroes',nombre:'Superhéroes',img:IMG_BASE+'10dd2d126-4df1-4125-b143-c88ebc8edee4.png',palette:'neon'},
+{slug:'bajo-mar',nombre:'Bajo el Mar',img:IMG_BASE+'15b4fdd6a-ea6d-4fd4-bb5b-2afed3d8e56f.png',palette:'oceano'},
+{slug:'circo-magico',nombre:'Circo Mágico',img:IMG_BASE+'1d59de596-f8ee-48cc-861c-007cc59bcdd7.png',palette:'neon'},
+{slug:'espacio-intergalactico',nombre:'Espacio Intergaláctico',img:IMG_BASE+'1d1c827a6-2b5c-462c-a251-1a458df766d1.png',palette:'neon'},
+{slug:'granja-encantada',nombre:'Granja Encantada',img:IMG_BASE+'1448761f5-54ad-401f-a434-212a8c9056b2.png',palette:'violeta'},
+{slug:'piratas-caribe',nombre:'Piratas del Caribe',img:IMG_BASE+'114a9757f-f8aa-4e24-ab3e-5f8b0bc8b4a5.png',palette:'oceano'},
+{slug:'mundo-candy',nombre:'Mundo Candy',img:IMG_BASE+'1eddc5e12-98f4-420d-ab6b-7622f8930775.png',palette:'violeta'},
+{slug:'jardin-mariposas',nombre:'Jardín de Mariposas',img:IMG_BASE+'157de0040-6d12-4912-a1d1-494108f4c377.png',palette:'violeta'}
+]
+},
+'empresarial':{
+nombre:'Empresarial',label:'Empresarial',palette:'oceano',age:'',ageSuffix:'',
+templates:[
+{slug:'brand-launch',nombre:'Lanzamiento de Marca',img:IMG_BASE+'188417c74-5dd4-4216-b950-5824464e8cf1.png',palette:'oceano'},
+{slug:'annual-gala',nombre:'Gala Anual',img:IMG_BASE+'1bd1c19df-2c74-4803-b8cb-6295689eae36.png',palette:'dorado'},
+{slug:'congress-pro',nombre:'Congreso Pro',img:IMG_BASE+'19563913c-34a6-4595-bc16-4d69ce4fdf4f.png',palette:'oceano'},
+{slug:'vip-experience',nombre:'Experiencia VIP',img:IMG_BASE+'1af091599-09b2-456e-b99d-221a6fd21e0b.png',palette:'dorado'}
+]
+}
 };
-const GAL_ORDER = ['retrato','fashion','vals','pista','pastel','corte','baile','brindis','decoracion','sorpresa','amigas','final'];
-const GAL_LABELS = {retrato:'Retrato',fashion:'Fashion',vals:'Vals',pista:'Pista',pastel:'Pastel',corte:'Corte',baile:'Baile',brindis:'Brindis',decoracion:'Decoración',sorpresa:'Sorpresa',amigas:'Amigas',final:'Final'};
-/* ============ PLAN SYSTEM ============ */
+/* ═══════════════════════════════════════
+SISTEMA DE PLANES
+═══════════════════════════════════════ */
 const PLAN_ORDER=['classic','premium','deluxe'];
 const PLANS={
 classic:{key:'classic',name:'CLASSIC',label:'Básico',price:'$80.000',color:'#22e0d6',maxGal:4,
- feats:['Portada estilo TikTok','Cuenta regresiva','La fecha','Galería · 4 fotos','Dress code & detalles','Cierre & firma','Paletas neón']},
+feats:['Portada estilo TikTok','Cuenta regresiva','La fecha','Galería · 4 fotos','Dress code & detalles','Cierre & firma','Paletas neón']},
 premium:{key:'premium',name:'PREMIUM',label:'Medio',price:'$140.000',color:'#ff3d7f',maxGal:8,
- feats:['Todo lo de Classic','Galería · 8 fotos','Mi historia','Cronograma','Música de fondo','Confirmación RSVP','Redes & hashtag']},
+feats:['Todo lo de Classic','Galería · 8 fotos','Mi historia','Cronograma','Música de fondo','Confirmación RSVP','Redes & hashtag']},
 deluxe:{key:'deluxe',name:'DELUXE',label:'Todo incluido',price:'$200.000',color:'#ffd24a',maxGal:12,
- feats:['Todo lo de Premium','Galería · 12 fotos','Padrinos','Mapa & lugar','Info extra & logística','Mesa de regalos QR']}
+feats:['Todo lo de Premium','Galería · 12 fotos','Padrinos','Mapa & lugar','Info extra & logística','Mesa de regalos QR']}
 };
 const PLAN_REQ={history:'premium',itinerary:'premium',music:'premium',rsvp:'premium',hashtag:'premium',padrinos:'deluxe',location:'deluxe',extra:'deluxe',gifts:'deluxe'};
 const SECTION_FEATURE={4:'history',5:'itinerary',6:'padrinos',7:'location',9:'extra',11:'music',12:'gifts',13:'rsvp'};
@@ -1317,8 +1291,8 @@ function allowedGalKeys(){ return GAL_ORDER.slice(0, PLANS[state.plan].maxGal); 
 function minPlanForGalSlot(i){ for(const p of PLAN_ORDER){ if(PLANS[p].maxGal>i) return p; } return 'deluxe'; }
 function applyPlanGates(){
 GATED.forEach(([sel,key])=>{
- const el=$(sel); if(el) el.style.display=planHas(key)?'':'none';
- const nb=$('#nb-'+key); if(nb) nb.style.display=planHas(key)?'':'none';
+const el=$(sel); if(el) el.style.display=planHas(key)?'':'none';
+const nb=$('#nb-'+key); if(nb) nb.style.display=planHas(key)?'':'none';
 });
 const hasMusic=planHas('music');
 const fab=$('#music-fab'), strip=$('#song-strip');
@@ -1350,27 +1324,121 @@ const gc=$('#galSideCount'); if(gc) gc.textContent=P.maxGal+' fotos activas · '
 const c=$('#planCards');
 if(c){ c.innerHTML='';
 PLAN_ORDER.forEach(k=>{ const p=PLANS[k]; const b=document.createElement('button'); b.type='button'; b.className='plan-card'+(k===state.plan?' sel':''); b.style.setProperty('--pc',p.color);
- b.innerHTML=(k==='premium'?'<span class="pc-pop">POPULAR</span>':'')+'<div class="pc-name" style="color:'+p.color+'">'+p.name+'</div><div class="pc-price">'+p.price+'</div><div class="pc-gal">📷 '+p.maxGal+' fotos</div>'+(k===state.plan?'<span class="pc-check">✓</span>':'');
- b.onclick=()=>setPlan(k);
- c.appendChild(b); });
+b.innerHTML=(k==='premium'?'<span class="pc-pop">POPULAR</span>':'')+'<div class="pc-name" style="color:'+p.color+'">'+p.name+'</div><div class="pc-price">'+p.price+'</div><div class="pc-gal">📷 '+p.maxGal+' fotos</div>'+(k===state.plan?'<span class="pc-check">✓</span>':'');
+b.onclick=()=>setPlan(k);
+c.appendChild(b); });
 }
 const ml=$('#planModalList');
 if(ml){ ml.innerHTML='';
 PLAN_ORDER.forEach(k=>{ const p=PLANS[k]; const d=document.createElement('div'); d.className='plan-opt'+(k===state.plan?' sel':''); d.style.setProperty('--pc',p.color);
- d.innerHTML='<div class="plan-opt-head"><span class="plan-opt-name" style="color:'+p.color+'">'+p.name+' · '+p.label+(k===state.plan?' ✓ ACTUAL':'')+'</span><span class="plan-opt-price" style="color:'+p.color+'">'+p.price+' COP</span></div><div class="plan-opt-gal">GALERÍA: HASTA '+p.maxGal+' FOTOS</div><div class="plan-feats">'+p.feats.map(f=>'<span class="plan-feat">'+f+'</span>').join('')+'</div>';
- d.onclick=()=>setPlan(k);
- ml.appendChild(d); });
+d.innerHTML='<div class="plan-opt-head"><span class="plan-opt-name" style="color:'+p.color+'">'+p.name+' · '+p.label+(k===state.plan?' ✓ ACTUAL':'')+'</span><span class="plan-opt-price" style="color:'+p.color+'">'+p.price+' COP</span></div><div class="plan-opt-gal">GALERÍA: HASTA '+p.maxGal+' FOTOS</div><div class="plan-feats">'+p.feats.map(f=>'<span class="plan-feat">'+f+'</span>').join('')+'</div>';
+d.onclick=()=>setPlan(k);
+ml.appendChild(d); });
 }
 }
 function setPlan(k){
 if(state.plan===k){ renderPlanUI(); const pm=$('#planModal'); if(pm) pm.classList.remove('show'); return; }
 state.plan=k;
+writeCart();
 fullRender();
 toast('Plan activo: <b>'+PLANS[k].name+'</b> · '+PLANS[k].label+' · galería '+PLANS[k].maxGal+' fotos');
 const pm=$('#planModal'); if(pm) pm.classList.remove('show');
 }
 function openPlanModal(){ renderPlanUI(); $('#planModal').classList.add('show'); }
-/* ============ /PLAN SYSTEM ============ */
+/* ═══════════════════════════════════════
+CARGA DE PLANTILLA DESDE EL FLUJO DE COMPRA
+Lee ?categoria=&modelo=&plan= o localStorage gueka_cart_v1
+═══════════════════════════════════════ */
+function buildTemplateSelector(){
+const sel=$('#tplSelect'); if(!sel) return;
+sel.innerHTML='';
+Object.keys(TEMPLATES).forEach(catKey=>{
+const cat=TEMPLATES[catKey]; if(!cat.templates||!cat.templates.length) return;
+const og=document.createElement('optgroup'); og.label=cat.label;
+cat.templates.forEach(tpl=>{
+const opt=document.createElement('option');
+opt.value=catKey+'/'+tpl.slug;
+opt.textContent=tpl.nombre;
+og.appendChild(opt);
+});
+sel.appendChild(og);
+});
+sel.onchange=()=>{
+const val=sel.value;
+if(!val) return;
+loadTemplateByPath(val);
+if(IS_EDITOR) markSave();
+};
+}
+function loadTemplateByPath(path){
+const parts=path.split('/'); if(parts.length<2) return false;
+const catKey=parts[0], slug=parts[1];
+const cat=TEMPLATES[catKey]; if(!cat||!cat.templates) return false;
+const tpl=cat.templates.find(t=>t.slug===slug); if(!tpl) return false;
+applyTemplate(cat,tpl);
+return true;
+}
+function applyTemplate(cat,tpl){
+// Resuelve la key de categoría a partir del objeto
+const catKey=Object.keys(TEMPLATES).find(k=>TEMPLATES[k]===cat)||state.category||'quince';
+// Aplica contexto de categoría (nombre, etiqueta, edad sugerida)
+state.category=catKey;
+state.categoryLabel=cat.label||cat.nombre||'';
+state.templateName=tpl.nombre;
+if(cat.age!==undefined){ state.age=cat.age; state.ageSuffix=cat.ageSuffix||''; }
+// Aplica la paleta de la plantilla
+if(tpl.palette&&PALETTES[tpl.palette]) state.palette=tpl.palette;
+// Aplica la imagen de la plantilla como retrato si no hay una personalizada
+if(tpl.img&&(!state.imgs.retrato||!state.imgs.retrato.trim()||state.imgs.retrato===DEFAULT_IMGS.retrato)){
+state.imgs.retrato=tpl.img;
+}
+// Badge + selector sincronizados
+updateTplBadge();
+const sel=$('#tplSelect');
+if(sel) sel.value=catKey+'/'+tpl.slug;
+// Redibuja todo con el nuevo diseño
+fullRender();
+toast('✦ Plantilla cargada: <b>'+tpl.nombre+'</b> ('+(cat.label||catKey)+')');
+}
+function updateTplBadge(){
+const badge=$('#tplBadge'); const txt=$('#tplBadgeTxt'); const cat=$('#tplBadgeCat');
+if(!badge) return;
+if(state.templateName){
+badge.style.display='flex';
+txt.textContent=state.templateName;
+cat.textContent=state.categoryLabel||state.category||'';
+}else{
+badge.style.display='none';
+}
+}
+function readCart(){ try{ return JSON.parse(localStorage.getItem('gueka_cart_v1'))||{}; }catch(e){ return {}; } }
+function loadFromUrlAndCart(){
+const params=new URLSearchParams(location.search);
+const cart=readCart();
+// Prioridad: URL params > localStorage cart
+const cat=params.get('categoria')||cart.cat||(cart.template&&cart.template.cat)||'';
+const modelo=params.get('modelo')||(cart.template&&cart.template.name)||'';
+const plan=(params.get('plan')||cart.plan||'').toLowerCase();
+// Aplica plan contratado desde la compra
+if(plan&&PLANS[plan]) state.plan=plan;
+// Busca la plantilla por categoría y modelo escogido
+if(cat&&TEMPLATES[cat]){
+const catObj=TEMPLATES[cat];
+let applied=false;
+if(modelo&&catObj.templates&&catObj.templates.length){
+const tpl=catObj.templates.find(t=>t.nombre===modelo||t.slug===modelo);
+if(tpl){ applyTemplate(catObj,tpl); applied=true; }
+}
+if(!applied&&catObj.templates&&catObj.templates.length){
+// Sin modelo específico: primera plantilla de la categoría
+state.category=cat;
+state.categoryLabel=catObj.label||cat;
+if(catObj.age!==undefined){ state.age=catObj.age; state.ageSuffix=catObj.ageSuffix||''; }
+if(catObj.palette&&PALETTES[catObj.palette]) state.palette=catObj.palette;
+updateTplBadge();
+}
+}
+}
 function buildGalStruct(){ const allowed=allowedGalKeys(); const s={'Todas':allowed.slice()}; (state.galCategories||[]).forEach(c=>{ if(c.name) s[c.name]=(c.photos||[]).filter(k=>allowed.includes(k)); }); return s; }
 function getGalTabs(){ return Object.keys(buildGalStruct()); }
 const PALETTES = {
@@ -1386,9 +1454,13 @@ const PAD_ICONS = ['<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><ci
 const WEEKDAY = ['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
 const MESES = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
 const MESES_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DEFAULT_IMGS={retrato:IMG_BASE2+'119aaf951-991f-48f5-bce6-7cf6bf499e4a.png',fashion:IMG_BASE2+'17d5b58f7-f052-4079-9919-eba1f0eb4faf.png',vals:IMG_BASE2+'1c47802b1-d5c7-42a2-b4e9-5760a7d1ad99.png',pista:IMG_BASE2+'1385e988c-a5df-4c1e-91cb-799172df6c05.png',pastel:IMG_BASE2+'1fe1911b5-6f9c-44d9-a7e4-501790d88989.png',corte:IMG_BASE2+'165e63c14-7d2d-4406-9482-bdee4fc07f7b.png',baile:'',brindis:'',decoracion:'',sorpresa:'',amigas:'',final:''};
+const GAL_ORDER=['retrato','fashion','vals','pista','pastel','corte','baile','brindis','decoracion','sorpresa','amigas','final'];
+const GAL_LABELS={retrato:'Retrato',fashion:'Fashion',vals:'Vals',pista:'Pista',pastel:'Pastel',corte:'Corte',baile:'Baile',brindis:'Brindis',decoracion:'Decoración',sorpresa:'Sorpresa',amigas:'Amigas',final:'Final'};
 function makeDefaults(){
 return {
 plan:'classic',
+category:'quince',categoryLabel:'Quince Años',templateName:'',
 name:'Sofía Valentina', age:'15', ageSuffix:'AÑOS', username:'sofia.valentina.xv',
 date:'2026-06-20', time:'18:30', locationShort:'BOG · COL', timezone:'GMT-5 · BOGOTÁ',
 hashtag:'#SofíaValentinaXV', likeCount:158400,
@@ -1445,11 +1517,11 @@ waOrganizer:'', rsvpCapacity:0, sheetUrl:'', pin:'',
 poem:'Hoy comienzas a escribir\nel capítulo más hermoso\nde tu historia.', signature:'Con amor, Sofía',
 palette:'neon', particles:true,
 galCategories:[
-{name:'Sofía',   photos:['retrato','fashion','corte']},
-{name:'Pista',   photos:['vals','pista']},
+{name:'Sofía',photos:['retrato','fashion','corte']},
+{name:'Pista',photos:['vals','pista']},
 {name:'Detalles',photos:['pastel','pista']}
 ],
-imgs: {...DEFAULT_IMGS}
+imgs:{...DEFAULT_IMGS}
 };
 }
 let state = makeDefaults();
@@ -1485,15 +1557,14 @@ try{ const saved=localStorage.getItem(storageKey(id)); state=saved?Object.assign
 zoom=1; fullRender(); clearModified(); renderProjectSelect();
 toast('Proyecto: <b>'+esc(activeProjectName())+'</b>');
 }
-/* Compresión automática de imágenes */
 function compressImage(file, cb){
 const rd=new FileReader();
 rd.onload=()=>{ const img=new Image();
- img.onload=()=>{ const MAX=1600; let w=img.width,h=img.height; const sc=Math.min(1,MAX/Math.max(w,h)); w=Math.round(w*sc); h=Math.round(h*sc);
-  const cv=document.createElement('canvas'); cv.width=w; cv.height=h; cv.getContext('2d').drawImage(img,0,0,w,h);
-  cb(cv.toDataURL('image/jpeg',0.85)); };
- img.onerror=()=>{ cb(rd.result); };
- img.src=rd.result; };
+img.onload=()=>{ const MAX=1600; let w=img.width,h=img.height; const sc=Math.min(1,MAX/Math.max(w,h)); w=Math.round(w*sc); h=Math.round(h*sc);
+const cv=document.createElement('canvas'); cv.width=w; cv.height=h; cv.getContext('2d').drawImage(img,0,0,w,h);
+cb(cv.toDataURL('image/jpeg',0.85)); };
+img.onerror=()=>{ cb(rd.result); };
+img.src=rd.result; };
 rd.readAsDataURL(file);
 }
 function imgUrl(key){ return (state.imgs && state.imgs[key] && state.imgs[key].trim()) || DEFAULT_IMGS[key] || IMG_FALLBACK; }
@@ -1507,9 +1578,9 @@ function setPhotoUrl(key, url){
 state.imgs[key] = url;
 const prev = $('#prev-'+key) || $('#prev-gal-'+key);
 if(prev){ prev.style.opacity='0.5'; const tmp=new Image();
- tmp.onload=()=>{ prev.src=url; prev.style.opacity='1'; hidePhotoErr(key); };
- tmp.onerror=()=>{ prev.style.opacity='0.3'; showPhotoErr(key); };
- tmp.src=url; }
+tmp.onload=()=>{ prev.src=url; prev.style.opacity='1'; hidePhotoErr(key); };
+tmp.onerror=()=>{ prev.style.opacity='0.3'; showPhotoErr(key); };
+tmp.src=url; }
 updatePhotos(); markSave();
 }
 function showPhotoErr(key){ const e=$('#err-'+key); if(e) e.classList.add('show'); }
@@ -1543,21 +1614,30 @@ host.appendChild(div);
 });
 }
 function buildPhotosEditor(){
-['retrato','fashion','pista'].forEach(key=>{
-const inp=$('#url-'+key); if(!inp) return;
-inp.value=state.imgs[key]||'';
-const prev=$('#prev-'+key); if(prev){ wireImgFallback(prev); if(state.imgs[key]) prev.src=state.imgs[key]; }
-if(inp._bound) return; inp._bound=true;
-inp.addEventListener('input',()=>{ const url=inp.value.trim(); if(url) setPhotoUrl(key,url); });
+['retrato','fashion','pista'].forEach(key => {
+const inp = $('#url-'+key); if(!inp) return;
+inp.value = state.imgs[key] || '';
+const prev = $('#prev-'+key);
+if(prev){ wireImgFallback(prev); if(state.imgs[key]) prev.src = state.imgs[key]; }
+if(inp._bound) return;
+inp._bound=true;
+inp.addEventListener('input', () => { const url = inp.value.trim(); if(url) setPhotoUrl(key, url); });
 const old=inp.parentElement.querySelector('.photo-tools'); if(old) old.remove();
 inp.after(makePhotoTools(key,syncPhotoInputs));
 });
-GAL_ORDER.forEach(key=>{
-const inp=$('#url-gal-'+key); if(!inp) return;
-inp.value=state.imgs[key]||'';
-const prev=$('#prev-gal-'+key); if(prev){ wireImgFallback(prev); if(state.imgs[key]) prev.src=state.imgs[key]; }
-if(inp._bound) return; inp._bound=true;
-inp.addEventListener('input',()=>{ const url=inp.value.trim(); if(!url) return; state.imgs[key]=url; if(prev) prev.src=url; updatePhotos(); markSave(); });
+GAL_ORDER.forEach(key => {
+const inp = $('#url-gal-'+key); if(!inp) return;
+inp.value = state.imgs[key] || '';
+const prev = $('#prev-gal-'+key);
+if(prev){ wireImgFallback(prev); if(state.imgs[key]) prev.src = state.imgs[key]; }
+if(inp._bound) return;
+inp._bound=true;
+inp.addEventListener('input', () => {
+const url = inp.value.trim(); if(!url) return;
+state.imgs[key] = url;
+if(prev){ prev.src = url; }
+updatePhotos(); markSave();
+});
 const old=inp.parentElement.querySelector('.photo-tools'); if(old) old.remove();
 inp.after(makePhotoTools(key,syncPhotoInputs));
 });
@@ -1570,13 +1650,13 @@ const field=document.querySelector('.photo-field[data-gkey="'+key+'"]'); if(!fie
 const old=field.querySelector('.gal-lock-note'); if(old) old.remove();
 field.classList.toggle('gal-beyond', idx>=max);
 if(idx>=max){ const req=minPlanForGalSlot(idx);
- const note=document.createElement('div'); note.className='gal-lock-note';
- note.innerHTML='🔒 Puedes editar esta foto, pero aparecerá en la galería desde el plan '+PLANS[req].name;
- const inp=field.querySelector('input'); field.insertBefore(note,inp);
+const note=document.createElement('div'); note.className='gal-lock-note';
+note.innerHTML='🔒 Puedes editar esta foto, pero aparecerá en la galería desde el plan '+PLANS[req].name;
+const inp=field.querySelector('input'); field.insertBefore(note,inp);
 }
 });
 }
-function parseDate(){ const d=new Date(state.date+'T'+(state.time||'00:00')+':00'); return isNaN(d)? new Date() : d; }
+function parseDate(){ const d = new Date(state.date+'T'+(state.time||'00:00')+':00'); return isNaN(d)? new Date() : d; }
 function dateParts(){ const d=parseDate(); return {day:pad(d.getDate()),mon:MESES[d.getMonth()],year:d.getFullYear(),wd:WEEKDAY[d.getDay()],h24:d.getHours(),min:d.getMinutes()}; }
 function timeLabel(){ const d=parseDate(); let h=d.getHours(); const m=pad(d.getMinutes()); const ap=h>=12?'PM':'AM'; h=h%12||12; return h+':'+m+' '+ap; }
 function hourLabel(){ const d=parseDate(); let h=d.getHours(); const ap=h>=12?'PM':'AM'; h=h%12||12; return h+' '+ap; }
@@ -1585,15 +1665,18 @@ function splashDate(){ const p=dateParts(); return p.day+' '+p.mon+' · '+p.wd+'
 function fmtK(n){ return n>=1000 ? (n/1000).toFixed(1)+'K' : String(n); }
 let eventDate = parseDate();
 function renderStatic(){
-eventDate=parseDate();
+eventDate = parseDate();
 const set=(id,v)=>{ const e=$(id); if(e) e.textContent=v; };
 const setH=(id,v)=>{ const e=$(id); if(e) e.innerHTML=v; };
-set('#sp-15',state.age); set('#sp-anos',state.ageSuffix); set('#sp-name',state.name);
+const sp15=$('#sp-15'), spanos=$('#sp-anos');
+if(state.age){ sp15.style.display=''; spanos.style.display=''; sp15.textContent=state.age; spanos.textContent=state.ageSuffix||'AÑOS'; }
+else { sp15.style.display='none'; spanos.style.display='none'; }
+set('#sp-name',state.name);
 set('#sp-date',splashDate()); set('#sp-btn',state.splashBtn); set('#sp-hint',state.splashHint);
-set('#st-user',state.username); set('#st-sub',state.age+' AÑOS · '+dateLabel());
+set('#st-user',state.username); set('#st-sub',(state.ageSuffix||state.categoryLabel||'')+' · '+dateLabel());
 set('#st-at','@'+state.username); set('#st-cap',state.caption);
-set('#st-hash',state.hashtag+'   #XVaños   #Quinceañera');
-set('#st-music',state.name+' · '+state.age+' Años Mix');
+set('#st-hash',state.hashtag+'   #'+(state.categoryLabel||'Evento'));
+set('#st-music',state.name+' · Mix');
 set('#like-count',fmtK(state.likeCount));
 set('#hc-fecha',dateLabel()); set('#hc-hora',timeLabel()); set('#hc-lugar',state.locationShort);
 set('#hq-quote',state.quote);
@@ -1609,13 +1692,15 @@ setH('#mu-intro',nl2br(state.musicIntro)); set('#mu-suggest-label',state.suggest
 setH('#rv-intro',nl2br(state.rsvpIntro)+'<br>Confirma antes del <strong style="color:var(--gold);text-shadow:0 0 8px rgba(255,215,0,.7)">'+esc(state.rsvpDeadline)+'</strong>');
 set('#rv-note',state.rsvpNote);
 setH('#ft-poem',nl2br(state.poem)); set('#ft-sig',state.signature);
-set('#hs-pill',state.hashtag); set('#ft-tag2',state.hashtag);
-set('#ft-fyp','EN TU FOR YOU PAGE ✦ '+state.hashtag);
-set('#eventTitleTxt',state.name+' · '+state.age+' Años');
+set('#hs-pill',state.hashtag);
+set('#eventTitleTxt',state.name+' · '+(state.categoryLabel||''));
 buildTicker();
 updatePhotos();
+updateTplBadge();
 }
-function tickerPhrases(){ return ['GLAMOUR · '+state.age+' AÑOS', state.name.toUpperCase(), dateLabel(), 'THE FLOOR IS YOURS','YOU ARE INVITED','BAILA TODA LA NOCHE', timeLabel()+' · '+state.locationShort,'✦ FOR YOU ✦']; }
+function tickerPhrases(){
+return [(state.categoryLabel||'EVENTO'), state.name.toUpperCase(), dateLabel(), 'THE FLOOR IS YOURS','YOU ARE INVITED','CELEBRA CON NOSOTROS', timeLabel()+' · '+state.locationShort,'✦ FOR YOU ✦'];
+}
 function buildTicker(){
 const track=$('#ticker-track'); if(!track) return;
 track.innerHTML='';
@@ -1629,9 +1714,15 @@ let tickerStarted=false;
 function startTickerLoop(){
 if(tickerStarted) return; tickerStarted=true;
 const track=$('#ticker-track'); let x=0,lastTs=null; const speed=0.035;
-(function tick(ts){ if(lastTs==null) lastTs=ts; const dt=ts-lastTs; lastTs=ts;
-if(!document.hidden && track){ const half=track.scrollWidth/2; if(half>0){ x=(x+dt*speed)%half; track.style.transform='translateX(-'+x+'px)'; } }
-requestAnimationFrame(tick); })();
+(function tick(ts){
+if(lastTs==null) lastTs=ts;
+const dt=ts-lastTs; lastTs=ts;
+if(!document.hidden && track){
+const half=track.scrollWidth/2;
+if(half>0){ x=(x+dt*speed)%half; track.style.transform='translateX(-'+x+'px)'; }
+}
+requestAnimationFrame(tick);
+})();
 }
 function renderItinerary(){
 const c=$('#itinerary-items'); if(!c) return; c.innerHTML='';
@@ -1696,7 +1787,9 @@ el.innerHTML='<button class="gift-header" data-gk="'+g.key+'"><div class="gift-c
 list.appendChild(el);
 });
 list.querySelectorAll('[data-gk]').forEach(b=>b.onclick=()=>toggleGift(b.dataset.gk));
-state.gifts.forEach(g=>{ ['gname','gamt'].forEach(prefix=>{ const e=$('#'+prefix+'-'+g.key); if(e) e.addEventListener('input',()=>updateQR(g.key)); }); });
+state.gifts.forEach(g=>{
+['gname','gamt'].forEach(prefix=>{ const e=$('#'+prefix+'-'+g.key); if(e) e.addEventListener('input',()=>updateQR(g.key)); });
+});
 }
 function toggleGift(key){
 const body=$('#body-'+key), chev=$('#chev-'+key), item=$('#gift-'+key); const i=state.gifts.findIndex(x=>x.key===key); const col=cycleGift(i);
@@ -1706,9 +1799,13 @@ if(!qrInstances[key] && typeof QRCode!=='undefined'){ const qrEl=$('#qr-'+key); 
 }
 function updateQR(key){ const i=state.gifts.findIndex(x=>x.key===key); const name=$('#gname-'+key).value||'Invitado'; const amt=$('#gamt-'+key).value||'0'; const pk=state.gifts[i].paykey||''; const txt='PAGO '+state.gifts[i].label+(pk?' | '+pk:'')+' | '+name+' | COP '+amt; if(qrInstances[key]){ qrInstances[key].clear(); qrInstances[key].makeCode(txt); } }
 let galTab='Todas', galIdx=0, galleryTimer=null;
-function galList(){ const s=buildGalStruct(); const l=s[galTab]||allowedGalKeys(); return l.length?l:allowedGalKeys(); }
+function galList(){ const s=buildGalStruct(); return s[galTab]||allowedGalKeys(); }
 function galItem(key){ return {url:imgUrl(key),caption:state.captions[key]||GAL_LABELS[key]}; }
-function initGallery(){ rebuildGalTabs(); renderGallery(); galleryTimer=setInterval(()=>galleryGo(1),4500); }
+function initGallery(){
+rebuildGalTabs();
+renderGallery();
+galleryTimer=setInterval(()=>galleryGo(1),4500);
+}
 function rebuildGalTabs(){
 const tabsEl=$('#gal-tabs'); if(!tabsEl) return; tabsEl.innerHTML='';
 getGalTabs().forEach(t=>{ const b=document.createElement('button'); b.className='gal-tab'; b.dataset.tab=t; b.textContent=t; b.onclick=()=>setGalTab(t); tabsEl.appendChild(b); });
@@ -1735,7 +1832,7 @@ function gallerySet(i){ galIdx=i; const img=$('#gallery-img'); img.style.opacity
 function openLightbox(){ updateLightbox(); $('#lightbox').classList.add('open'); }
 function closeLightbox(){ $('#lightbox').classList.remove('open'); }
 function updateLightbox(){ const l=galList().map(galItem); const p=l[Math.min(galIdx,l.length-1)]||{url:IMG_FALLBACK,caption:''}; const li=$('#lb-img'); wireImgFallback(li); li.src=p.url; $('#lb-cap').textContent=p.caption; }
-document.addEventListener('keydown',e=>{ if(!$('#lightbox').classList.contains('open')) return; if(e.key==='Escape') closeLightbox(); if(e.key==='ArrowLeft'){ galleryGo(-1); updateLightbox(); } if(e.key==='ArrowRight'){ galleryGo(1); updateLightbox(); } });
+document.addEventListener('keydown',e=>{ if(!$('#lightbox').classList.contains('open')) return; if(e.key==='Escape') closeLightbox(); });
 function buildPaletteEditor(){
 const g=$('#palette-grid'); g.innerHTML='';
 Object.entries(PALETTES).forEach(([k,p])=>{
@@ -1793,20 +1890,33 @@ function edPadr(){
 const c=$('#ed-padr'); if(!c) return; c.innerHTML='';
 state.padrinos.forEach((p,i)=>{
 const row=document.createElement('div'); row.className='list-row';
-const handle=document.createElement('span'); handle.className='list-drag'; handle.textContent='⠿';
+const handle=document.createElement('span'); handle.className='list-drag'; handle.textContent='⠿'; handle.title='Arrastrar para reordenar';
 row.appendChild(handle);
 const catInp=document.createElement('input'); catInp.className='in'; catInp.placeholder='Categoría'; catInp.value=p.cat; catInp.style.marginBottom='7px';
 catInp.addEventListener('input',()=>{ state.padrinos[i].cat=catInp.value; renderPadrinos(); markSave(); });
 const nameInp=document.createElement('input'); nameInp.className='in'; nameInp.placeholder='Nombre / Familia'; nameInp.value=p.name; nameInp.style.marginBottom='7px';
 nameInp.addEventListener('input',()=>{ state.padrinos[i].name=nameInp.value; renderPadrinos(); markSave(); });
-const photoInp=document.createElement('input'); photoInp.className='in'; photoInp.type='url'; photoInp.placeholder='Foto (opcional) https://...'; photoInp.value=p.photo||'';
-photoInp.addEventListener('input',()=>{ state.padrinos[i].photo=photoInp.value.trim(); renderPadrinos(); markSave(); });
-row.appendChild(catInp); row.appendChild(nameInp); row.appendChild(photoInp);
-const dup=document.createElement('button'); dup.className='list-dup'; dup.textContent='⧉';
+const photoWrap=document.createElement('div'); photoWrap.style.marginBottom='0';
+const photoLabel=document.createElement('label');
+photoLabel.style.cssText="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.14em;color:var(--e-muted);display:flex;align-items:center;gap:6px;margin-bottom:5px;text-transform:uppercase;";
+photoLabel.innerHTML='Foto (opcional) <span style="color:rgba(255,255,255,.2);font-size:8px;">— deja vacío para usar el ícono</span>';
+const photoRow=document.createElement('div'); photoRow.style.cssText='display:flex;gap:8px;align-items:center';
+const thumb=document.createElement('img'); thumb.style.cssText='width:36px;height:36px;border-radius:50%;object-fit:cover;object-position:top;border:1px solid rgba(255,255,255,.12);flex-shrink:0;background:#111';
+thumb.src=p.photo||''; thumb.style.display=p.photo?'block':'none';
+const photoInp=document.createElement('input'); photoInp.className='in'; photoInp.type='url'; photoInp.placeholder='https://...'; photoInp.value=p.photo||''; photoInp.style.flex='1';
+photoInp.addEventListener('input',()=>{
+const url=photoInp.value.trim();
+state.padrinos[i].photo=url;
+if(url){ thumb.src=url; thumb.style.display='block'; } else { thumb.style.display='none'; }
+renderPadrinos(); markSave();
+});
+photoRow.appendChild(thumb); photoRow.appendChild(photoInp);
+photoWrap.appendChild(photoLabel); photoWrap.appendChild(photoRow);
+const dup=document.createElement('button'); dup.className='list-dup'; dup.textContent='⧉'; dup.title='Duplicar';
 dup.onclick=()=>{ state.padrinos.splice(i+1,0,JSON.parse(JSON.stringify(state.padrinos[i]))); edPadr(); renderPadrinos(); markSave(); };
-const del=document.createElement('button'); del.className='list-del'; del.textContent='✕';
+const del=document.createElement('button'); del.className='list-del'; del.textContent='✕'; del.title='Eliminar';
 del.onclick=()=>{ state.padrinos.splice(i,1); edPadr(); renderPadrinos(); markSave(); };
-row.appendChild(dup); row.appendChild(del);
+row.appendChild(catInp); row.appendChild(nameInp); row.appendChild(photoWrap); row.appendChild(dup); row.appendChild(del);
 attachDrag(row,i,(from,to)=>{ const mv=state.padrinos.splice(from,1)[0]; state.padrinos.splice(to,0,mv); edPadr(); renderPadrinos(); markSave(); });
 c.appendChild(row);
 });
@@ -1816,71 +1926,21 @@ c.appendChild(add);
 }
 function edDress(){ buildListEditor('ed-dress','dressCode',[{key:'title',label:'Título'},{key:'desc',label:'Descripción',type:'textarea'}],{add:'Agregar indicación',tpl:()=>({title:'NUEVO',desc:'Descripción'}),render:renderDressCode,rebuild:edDress}); }
 function edExtra(){ buildListEditor('ed-extra','extra',[{key:'icon',label:'Emoji'},{key:'title',label:'Título'},{key:'body',label:'Texto',type:'textarea'}],{add:'Agregar info',tpl:()=>({icon:'✨',title:'NUEVO',body:'Texto informativo'}),render:renderExtra,rebuild:edExtra}); }
-function edGifts(){ buildListEditor('ed-gifts','gifts',[{key:'label',label:'Método'},{key:'sub',label:'Subtítulo'},{key:'paykey',label:'Llave / N° de cuenta (Nequi, Daviplata, CBU…)'}],{add:'Agregar método',tpl:()=>({key:'m'+Date.now(),label:'NUEVO',sub:'Descripción',paykey:''}),render:renderGifts,rebuild:edGifts}); }
+function edGifts(){ buildListEditor('ed-gifts','gifts',[{key:'label',label:'Método'},{key:'sub',label:'Subtítulo'},{key:'paykey',label:'Llave / N° de cuenta'}],{add:'Agregar método',tpl:()=>({key:'m'+Date.now(),label:'NUEVO',sub:'Descripción',paykey:''}),render:renderGifts,rebuild:edGifts}); }
 function buildCaptionsEditor(){
 const c=$('#ed-gal'); if(!c) return; c.innerHTML='';
-const max=PLANS[state.plan].maxGal;
-GAL_ORDER.forEach((k,idx)=>{
+GAL_ORDER.forEach(k=>{
 const wrap=document.createElement('div');
-wrap.style.cssText='margin-bottom:14px;border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px;background:rgba(255,255,255,.015)'+(idx>=max?';opacity:.55':'');
+wrap.style.cssText='margin-bottom:14px;border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px;background:rgba(255,255,255,.015)';
 const row=document.createElement('div'); row.className='cap-row'; row.style.marginBottom='8px';
-row.innerHTML='<img src="'+imgUrl(k)+'" id="galthumb-'+k+'" alt="" style="width:42px;height:42px;border-radius:7px;object-fit:cover;object-position:top;border:1px solid rgba(255,255,255,.1)"><div class="cap-meta"><strong>'+GAL_LABELS[k]+' · FOTO '+(idx+1)+'</strong><input class="in" value="'+escA(state.captions[k])+'" placeholder="Título de la foto"></div>';
+row.innerHTML='<img src="'+imgUrl(k)+'" alt="" style="width:42px;height:42px;border-radius:7px;object-fit:cover;object-position:top;border:1px solid rgba(255,255,255,.1)"><div class="cap-meta"><strong>'+GAL_LABELS[k]+'</strong><input class="in" value="'+escA(state.captions[k])+'" placeholder="Título de la foto"></div>';
 const titleInp=row.querySelector('input');
 titleInp.addEventListener('input',()=>{ state.captions[k]=titleInp.value; renderGallery(); markSave(); });
 wrap.appendChild(row);
-if(idx>=max){ const req=minPlanForGalSlot(idx);
- const note=document.createElement('div'); note.className='gal-lock-note';
- note.innerHTML='🔒 Esta foto se mostrará en la galería desde el plan '+PLANS[req].name;
- wrap.appendChild(note);
-}
 c.appendChild(wrap);
 });
 }
-function buildGalCatsEditor(){
-const c=$('#ed-gal-cats'); if(!c) return; c.innerHTML='';
-const allowed=allowedGalKeys();
-const lockedCount=GAL_ORDER.length-allowed.length;
-if(lockedCount>0){
-const hint=document.createElement('div');
-hint.style.cssText="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,210,74,.7);letter-spacing:.1em;margin-bottom:12px;padding:7px 10px;background:rgba(255,210,74,.05);border:1px solid rgba(255,210,74,.2);border-radius:6px;line-height:1.6";
-hint.innerHTML='🔒 Tu plan incluye '+allowed.length+' fotos en galería. '+lockedCount+' slots adicionales se desbloquean con un plan superior.';
-c.appendChild(hint);
-}
-state.galCategories.forEach((cat,ci)=>{
-const block=document.createElement('div');
-block.style.cssText='margin-bottom:14px;border:1px solid rgba(255,210,74,.2);border-radius:9px;padding:12px;background:rgba(255,210,74,.03)';
-const nameRow=document.createElement('div'); nameRow.style.marginBottom='10px';
-nameRow.innerHTML="<label style=\"font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.14em;color:rgba(255,210,74,.7);display:block;margin-bottom:5px;text-transform:uppercase;\">Nombre de la pestaña "+(ci+1)+"</label>";
-const nameInp=document.createElement('input'); nameInp.className='in'; nameInp.value=cat.name; nameInp.placeholder='ej: Sofía';
-nameInp.addEventListener('input',()=>{ state.galCategories[ci].name=nameInp.value; rebuildGalTabs(); renderGallery(); markSave(); });
-nameRow.appendChild(nameInp); block.appendChild(nameRow);
-const checkLabel=document.createElement('div');
-checkLabel.style.cssText="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.12em;color:var(--e-muted);margin-bottom:8px;text-transform:uppercase;";
-checkLabel.textContent='Fotos incluidas';
-block.appendChild(checkLabel);
-const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:6px;';
-allowed.forEach(key=>{
-const label=document.createElement('label');
-label.style.cssText="display:flex;align-items:center;gap:7px;cursor:pointer;padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02);transition:.15s;font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--e-ink)";
-const cb=document.createElement('input'); cb.type='checkbox'; cb.style.cssText='width:13px;height:13px;cursor:pointer;accent-color:var(--e-cyan)';
-cb.checked=(cat.photos||[]).includes(key);
-cb.addEventListener('change',()=>{
-const arr=state.galCategories[ci].photos;
-if(cb.checked){ if(!arr.includes(key)) arr.push(key); }
-else { const ix=arr.indexOf(key); if(ix>-1) arr.splice(ix,1); }
-if(arr.length===0){ arr.push(allowed[0]); cb.checked=key===allowed[0]; }
-rebuildGalTabs(); renderGallery(); markSave();
-});
-label.appendChild(cb);
-const thumb=document.createElement('img'); thumb.src=imgUrl(key); thumb.style.cssText='width:20px;height:20px;border-radius:4px;object-fit:cover;object-position:top;flex-shrink:0';
-label.appendChild(thumb);
-const name=document.createElement('span'); name.textContent=GAL_LABELS[key]; label.appendChild(name);
-grid.appendChild(label);
-});
-block.appendChild(grid);
-c.appendChild(block);
-});
-}
+function buildAllEditors(){ edItin(); edPadr(); edDress(); edExtra(); edGifts(); buildCaptionsEditor(); buildPaletteEditor(); buildPhotosEditor(); buildMusicEditor(); }
 function buildMusicEditor(){
 const c=$('#ed-songs'); if(!c) return; c.innerHTML='';
 const songs=state.songs||[];
@@ -1896,13 +1956,25 @@ const delBtn=document.createElement('button');
 delBtn.style.cssText="background:rgba(255,61,127,.12);border:1px solid rgba(255,61,127,.4);border-radius:999px;color:var(--e-pink);font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 10px;cursor:pointer";
 delBtn.textContent='✕ Quitar';
 delBtn.onclick=()=>{ state.songs.splice(i,1); if(songIdx>=state.songs.length) songIdx=Math.max(0,state.songs.length-1); updateInlinePlayer(); buildMusicEditor(); markSave(); };
-badge.appendChild(btnWrap); if(songs.length>1) btnWrap.appendChild(delBtn);
+btnWrap.appendChild(delBtn); if(songs.length>1) btnWrap.appendChild(delBtn);
+badge.appendChild(btnWrap);
 block.appendChild(badge);
-const titleInp=document.createElement('input'); titleInp.className='in'; titleInp.placeholder='Título · ej: Tusa — Karol G'; titleInp.value=song.title||''; titleInp.style.marginBottom='8px';
+const titleLabel=document.createElement('label');
+titleLabel.style.cssText="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.14em;color:var(--e-muted);display:block;margin-bottom:4px;text-transform:uppercase;";
+titleLabel.textContent='Título';
+const titleInp=document.createElement('input'); titleInp.className='in'; titleInp.placeholder='ej: Tusa — Karol G'; titleInp.value=song.title||''; titleInp.style.marginBottom='8px';
 titleInp.addEventListener('input',()=>{ state.songs[i].title=titleInp.value; updateInlinePlayer(); markSave(); });
-const urlInp=document.createElement('input'); urlInp.className='in'; urlInp.type='url'; urlInp.placeholder='URL del audio https://...cancion.mp3'; urlInp.value=song.src||'';
-urlInp.addEventListener('input',()=>{ state.songs[i].src=urlInp.value.trim(); updateInlinePlayer(); markSave(); });
-block.appendChild(titleInp); block.appendChild(urlInp);
+const urlLabel=document.createElement('label');
+urlLabel.style.cssText="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.14em;color:var(--e-muted);display:block;margin-bottom:4px;text-transform:uppercase;";
+urlLabel.textContent='URL del audio (mp3 / ogg / wav)';
+const urlInp=document.createElement('input'); urlInp.className='in'; urlInp.type='url'; urlInp.placeholder='https://...cancion.mp3'; urlInp.value=song.src||'';
+urlInp.addEventListener('input',()=>{
+state.songs[i].src=urlInp.value.trim();
+if(songIdx===i && isPlaying){ audio.src=state.songs[i].src; audio.play().catch(()=>{}); }
+updateInlinePlayer(); markSave();
+});
+block.appendChild(titleLabel); block.appendChild(titleInp);
+block.appendChild(urlLabel); block.appendChild(urlInp);
 c.appendChild(block);
 });
 if(songs.length<3){
@@ -1911,7 +1983,6 @@ add.onclick=()=>{ state.songs.push({title:'',src:''}); buildMusicEditor(); markS
 c.appendChild(add);
 }
 }
-function buildAllEditors(){ edItin(); edPadr(); edDress(); edExtra(); edGifts(); buildCaptionsEditor(); buildGalCatsEditor(); buildPaletteEditor(); buildPhotosEditor(); buildMusicEditor(); applyGalFieldNotes(); }
 function syncInputs(){
 $$('[data-bind]').forEach(el=>{
 const k=el.dataset.bind;
@@ -1936,11 +2007,20 @@ function markSave(){
 const s=$('#saveState'); if(s){ s.classList.add('saving'); const tx=$('#saveTxt'); if(tx) tx.textContent='Guardando…'; }
 clearTimeout(saveTimer);
 saveTimer=setTimeout(()=>{
-if(IS_EDITOR){ try{ localStorage.setItem(storageKey(activeId), JSON.stringify(state)); }catch(e){} }
+if(IS_EDITOR){ try{ localStorage.setItem(storageKey(activeId), JSON.stringify(state)); }catch(e){} writeCart(); }
 lastSavedAt=Date.now();
 if(s){ s.classList.remove('saving'); const tx=$('#saveTxt'); if(tx) tx.textContent='Guardado'; }
 startSaveAgoUpdater();
 },650);
+}
+function writeCart(){
+try{
+localStorage.setItem('gueka_cart_v1',JSON.stringify({
+cat:state.category,
+plan:state.plan,
+template:{cat:state.category,name:state.templateName}
+}));
+}catch(e){}
 }
 function toast(html){ const t=document.createElement('div'); t.className='toast'; t.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span>'+html+'</span>'; const box=$('#toasts'); if(!box) return; box.appendChild(t); requestAnimationFrame(()=>t.classList.add('show')); setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),350); },2700); }
 let revealObs;
@@ -1959,20 +2039,29 @@ let colonOn=true;
 const cdSection=$('#countdown');
 function update(){
 const t=getTimeLeft();
-if(eventDate.getTime()<=Date.now()){
+const isOver=eventDate.getTime()<=Date.now();
+if(isOver){
 if(cdSection && !cdSection.querySelector('.cd-over-msg')){
 const grid=$('#countdown-grid');
-if(grid){ grid.style.display='none';
-const msg=document.createElement('div'); msg.className='cd-over-msg';
+if(grid){
+grid.style.display='none';
+const msg=document.createElement('div');
+msg.className='cd-over-msg';
 msg.innerHTML='<div style="font-size:3rem;margin-bottom:12px">🎉</div><div style="font-family:var(--sans);font-weight:900;font-size:1.4rem;letter-spacing:.12em;color:var(--pink);text-shadow:0 0 16px var(--pink);margin-bottom:10px">¡LA NOCHE LLEGÓ!</div><div style="font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:rgba(255,255,255,.45)">Esta noche es tuya · Disfruta cada momento</div>';
 msg.style.cssText='text-align:center;padding:32px 0;animation:fadeIn .8s ease both';
-grid.parentElement.appendChild(msg); }
+grid.parentElement.appendChild(msg);
+}
 }
 return;
 }
-$('#num-days').textContent=pad(t.days); $('#num-hours').textContent=pad(t.hours);
-$('#num-mins').textContent=pad(t.mins); $('#num-secs').textContent=pad(t.secs);
-setRing('#ring-days',t.days,365); setRing('#ring-hours',t.hours,24); setRing('#ring-mins',t.mins,60); setRing('#ring-secs',t.secs,60);
+$('#num-days').textContent=pad(t.days);
+$('#num-hours').textContent=pad(t.hours);
+$('#num-mins').textContent=pad(t.mins);
+$('#num-secs').textContent=pad(t.secs);
+setRing('#ring-days',t.days,365);
+setRing('#ring-hours',t.hours,24);
+setRing('#ring-mins',t.mins,60);
+setRing('#ring-secs',t.secs,60);
 colonOn=!colonOn;
 ['col0','col1','col2'].forEach(id=>{ const e=$('#'+id); if(e) e.style.opacity=colonOn?'1':'0.15'; });
 }
@@ -1988,7 +2077,7 @@ function getSongs(){ return (state.songs&&state.songs.length)?state.songs:SONGS_
 let songIdx=0, isPlaying=false, isMuted=false;
 const audio=$('#bg-audio');
 function fmtTime(s){ if(!s||isNaN(s)) return '--:--'; const m=Math.floor(s/60), ss=Math.floor(s%60); return m+':'+(ss<10?'0':'')+ss; }
-function updateDots(idx){ for(let i=0;i<3;i++){ const d=$('#ip-dot-'+i); if(d) d.style.background=i===idx&&i<getSongs().length?PAL.pink:'rgba(255,255,255,.18)'; } }
+function updateDots(idx){ const songs=getSongs(); for(let i=0;i<3;i++){ const d=$('#ip-dot-'+i); if(d) d.style.background=i===idx&&i<songs.length?PAL.pink:'rgba(255,255,255,.18)'; } }
 function updateInlinePlayer(){ const songs=getSongs(); const t=$('#ip-title'); if(t) t.textContent=songs[songIdx]?songs[songIdx].title:'—'; updateDots(songIdx); }
 function initMusicUI(){ songIdx=0; updateInlinePlayer(); }
 function showStrip(title){ const s=$('#song-strip'); if(!s) return; s.textContent='♪ '+title; s.classList.add('visible'); clearTimeout(s._t); s._t=setTimeout(()=>s.classList.remove('visible'),3500); }
@@ -1997,7 +2086,6 @@ function syncPlayState(){ const fp=$('#fab-play-icon'); if(fp) fp.textContent=is
 function togglePlay(e){ if(e&&e.stopPropagation) e.stopPropagation(); const songs=getSongs(); if(!songs.length) return; if(!isPlaying){ if(!audio.src||audio.src==='') loadSong(songIdx); audio.play().catch(()=>{}); isPlaying=true; showStrip(songs[songIdx].title); } else { audio.pause(); isPlaying=false; } syncPlayState(); }
 function nextTrack(e){ if(e&&e.stopPropagation) e.stopPropagation(); const songs=getSongs(); songIdx=(songIdx+1)%songs.length; loadSong(songIdx); if(isPlaying) audio.play().catch(()=>{}); }
 function prevTrack(e){ if(e&&e.stopPropagation) e.stopPropagation(); const songs=getSongs(); songIdx=(songIdx-1+songs.length)%songs.length; loadSong(songIdx); if(isPlaying) audio.play().catch(()=>{}); }
-function toggleMuteMusic(){ isMuted=!isMuted; audio.muted=isMuted; }
 function seekMusic(e){ const track=e.currentTarget; if(!audio.duration) return; const rect=track.getBoundingClientRect(); audio.currentTime=((e.clientX-rect.left)/rect.width)*audio.duration; }
 audio.addEventListener('timeupdate',()=>{ if(!audio.duration) return; $('#ip-bar').style.width=(audio.currentTime/audio.duration*100)+'%'; $('#ip-cur').textContent=fmtTime(audio.currentTime); $('#ip-dur').textContent=fmtTime(audio.duration); });
 audio.addEventListener('loadedmetadata',()=>{ $('#ip-dur').textContent=fmtTime(audio.duration); });
@@ -2009,42 +2097,31 @@ function submitRSVP(){
 const name=$('#rsvp-name').value.trim();
 const err=$('#rsvp-error');
 if(!name){ err.textContent='⚠ Por favor ingresa tu nombre'; err.style.display='block'; return; }
-const cap=state.rsvpCapacity||0;
-if(cap>0){
-const count=parseInt(sessionStorage.getItem('rsvp_count')||'0',10);
-const attendNow=$('#btn-yes').classList.contains('active');
-if(attendNow && count>=cap){
-const fullOverlay=$('#rsvp-full-overlay');
-if(fullOverlay){
-const wa=(state.waOrganizer||'').replace(/\D/g,'');
-const waLink=$('#rsvp-full-wa-link');
-if(waLink && wa){ const msg=encodeURIComponent('¡Hola! Me gustaría estar en la lista de espera para los XV de '+state.name+'. Mi nombre es ...'); waLink.href='https://wa.me/'+wa+'?text='+msg; waLink.style.display='inline-flex'; }
-else if(waLink){ waLink.style.display='none'; }
-fullOverlay.classList.add('show');
-} else { err.textContent='⚠ Lo sentimos, el aforo está completo.'; err.style.display='block'; }
-return;
-}
-if(attendNow) sessionStorage.setItem('rsvp_count', String(count+1));
-}
 err.style.display='none';
 const btn=$('#rsvp-submit'); btn.textContent='ENVIANDO...'; btn.disabled=true;
 const wa=(state.waOrganizer||'').replace(/\D/g,'');
 const guests=$('#rsvp-guests').value||'1';
 const attend=$('#btn-yes').classList.contains('active')?'SÍ ASISTE':'NO ASISTE';
-const food=$('#rsvp-food')?$('#rsvp-food').value:'no';
-const transport=$('#rsvp-transport')?$('#rsvp-transport').value:'no';
 const msg=$('#rsvpMsgInput')?$('#rsvpMsgInput').value.trim():'';
-if(state.sheetUrl && state.sheetUrl.startsWith('http')){
-try{ fetch(state.sheetUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({nombre:name,asistencia:attend,personas:guests,dieta:food,transporte:transport,mensaje:msg,evento:state.name,fecha:dateLabel()})}).catch(()=>{}); }catch(e){}
-}
 if(wa){
-const lines=['🎀 *CONFIRMACIÓN DE ASISTENCIA*','👤 Nombre: '+name,'✅ Asistencia: '+attend,'👥 Personas: '+guests,'🍽 Dieta: '+(food==='no'?'Sin restricción':food),'🚌 Transporte: '+(transport==='no'?'Por cuenta propia':'Necesita bus'),msg?'💬 Mensaje: '+msg:'','','— Enviado desde la invitación de '+state.name].filter(l=>l!=='');
+const lines=[
+'🎀 *CONFIRMACIÓN DE ASISTENCIA*',
+'👤 Nombre: '+name,
+'✅ Asistencia: '+attend,
+'👥 Personas: '+guests,
+msg?'💬 Mensaje: '+msg:'',
+'',
+'— Enviado desde la invitación de '+state.name
+].filter(l=>l!==undefined&&l!=='');
 window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(lines.join('\n')),'_blank','noopener');
 }
-setTimeout(()=>{ $('#rsvp-form').classList.add('hide'); $('#rsvp-done').classList.add('show'); btn.textContent='CONFIRMAR ASISTENCIA ▶'; btn.disabled=false; },600);
+setTimeout(()=>{
+$('#rsvp-form').classList.add('hide'); $('#rsvp-done').classList.add('show');
+btn.textContent='CONFIRMAR ASISTENCIA ▶'; btn.disabled=false;
+},600);
 }
 let footerLiked=true;
-function toggleFooterHeart(){ footerLiked=!footerLiked; const btn=$('#heart-btn'), fill=$('#heart-fill'), g=$('#heart-g'); if(footerLiked){ btn.classList.add('liked'); fill.setAttribute('fill',PAL.pink); fill.setAttribute('opacity','1'); g.setAttribute('stroke',PAL.pink); } else { btn.classList.remove('liked'); fill.setAttribute('fill','none'); fill.setAttribute('opacity','0'); g.setAttribute('stroke','rgba(255,255,255,.5)'); } }
+function toggleFooterHeart(){ footerLiked=!footerLiked; const btn=$('#heart-btn'), fill=$('#heart-fill'), g=$('#heart-g'); if(footerLiked){ btn.classList.add('liked'); fill.setAttribute('fill',PAL.pink); fill.setAttribute('opacity','1'); g.setAttribute('stroke',PAL.pink); } else { btn.classList.remove('liked'); fill.setAttribute('fill','none'); fill.setAttribute('opacity','0'); g.setAttribute('stroke','rgba(255,255,255,.5)'); } const svg=btn.querySelector('.heart-svg'); svg.style.animation='none'; svg.offsetHeight; svg.style.animation=''; }
 function startPetals(){
 const canvas=$('#petal-canvas'); if(!canvas) return;
 const ctx=canvas.getContext('2d'); let W,H,parts=[]; const host=canvas.parentElement;
@@ -2070,13 +2147,20 @@ charPairs.length=0;
 $$('textarea[data-bind]').forEach(t=>{
 const k=t.dataset.bind; if(!CHAR_LIMITS[k]) return;
 let cnt=t.nextElementSibling;
-if(!cnt||!cnt.classList||!cnt.classList.contains('char-count')){ cnt=document.createElement('span'); cnt.className='char-count'; t.after(cnt); }
+if(!cnt||!cnt.classList||!cnt.classList.contains('char-count')){
+cnt=document.createElement('span'); cnt.className='char-count'; t.after(cnt);
+}
 charPairs.push({el:t,cnt:cnt,max:CHAR_LIMITS[k]});
 });
 updateCharCounters();
 }
-function updateCharCounters(){ charPairs.forEach(p=>{ const n=p.el.value.length; p.cnt.textContent=n+' / '+p.max; p.cnt.classList.toggle('over',n>p.max); }); }
-/* Export limpio con gates de plan + OG + PIN */
+function updateCharCounters(){
+charPairs.forEach(p=>{
+const n=p.el.value.length;
+p.cnt.textContent=n+' / '+p.max;
+p.cnt.classList.toggle('over',n>p.max);
+});
+}
 function buildCleanExport(){
 const clone=document.documentElement.cloneNode(true);
 const cq=s=>clone.querySelectorAll(s).forEach(n=>n.remove());
@@ -2086,44 +2170,38 @@ if(!planHas('music')) cq('.music-fab,#song-strip,#bg-audio');
 const splash=clone.querySelector('#splash'); if(splash) splash.style.display='flex';
 const rf=clone.querySelector('#rsvp-form'); if(rf) rf.classList.remove('hide');
 const rd=clone.querySelector('#rsvp-done'); if(rd) rd.classList.remove('show');
-const fo=clone.querySelector('#rsvp-full-overlay'); if(fo) fo.classList.remove('show');
-const sf=clone.querySelector('#suggest-form'); if(sf) sf.removeAttribute('style');
-const sd=clone.querySelector('#suggest-done'); if(sd) sd.classList.remove('show');
 const lb=clone.querySelector('#lightbox'); if(lb) lb.classList.remove('open');
 const st=clone.querySelector('#preview-stage'); if(st) st.removeAttribute('style');
 const tt=clone.querySelector('#ticker-track'); if(tt) tt.removeAttribute('style');
 clone.querySelectorAll('.gift-body.open').forEach(b=>b.classList.remove('open'));
 clone.querySelectorAll('.gift-chevron.open').forEach(b=>b.classList.remove('open'));
+clone.querySelectorAll('.cd-over-msg').forEach(n=>n.remove());
+const cg=clone.querySelector('#countdown-grid'); if(cg) cg.removeAttribute('style');
 const exported=Object.assign({},state,{showSplash:true});
 const json=JSON.stringify(exported).replace(/\u003c/g,'\\u003c');
 const marker='// Load persisted state from localStorage if available';
+const injection='const EXPORTED_STATE='+json+';\n';
 let html='<!DOCTYPE html>\n'+clone.outerHTML;
-html=html.replace(marker,'const EXPORTED_STATE='+json+';\n'+marker);
-html=html.replace(/<title>[\s\S]*?<\/title>/,'<title>'+esc(state.name)+' · XV Años</title>');
-const og='\n<meta property="og:title" content="'+esc(state.name)+' · XV Años">\n<meta property="og:description" content="'+esc(state.caption)+'">\n<meta property="og:image" content="'+escA(imgUrl('retrato'))+'">\n<meta property="og:type" content="website">\n<meta name="theme-color" content="'+PAL.bg+'">';
+html=html.replace(marker, injection+marker);
+html=html.replace(/<title>[\s\S]*?<\/title>/, '<title>'+esc(state.name)+' · '+(state.categoryLabel||'Evento')+'</title>');
+const og='\n<meta property="og:title" content="'+esc(state.name)+' · '+(state.categoryLabel||'Evento')+'">\n<meta property="og:description" content="'+esc(state.caption)+'">\n<meta property="og:image" content="'+escA(imgUrl('retrato'))+'">\n<meta property="og:type" content="website">';
 html=html.replace('</head>',og+'\n</head>');
-if(state.pin){
-const pinEsc=esc(state.pin).replace(/"/g,'\\"');
-const pinHtml='<div id="pin-gate" style="position:fixed;inset:0;z-index:999999;background:#080810;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:\'JetBrains Mono\',monospace">'
-+'<div style="font-size:2rem">🔐</div>'
-+'<div style="font-size:10px;letter-spacing:.32em;color:#ff0050">INVITACIÓN PROTEGIDA</div>'
-+'<div style="font-size:9px;letter-spacing:.14em;color:rgba(255,255,255,.4)">INGRESA EL CÓDIGO PARA ABRIR</div>'
-+'<input id="pin-inp" type="password" inputmode="numeric" maxlength="6" placeholder="••••" style="background:#0a0a12;border:1px solid rgba(255,0,80,.5);color:#fff;text-align:center;letter-spacing:.4em;font-size:18px;padding:12px 16px;border-radius:6px;outline:none;width:180px;font-family:inherit">'
-+'<button onclick="xvCheckPin()" style="background:linear-gradient(135deg,#ff0050,#00f2ea);border:none;color:#080810;font-weight:700;letter-spacing:.18em;padding:12px 28px;border-radius:6px;cursor:pointer;font-family:inherit">ENTRAR</button>'
-+'<div id="pin-err" style="font-size:9px;color:#ffd700;letter-spacing:.12em;display:none">CÓDIGO INCORRECTO · INTENTA DE NUEVO</div>'
-+'</div>'
-+'<script>function xvCheckPin(){if(document.getElementById("pin-inp").value==="'+pinEsc+'"){document.getElementById("pin-gate").remove();}else{document.getElementById("pin-err").style.display="block";}}document.getElementById("pin-inp").addEventListener("keydown",function(e){if(e.key==="Enter")xvCheckPin();});<\/script>';
-html=html.replace('</body>',pinHtml+'\n</body>');
-}
 return html;
 }
-function downloadBlob(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2500); }
+function downloadBlob(blob,name){
+const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
+a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2500);
+}
 async function captureCard(){
 if(typeof html2canvas==='undefined') throw new Error('no-lib');
 const st=$('#preview-stage'); const prevT=st?st.style.transform:''; const prevM=st?st.style.marginBottom:'';
 if(st){ st.style.transform='none'; st.style.marginBottom='0'; }
-try{ return await html2canvas($('#card-wrapper'),{backgroundColor:PAL.bg||'#080810',scale:1.5,useCORS:true,logging:false}); }
-finally { if(st){ st.style.transform=prevT; st.style.marginBottom=prevM; } }
+try{
+const canvas=await html2canvas($('#card-wrapper'),{backgroundColor:PAL.bg||'#080810',scale:1.5,useCORS:true,logging:false});
+return canvas;
+} finally {
+if(st){ st.style.transform=prevT; st.style.marginBottom=prevM; }
+}
 }
 const VERSIONS_KEY='quince_versions_v1';
 function loadVersions(){ try{ return JSON.parse(localStorage.getItem(VERSIONS_KEY))||[]; }catch(e){ return []; } }
@@ -2138,30 +2216,38 @@ row.innerHTML='<div class="ver-meta"><strong>'+esc(v.name)+'</strong><span>'+new
 const rest=document.createElement('button'); rest.className='ver-act rest'; rest.textContent='Restaurar';
 rest.onclick=()=>{ try{ state=Object.assign(makeDefaults(),JSON.parse(v.data)); zoom=1; fullRender(); clearModified(); markSave(); toast('Versión restaurada: <b>'+esc(v.name)+'</b>'); $('#versionsModal').classList.remove('show'); }catch(e){ toast('Error al restaurar'); } };
 const del=document.createElement('button'); del.className='ver-act del'; del.textContent='✕';
-del.onclick=()=>{ saveVersions(loadVersions().filter(x=>x.id!==v.id)); renderVersions(); };
+del.onclick=()=>{ const vs=loadVersions().filter(x=>x.id!==v.id); saveVersions(vs); renderVersions(); };
 row.appendChild(rest); row.appendChild(del);
 list.appendChild(row);
 });
 }
-function clearModified(){ $$('.sec').forEach(s=>s.classList.remove('sec-modified')); updateProgress(); }
-const SECTION_FIELDS={1:['name','age','ageSuffix','username','date','time','locationShort','timezone','likeCount','hashtag','caption','quote'],2:['imgs'],3:['showSplash','splashBtn','splashHint'],4:['historyTag','historyQuote','historyText'],5:['itinerary'],6:['padrinos'],7:['venue','address','mapUrl'],8:['dressIntro','dressSub','dressCode','dressWarn'],9:['extra'],10:['captions','galCategories'],11:['musicIntro','suggestLabel','songs'],12:['gifts'],13:['rsvpIntro','rsvpDeadline','rsvpDeadlineDate','rsvpNote','waOrganizer','rsvpCapacity','sheetUrl','pin'],14:['poem','signature'],15:['palette','particles']};
+function clearModified(){ $$('.sec').forEach(s=>s.classList.remove('sec-modified')); if(typeof updateProgress==='function') updateProgress(); }
+const SECTION_FIELDS={1:['name','age','ageSuffix','username','date','time','locationShort','timezone','likeCount','hashtag','caption','quote'],2:['imgs'],3:['showSplash','splashBtn','splashHint'],4:['historyTag','historyQuote','historyText'],5:['itinerary'],6:['padrinos'],7:['venue','address','mapUrl'],8:['dressIntro','dressSub','dressCode','dressWarn'],9:['extra'],10:['captions','galCategories'],11:['musicIntro','suggestLabel','songs'],12:['gifts'],13:['rsvpIntro','rsvpDeadline','rsvpDeadlineDate','rsvpNote','waOrganizer','rsvpCapacity'],14:['poem','signature'],15:['palette','particles']};
 function bindEditor(){
 $$('[data-bind]').forEach(el=>{
 el.addEventListener('input',()=>{
 const k=el.dataset.bind; let v=el.type==='checkbox'?el.checked:el.value;
-if(k==='likeCount'||k==='rsvpCapacity') v=parseInt(v,10)||0;
+if(k==='likeCount') v=parseInt(v,10)||0;
+if(k==='rsvpCapacity') v=parseInt(v,10)||0;
 state[k]=v;
 if(k==='showSplash') updateSplash();
 if(k==='particles') updateCanvas();
-if(k==='rsvpDeadlineDate' && v){ const d=new Date(v+'T12:00:00'); if(!isNaN(d)){ state.rsvpDeadline=d.getDate()+' de '+MESES_FULL[d.getMonth()]; const r=$('[data-bind="rsvpDeadline"]'); if(r) r.value=state.rsvpDeadline; } }
-if(k==='waOrganizer'){ const digits=(v||'').replace(/\D/g,''); const warn=$('#wa-warn'); if(warn) warn.style.display=(v&&(digits.length<10||digits.length>15))?'block':'none'; }
+if(k==='rsvpDeadlineDate' && v){
+const d=new Date(v+'T12:00:00');
+if(!isNaN(d)){ state.rsvpDeadline=d.getDate()+' de '+MESES_FULL[d.getMonth()]; const rd=$('[data-bind="rsvpDeadline"]'); if(rd) rd.value=state.rsvpDeadline; }
+}
+if(k==='waOrganizer'){
+const digits=(v||'').replace(/\D/g,'');
+const warn=$('#wa-warn');
+if(warn) warn.style.display=(v&&(digits.length<10||digits.length>15))?'block':'none';
+}
 renderStatic(); markSave();
 });
 });
 initCharCounters();
 $$('.sec').forEach((sec,i)=>{
 const h=sec.querySelector('.sec-head'); if(!h||h.querySelector('.sec-reset')) return;
-const rb=document.createElement('button'); rb.type='button'; rb.className='sec-reset'; rb.title='Restablecer solo esta sección'; rb.textContent='↺';
+const rb=document.createElement('button'); rb.type='button'; rb.className='sec-reset'; rb.title='Restablecer solo esta sección'; rb.setAttribute('aria-label','Restablecer sección'); rb.textContent='↺';
 rb.addEventListener('click',e=>{
 e.stopPropagation();
 const d=makeDefaults();
@@ -2177,7 +2263,11 @@ const o=s.classList.toggle('open'); h.setAttribute('aria-expanded',o);
 }));
 $('#btnReset').onclick=()=>{ $('#resetModal').classList.add('show'); };
 $('#resetCancel').onclick=()=>{ $('#resetModal').classList.remove('show'); };
-$('#resetConfirm').onclick=()=>{ $('#resetModal').classList.remove('show'); try{ localStorage.removeItem(storageKey(activeId)); }catch(e){} state=makeDefaults(); zoom=1; fullRender(); clearModified(); toast('Plantilla restablecida'); };
+$('#resetConfirm').onclick=()=>{
+$('#resetModal').classList.remove('show');
+try{ localStorage.removeItem(storageKey(activeId)); }catch(e){}
+state=makeDefaults(); zoom=1; fullRender(); clearModified(); toast('Plantilla restablecida');
+};
 $('#resetModal').addEventListener('click',e=>{ if(e.target===$('#resetModal')) $('#resetModal').classList.remove('show'); });
 $('#btnPrint').onclick=()=>window.print();
 $('#zoomIn').onclick=()=>{ zoom=Math.min(1.4,+(zoom+0.1).toFixed(2)); applyZoom(); };
@@ -2185,16 +2275,28 @@ $('#zoomOut').onclick=()=>{ zoom=Math.max(0.6,+(zoom-0.1).toFixed(2)); applyZoom
 $('#zoomVal').addEventListener('click',()=>{ zoom=1; applyZoom(); });
 $('#toolSplash').onclick=()=>{ state.showSplash=!state.showSplash; updateSplash(); markSave(); };
 $('#toolGuest').onclick=()=>{
-try{ const html=buildCleanExport(); const url=URL.createObjectURL(new Blob([html],{type:'text/html'})); const ov=$('#guestOverlay'); const fr=$('#guestFrame'); fr.src=url; ov.classList.add('show'); fr._blob=url; }catch(e){ toast('No se pudo abrir la vista invitado'); }
+try{
+const html=buildCleanExport();
+const url=URL.createObjectURL(new Blob([html],{type:'text/html'}));
+const ov=$('#guestOverlay'); const fr=$('#guestFrame');
+fr.src=url; ov.classList.add('show');
+fr._blob=url;
+}catch(e){ toast('No se pudo abrir la vista invitado'); }
 };
 $('#guestClose').onclick=()=>{ const ov=$('#guestOverlay'); const fr=$('#guestFrame'); if(fr&&fr._blob){ URL.revokeObjectURL(fr._blob); fr._blob=null; } fr.src='about:blank'; ov.classList.remove('show'); };
 $('#btnQR').onclick=()=>{
 if(typeof QRCode==='undefined'){ toast('Librería QR no disponible'); return; }
 const box=$('#qrBox'); box.innerHTML='';
 const wa=(state.waOrganizer||'').replace(/\D/g,'');
-let txt,desc;
-if(wa){ const msg='¡Estás invitad@ a los XV de '+state.name+'! '+dateLabel()+' · '+timeLabel()+' · '+state.venue; txt='https://wa.me/'+wa+'?text='+encodeURIComponent(msg); desc='Este QR abre WhatsApp con la invitación.'; }
-else { txt='XV AÑOS · '+state.name+' · '+dateLabel()+' · '+timeLabel()+' · '+state.venue; desc='QR con los datos del evento.'; }
+let txt, desc;
+if(wa){
+const msg='¡Estás invitad@ a los XV de '+state.name+'! '+dateLabel()+' · '+timeLabel()+' · '+state.venue;
+txt='https://wa.me/'+wa+'?text='+encodeURIComponent(msg);
+desc='Este QR abre WhatsApp con la invitación. Imprímelo o compártelo.';
+}else{
+txt='XV AÑOS · '+state.name+' · '+dateLabel()+' · '+timeLabel()+' · '+state.venue;
+desc='QR con los datos del evento. Configura el WhatsApp en la sección 13 para un QR de contacto.';
+}
 $('#qrDesc').textContent=desc;
 new QRCode(box,{text:txt,width:180,height:180,colorDark:'#080810',colorLight:'#ffffff'});
 $('#qrModal').classList.add('show');
@@ -2202,8 +2304,10 @@ $('#qrModal').classList.add('show');
 $('#qrClose').onclick=()=>$('#qrModal').classList.remove('show');
 $('#qrModal').addEventListener('click',e=>{ if(e.target===$('#qrModal')) $('#qrModal').classList.remove('show'); });
 $('#qrDown').onclick=()=>{
-const cv=$('#qrBox').querySelector('canvas'); const im=$('#qrBox').querySelector('img');
-const url=cv?cv.toDataURL('image/png'):(im?im.src:null);
+const box=$('#qrBox');
+const cv=box.querySelector('canvas'); const im=box.querySelector('img');
+let url=null;
+if(cv) url=cv.toDataURL('image/png'); else if(im) url=im.src;
 if(!url){ toast('QR aún no disponible'); return; }
 const a=document.createElement('a'); a.href=url; a.download='qr-'+slugify(state.name)+'.png'; a.click();
 toast('✓ QR descargado');
@@ -2220,31 +2324,53 @@ saveVersions(vs); $('#verName').value=''; renderVersions(); toast('Versión guar
 };
 $('#btnExport').onclick=()=>{
 toast('⏳ Generando HTML…');
-setTimeout(()=>{ try{ downloadBlob(new Blob([buildCleanExport()],{type:'text/html;charset=utf-8'}),'invitacion-'+slugify(state.name)+'.html'); toast('✓ Invitación descargada · <b>invitacion-'+slugify(state.name)+'.html</b>'); }catch(err){ toast('Error al generar el HTML'); } },80);
+setTimeout(()=>{
+try{
+const html=buildCleanExport();
+downloadBlob(new Blob([html],{type:'text/html;charset=utf-8'}),'invitacion-'+slugify(state.name)+'.html');
+toast('✓ Invitación descargada · <b>invitacion-'+slugify(state.name)+'.html</b>');
+}catch(err){ toast('Error al generar el HTML'); }
+},80);
 };
 $('#btnJSON').onclick=()=>{
-downloadBlob(new Blob([JSON.stringify({app:'estudio-xv',version:3,plan:state.plan,name:state.name,savedAt:new Date().toISOString(),state:state},null,2)],{type:'application/json'}),'proyecto-'+slugify(state.name)+'.json');
+const data={app:'estudio-xv',version:4,category:state.category,template:state.templateName,plan:state.plan,name:state.name,savedAt:new Date().toISOString(),state:state};
+downloadBlob(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),'proyecto-'+slugify(state.name)+'.json');
 toast('✓ Backup JSON descargado');
 };
 $('#btnPNG').onclick=async()=>{
 toast('⏳ Generando imagen…');
-try{ const canvas=await captureCard(); const a=document.createElement('a'); a.download='invitacion-'+slugify(state.name)+'.png'; a.href=canvas.toDataURL('image/png'); a.click(); toast('✓ PNG descargado'); }catch(e){ toast('⚠ No se pudo generar el PNG'); }
+try{
+const canvas=await captureCard();
+const a=document.createElement('a'); a.download='invitacion-'+slugify(state.name)+'.png'; a.href=canvas.toDataURL('image/png'); a.click();
+toast('✓ PNG descargado');
+}catch(e){ toast('⚠ No se pudo generar el PNG'); }
 };
 $('#btnPDF').onclick=async()=>{
 if(typeof jspdf==='undefined'){ toast('Librería PDF no disponible'); return; }
 toast('⏳ Generando PDF…');
-try{ const canvas=await captureCard(); const {jsPDF}=window.jspdf; const pdf=new jsPDF({orientation:'portrait',unit:'px',format:[canvas.width,canvas.height],hotfixes:['px_scaling']}); pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,canvas.width,canvas.height); pdf.save('invitacion-'+slugify(state.name)+'.pdf'); toast('✓ PDF descargado'); }catch(e){ toast('⚠ No se pudo generar el PDF'); }
+try{
+const canvas=await captureCard();
+const {jsPDF}=window.jspdf;
+const pdf=new jsPDF({orientation:'portrait',unit:'px',format:[canvas.width,canvas.height],hotfixes:['px_scaling']});
+pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,canvas.width,canvas.height);
+pdf.save('invitacion-'+slugify(state.name)+'.pdf');
+toast('✓ PDF descargado');
+}catch(e){ toast('⚠ No se pudo generar el PDF'); }
 };
 $('#btnImport').onchange=function(){
 const file=this.files[0]; if(!file) return;
 const reader=new FileReader();
 reader.onload=e=>{
 try{
-const txt=e.target.result; let data=null;
-try{ data=JSON.parse(txt); }catch(_){ const m=txt.match(/const EXPORTED_STATE=(\{[\s\S]*?\});/); if(m){ try{ data=JSON.parse(m[1]); }catch(_2){} } }
+const txt=e.target.result;
+let data=null;
+try{ data=JSON.parse(txt); }catch(_){
+const m=txt.match(/const EXPORTED_STATE=(\{[\s\S]*?\});/);
+if(m){ try{ data=JSON.parse(m[1]); }catch(_2){} }
+}
 if(!data) throw new Error('bad');
 if(data.state) data=data.state;
-state=Object.assign(makeDefaults(),data);
+state=Object.assign(makeDefaults(), data);
 zoom=1; fullRender(); clearModified(); markSave();
 toast('✓ Proyecto importado correctamente');
 }catch(err){ toast('⚠ Archivo no válido'); }
@@ -2266,24 +2392,28 @@ state=makeDefaults(); zoom=1; fullRender(); clearModified(); markSave(); renderP
 toast('Proyecto creado');
 };
 $('#projRename').onclick=()=>{
-const name=prompt('Nuevo nombre del proyecto:',activeProjectName());
+const cur=activeProjectName();
+const name=prompt('Nuevo nombre del proyecto:',cur);
 if(name===null||!name.trim()) return;
 const p=projects.find(x=>x.id===activeId); if(p){ p.name=name.trim(); persistProjects(); renderProjectSelect(); toast('Proyecto renombrado'); }
 };
 $('#projDel').onclick=()=>{
 if(projects.length<=1){ toast('Debe existir al menos un proyecto'); return; }
-if(!confirm('¿Eliminar el proyecto "'+activeProjectName()+'"?')) return;
+if(!confirm('¿Eliminar el proyecto "'+activeProjectName()+'"? No se puede deshacer.')) return;
 const delId=activeId;
 projects=projects.filter(x=>x.id!==delId);
 persistProjects();
 try{ localStorage.removeItem(storageKey(delId)); }catch(e){}
 switchProject(projects[0].id);
+toast('Proyecto eliminado');
 };
 $('#panel-search').addEventListener('input',function(){
 const q=this.value.trim().toLowerCase();
-$$('.sec').forEach(sec=>{ const title=(sec.querySelector('.sec-title')||sec).textContent.toLowerCase(); sec.style.display=(!q||title.includes(q))?'':'none'; });
+$$('.sec').forEach(sec=>{
+const title=(sec.querySelector('.sec-title')||sec).textContent.toLowerCase();
+sec.style.display=(!q||title.includes(q))?'':'none';
 });
-// Plan modal wiring
+});
 $('#planPill').onclick=openPlanModal;
 $('#planBarName').onclick=openPlanModal;
 $('#planClose').onclick=()=>$('#planModal').classList.remove('show');
@@ -2299,7 +2429,6 @@ renderGallery();
 updatePhotos();
 updateSplash(); updateCanvas(); applyZoom();
 }
-/* ── Init ── */
 // Load persisted state from localStorage if available
 (function(){
 try{
@@ -2308,13 +2437,14 @@ if(IS_EDITOR){
 initProjects();
 const saved=localStorage.getItem(storageKey(activeId));
 if(saved){ state=Object.assign(makeDefaults(),JSON.parse(saved)); }
+else { const legacy=localStorage.getItem(LEGACY_KEY); if(legacy) state=Object.assign(makeDefaults(),JSON.parse(legacy)); }
 }
 }catch(e){}
 })();
-if(IS_EDITOR) buildGalFields();
+if(IS_EDITOR){ loadFromUrlAndCart(); buildTemplateSelector(); }
 syncInputs();
 renderStatic();
-if(IS_EDITOR){ buildAllEditors(); renderPlanUI(); applyPlanLocks(); }
+if(IS_EDITOR) buildAllEditors();
 applyPalette(state.palette);
 applyPlanGates();
 initGallery();
@@ -2336,14 +2466,18 @@ if(!overlay||!IS_EDITOR) return;
 if(!localStorage.getItem('xv-onboarding-done')){
 requestAnimationFrame(()=>{ overlay.classList.add('visible'); });
 document.getElementById('ob-start-btn').addEventListener('click',function(){
-overlay.style.opacity='0'; setTimeout(()=>{ overlay.style.display='none'; },400);
+overlay.style.opacity='0';
+setTimeout(()=>{ overlay.style.display='none'; },400);
 localStorage.setItem('xv-onboarding-done','1');
 });
-} else { overlay.style.display='none'; }
+} else {
+overlay.style.display='none';
+}
 })();
 (function(){
 function upd(){ const r=$('#rsvpMsgInput'); if(r) r.placeholder='Mensaje para '+(state.name||'la quinceañera')+' (opcional)'; }
-$$('[data-bind="name"]').forEach(el=>el.addEventListener('input',upd)); upd();
+$$('[data-bind="name"]').forEach(el=>{ el.addEventListener('input',upd); });
+upd();
 })();
 (function(){
 const fab=$('#music-fab'), main=$('#fab-main-btn');
@@ -2353,66 +2487,72 @@ if(window.matchMedia && window.matchMedia('(hover:none)').matches){ e.stopPropag
 });
 document.addEventListener('click',e=>{ if(!fab.contains(e.target)) fab.classList.remove('open'); });
 })();
-function handleShare(){
-const txt='🎀 ¡Estás invitad@ a los XV de '+state.name+'! 📅 '+dateLabel()+' · 🕕 '+timeLabel()+' · 📍 '+state.venue+' '+state.hashtag;
-try{ navigator.clipboard.writeText(txt); }catch(e){}
-window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank','noopener');
-toast('💬 Texto copiado · exporta el HTML para enviar la invitación completa');
-}
+function handleShare(){ toast('💾 Para compartir: usa "Exportar" (HTML) o descarga PNG/PDF y envíalos por WhatsApp.'); }
 (function(){ const bs=$('#btnShare'); if(bs) bs.onclick=handleShare; })();
 function updateProgress(){
 const total=document.querySelectorAll('.sec').length||15;
 const done=document.querySelectorAll('.sec-modified').length;
 const pct=Math.round((done/total)*100);
-const bar=document.getElementById('progBar'); const lbl=document.getElementById('progPct');
-if(bar) bar.style.width=pct+'%'; if(lbl) lbl.textContent=pct+'%';
+const bar=document.getElementById('progBar');
+const lbl=document.getElementById('progPct');
+if(bar) bar.style.width=pct+'%';
+if(lbl) lbl.textContent=pct+'%';
 }
 document.addEventListener('input',function(e){
 if(!IS_EDITOR) return;
 const sec=e.target.closest('.sec');
-if(sec && !sec.classList.contains('sec-modified')){ sec.classList.add('sec-modified'); updateProgress(); }
+if(sec && !sec.classList.contains('sec-modified')){
+sec.classList.add('sec-modified');
+updateProgress();
+}
 if(e.target.matches('textarea[data-bind]')) updateCharCounters();
 });
 $$('.sec-head').forEach(h=>{
 h.addEventListener('click',function(){
 const sec=h.parentElement;
-if(sec.classList.contains('locked')) return;
-if(sec.classList.contains('open')){
+const isNowOpen=sec.classList.contains('open');
+if(isNowOpen){
 document.querySelectorAll('.sec.open').forEach(function(s){
 if(s!==sec){ s.classList.remove('open'); const sh=s.querySelector('.sec-head'); if(sh) sh.setAttribute('aria-expanded','false'); }
 });
 }
 });
 });
-function resetRsvpForm(){
-const done=document.querySelector('.rsvp-done'); const form=document.querySelector('.rsvp-form-inner');
-if(done) done.classList.remove('show');
-if(form) form.classList.remove('hide');
-}
 (function(){
 if(!IS_EDITOR) return;
 const MAX_HISTORY=40;
 let history=[JSON.stringify(state)], histIdx=0, _skipPush=false;
 function updateUndoUI(){
 const u=$('#btnUndo'), r=$('#btnRedo');
-if(u){ u.style.opacity=histIdx>0?'1':'0.4'; u.style.pointerEvents=histIdx>0?'auto':'none'; }
-if(r){ r.style.opacity=histIdx<history.length-1?'1':'0.4'; r.style.pointerEvents=histIdx<history.length-1?'auto':'none'; }
+if(u){ u.style.opacity=histIdx>0?'1':'0.35'; u.style.pointerEvents=histIdx>0?'auto':'none'; }
+if(r){ r.style.opacity=histIdx<history.length-1?'1':'0.35'; r.style.pointerEvents=histIdx<history.length-1?'auto':'none'; }
 }
 function pushHistory(){
 if(_skipPush) return;
 const snap=JSON.stringify(state);
 if(snap===history[histIdx]) return;
-history=history.slice(0,histIdx+1); history.push(snap);
+history=history.slice(0,histIdx+1);
+history.push(snap);
 if(history.length>MAX_HISTORY) history.shift();
-histIdx=history.length-1; updateUndoUI();
+histIdx=history.length-1;
+updateUndoUI();
 }
 function applyHistory(idx){
-_skipPush=true; histIdx=idx;
+_skipPush=true;
+histIdx=idx;
 state=Object.assign(makeDefaults(), JSON.parse(history[histIdx]));
-fullRender(); markSave(); _skipPush=false; updateUndoUI();
+fullRender(); markSave();
+_skipPush=false;
+updateUndoUI();
+toast(idx===0?'Vuelto al inicio':'Cambio '+(histIdx>0?'deshecho':'rehecho'));
 }
 const _orig_mark=markSave;
-markSave=function(){ _orig_mark(); clearTimeout(window._histTimer); window._histTimer=setTimeout(pushHistory,700); };
+window.markSave=function(){
+_orig_mark();
+clearTimeout(window._histTimer);
+window._histTimer=setTimeout(pushHistory,700);
+};
+markSave=window.markSave;
 setTimeout(()=>{ history=[JSON.stringify(state)]; histIdx=0; updateUndoUI(); },300);
 $('#btnUndo').onclick=()=>{ if(histIdx>0) applyHistory(histIdx-1); };
 $('#btnRedo').onclick=()=>{ if(histIdx<history.length-1) applyHistory(histIdx+1); };
@@ -2431,24 +2571,103 @@ document.addEventListener('keydown',function(e){
 if(!IS_EDITOR) return;
 if(e.key==='/' && !e.ctrlKey && !e.metaKey){
 const tag=(document.activeElement&&document.activeElement.tagName)||'';
-if(tag!=='INPUT'&&tag!=='TEXTAREA'){ e.preventDefault(); const s=$('#panel-search'); if(s){ s.focus(); s.select(); } }
+if(tag!=='INPUT'&&tag!=='TEXTAREA'){
+e.preventDefault();
+const s=$('#panel-search');
+if(s){ s.focus(); s.select(); }
 }
-if(e.key==='Escape'){ const ov=$('#guestOverlay'); if(ov&&ov.classList.contains('show')) $('#guestClose').click(); }
+}
+if(e.key==='Escape'){
+const ov=$('#guestOverlay');
+if(ov&&ov.classList.contains('show')) $('#guestClose').click();
+}
 });
+/* ═══════════════════════════════════════
+GESTOS TÁCTILES MÓVILES (swipe entre vista y editor)
+═══════════════════════════════════════ */
 (function(){
 const sidebar=document.getElementById('sidebar');
 const backdrop=document.getElementById('sidebarBackdrop');
 const drawerToggle=document.getElementById('mobDrawerToggle');
 const previewWrap=document.querySelector('.preview-wrap');
-window.openMobDrawer=function(){ if(sidebar) sidebar.classList.add('mob-open'); if(backdrop) backdrop.classList.add('show'); if(drawerToggle) drawerToggle.classList.add('open'); };
-window.closeMobDrawer=function(){ if(sidebar) sidebar.classList.remove('mob-open'); if(backdrop) backdrop.classList.remove('show'); if(drawerToggle) drawerToggle.classList.remove('open'); };
-window.toggleMobDrawer=function(){ (sidebar&&sidebar.classList.contains('mob-open'))?closeMobDrawer():openMobDrawer(); };
-window.mobSwitchTab=function(tab){
-const tp=document.getElementById('mob-tab-preview'), te=document.getElementById('mob-tab-edit');
-[tp,te].forEach(t=>{ if(t) t.classList.remove('active'); });
-if(tab==='edit'){ if(te) te.classList.add('active'); if(previewWrap) previewWrap.classList.add('mob-hidden'); if(sidebar) sidebar.classList.add('mob-open'); }
-else { if(tp) tp.classList.add('active'); if(previewWrap) previewWrap.classList.remove('mob-hidden'); if(sidebar) sidebar.classList.remove('mob-open'); }
+window.toggleMobDrawer=function(){
+const isOpen=sidebar&&sidebar.classList.contains('mob-open');
+if(isOpen){ closeMobDrawer(); } else { openMobDrawer(); }
 };
+window.openMobDrawer=function(){
+if(sidebar) sidebar.classList.add('mob-open');
+if(backdrop) backdrop.classList.add('show');
+if(drawerToggle){ drawerToggle.classList.add('open'); drawerToggle.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'; }
+};
+window.closeMobDrawer=function(){
+if(sidebar) sidebar.classList.remove('mob-open');
+if(backdrop) backdrop.classList.remove('show');
+if(drawerToggle){ drawerToggle.classList.remove('open'); drawerToggle.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'; }
+};
+window.mobSwitchTab=function(tab){
+const tabPreview=document.getElementById('mob-tab-preview');
+const tabEdit=document.getElementById('mob-tab-edit');
+[tabPreview,tabEdit].forEach(t=>{ if(t) t.classList.remove('active'); });
+if(tab==='edit'){
+if(tabEdit) tabEdit.classList.add('active');
+if(previewWrap) previewWrap.classList.add('mob-hidden');
+if(sidebar) sidebar.classList.add('mob-open');
+} else if(tab==='preview'){
+if(tabPreview) tabPreview.classList.add('active');
+if(previewWrap) previewWrap.classList.remove('mob-hidden');
+if(sidebar) sidebar.classList.remove('mob-open');
+}
+};
+let touchStartX=0, touchStartY=0;
+document.addEventListener('touchstart',function(e){
+touchStartX=e.touches[0].clientX;
+touchStartY=e.touches[0].clientY;
+},{passive:true});
+document.addEventListener('touchend',function(e){
+const dx=e.changedTouches[0].clientX-touchStartX;
+const dy=Math.abs(e.changedTouches[0].clientY-touchStartY);
+if(Math.abs(dx)<60||dy>Math.abs(dx)) return; // swipe horizontal válido únicamente
+const isMobile=window.matchMedia('(max-width:640px)').matches;
+const isTablet=!isMobile&&window.matchMedia('(max-width:1024px)').matches;
+if(isTablet&&dx>60&&sidebar&&sidebar.classList.contains('mob-open')){ closeMobDrawer(); }
+if(isMobile){
+const previewHidden=previewWrap&&previewWrap.classList.contains('mob-hidden');
+if(dx<-70&&!previewHidden){ window.mobSwitchTab('edit'); }
+else if(dx>70&&previewHidden){ window.mobSwitchTab('preview'); }
+}
+},{passive:true});
+})();
+/* ═══════════════════════════════════════
+INTEGRACIÓN FINAL CON EL FLUJO DE COMPRA
+· Sincronización en vivo con gueka_cart_v1
+· API pública para la tienda (window.ESTUDIO_XV)
+═══════════════════════════════════════ */
+(function(){
+if(!IS_EDITOR) return;
+// Si la tienda actualiza el carrito en otra pestaña, el editor se sincroniza solo
+window.addEventListener('storage',function(e){
+if(e.key!=='gueka_cart_v1') return;
+const before=(state.category||'')+'|'+(state.templateName||'')+'|'+(state.plan||'');
+loadFromUrlAndCart();
+fullRender();
+clearModified();
+const after=(state.category||'')+'|'+(state.templateName||'')+'|'+(state.plan||'');
+if(before!==after){
+toast('🛒 Compra detectada · plantilla y plan sincronizados');
+}
+});
+// API pública: permite a la página de compra cargar plantilla/plan sin recargar
+window.ESTUDIO_XV={
+getState:function(){ return state; },
+setPlan:function(k){ if(PLANS[k]) setPlan(k); },
+loadTemplate:function(catKey,slug){ return loadTemplateByPath(catKey+'/'+slug); },
+loadFromCart:function(){ loadFromUrlAndCart(); fullRender(); toast('🛒 Carrito sincronizado'); },
+refresh:function(){ fullRender(); }
+};
+// Si llegamos con ?categoria=&modelo=&plan= limpiamos la URL para compartir limpio
+if(location.search && (location.search.includes('categoria')||location.search.includes('plan'))){
+try{ history.replaceState(null,'',location.pathname); }catch(e){}
+}
 })();
 </script>
 </body>
