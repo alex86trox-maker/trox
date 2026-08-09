@@ -60,11 +60,24 @@ body{font-family:var(--fb);background:var(--e-bg);color:var(--e-ink);display:fle
 .btn-publish:disabled{opacity:.6;cursor:progress}
 .publish-note{margin-top:8px;font-size:9.5px;line-height:1.5;color:var(--e-mut);text-align:center}
 .publish-log{margin-top:9px;font-size:10px;font-weight:600;color:var(--e-green);min-height:14px;text-align:center}
-/* Plan bloqueado por URL: el cliente no puede cambiarlo */
-.plan-bar{display:none}
-.plan-locked{padding:12px 14px;border-bottom:1px solid var(--e-line);background:linear-gradient(135deg,rgba(184,155,94,.12),rgba(30,77,56,.06))}
-.plan-locked strong{display:block;font-family:var(--fd);font-size:12.5px;letter-spacing:.16em;color:var(--e-green)}
-.plan-locked span{display:block;margin-top:4px;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--e-gold)}
+/* Selector de planes en el panel */
+.plan-bar{padding:14px;border-bottom:1px solid var(--e-line);background:#fff}
+.plan-bar-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+.plan-bar-head strong{font-family:var(--fd);font-size:11.5px;letter-spacing:.18em;color:var(--e-green)}
+.plan-bar-head span{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--e-gold);font-weight:700}
+.plan-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.plan-card{position:relative;border:1px solid var(--e-line);border-radius:12px;padding:12px 6px 10px;background:#fff;cursor:pointer;text-align:center;font:inherit}
+.plan-card.sel{border-color:var(--pc);box-shadow:0 0 0 1.5px var(--pc);background:linear-gradient(180deg,rgba(184,155,94,.08),#fff)}
+.plan-card .n{font-family:var(--fd);font-size:10px;letter-spacing:.14em;color:var(--e-green)}
+.plan-card .pr{font-size:13px;font-weight:800;margin-top:3px}
+.plan-card .g{font-size:8.5px;color:var(--e-mut);margin-top:3px;letter-spacing:.06em}
+.plan-card .tag{position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:7px;font-weight:800;letter-spacing:.1em;padding:3px 7px;border-radius:99px;background:var(--e-gold);color:#231a06;white-space:nowrap}
+.plan-detail{margin-top:11px;border:1px solid var(--e-line);border-radius:12px;padding:11px 13px;background:var(--e-sage)}
+.plan-detail h4{font-family:var(--fd);font-size:11px;letter-spacing:.14em;color:var(--e-green);margin-bottom:3px}
+.plan-detail .eta{font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--e-gold);margin-bottom:8px}
+.plan-detail ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.plan-detail li{position:relative;padding-left:15px;font-size:10.5px;line-height:1.45;color:var(--e-ink)}
+.plan-detail li::before{content:'✦';position:absolute;left:0;top:0;color:var(--e-gold);font-size:9px}
 .sec{border-bottom:1px solid var(--e-line)}
 .sec-head{width:100%;display:flex;align-items:center;gap:11px;padding:14px 18px;background:none;border:0;cursor:pointer;font:inherit;text-align:left}
 .sec-num{font-family:var(--fd);font-size:12px;color:var(--e-gold)}
@@ -183,8 +196,11 @@ textarea.in{resize:vertical;min-height:52px}
   <div class="publish-note">Subimos tus fotos a la nube, enviamos tu diseño a producción y abrimos WhatsApp con Gueka Ideas.</div>
 </div>
 
-<div class="plan-locked" id="planLocked"><strong id="planLockedTxt">ESTÁS EDITANDO TU PLAN CLASSIC</strong><span id="planLockedSub">Hasta 4 fotos de galería</span></div>
-<div class="plan-bar"><div class="plan-cards" id="planCards"></div></div>
+<div class="plan-bar">
+  <div class="plan-bar-head"><strong>ELIGE TU PLAN</strong><span id="planBarSub">Hasta 4 fotos de galería</span></div>
+  <div class="plan-cards" id="planCards"></div>
+  <div class="plan-detail" id="planDetail"></div>
+</div>
 
 <div class="sec open"><button class="sec-head"><span class="sec-num">01</span><span class="sec-title">Contenido</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
@@ -303,7 +319,11 @@ function obtenerFotosLocales(){
 }
 
 /* ═══ ESTADO (las 15 casillas anteriores intactas) ═══ */
-const PLANS={classic:{name:'CLASSIC',price:80000,maxGal:4,color:'#6d7a72'},premium:{name:'PREMIUM',price:140000,maxGal:8,color:'#b89b5e'},deluxe:{name:'DELUXE',price:200000,maxGal:12,color:'#1e4d38'}};
+const PLANS={
+classic:{name:'CLASSIC',price:80000,maxGal:4,color:'#6d7a72',tag:'',eta:'Entrega 24 a 48 horas',feats:['Portada con cuenta regresiva animada','Fecha, hora y detalles del evento','Galería de 4 fotos','Dress code (código de vestimenta)','Cierre y firma']},
+premium:{name:'PREMIUM',price:140000,maxGal:8,color:'#b89b5e',tag:'⭐ MÁS POPULAR',eta:'Entrega 24 horas',feats:['Todo lo del plan Classic, más:','Galería ampliada a 8 fotos','Música de fondo a tu gusto','Confirmación de asistencia (RSVP) online','Sección "Mi Historia"','Cronograma / itinerario del evento','Redes sociales y hashtag oficial']},
+deluxe:{name:'DELUXE',price:200000,maxGal:12,color:'#1e4d38',tag:'TODO INCLUIDO',eta:'Entrega 12 horas',feats:['Todo lo del plan Premium, más:','Galería completa de 12 fotos','Mesa de regalos con código QR o billetera virtual','Mapa completo integrado con indicaciones','Padrinos o invitados VIP destacados','Información extra y logística (transporte, streaming)','Una sección adicional libre y personalizable']}
+};
 const PALETTES={neon:{a:'#ff0050',b:'#00f2ea',c:'#ffd700',d:'#39ff14',e:'#bf00ff',bg:'#080810'},violeta:{a:'#c026d3',b:'#8b5cf6',c:'#f0abfc',d:'#22d3ee',e:'#e879f9',bg:'#0a0612'},dorado:{a:'#b89b5e',b:'#8fb39c',c:'#e8dcc0',d:'#cdb079',e:'#9db8a4',bg:'#0f1712'},oceano:{a:'#22d3ee',b:'#38bdf8',c:'#a5f3fc',d:'#2dd4bf',e:'#818cf8',bg:'#060a12'}};
 function makeDefaults(){return{plan:'classic',category:'quince',templateName:'',name:'Sofía Valentina',age:'15',date:'2026-06-20',time:'18:30',hashtag:'#SofíaValentinaXV',caption:'✨ Mi gran noche llega...',historyText:'Sofía Valentina nació el 20 de junio de 2011.',venue:'SALÓN DE EVENTOS',address:'Calle de los Sueños 123, Bogotá',waOrganizer:'',rsvpCapacity:0,poem:'Hoy comienzas a escribir\nel capítulo más hermoso.',signature:'Con amor, Sofía',palette:'neon',showSplash:true,splashBtn:'▶ ABRIR INVITACIÓN',itinerary:[{time:'6:30 PM',name:'RECEPCIÓN'},{time:'8:00 PM',name:'VALS'}],padrinos:[{cat:'VALS',name:'Familia Rodríguez'}],dressCode:[{title:'DAMAS',desc:'Vestido largo'}],extra:[{icon:'📸',title:'FOTÓGRAFO',body:'Fotógrafo toda la noche'}],songs:[{title:'Vals Op.64 No.1',src:''}],gifts:[{label:'NEQUI',sub:'Colombia'}],captions:{},imgs:{retrato:'',fashion:''},gal:[]};}
 let state=makeDefaults();
@@ -345,10 +365,24 @@ setInterval(()=>{let t=new Date(state.date+'T'+(state.time||'18:30'))-Date.now()
 /* ═══ PLANES / SELECTORES ═══ */
 function renderPlans(){
   const c=$('#planCards');c.innerHTML='';
-  Object.keys(PLANS).forEach(k=>{const p=PLANS[k];const b=document.createElement('button');b.className='plan-card'+(k===state.plan?' sel':'');b.style.setProperty('--pc',p.color);b.innerHTML='<div class="n">'+p.name+'</div><div class="pr">$'+(p.price/1000)+'K</div><div class="g">📷 '+p.maxGal+'</div>';b.disabled=true;c.appendChild(b);});
-  $('#planPillTxt').textContent='PLAN '+PLANS[state.plan].name;
-  $('#planLockedTxt').textContent='ESTÁS EDITANDO TU PLAN '+PLANS[state.plan].name;
-  $('#planLockedSub').textContent='Hasta '+PLANS[state.plan].maxGal+' fotos de galería';
+  Object.keys(PLANS).forEach(k=>{
+    const p=PLANS[k];
+    const b=document.createElement('button');
+    b.className='plan-card'+(k===state.plan?' sel':'');
+    b.style.setProperty('--pc',p.color);
+    b.innerHTML=(p.tag?'<span class="tag">'+p.tag+'</span>':'')+'<div class="n">'+p.name+'</div><div class="pr">$'+(p.price/1000)+'K</div><div class="g">📷 '+p.maxGal+' fotos</div>';
+    b.onclick=()=>{
+      state.plan=k;
+      if((state.gal||[]).length>p.maxGal){state.gal=state.gal.slice(0,p.maxGal);buildLists();}
+      renderPlans();renderPreview();markSave();
+      toast('✓ Plan '+p.name+' seleccionado');
+    };
+    c.appendChild(b);
+  });
+  const P=PLANS[state.plan];
+  $('#planDetail').innerHTML='<h4>PLAN '+P.name+' · $'+P.price.toLocaleString('es-CO')+' COP</h4><div class="eta">'+P.eta+'</div><ul>'+P.feats.map(f=>'<li>'+esc(f)+'</li>').join('')+'</ul>';
+  $('#planBarSub').textContent='Hasta '+P.maxGal+' fotos de galería';
+  $('#planPillTxt').textContent='PLAN '+P.name;
 }
 function buildSelectors(){$('#tplSelect').innerHTML=['quince','matrimonio','bautizo','comunion','cumpleanos','graduacion','infantiles','empresarial'].map(c=>'<option value="'+c+'">'+c+'</option>').join('');$('#tplSelect').value=state.category;$('#tplSelect').onchange=e=>{state.category=e.target.value;renderPreview();markSave();};}
 function buildPalette(){const g=$('#palette-grid');g.innerHTML='';Object.keys(PALETTES).forEach(k=>{const P=PALETTES[k];const b=document.createElement('button');b.className='pal-card'+(k===state.palette?' sel':'');b.innerHTML='<div class="pal-dots"><i style="background:'+P.a+'"></i><i style="background:'+P.b+'"></i><i style="background:'+P.c+'"></i></div>';b.onclick=()=>{state.palette=k;buildPalette();renderPreview();markSave();};g.appendChild(b);});}
