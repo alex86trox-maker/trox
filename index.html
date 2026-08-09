@@ -322,7 +322,7 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 .db-status{font-size:9px;color:var(--e-green);margin-top:6px;font-weight:600}
 
 /* ── PALETAS ── */
-.pal-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.pal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .pal-card{
   border:1.5px solid var(--e-line);border-radius:12px;
   padding:12px 11px;background:#fff;cursor:pointer;
@@ -462,6 +462,7 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
       <div class="phone-notch"></div>
       <div id="preview-stage">
         <div id="card-wrapper" data-theme="neon">
+<canvas id="particle-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.55"></canvas>
 <section id="splash"><div class="splash-15" id="sp-15">15</div><div class="splash-name" id="sp-name">Sofía Valentina</div><div class="splash-date" id="sp-date"></div><button class="splash-btn" id="sp-btn">▶ ABRIR INVITACIÓN</button></section>
 <section><img class="cover-img" id="pv-retrato" src="" alt=""><h2 id="pv-nombre">Sofía Valentina</h2><div class="card-cap" id="pv-caption"></div></section>
 <section><h2>CUENTA REGRESIVA</h2><div id="cd" style="font-size:1.6rem;font-weight:900">00:00:00:00</div></section>
@@ -592,8 +593,13 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 <div class="field"><label>Firma</label><input class="in" data-bind="signature"></div>
 </div></div></div></div>
 
-<div class="sec"><button class="sec-head"><span class="sec-num">15</span><span class="sec-title">Estilo</span><span class="chev">▾</span></button>
-<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div class="pal-grid" id="palette-grid"></div></div></div></div></div>
+<div class="sec open"><button class="sec-head"><span class="sec-num">15</span><span class="sec-title">Estilo</span><span class="chev">▾</span></button>
+<div class="sec-body"><div class="sec-inner"><div class="sec-pad">
+<div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:8px">PALETA DE COLORES</div>
+<div class="pal-grid" id="palette-grid"></div>
+<div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin:18px 0 8px">EFECTO DE PARTÍCULAS</div>
+<div class="pal-grid" id="particles-grid"></div>
+</div></div></div></div>
 </aside>
 </div>
 <button class="mob-fab" id="mobFab">✦ Editar</button>
@@ -647,8 +653,16 @@ classic:{name:'CLASSIC',price:80000,maxGal:4,color:'#6d7a72',tag:'',eta:'Entrega
 premium:{name:'PREMIUM',price:140000,maxGal:8,color:'#b89b5e',tag:'⭐ MÁS POPULAR',eta:'Entrega 24 horas',feats:['Todo lo del plan Classic, más:','Galería ampliada a 8 fotos','Música de fondo a tu gusto','Confirmación de asistencia (RSVP) online','Sección "Mi Historia"','Cronograma / itinerario del evento','Redes sociales y hashtag oficial','Botón de agendar en calendario','Colector de fotos del evento']},
 deluxe:{name:'DELUXE',price:200000,maxGal:12,color:'#1e4d38',tag:'TODO INCLUIDO',eta:'Entrega 12 horas',feats:['Todo lo del plan Premium, más:','Galería completa de 12 fotos','Mesa de regalos con código QR o billetera virtual','Mapa completo integrado con indicaciones','Padrinos o invitados VIP destacados','Información extra y logística (transporte, streaming)','Una sección adicional libre y personalizable','Pase personalizado con nombre','Código QR de acceso al salón']}
 };
-const PALETTES={neon:{a:'#ff0050',b:'#00f2ea',c:'#ffd700',d:'#39ff14',e:'#bf00ff',bg:'#080810'},violeta:{a:'#c026d3',b:'#8b5cf6',c:'#f0abfc',d:'#22d3ee',e:'#e879f9',bg:'#0a0612'},dorado:{a:'#b89b5e',b:'#8fb39c',c:'#e8dcc0',d:'#cdb079',e:'#9db8a4',bg:'#0f1712'},oceano:{a:'#22d3ee',b:'#38bdf8',c:'#a5f3fc',d:'#2dd4bf',e:'#818cf8',bg:'#060a12'}};
-function makeDefaults(){return{plan:'classic',category:'quince',templateName:'',name:'Sofía Valentina',age:'15',date:'2026-06-20',time:'18:30',hashtag:'#SofíaValentinaXV',caption:'✨ Mi gran noche llega...',historyText:'Sofía Valentina nació el 20 de junio de 2011.',venue:'SALÓN DE EVENTOS',address:'Calle de los Sueños 123, Bogotá',mapUrl:'',customTitle:'SECCIÓN LIBRE',customText:'',waOrganizer:'',rsvpCapacity:0,albumUrl:'',rsvpPara:'',rsvpMaxPases:0,poem:'Hoy comienzas a escribir\nel capítulo más hermoso.',signature:'Con amor, Sofía',palette:'neon',showSplash:true,splashBtn:'▶ ABRIR INVITACIÓN',itinerary:[{v:'6:30 PM · RECEPCIÓN'},{v:'8:00 PM · VALS'}],padrinos:[{v:'VALS · Familia Rodríguez'}],dressCode:[{v:'DAMAS · Vestido largo'}],extra:[{v:'📸 FOTÓGRAFO · Fotógrafo toda la noche'}],songs:[{v:'Vals Op.64 No.1'}],gifts:[{v:'NEQUI · Colombia'}],captions:{},imgs:{retrato:'',fashion:''},gal:[]};}
+const PALETTES={
+  neon:    {a:'#ff0050',b:'#00f2ea',c:'#ffd700',d:'#39ff14',e:'#bf00ff',bg:'#080810'},
+  violeta: {a:'#c026d3',b:'#8b5cf6',c:'#f0abfc',d:'#22d3ee',e:'#e879f9',bg:'#0a0612'},
+  dorado:  {a:'#b89b5e',b:'#8fb39c',c:'#e8dcc0',d:'#cdb079',e:'#9db8a4',bg:'#0f1712'},
+  oceano:  {a:'#22d3ee',b:'#38bdf8',c:'#a5f3fc',d:'#2dd4bf',e:'#818cf8',bg:'#060a12'},
+  rosas:   {a:'#ff6b9d',b:'#ff8fab',c:'#ffb3c6',d:'#ff4d8d',e:'#c9184a',bg:'#1a0610'},
+  esmeralda:{a:'#10b981',b:'#34d399',c:'#6ee7b7',d:'#059669',e:'#a7f3d0',bg:'#022c22'},
+  fuego:   {a:'#f97316',b:'#ef4444',c:'#fbbf24',d:'#dc2626',e:'#fb923c',bg:'#160500'}
+};
+function makeDefaults(){return{plan:'classic',category:'quince',templateName:'',name:'Sofía Valentina',age:'15',date:'2026-06-20',time:'18:30',hashtag:'#SofíaValentinaXV',caption:'✨ Mi gran noche llega...',historyText:'Sofía Valentina nació el 20 de junio de 2011.',venue:'SALÓN DE EVENTOS',address:'Calle de los Sueños 123, Bogotá',mapUrl:'',customTitle:'SECCIÓN LIBRE',customText:'',waOrganizer:'',rsvpCapacity:0,albumUrl:'',rsvpPara:'',rsvpMaxPases:0,poem:'Hoy comienzas a escribir\nel capítulo más hermoso.',signature:'Con amor, Sofía',palette:'neon',particles:'ninguna',showSplash:true,splashBtn:'▶ ABRIR INVITACIÓN',itinerary:[{v:'6:30 PM · RECEPCIÓN'},{v:'8:00 PM · VALS'}],padrinos:[{v:'VALS · Familia Rodríguez'}],dressCode:[{v:'DAMAS · Vestido largo'}],extra:[{v:'📸 FOTÓGRAFO · Fotógrafo toda la noche'}],songs:[{v:'Vals Op.64 No.1'}],gifts:[{v:'NEQUI · Colombia'}],captions:{},imgs:{retrato:'',fashion:''},gal:[]};}
 let state=makeDefaults();
 try{const s=localStorage.getItem('gueka_editor_v2');if(s)state=Object.assign(makeDefaults(),JSON.parse(s));}catch(e){}
 
@@ -761,14 +775,14 @@ function renderPlans(){
 }
 function buildSelectors(){$('#tplSelect').innerHTML=['quince','matrimonio','bautizo','comunion','cumpleanos','graduacion','infantiles','empresarial'].map(c=>'<option value="'+c+'">'+c+'</option>').join('');$('#tplSelect').value=state.category;$('#tplSelect').onchange=e=>{state.category=e.target.value;renderPreview();markSave();};}
 function buildPalette(){
-  const NAMES={neon:'Neón',violeta:'Violeta',dorado:'Dorado',oceano:'Océano'};
+  const NAMES={neon:'Neón',violeta:'Violeta',dorado:'Dorado',oceano:'Océano',rosas:'Rosas',esmeralda:'Esmeralda',fuego:'Fuego'};
   const g=$('#palette-grid');g.innerHTML='';
   Object.keys(PALETTES).forEach(k=>{
     const P=PALETTES[k];
     const b=document.createElement('button');
     b.className='pal-card'+(k===state.palette?' sel':'');
     b.innerHTML='<div class="pal-dots"><i style="background:'+P.a+'"></i><i style="background:'+P.b+'"></i><i style="background:'+P.c+'"></i></div><div class="pal-name">'+(NAMES[k]||k)+'</div>';
-    b.onclick=()=>{state.palette=k;buildPalette();renderPreview();markSave();};
+    b.onclick=()=>{state.palette=k;buildPalette();renderPreview();startParticles(state.particles||'ninguna');markSave();};
     g.appendChild(b);
   });
 }
@@ -850,7 +864,7 @@ async function exportarHTML(){
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download='invitacion.html';a.click();toast('✓ HTML descargado');
 }
 $('#btnExport').onclick=exportarHTML;
-$('#btnResetAll').onclick=()=>{const plan=state.plan;state=makeDefaults();state.plan=plan;hydrateInputs();renderPreview();renderPlans();buildLists();markSave();toast('Restablecido');};
+$('#btnResetAll').onclick=()=>{const plan=state.plan;state=makeDefaults();state.plan=plan;hydrateInputs();renderPreview();renderPlans();buildLists();buildParticles();startParticles('ninguna');markSave();toast('Restablecido');};
 $('#btnUndo').onclick=()=>toast('↺ Deshacer');$('#btnRedo').onclick=()=>toast('↻ Rehacer');
 $('#btnQR').onclick=()=>{if(typeof QRCode!=='undefined'){const w=window.open('','_blank');w.document.write('<div id="q"></div><script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script><script>new QRCode(document.getElementById("q"),{text:"https://guekaideas.com/invitacion",width:200,height:200});<\/script>');} };
 $('#mobFab').onclick=()=>$('#sidebar').classList.toggle('mob-open');
@@ -971,8 +985,78 @@ $('#btnPublish').addEventListener('click',async()=>{
   }
 });
 
-hydrateInputs();renderPlans();buildSelectors();buildPalette();buildLists();renderPreview();restaurarFotos();
+/* ═══ MOTOR DE PARTÍCULAS ═══ */
+const PAR_TYPES={
+  ninguna:{label:'Sin efecto',icon:'✕'},
+  estrellas:{label:'Estrellas',icon:'✦'},
+  burbujas:{label:'Burbujas',icon:'◯'},
+  petalos:{label:'Pétalos',icon:'❀'}
+};
+let _parAnim=null;
+function startParticles(type){
+  const cv=$('#particle-canvas');if(!cv)return;
+  const ctx=cv.getContext('2d');
+  if(_parAnim){cancelAnimationFrame(_parAnim);_parAnim=null;}
+  ctx.clearRect(0,0,cv.width,cv.height);
+  if(!type||type==='ninguna'){cv.style.display='none';return;}
+  cv.style.display='block';
+  const W=cv.offsetWidth,H=cv.offsetHeight;cv.width=W;cv.height=H;
+  const P=PALETTES[state.palette]||PALETTES.neon;
+  const colors=[P.a,P.b,P.c];
+  const N=type==='burbujas'?28:type==='petalos'?22:40;
+  const pts=Array.from({length:N},()=>({
+    x:Math.random()*W,y:Math.random()*H,
+    r:type==='burbujas'?Math.random()*10+4:Math.random()*4+2,
+    vx:(Math.random()-.5)*(type==='petalos'?.6:.4),
+    vy:type==='burbujas'?-(Math.random()*.5+.2):-(Math.random()*.4+.15),
+    a:Math.random()*Math.PI*2,va:(Math.random()-.5)*.05,
+    color:colors[Math.floor(Math.random()*colors.length)],
+    op:Math.random()*.6+.3
+  }));
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      ctx.save();ctx.globalAlpha=p.op;
+      if(type==='estrellas'){
+        ctx.fillStyle=p.color;
+        const s=p.r;
+        ctx.translate(p.x,p.y);ctx.rotate(p.a);
+        ctx.beginPath();
+        for(let i=0;i<5;i++){ctx.lineTo(Math.cos((18+i*72)*Math.PI/180)*s,Math.sin((18+i*72)*Math.PI/180)*s);ctx.lineTo(Math.cos((54+i*72)*Math.PI/180)*s*.45,Math.sin((54+i*72)*Math.PI/180)*s*.45);}
+        ctx.closePath();ctx.fill();
+      } else if(type==='burbujas'){
+        ctx.strokeStyle=p.color;ctx.lineWidth=1.2;
+        ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.stroke();
+        ctx.fillStyle=p.color;ctx.globalAlpha=p.op*.15;
+        ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+      } else {
+        ctx.fillStyle=p.color;
+        ctx.translate(p.x,p.y);ctx.rotate(p.a);
+        ctx.beginPath();ctx.ellipse(0,0,p.r*1.8,p.r*.9,0,0,Math.PI*2);ctx.fill();
+      }
+      ctx.restore();
+      p.x+=p.vx;p.y+=p.vy;p.a+=p.va;
+      if(p.y<-20)p.y=H+10;
+      if(p.x<-20)p.x=W+10;if(p.x>W+20)p.x=-10;
+    });
+    _parAnim=requestAnimationFrame(draw);
+  }
+  draw();
+}
+function buildParticles(){
+  const g=$('#particles-grid');if(!g)return;g.innerHTML='';
+  Object.keys(PAR_TYPES).forEach(k=>{
+    const T=PAR_TYPES[k];
+    const b=document.createElement('button');
+    b.className='pal-card'+(k===state.particles?' sel':'');
+    b.innerHTML='<div style="font-size:1.3rem;margin-bottom:6px">'+T.icon+'</div><div class="pal-name">'+T.label+'</div>';
+    b.onclick=()=>{state.particles=k;buildParticles();startParticles(k);markSave();};
+    g.appendChild(b);
+  });
+  startParticles(state.particles||'ninguna');
+}
+
+hydrateInputs();renderPlans();buildSelectors();buildPalette();buildParticles();buildLists();renderPreview();restaurarFotos();
 </script>
 </body>
 </html>
-
