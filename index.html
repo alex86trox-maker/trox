@@ -52,6 +52,9 @@ body{font-family:var(--fb);background:var(--e-bg);color:var(--e-ink);display:fle
   z-index:40;
 }
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+/* Botón HTML oculto — solo visible en modo admin (?admin=true) */
+#btnExport{display:none !important;}
+.modo-admin #btnExport{display:inline-flex !important;}
 .brand-logo-wrap{
   background:#16211b;
   border-radius:8px;
@@ -462,10 +465,18 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 <section id="splash"><div class="splash-15" id="sp-15">15</div><div class="splash-name" id="sp-name">Sofía Valentina</div><div class="splash-date" id="sp-date"></div><button class="splash-btn" id="sp-btn">▶ ABRIR INVITACIÓN</button></section>
 <section><img class="cover-img" id="pv-retrato" src="" alt=""><h2 id="pv-nombre">Sofía Valentina</h2><div class="card-cap" id="pv-caption"></div></section>
 <section><h2>CUENTA REGRESIVA</h2><div id="cd" style="font-size:1.6rem;font-weight:900">00:00:00:00</div></section>
+<section data-plan="premium" id="pv-cal-sec">
+  <a id="pv-cal-btn" href="#" target="_blank" rel="noopener" style="display:inline-block;padding:10px 22px;border-radius:20px;background:var(--c-a);color:#fff;text-decoration:none;font-weight:700;font-size:0.85rem;letter-spacing:.08em">📅 AGENDAR EN MI CALENDARIO</a>
+</section>
 <section data-plan="premium"><h2>MI HISTORIA</h2><img class="cover-img" id="pv-fashion" src="" alt="" style="height:320px;border-radius:12px"><div class="card-cap" id="pv-history"></div></section>
 <section data-plan="premium"><h2>PROGRAMA</h2><div class="card-list" id="pv-itin"></div></section>
 <section data-plan="deluxe"><h2>PADRINOS</h2><div class="card-list" id="pv-padr"></div></section>
 <section><h2>GALERÍA</h2><div class="gal-prev" id="pv-galeria"></div></section>
+<section data-plan="premium" id="pv-album-sec">
+  <h2>📸 CAPTURA EL MOMENTO</h2>
+  <div class="card-cap" style="margin-bottom:12px">¡Ayúdanos a capturar cada momento! Sube tus fotos y videos desde tu celular</div>
+  <a id="pv-album-btn" href="#" target="_blank" rel="noopener" style="display:inline-block;padding:10px 22px;border-radius:20px;background:var(--c-b);color:#fff;text-decoration:none;font-weight:700;font-size:0.85rem;letter-spacing:.08em">📁 SUBIR MIS FOTOS</a>
+</section>
 <section data-plan="premium"><h2>MÚSICA</h2><div class="card-list" id="pv-songs"></div></section>
 <section data-plan="deluxe"><h2>MESA DE REGALOS</h2><div class="card-list" id="pv-gifts"></div></section>
 <section data-plan="deluxe"><h2>INFO EXTRA</h2><div class="card-list" id="pv-extra"></div></section>
@@ -479,6 +490,11 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
     <input id="rsvp-acomp" type="number" min="0" value="0" placeholder="Acompañantes">
     <textarea id="rsvp-msg" placeholder="Mensaje para la festejada (opcional)"></textarea>
     <button type="submit">CONFIRMAR POR WHATSAPP</button>
+    <div id="rsvp-qr-wrap" style="display:none;margin-top:18px;text-align:center">
+      <div style="font-size:0.8rem;letter-spacing:.1em;margin-bottom:8px;color:var(--c-a)">TU PASE DE ACCESO</div>
+      <div id="rsvp-qr-canvas" style="display:inline-block;background:#fff;padding:10px;border-radius:8px"></div>
+      <div style="font-size:0.7rem;margin-top:8px;color:var(--c-b)">Muestra este código QR en la entrada</div>
+    </div>
   </form>
   <div class="rsvp-note" id="pv-rsvp"></div>
 </section>
@@ -548,6 +564,7 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 
 <div class="sec" data-plan="deluxe"><button class="sec-head"><span class="sec-num">9</span><span class="sec-title">Info extra</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-extra"></div>
+<div class="field" data-plan="premium"><label>Enlace álbum compartido (Google Drive / Dropbox)</label><input class="in" data-bind="albumUrl" placeholder="https://drive.google.com/..."></div>
 <div class="field" style="margin-top:12px"><label>Título de sección libre</label><input class="in" data-bind="customTitle" placeholder="SECCIÓN LIBRE"></div>
 <div class="field"><label>Texto de sección libre</label><textarea class="in" data-bind="customText"></textarea></div>
 </div></div></div></div>
@@ -565,6 +582,8 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label>WhatsApp organizadora</label><input class="in" data-bind="waOrganizer" placeholder="573001234567"></div>
 <div class="field"><label>Aforo (0=∞)</label><input class="in" type="number" data-bind="rsvpCapacity"></div>
+<div class="field" data-plan="deluxe"><label>Nombre en pase (desde URL: ?para=Familia-Perez)</label><input class="in" data-bind="rsvpPara" placeholder="Ej: Familia Pérez · 4 pases"></div>
+<div class="field" data-plan="deluxe"><label>Pases máximos (bloquea el selector RSVP)</label><input class="in" type="number" data-bind="rsvpMaxPases" placeholder="4"></div>
 </div></div></div></div>
 
 <div class="sec"><button class="sec-head"><span class="sec-num">14</span><span class="sec-title">Cierre</span><span class="chev">▾</span></button>
@@ -625,11 +644,11 @@ function obtenerFotosLocales(){
 /* ═══ ESTADO ═══ */
 const PLANS={
 classic:{name:'CLASSIC',price:80000,maxGal:4,color:'#6d7a72',tag:'',eta:'Entrega 24 a 48 horas',feats:['Portada con cuenta regresiva animada','Fecha, hora y detalles del evento','Galería de 4 fotos','Dress code (código de vestimenta)','Cierre y firma']},
-premium:{name:'PREMIUM',price:140000,maxGal:8,color:'#b89b5e',tag:'⭐ MÁS POPULAR',eta:'Entrega 24 horas',feats:['Todo lo del plan Classic, más:','Galería ampliada a 8 fotos','Música de fondo a tu gusto','Confirmación de asistencia (RSVP) online','Sección "Mi Historia"','Cronograma / itinerario del evento','Redes sociales y hashtag oficial']},
-deluxe:{name:'DELUXE',price:200000,maxGal:12,color:'#1e4d38',tag:'TODO INCLUIDO',eta:'Entrega 12 horas',feats:['Todo lo del plan Premium, más:','Galería completa de 12 fotos','Mesa de regalos con código QR o billetera virtual','Mapa completo integrado con indicaciones','Padrinos o invitados VIP destacados','Información extra y logística (transporte, streaming)','Una sección adicional libre y personalizable']}
+premium:{name:'PREMIUM',price:140000,maxGal:8,color:'#b89b5e',tag:'⭐ MÁS POPULAR',eta:'Entrega 24 horas',feats:['Todo lo del plan Classic, más:','Galería ampliada a 8 fotos','Música de fondo a tu gusto','Confirmación de asistencia (RSVP) online','Sección "Mi Historia"','Cronograma / itinerario del evento','Redes sociales y hashtag oficial','Botón de agendar en calendario','Colector de fotos del evento']},
+deluxe:{name:'DELUXE',price:200000,maxGal:12,color:'#1e4d38',tag:'TODO INCLUIDO',eta:'Entrega 12 horas',feats:['Todo lo del plan Premium, más:','Galería completa de 12 fotos','Mesa de regalos con código QR o billetera virtual','Mapa completo integrado con indicaciones','Padrinos o invitados VIP destacados','Información extra y logística (transporte, streaming)','Una sección adicional libre y personalizable','Pase personalizado con nombre','Código QR de acceso al salón']}
 };
 const PALETTES={neon:{a:'#ff0050',b:'#00f2ea',c:'#ffd700',d:'#39ff14',e:'#bf00ff',bg:'#080810'},violeta:{a:'#c026d3',b:'#8b5cf6',c:'#f0abfc',d:'#22d3ee',e:'#e879f9',bg:'#0a0612'},dorado:{a:'#b89b5e',b:'#8fb39c',c:'#e8dcc0',d:'#cdb079',e:'#9db8a4',bg:'#0f1712'},oceano:{a:'#22d3ee',b:'#38bdf8',c:'#a5f3fc',d:'#2dd4bf',e:'#818cf8',bg:'#060a12'}};
-function makeDefaults(){return{plan:'classic',category:'quince',templateName:'',name:'Sofía Valentina',age:'15',date:'2026-06-20',time:'18:30',hashtag:'#SofíaValentinaXV',caption:'✨ Mi gran noche llega...',historyText:'Sofía Valentina nació el 20 de junio de 2011.',venue:'SALÓN DE EVENTOS',address:'Calle de los Sueños 123, Bogotá',mapUrl:'',customTitle:'SECCIÓN LIBRE',customText:'',waOrganizer:'',rsvpCapacity:0,poem:'Hoy comienzas a escribir\nel capítulo más hermoso.',signature:'Con amor, Sofía',palette:'neon',showSplash:true,splashBtn:'▶ ABRIR INVITACIÓN',itinerary:[{v:'6:30 PM · RECEPCIÓN'},{v:'8:00 PM · VALS'}],padrinos:[{v:'VALS · Familia Rodríguez'}],dressCode:[{v:'DAMAS · Vestido largo'}],extra:[{v:'📸 FOTÓGRAFO · Fotógrafo toda la noche'}],songs:[{v:'Vals Op.64 No.1'}],gifts:[{v:'NEQUI · Colombia'}],captions:{},imgs:{retrato:'',fashion:''},gal:[]};}
+function makeDefaults(){return{plan:'classic',category:'quince',templateName:'',name:'Sofía Valentina',age:'15',date:'2026-06-20',time:'18:30',hashtag:'#SofíaValentinaXV',caption:'✨ Mi gran noche llega...',historyText:'Sofía Valentina nació el 20 de junio de 2011.',venue:'SALÓN DE EVENTOS',address:'Calle de los Sueños 123, Bogotá',mapUrl:'',customTitle:'SECCIÓN LIBRE',customText:'',waOrganizer:'',rsvpCapacity:0,albumUrl:'',rsvpPara:'',rsvpMaxPases:0,poem:'Hoy comienzas a escribir\nel capítulo más hermoso.',signature:'Con amor, Sofía',palette:'neon',showSplash:true,splashBtn:'▶ ABRIR INVITACIÓN',itinerary:[{v:'6:30 PM · RECEPCIÓN'},{v:'8:00 PM · VALS'}],padrinos:[{v:'VALS · Familia Rodríguez'}],dressCode:[{v:'DAMAS · Vestido largo'}],extra:[{v:'📸 FOTÓGRAFO · Fotógrafo toda la noche'}],songs:[{v:'Vals Op.64 No.1'}],gifts:[{v:'NEQUI · Colombia'}],captions:{},imgs:{retrato:'',fashion:''},gal:[]};}
 let state=makeDefaults();
 try{const s=localStorage.getItem('gueka_editor_v2');if(s)state=Object.assign(makeDefaults(),JSON.parse(s));}catch(e){}
 
@@ -637,8 +656,20 @@ const urlParams=new URLSearchParams(window.location.search);
 const planValidado=(urlParams.get('plan')||state.plan||'classic').toLowerCase();
 state.plan=PLANS[planValidado]?planValidado:'classic';
 const ORDER={id:urlParams.get('order')||urlParams.get('pedido')||'',cliente:urlParams.get('cliente')||'',tel:urlParams.get('tel')||''};
+if(urlParams.get('admin')==='true'){document.body.classList.add('modo-admin');}
 
 function markSave(){const d=$('#saveDot');d.classList.add('saving');clearTimeout(markSave.t);markSave.t=setTimeout(()=>{try{localStorage.setItem('gueka_editor_v2',JSON.stringify(state));}catch(e){}d.classList.remove('saving');},600);}
+
+/* ═══ HELPER: CALENDAR URL ═══ */
+function buildCalendarUrl(){
+  const start=(state.date||'').replace(/-/g,'')+'T'+(state.time||'1800').replace(':','')+'00';
+  const d=new Date((state.date+'T'+state.time)||'2026-01-01T18:00');
+  d.setHours(d.getHours()+4);
+  const end=d.toISOString().replace(/[-:]/g,'').split('.')[0];
+  const title=encodeURIComponent('🎉 '+state.name+(state.age?' · '+state.age+' años':''));
+  const loc=encodeURIComponent((state.venue||'')+' '+(state.address||''));
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+title+'&dates='+start+'/'+end+'&location='+loc+'&details=Invitaci%C3%B3n+digital+por+Gueka+Ideas';
+}
 
 /* ═══ RENDER VISTA PREVIA ═══ */
 function renderPreview(){
@@ -654,7 +685,22 @@ $('#pv-retrato').src=state.imgs.retrato||'https://image.qwenlm.ai/public_source/
 $('#pv-fashion').src=state.imgs.fashion||state.imgs.retrato||'https://image.qwenlm.ai/public_source/501fff7f-a609-4843-af5b-2ac3bc956c88/119aaf951-991f-48f5-bce6-7cf6bf499e4a.png';
 $('#prev-retrato').src=$('#pv-retrato').src;$('#prev-fashion').src=$('#pv-fashion').src;
 $('#pv-lugar').innerHTML=esc(state.venue)+'<br>'+esc(state.address)+(state.mapUrl?'<br><a href="'+esc(state.mapUrl)+'" target="_blank" style="color:var(--c-a)">Ver mapa e indicaciones</a>':'');
-$('#pv-rsvp').textContent='Confirmaciones al WhatsApp '+(state.waOrganizer||'(pendiente)')+' · Aforo: '+(state.rsvpCapacity||'∞');
+// RSVP note — pase personalizado (DELUXE) o mensaje estándar
+const paraUrl=urlParams.get('para')||'';
+const paraLabel=paraUrl?paraUrl.replace(/-/g,' '):(state.rsvpPara||'');
+const maxPases=parseInt(state.rsvpMaxPases)||0;
+const rsvpNote=$('#pv-rsvp');
+if(rsvpNote){
+  let rsvpTxt='Confirmaciones al WhatsApp '+(state.waOrganizer||'(pendiente)')+' · Aforo: '+(state.rsvpCapacity||'∞');
+  if(PLAN_RANK[state.plan]>=3&&paraLabel){
+    rsvpTxt='¡Hola '+paraLabel+'!'+(maxPases?' Tienen '+maxPases+' pases reservados.':'')+' Confirma tu asistencia al WhatsApp '+(state.waOrganizer||'(pendiente)');
+  }
+  rsvpNote.textContent=rsvpTxt;
+}
+const acompInput=$('#rsvp-acomp');
+if(acompInput&&PLAN_RANK[state.plan]>=3&&maxPases>0){
+  acompInput.max=maxPases;acompInput.value=maxPases;acompInput.readOnly=true;
+}else if(acompInput){acompInput.removeAttribute('max');acompInput.readOnly=false;}
 $('#pv-itin').innerHTML=(state.itinerary||[]).map(it=>'<div>'+esc(it.v||'')+'</div>').join('');
 $('#pv-padr').innerHTML=(state.padrinos||[]).map(it=>'<div>'+esc(it.v||'')+'</div>').join('');
 $('#pv-dress').innerHTML=(state.dressCode||[]).map(it=>'<div>'+esc(it.v||'')+'</div>').join('');
@@ -666,6 +712,11 @@ $('#pv-custom-text').textContent=state.customText||'';
 const g=$('#pv-galeria');g.innerHTML='';(state.gal||[]).slice(0,PLANS[state.plan].maxGal).forEach(u=>{const im=document.createElement('img');im.src=u;g.appendChild(im);});
 const cw=$('#card-wrapper');cw.dataset.theme=({quince:'neon',matrimonio:'elegante',bautizo:'pastel',comunion:'pastel',graduacion:'elegante',empresarial:'elegante',cumpleanos:'neon',infantiles:'pastel'})[state.category]||'neon';
 const P=PALETTES[state.palette]||PALETTES.neon;cw.style.setProperty('--c-a',P.a);cw.style.setProperty('--c-b',P.b);cw.style.setProperty('--c-c',P.c);cw.style.setProperty('--c-d',P.d);cw.style.setProperty('--c-e',P.e);cw.style.setProperty('--c-bg',P.bg);
+// Botón calendario (PREMIUM)
+const calBtn=$('#pv-cal-btn');if(calBtn)calBtn.href=buildCalendarUrl();
+// Álbum de fotos (PREMIUM)
+const albumBtn=$('#pv-album-btn');if(albumBtn){albumBtn.href=state.albumUrl||'#';albumBtn.style.opacity=state.albumUrl?'1':'0.4';}
+const albumSec=$('#pv-album-sec');if(albumSec)albumSec.style.display=state.albumUrl?'':'none';
 }
 setInterval(()=>{let t=new Date(state.date+'T'+(state.time||'18:30'))-Date.now();if(t<0)t=0;const dd=Math.floor(t/864e5),h=Math.floor(t%864e5/36e5),m=Math.floor(t%36e5/6e4),s=Math.floor(t%6e4/1e3);const c=$('#cd');if(c)c.textContent=pad(dd)+':'+pad(h)+':'+pad(m)+':'+pad(s);},1000);
 
@@ -752,6 +803,18 @@ $('#rsvp-form').addEventListener('submit',(ev)=>{
     +($('#rsvp-msg').value.trim()?('Mensaje: '+$('#rsvp-msg').value.trim()+'\n'):'')
     +(state.hashtag||'');
   window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(msg),'_blank');
+  // QR de acceso — solo plan DELUXE
+  if(PLAN_RANK[state.plan]>=3&&typeof QRCode!=='undefined'){
+    const qrWrap=$('#rsvp-qr-wrap');
+    const qrCanvas=$('#rsvp-qr-canvas');
+    if(qrWrap&&qrCanvas){
+      qrCanvas.innerHTML='';
+      const code='GUEKA|'+state.name+'|'+(nombre||'Invitado')+'|'+(new Date(state.date).toLocaleDateString('es-CO'))+'|'+Date.now();
+      new QRCode(qrCanvas,{text:code,width:180,height:180,colorDark:'#000000',colorLight:'#ffffff'});
+      qrWrap.style.display='block';
+      toast('✓ Tu pase QR fue generado. Toma un pantallazo.');
+    }
+  }
 });
 
 /* ═══ SUBIDA DE FOTOS → IndexedDB ═══ */
@@ -871,7 +934,8 @@ function construirPayload(fotos){
     regalos:state.gifts.map(i=>i.v).join('\n'),
     foto_retrato:fotos.retrato||state.imgs.retrato||'',
     foto_historia:fotos.fashion||state.imgs.fashion||'',
-    galeria:(fotos.galeria.length?fotos.galeria:state.gal||[]).join(', ')
+    galeria:(fotos.galeria.length?fotos.galeria:state.gal||[]).join(', '),
+    album_fotos:state.albumUrl||''
   };
 }
 async function enviarAProduccion(payload){
@@ -911,3 +975,4 @@ hydrateInputs();renderPlans();buildSelectors();buildPalette();buildLists();rende
 </script>
 </body>
 </html>
+
