@@ -221,7 +221,7 @@ textarea.in{resize:vertical;min-height:52px}
 <div class="photo-field"><label>Retrato principal</label><div class="photo-preview-wrap"><img id="prev-retrato" src=""></div><div class="photo-tools"><button class="photo-tool" data-up="retrato">📁 Subir foto</button><button class="photo-tool" data-def="retrato">↺ Default</button></div></div>
 <div class="photo-field" data-plan="premium"><label>Mi historia</label><div class="photo-preview-wrap"><img id="prev-fashion" src=""></div><div class="photo-tools"><button class="photo-tool" data-up="fashion">📁 Subir foto</button><button class="photo-tool" data-def="fashion">↺ Default</button></div></div>
 <div class="field"><label>Galería (múltiple) · <span id="galLimitTxt">máx 4</span></label><input type="file" id="cantidad_fotos" accept="image/*" multiple></div>
-<div class="db-status" id="dbStatus">⏳ Conectando IndexedDB…</div>
+<div class="db-status" id="dbStatus"></div>
 </div></div></div></div>
 
 <div class="sec"><button class="sec-head"><span class="sec-num">3</span><span class="sec-title">Bienvenida</span><span class="chev">▾</span></button>
@@ -294,7 +294,6 @@ function toast(h){const t=document.createElement('div');t.className='toast';t.in
 
 /* ════════════════════════════════════════════════════════════
    📦 CONFIGURACIÓN DE LA BASE DE DATOS LOCAL (IndexedDB)
-   Adaptada al editor anterior SIN modificar las demás funciones
 ════════════════════════════════════════════════════════════ */
 const DB_NAME="GuekaEditorDB", DB_VERSION=1, STORE_NAME="fotos_proyecto";
 let db=null;
@@ -328,7 +327,7 @@ function obtenerFotosLocales(){
   });
 }
 
-/* ═══ ESTADO (las 15 casillas anteriores intactas) ═══ */
+/* ═══ ESTADO ═══ */
 const PLANS={
 classic:{name:'CLASSIC',price:80000,maxGal:4,color:'#6d7a72',tag:'',eta:'Entrega 24 a 48 horas',feats:['Portada con cuenta regresiva animada','Fecha, hora y detalles del evento','Galería de 4 fotos','Dress code (código de vestimenta)','Cierre y firma']},
 premium:{name:'PREMIUM',price:140000,maxGal:8,color:'#b89b5e',tag:'⭐ MÁS POPULAR',eta:'Entrega 24 horas',feats:['Todo lo del plan Classic, más:','Galería ampliada a 8 fotos','Música de fondo a tu gusto','Confirmación de asistencia (RSVP) online','Sección "Mi Historia"','Cronograma / itinerario del evento','Redes sociales y hashtag oficial']},
@@ -339,18 +338,14 @@ function makeDefaults(){return{plan:'classic',category:'quince',templateName:'',
 let state=makeDefaults();
 try{const s=localStorage.getItem('gueka_editor_v2');if(s)state=Object.assign(makeDefaults(),JSON.parse(s));}catch(e){}
 
-/* ═══ 2) SINCRONIZACIÓN AUTOMÁTICA DE PLANES (Query Parameters) ═══
-   El plan llega inyectado en la URL (?plan=premium) y NO se puede cambiar
-   desde el panel. El selector visual queda oculto por CSS (.plan-bar). */
 const urlParams=new URLSearchParams(window.location.search);
 const planValidado=(urlParams.get('plan')||state.plan||'classic').toLowerCase();
 state.plan=PLANS[planValidado]?planValidado:'classic';
-/* Datos del pedido enviados por Make/WhatsApp (opcionales) */
 const ORDER={id:urlParams.get('order')||urlParams.get('pedido')||'',cliente:urlParams.get('cliente')||'',tel:urlParams.get('tel')||''};
 
 function markSave(){const d=$('#saveDot');d.classList.add('saving');clearTimeout(markSave.t);markSave.t=setTimeout(()=>{try{localStorage.setItem('gueka_editor_v2',JSON.stringify(state));}catch(e){}d.classList.remove('saving');},600);}
 
-/* ═══ RENDER VISTA PREVIA (sin tocar otras funciones) ═══ */
+/* ═══ RENDER VISTA PREVIA ═══ */
 function renderPreview(){
 $('#sp-15').textContent=state.age;$('#sp-name').textContent=state.name;$('#sp-btn').textContent=state.splashBtn;
 $('#splash').style.display=state.showSplash?'flex':'none';
@@ -431,12 +426,12 @@ mk('#ed-gifts','gifts',['Método'],'método');
 const g=$('#ed-gal');g.innerHTML='';(state.gal||[]).forEach((u,i)=>{const r=document.createElement('div');r.className='list-row';const inp=document.createElement('input');inp.className='in';inp.value=u;inp.oninput=()=>{state.gal[i]=inp.value;renderPreview();markSave();};r.appendChild(inp);const del=document.createElement('button');del.className='list-del';del.textContent='✕';del.onclick=()=>{state.gal.splice(i,1);buildLists();renderPreview();markSave();};r.appendChild(del);g.appendChild(r);});
 }
 
-/* ═══ BIND de las 15 casillas (sin modificar) ═══ */
+/* ═══ BIND ═══ */
 $$('[data-bind]').forEach(el=>{el.addEventListener('input',()=>{const k=el.dataset.bind;state[k]=el.type==='checkbox'?el.checked:el.value;renderPreview();markSave();});});
 $$('.sec-head').forEach(h=>h.addEventListener('click',()=>h.parentElement.classList.toggle('open')));
 function hydrateInputs(){$$('[data-bind]').forEach(el=>{const v=state[el.dataset.bind];if(el.type==='checkbox')el.checked=!!v;else el.value=v==null?'':v;});}
 
-/* ═══ 4) RSVP DE LA TARJETA → WhatsApp de la organizadora (state.waOrganizer) ═══ */
+/* ═══ RSVP ═══ */
 $('#rsvp-form').addEventListener('submit',(ev)=>{
   ev.preventDefault();
   const wa=String(state.waOrganizer||'').replace(/\D/g,'');
@@ -453,11 +448,10 @@ $('#rsvp-form').addEventListener('submit',(ev)=>{
   window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(msg),'_blank');
 });
 
-/* ═══ SUBIDA DE FOTOS → IndexedDB (adaptada) ═══ */
+/* ═══ SUBIDA DE FOTOS → IndexedDB ═══ */
 async function restaurarFotos(){
 try{
 await inicializarBaseDatosLocal();
-$('#dbStatus').textContent='✓ Conexión exitosa a IndexedDB (GuekaEditorDB)';
 const fotos=await obtenerFotosLocales();
 if(fotos&&fotos.length){state.gal=state.gal||[];fotos.slice(0,PLANS[state.plan].maxGal).forEach(f=>{const url=URL.createObjectURL(f.blob);if(!state.gal.includes(url))state.gal.push(url);});renderPreview();}
 }catch(e){$('#dbStatus').textContent='⚠ IndexedDB no disponible';}
@@ -480,9 +474,8 @@ ev.target.value='';
 $$('.photo-tool[data-up]').forEach(b=>b.onclick=()=>{const k=b.dataset.up;const fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.onchange=async()=>{const f=fi.files[0];if(!f)return;const id='foto_'+k+'_'+Date.now();await guardarFotoLocal(id,f);const url=URL.createObjectURL(f);state.imgs[k]=url;$('#prev-'+k).src=url;renderPreview();markSave();toast('✓ Foto guardada en IndexedDB');};fi.click();});
 $$('.photo-tool[data-def]').forEach(b=>b.onclick=()=>{const k=b.dataset.def;state.imgs[k]='';renderPreview();markSave();});
 
-/* ═══ EXPORT / RESET / UNDO (funciones anteriores intactas) ═══ */
+/* ═══ EXPORT / RESET / UNDO ═══ */
 async function exportarHTML(){
-  /* Antes de exportar hacemos la lectura masiva y subimos las fotos a la nube */
   try{await sincronizarFotosANube();}catch(e){}
   const html=document.documentElement.outerHTML;
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download='invitacion.html';a.click();toast('✓ HTML descargado');
@@ -494,16 +487,11 @@ $('#btnQR').onclick=()=>{if(typeof QRCode!=='undefined'){const w=window.open('',
 $('#mobFab').onclick=()=>$('#sidebar').classList.toggle('mob-open');
 
 /* ════════════════════════════════════════════════════════════════
-   🔌 PUENTE DE PRODUCCIÓN (antes connection.js)
-   1. Lectura masiva de IndexedDB (los binarios siguen guardados seguros)
-   2. Cargador asíncrono hacia la nube (API gratuita de ImgBB)
-   3. Envío del diseño completo (15 secciones) a Google Sheets
-   4. Apertura de WhatsApp de Gueka Ideas con el aviso de diseño listo
+   🔌 PUENTE DE PRODUCCIÓN
 ════════════════════════════════════════════════════════════════ */
-/* ── CONFIGURACIÓN (edita solo estas 3 líneas) ── */
-const IMGBB_API_KEY="TU_API_KEY_DE_IMGBB";                 /* https://api.imgbb.com/ */
-const SHEETS_WEBHOOK="https://hook.make.com/TU_WEBHOOK";   /* Make → Google Sheets */
-const WA_GUEKA="573000000000";                             /* WhatsApp comercial Gueka Ideas */
+const IMGBB_API_KEY="TU_API_KEY_DE_IMGBB";
+const SHEETS_WEBHOOK="https://hook.make.com/TU_WEBHOOK";
+const WA_GUEKA="573000000000";
 
 const CLOUD_CACHE_KEY="gueka_cloud_urls_v1";
 const log=t=>{const el=document.getElementById('publishLog');if(el)el.textContent=t;};
@@ -511,7 +499,6 @@ function leerCache(){try{return JSON.parse(localStorage.getItem(CLOUD_CACHE_KEY)
 function guardarCache(c){try{localStorage.setItem(CLOUD_CACHE_KEY,JSON.stringify(c));}catch(e){}}
 function blobABase64(blob){return new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(String(fr.result).split(',')[1]);fr.onerror=()=>reject(fr.error);fr.readAsDataURL(blob);});}
 
-/* ── 1 + 2) Lectura masiva de IndexedDB y carga asíncrona a la nube ── */
 async function subirFotoANube(registro){
   const cache=leerCache();
   if(cache[registro.id])return cache[registro.id];
@@ -548,7 +535,6 @@ async function sincronizarFotosANube(){
       subidas++;
     }catch(e){console.warn(e);}
   }
-  /* Reemplazamos los blob: locales por URLs permanentes de alta velocidad */
   if(resultado.retrato)state.imgs.retrato=resultado.retrato;
   if(resultado.fashion)state.imgs.fashion=resultado.fashion;
   if(resultado.galeria.length)state.gal=resultado.galeria.slice(0,max);
@@ -557,7 +543,6 @@ async function sincronizarFotosANube(){
   return resultado;
 }
 
-/* ── 3) Envío del bloque completo a Google Sheets ── */
 function construirPayload(fotos){
   return {
     estado:'Pendiente de actualización',
@@ -585,7 +570,6 @@ async function enviarAProduccion(payload){
   return true;
 }
 
-/* ── 4) Botón dorado de despacho de producción ── */
 $('#btnPublish').addEventListener('click',async()=>{
   const btn=$('#btnPublish');
   btn.disabled=true;
