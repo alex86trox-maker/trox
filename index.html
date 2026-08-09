@@ -1,729 +1,268 @@
-
-                        <!DOCTYPE html>
-                        <html lang="en">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <style>
-                body {
-                  background-color: white; /* Ensure the iframe has a white background */
-                }
-
-                /* ════════════════════════════════════════════════════════════
-   📄 css-plataforma/interfaz-editor.css
-   Piel de la aplicación del editor (marfil · verde · oro)
-════════════════════════════════════════════════════════════ */
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--white:#fff;--tint:#fafbf9;--sage:#eef1ec;--ink:#16211b;--green:#1e4d38;--green2:#2c6a4f;--gold:#b89b5e;--gold2:#cdb079;--mut:#6d7a72;--line:#e4e8e2;--red:#a3403f;--fd:'Marcellus',Georgia,serif;--fb:'Figtree','Segoe UI',system-ui,sans-serif;--fs:'Great Vibes',cursive;--sh:0 22px 55px rgba(22,33,27,.10);--safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px)}
-html,body{height:100%}
-body{font-family:var(--fb);background:var(--tint);color:var(--ink);display:flex;flex-direction:column;overflow:hidden;-webkit-font-smoothing:antialiased}
-::selection{background:var(--green);color:#fff}
-::-webkit-scrollbar{width:9px}::-webkit-scrollbar-thumb{background:#c9d2c8;border-radius:9px}
-.topbar{height:calc(66px + var(--safe-t));padding-top:var(--safe-t);flex:0 0 auto;display:flex;align-items:center;gap:12px;padding-inline:20px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.94);backdrop-filter:blur(12px);z-index:30;position:relative}
-.topbar::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--green),var(--gold),transparent);opacity:.6}
-.brand{display:flex;align-items:center;gap:12px;min-width:0}
-.brand-logo{height:40px;width:auto;display:block}
-.brand-text strong{font-family:var(--fd);letter-spacing:.14em;font-size:15px;color:var(--green);display:block;white-space:nowrap}
-.brand-text span{display:block;font-size:8px;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;white-space:nowrap}
-.proj-wrap{display:flex;align-items:center;gap:6px;min-width:0}
-.proj-select{background:#fff;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:11px;padding:7px 9px;max-width:140px;cursor:pointer}
-.proj-btn{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--mut);cursor:pointer;font-size:12px;transition:.2s;flex:0 0 auto}
-.proj-btn:hover{color:var(--green);border-color:var(--gold);background:var(--sage)}
-.proj-btn.danger:hover{color:var(--red);border-color:#d8a19f;background:#f8efee}
-.tpl-select-wrap{display:flex;align-items:center;gap:6px;min-width:0}
-.cat-select,.tpl-select{background:#fff;border:1px solid var(--gold);border-radius:8px;font:inherit;font-size:11px;padding:7px 9px;max-width:150px;cursor:pointer}
-.event-pill{display:flex;align-items:center;gap:7px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--green);background:var(--sage);font-weight:600;white-space:nowrap}
-.event-pill i{width:6px;height:6px;border-radius:50%;background:var(--gold)}
-.plan-top-pill{cursor:pointer}.plan-top-pill:hover{background:var(--gold);color:#fff}
-.top-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
-.save-dot{display:flex;align-items:center;gap:7px;font-size:10.5px;color:var(--mut);white-space:nowrap}
-.save-dot i{width:7px;height:7px;border-radius:50%;background:var(--green)}
-.save-dot.saving i{background:var(--gold);animation:pulse 1s infinite}
-@keyframes pulse{50%{opacity:.4}}
-.btn{font:inherit;font-size:11.5px;font-weight:600;padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
-.btn:hover{border-color:var(--gold);background:var(--sage)}
-.btn.solid{background:var(--green);color:#fff;border-color:var(--green)}
-.workspace{flex:1;display:grid;grid-template-columns:1fr 380px;min-height:0}
-.preview-wrap{position:relative;overflow:hidden;background:radial-gradient(720px 520px at 18% 8%,rgba(184,155,94,.10),transparent 60%),#eef1ec;touch-action:pan-y}
-.stage-tag{position:absolute;top:16px;left:18px;z-index:20;display:flex;align-items:center;gap:8px;font-size:9.5px;letter-spacing:.24em;color:var(--mut);text-transform:uppercase;pointer-events:none;font-weight:600}
-.stage-tag i{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 1.6s infinite}
-.frame-holder{position:absolute;inset:0;display:flex;justify-content:center}
-.frame-inner{width:430px;max-width:100%;height:100%;transform-origin:top center;box-shadow:0 40px 120px rgba(22,33,27,.35)}
-#cardFrame{width:100%;height:100%;border:0;background:transparent}
-.preview-tools{position:absolute;top:14px;right:16px;display:flex;align-items:center;gap:4px;padding:5px;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:12px;z-index:9600;box-shadow:var(--sh)}
-.tool{width:30px;height:28px;display:grid;place-items:center;border:0;background:none;color:var(--mut);border-radius:8px;cursor:pointer;font-size:15px}
-.tool.on{color:#fff;background:var(--green)}
-.tsep{width:1px;height:16px;background:var(--line)}
-#zoomVal{font-size:10px;color:var(--mut);min-width:38px;text-align:center;font-weight:600;cursor:pointer}
-.sidebar{overflow-y:auto;border-left:1px solid var(--line);background:var(--tint);position:relative;overscroll-behavior:contain}
-.sidebar::before{content:'';position:absolute;top:0;bottom:0;left:0;width:2px;background:linear-gradient(180deg,var(--gold),var(--green),var(--gold2),var(--green2),var(--gold));opacity:.7;pointer-events:none}
-.panel-head{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:11px;padding:14px 18px;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.panel-head strong{font-family:var(--fd);font-size:13px;letter-spacing:.14em;color:var(--green)}
-.panel-head .ph-sub{display:block;font-size:8.5px;letter-spacing:.24em;color:var(--gold);text-transform:uppercase}
-.ph-dot{width:9px;height:9px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
-.ph-count{margin-left:auto;font-size:9px;color:var(--mut);padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:#fff}
-.panel-toolbar{display:flex;flex-direction:column;gap:8px;padding:10px 14px;background:#fff;border-bottom:1px solid var(--line)}
-.panel-search{font-size:11px!important;padding:8px 12px!important;border-radius:99px!important}
-.panel-toolbar-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-.ptb{display:flex;align-items:center;justify-content:center;padding:7px 4px;background:#fff;border:1px solid var(--line);border-radius:9px;font-size:9px;font-weight:600;cursor:pointer;white-space:nowrap}
-.ptb:hover{background:var(--sage);border-color:var(--gold);color:var(--green)}
-.plan-bar{padding:12px 14px;border-bottom:1px solid var(--line);background:#fff}
-.plan-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.plan-card{position:relative;border:1px solid var(--line);border-radius:12px;padding:10px 6px 8px;background:#fff;cursor:pointer;text-align:center;font:inherit}
-.plan-card.sel{border-color:var(--pc);box-shadow:0 0 0 1px var(--pc)}
-.plan-card .pc-name{font-size:8.5px;letter-spacing:.12em;font-weight:700}
-.plan-card .pc-price{font-size:10px;font-weight:700;margin-top:3px;font-family:var(--fd)}
-.plan-card .pc-gal{font-size:7.5px;color:var(--mut);margin-top:3px}
-.plan-card .pc-pop{position:absolute;top:-7px;left:50%;transform:translateX(-50%);font-size:6.5px;background:var(--gold);color:#fff;padding:2px 6px;border-radius:999px;font-weight:700}
-.plan-opt{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;background:#fff}
-.plan-opt.sel{border-color:var(--pc);box-shadow:0 0 0 1px var(--pc)}
-.plan-opt-head{display:flex;justify-content:space-between;font-weight:700;margin-bottom:6px}
-.plan-feats{display:flex;flex-wrap:wrap;gap:5px}
-.plan-feat{font-size:8px;padding:3px 8px;border-radius:999px;background:var(--sage);border:1px solid var(--line)}
-.prog-wrap{padding:10px 14px 6px;border-bottom:1px solid var(--line);background:#fff}
-.prog-label{display:flex;justify-content:space-between;margin-bottom:6px;font-size:8.5px;letter-spacing:.16em;color:var(--mut);font-weight:600}
-.prog-bar-bg{height:3px;background:var(--sage);border-radius:999px;overflow:hidden}
-.prog-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .4s}
-.sec{border-bottom:1px solid var(--line)}
-.sec:nth-of-type(5n+1){--accent:#1e4d38}.sec:nth-of-type(5n+2){--accent:#b89b5e}.sec:nth-of-type(5n+3){--accent:#2c6a4f}.sec:nth-of-type(5n+4){--accent:#8a6d3b}.sec:nth-of-type(5n+5){--accent:#6d7a72}
-.sec-head{width:100%;display:flex;align-items:center;gap:11px;padding:15px 18px;background:none;border:0;color:var(--e-ink);cursor:pointer;font:inherit;text-align:left;position:relative}
-.sec-head::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%) scaleY(.2);width:3px;height:60%;background:var(--accent);transition:.3s;opacity:.5}
-.sec.open .sec-head::before{transform:translateY(-50%) scaleY(1);opacity:1}
-.sec-num{font-family:var(--fd);font-size:12px;color:var(--accent)}
-.sec-title{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
-.sec-head .chev{margin-left:auto;transition:transform .35s;color:var(--mut)}
-.sec.open .chev{transform:rotate(180deg);color:var(--accent)}
-.sec-reset{margin-left:auto;background:none;border:1px solid var(--line);color:var(--mut);border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:12px}
-.sec-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s}
-.sec.open .sec-body{grid-template-rows:1fr}
-.sec-inner{overflow:hidden;min-height:0}
-.sec-pad{padding:6px 18px 20px}
-.sec.locked .sec-body{display:none!important}
-.sec-lock-badge{margin-left:auto;font-size:7.5px;letter-spacing:.1em;padding:3px 8px;border-radius:999px;border:1px solid;font-weight:700}
-.sec-lock-badge.req-premium{color:var(--gold);border-color:rgba(184,155,94,.5);background:rgba(184,155,94,.08)}
-.sec-lock-badge.req-deluxe{color:var(--green);border-color:rgba(30,77,56,.4);background:rgba(30,77,56,.06)}
-.field{margin-bottom:12px}
-.field>label{display:block;font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
-.in{width:100%;font:inherit;font-size:12px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 11px}
-.in:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,155,94,.15)}
-textarea.in{resize:vertical;min-height:52px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.tog-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
-.tog-row strong{font-size:12px}
-.sw{position:relative;width:38px;height:22px;flex:0 0 auto}
-.sw input{position:absolute;opacity:0;inset:0;cursor:pointer;margin:0}
-.sw i{position:absolute;inset:0;border-radius:999px;background:#d5ddd3;transition:.28s}
-.sw i::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.28s}
-.sw input:checked + i{background:var(--green)}
-.sw input:checked + i::after{left:19px}
-.list-row{position:relative;border:1px solid var(--line);border-radius:10px;padding:10px 10px 10px 30px;margin-bottom:9px;background:#fff}
-.list-row .in{margin-bottom:7px}
-.list-drag{position:absolute;top:9px;left:7px;color:var(--mut);cursor:grab;font-size:13px;user-select:none;opacity:.5}
-.list-del,.list-dup{position:absolute;top:7px;width:22px;height:22px;border:0;border-radius:6px;cursor:pointer;font-size:12px}
-.list-del{right:7px;background:#f8efee;color:var(--red)}
-.list-dup{right:33px;background:var(--sage);color:var(--green)}
-.list-add{width:100%;font:inherit;font-size:10px;font-weight:700;padding:9px;border:1px dashed rgba(184,155,94,.6);border-radius:9px;background:rgba(184,155,94,.06);color:var(--gold);cursor:pointer;margin-top:2px}
-.photo-field{margin-bottom:16px}
-.photo-field>label{display:block;font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
-.photo-preview-wrap{position:relative;width:100%;height:90px;border-radius:10px;overflow:hidden;margin-bottom:6px;border:1px solid var(--line);background:var(--sage)}
-.photo-preview-wrap img{width:100%;height:100%;object-fit:cover;object-position:top}
-.photo-preview-wrap .photo-badge{position:absolute;top:6px;left:6px;font-size:8px;padding:3px 8px;background:rgba(255,255,255,.9);border:1px solid rgba(184,155,94,.5);border-radius:9999px;color:var(--gold);font-weight:700}
-.photo-tools{display:flex;gap:6px;margin-top:6px}
-.photo-tool{flex:1;font-size:9px;padding:6px;border-radius:7px;cursor:pointer;border:1px solid var(--line);background:#fff;font-weight:600}
-.photo-field.gal-beyond{opacity:.55}
-.gal-lock-note{font-size:8px;color:var(--gold);margin:6px 0;font-weight:600}
-.pal-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.pal-card{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;cursor:pointer;text-align:left}
-.pal-card.sel{border-color:var(--green);box-shadow:0 0 0 1px var(--green)}
-.pal-dots{display:flex;gap:4px;margin-bottom:8px}
-.pal-dots i{width:14px;height:14px;border-radius:50%}
-.pal-name{font-size:9.5px;font-weight:600}
-.tip{margin:16px 18px 26px;padding:13px 14px;border:1px solid rgba(184,155,94,.35);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;background:rgba(184,155,94,.06)}
-.tip strong{display:block;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
-.tip span{font-size:11px;line-height:1.55;color:var(--mut)}
-.reset-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(22,33,27,.45);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px}
-.reset-modal.show{display:flex}
-.reset-box{background:#fff;border:1px solid rgba(184,155,94,.5);border-radius:18px;padding:28px 26px;max-width:340px;width:100%;text-align:center;max-height:calc(100vh - 32px);overflow-y:auto}
-.reset-box h3{font-family:var(--fd);font-size:1.05rem;color:var(--green);margin-bottom:8px}
-.reset-box p{font-size:.68rem;color:var(--mut);margin-bottom:20px}
-.reset-box-btns{display:flex;gap:10px;justify-content:center}
-.rbtn{flex:1;padding:10px;border-radius:99px;font-size:9.5px;font-weight:700;cursor:pointer}
-.rbtn.cancel{background:#fff;border:1px solid var(--line);color:var(--mut)}
-.rbtn.confirm{background:var(--green);border:1px solid var(--green);color:#fff}
-.plan-modal-box{max-width:460px;text-align:left}
-.toasts{position:fixed;bottom:calc(24px + var(--safe-b));left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:100000;align-items:center;pointer-events:none;max-width:94vw}
-.toast{background:var(--ink);border:1px solid var(--gold);color:#fff;font-size:12px;padding:10px 18px;border-radius:12px;opacity:0;transform:translateY(12px);transition:.35s;max-width:94vw}
-.toast.show{opacity:1;transform:none}
-.toast b{color:var(--gold2)}
-#guestOverlay{display:none;position:fixed;inset:0;z-index:99990;background:#000;flex-direction:column}
-#guestOverlay.show{display:flex}
-.guest-bar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:#fff;font-size:10px;letter-spacing:.18em;color:var(--green);font-weight:700}
-.guest-bar button{font:inherit;font-size:10px;padding:7px 14px;border-radius:99px;border:1px solid var(--green);background:var(--sage);color:var(--green);cursor:pointer;font-weight:700}
-#guestFrame{flex:1;width:100%;border:0}
-#onboarding-overlay{position:fixed;inset:0;z-index:99999;background:rgba(22,33,27,.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s;padding:16px}
-#onboarding-overlay.visible{opacity:1;pointer-events:auto}
-.ob-box{background:#fff;border:1px solid rgba(184,155,94,.5);border-radius:22px;padding:32px 28px;max-width:400px;width:100%;text-align:center;max-height:calc(100vh - 32px);overflow-y:auto}
-.ob-logo{width:190px;max-width:70%;margin:0 auto 6px;display:block}
-.ob-sub{font-size:.62rem;letter-spacing:.3em;color:var(--gold);margin-bottom:26px;text-transform:uppercase}
-.ob-steps{display:flex;flex-direction:column;gap:14px;margin-bottom:30px;text-align:left}
-.ob-step{display:flex;gap:14px}
-.ob-step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);flex-shrink:0;background:rgba(184,155,94,.12);border:1px solid rgba(184,155,94,.5);color:var(--gold)}
-.ob-step-text strong{display:block;font-size:.82rem}
-.ob-step-text span{font-size:.6rem;color:var(--mut)}
-.ob-cta{width:100%;font-weight:700;font-size:.8rem;letter-spacing:.16em;padding:14px;background:var(--green);color:#fff;border:none;border-radius:99px;cursor:pointer}
-@media(max-width:1280px){.workspace{grid-template-columns:1fr 352px}.brand-text span{display:none}}
-@media(max-width:1024px){
-body{overflow:hidden}
-.workspace{display:block;position:relative;height:100%}
-.preview-wrap{position:absolute;inset:0}
-.event-pill{display:none}
-.sidebar{position:absolute;top:0;bottom:0;right:0;width:min(400px,92vw);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .35s;z-index:200}
-.sidebar.mob-open{transform:translateX(0)}
-.sidebar-backdrop{display:none;position:absolute;inset:0;background:rgba(22,33,27,.35);z-index:199}
-.sidebar-backdrop.show{display:block}
-.mob-drawer-toggle{display:flex!important}
-}
-@media(max-width:640px){
-.topbar{height:calc(56px + var(--safe-t));padding-inline:10px;gap:6px}
-.brand-text{display:none}
-.save-dot{display:none}
-.btn .lbl{display:none}
-.stage-tag{display:none}
-.proj-btn.opt{display:none}
-.in{font-size:16px}
-.mob-tabbar{display:flex!important}
-.workspace{position:fixed;top:calc(56px + var(--safe-t));left:0;right:0;bottom:calc(58px + var(--safe-b))}
-.sidebar{inset:0!important;width:100%!important}
-.mob-drawer-toggle{display:none!important}
-.sidebar-backdrop{display:none!important}
-}
-.mob-tabbar{display:none;position:fixed;bottom:0;left:0;right:0;height:calc(58px + var(--safe-b));padding-bottom:var(--safe-b);background:rgba(255,255,255,.97);border-top:1px solid var(--line);z-index:300}
-.mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;color:var(--mut);font-size:8px;font-weight:600;cursor:pointer}
-.mob-tab.active{color:var(--green)}
-.mob-drawer-toggle{display:none;position:fixed;bottom:calc(24px + var(--safe-b));right:24px;width:54px;height:54px;border-radius:50%;background:var(--green);border:none;color:#fff;align-items:center;justify-content:center;z-index:201;font-size:20px}
-.sidebar-backdrop{display:none}
-@media print{.topbar,.sidebar,.preview-tools,.toasts,#guestOverlay{display:none!important}body{overflow:visible}.workspace{display:block}.preview-wrap{position:static;overflow:visible}}
-
-/* ═══ 📄 disenos/quince/xv-tiktok-neon/design.css ═══ */
-:root{--a:#ff0050;--b:#00f2ea;--c:#ffd700;--bg:#080810;--txt:#fff}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--txt);font-family:'Montserrat',sans-serif;max-width:430px;margin:0 auto}
-#splash{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;text-align:center;background:radial-gradient(ellipse 70% 50% at 50% 40%,rgba(255,0,80,.18),transparent 70%),var(--bg)}
-.sp-logo{font-size:.6rem;letter-spacing:.3em;color:rgba(255,255,255,.4)}
-.sp-15{font-size:6rem;font-weight:900;text-shadow:3px 3px 0 var(--b),-3px -3px 0 var(--a)}
-.sp-suf{letter-spacing:.3em;color:var(--a)}
-.sp-name{font-family:cursive;font-size:1.9rem}
-.sp-date{font-size:.6rem;letter-spacing:.2em;color:rgba(255,255,255,.4)}
-.sp-btn{margin-top:1.5rem;background:linear-gradient(135deg,var(--a),var(--b));color:var(--bg);border:none;border-radius:4px;padding:12px 30px;font-weight:900;letter-spacing:.15em}
-#hero{position:relative}
-.hero-img{width:100%;height:480px;object-fit:cover;object-position:top}
-.hero-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,16,.95),transparent 55%)}
-.hero-body{position:absolute;bottom:0;left:0;right:0;padding:16px}
-.hero-user{font-weight:900}
-.hero-cap{font-style:italic;color:rgba(255,255,255,.9)}
-.hero-hash{color:var(--b);font-size:.7rem}
-.cd-title{text-align:center;letter-spacing:.3em;font-size:.7rem;color:var(--b);margin:2rem 0 1rem}
-.cd-grid{display:flex;gap:.5rem;justify-content:center}
-.cdu{background:rgba(255,255,255,.05);border:1px solid rgba(255,0,80,.4);border-radius:8px;padding:10px 14px;text-align:center}
-.cdu b{display:block;font-size:1.4rem}
-.cdu small{font-size:.5rem;letter-spacing:.15em}
-.his-img{width:100%;height:230px;object-fit:cover}
-.his-quote{font-style:italic;padding:1rem;color:rgba(255,255,255,.85)}
-.his-text{padding:0 1rem;font-size:.7rem;color:rgba(255,255,255,.5)}
-.gal-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;padding:0 1rem}
-.gal-grid img{width:100%;height:120px;object-fit:cover;border-radius:8px}
-.lug-name{text-align:center;font-weight:900;color:var(--b)}
-.lug-addr{text-align:center;font-size:.65rem;color:rgba(255,255,255,.5);margin:.5rem 0}
-.lug-btn{display:block;width:fit-content;margin:0 auto;background:transparent;border:2px solid var(--b);color:var(--b);padding:10px 20px;text-decoration:none}
-#rsvp{padding:1rem}
-#rv-name{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,0,80,.4);color:#fff;padding:12px;margin-bottom:.6rem}
-footer{text-align:center;padding:2rem 1rem}
-.ft{font-family:cursive;font-size:1.6rem}
-.ft-brand{font-size:.55rem;letter-spacing:.2em;color:rgba(255,255,255,.3);margin-top:.6rem}
-
-/* ═══ 📄 disenos/matrimonio/cinema-boda/design.css ═══ */
-:root{--a:#b89b5e;--b:#8fb39c;--c:#e8dcc0;--bg:#0f1712;--txt:#f5f2ea}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--txt);font-family:'Marcellus',serif;max-width:430px;margin:0 auto}
-#splash{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;text-align:center}
-.sp-logo{font-size:.6rem;letter-spacing:.3em;color:rgba(245,242,234,.4)}
-.sp-names{font-size:2.4rem}
-.sp-date{font-size:.65rem;letter-spacing:.25em;color:var(--a)}
-.sp-btn{margin-top:1.5rem;background:var(--a);color:var(--bg);border:none;border-radius:99px;padding:12px 30px;font-weight:700;letter-spacing:.15em}
-.hero-img{width:100%;height:460px;object-fit:cover}
-.hero-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,23,18,.95),transparent 55%)}
-#hero{position:relative}
-.hero-body{position:absolute;bottom:0;left:0;right:0;padding:16px;text-align:center}
-.hero-names{font-size:1.6rem}
-.hero-cap{font-size:.75rem;color:rgba(245,242,234,.7)}
-.cd-title{text-align:center;letter-spacing:.3em;font-size:.7rem;color:var(--a);margin:2rem 0 1rem}
-.cd-grid{display:flex;gap:.5rem;justify-content:center}
-.cdu{background:rgba(245,242,234,.05);border:1px solid rgba(184,155,94,.4);border-radius:8px;padding:10px 14px;text-align:center}
-.cdu b{display:block;font-size:1.4rem}
-.cdu small{font-size:.5rem}
-.lug-name{text-align:center;color:var(--a)}
-.lug-addr{text-align:center;font-size:.65rem;color:rgba(245,242,234,.5);margin:.5rem 0}
-.lug-btn{display:block;width:fit-content;margin:0 auto;border:2px solid var(--a);color:var(--a);padding:10px 20px;text-decoration:none}
-.gal-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;padding:0 1rem}
-.gal-grid img{width:100%;height:120px;object-fit:cover;border-radius:8px}
-#rsvp{padding:1rem}
-#rv-name{width:100%;background:rgba(245,242,234,.05);border:1px solid rgba(184,155,94,.4);color:var(--txt);padding:12px;margin-bottom:.6rem}
-footer{text-align:center;padding:2rem 1rem}
-.ft{font-size:1.5rem}
-.ft-brand{font-size:.55rem;letter-spacing:.2em;color:rgba(245,242,234,.3);margin-top:.6rem}
-
-
-              </style>
-                        </head>
-                        <body>
-                            <!-- ════════════════════════════════════════════════════════════
-     📄 editor.html — EDITOR VISUAL GUEKA IDEAS
-     Carga: css-plataforma/interfaz-editor.css + js-plataforma/*.js
-     Lee el funnel (gueka_cart_v1) y monta el diseño desde /disenos/
-════════════════════════════════════════════════════════════ -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Gueka Ideas · Estudio de Invitaciones</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gueka Ideas · Editor · 15 Secciones</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/marcellus/400.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/figtree/400.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/figtree/600.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/figtree/700.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/great-vibes/400.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/css/montserrat@latest/400.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/css/montserrat@latest/700.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/css/montserrat@latest/900.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/css/noto-serif@latest/400.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/css/noto-serif@latest/400-italic.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/css/jetbrains-mono@latest/400.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-<link rel="stylesheet" href="css-plataforma/interfaz-editor.css">
+<style>
+/* ═══ GUEKA IDEAS · ESTUDIO (marfil·verde·oro) ═══ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--e-bg:#f6f7f4;--e-panel:#fff;--e-line:#e4e8e2;--e-ink:#16211b;--e-mut:#6d7a72;--e-green:#1e4d38;--e-gold:#b89b5e;--e-sage:#eef1ec;--e-red:#a3403f;--fd:'Marcellus',Georgia,serif;--fb:'Figtree',system-ui,sans-serif;--sh:0 22px 55px rgba(22,33,27,.10)}
+html,body{height:100%}
+body{font-family:var(--fb);background:var(--e-bg);color:var(--e-ink);display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:64px;flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:0 18px;border-bottom:1px solid var(--e-line);background:rgba(255,255,255,.94);backdrop-filter:blur(12px);z-index:30}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{height:38px}
+.brand b{font-family:var(--fd);letter-spacing:.14em;font-size:14px;color:var(--e-green)}
+.sel{background:#fff;border:1px solid var(--e-line);border-radius:8px;font:inherit;font-size:11px;padding:7px 9px;max-width:160px;cursor:pointer}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border:1px solid var(--e-gold);border-radius:999px;font-size:10px;font-weight:700;color:var(--e-gold);background:rgba(184,155,94,.08);cursor:pointer}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.save-dot{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--e-mut)}
+.save-dot i{width:7px;height:7px;border-radius:50%;background:var(--e-green)}
+.btn{font:inherit;font-size:11px;font-weight:600;padding:8px 13px;border-radius:99px;border:1px solid var(--e-line);background:#fff;color:var(--e-ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn.solid{background:var(--e-green);color:#fff;border-color:var(--e-green)}
+.workspace{flex:1;display:grid;grid-template-columns:1fr 380px;min-height:0}
+.preview-wrap{position:relative;overflow:hidden;background:radial-gradient(700px 500px at 20% 10%,rgba(184,155,94,.1),transparent 60%),#eef1ec}
+.stage-tag{position:absolute;top:14px;left:16px;z-index:20;font-size:9px;letter-spacing:.24em;color:var(--e-mut);text-transform:uppercase}
+.empty-state{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:15}
+.empty-card{background:#fff;border:1px solid var(--e-line);border-radius:16px;padding:2rem;text-align:center;box-shadow:var(--sh);max-width:320px}
+.empty-card h3{font-family:var(--fd);color:var(--e-green);margin-bottom:.5rem}
+.empty-card p{font-size:.8rem;color:var(--e-mut);margin-bottom:1rem}
+#iframeCard{position:absolute;inset:0;width:100%;height:100%;border:0}
+.sidebar{overflow-y:auto;border-left:1px solid var(--e-line);background:var(--e-panel)}
+.panel-head{position:sticky;top:0;z-index:5;padding:14px 18px;background:rgba(255,255,255,.95);border-bottom:1px solid var(--e-line)}
+.panel-head strong{font-family:var(--fd);font-size:13px;letter-spacing:.14em;color:var(--e-green)}
+.plan-bar{padding:12px 14px;border-bottom:1px solid var(--e-line);background:#fff}
+.plan-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.plan-card{border:1px solid var(--e-line);border-radius:12px;padding:10px 6px;background:#fff;cursor:pointer;text-align:center;font:inherit}
+.plan-card.sel{border-color:var(--pc);box-shadow:0 0 0 1px var(--pc)}
+.plan-card .n{font-size:8.5px;font-weight:700;letter-spacing:.12em}
+.plan-card .p{font-size:10px;font-weight:700;margin-top:3px;font-family:var(--fd)}
+.sec{border-bottom:1px solid var(--e-line)}
+.sec-head{width:100%;display:flex;align-items:center;gap:10px;padding:14px 18px;background:none;border:0;color:var(--e-ink);cursor:pointer;font:inherit;text-align:left}
+.sec-num{font-family:var(--fd);font-size:12px;color:var(--e-gold)}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+.sec-head .chev{margin-left:auto;transition:transform .3s;color:var(--e-mut)}
+.sec.open .chev{transform:rotate(180deg)}
+.sec-lock{margin-left:auto;font-size:8px;font-weight:700;padding:3px 8px;border-radius:999px;border:1px solid}
+.sec-lock.req-premium{color:var(--e-gold);border-color:rgba(184,155,94,.5)}
+.sec-lock.req-deluxe{color:var(--e-green);border-color:rgba(30,77,56,.4)}
+.sec-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s}
+.sec.open .sec-body{grid-template-rows:1fr}
+.sec.locked .sec-body{display:none}
+.sec-inner{overflow:hidden}
+.sec-pad{padding:6px 18px 18px}
+.field{margin-bottom:11px}
+.field label{display:block;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:5px}
+.in{width:100%;font:inherit;font-size:12px;background:#fff;border:1px solid var(--e-line);border-radius:9px;padding:9px 11px}
+textarea.in{resize:vertical;min-height:50px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.list-row{position:relative;border:1px solid var(--e-line);border-radius:10px;padding:10px 40px 10px 10px;margin-bottom:9px;background:#fff}
+.list-row .in{margin-bottom:7px}
+.list-del{position:absolute;top:8px;right:8px;width:22px;height:22px;border:0;border-radius:6px;cursor:pointer;background:#f8efee;color:var(--e-red)}
+.list-add{width:100%;font:inherit;font-size:10px;font-weight:700;padding:9px;border:1px dashed rgba(184,155,94,.6);border-radius:9px;background:rgba(184,155,94,.06);color:var(--e-gold);cursor:pointer}
+.photo-field{margin-bottom:14px}
+.photo-field label{display:block;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:6px}
+.photo-preview-wrap{height:80px;border-radius:10px;overflow:hidden;border:1px solid var(--e-line);margin-bottom:6px}
+.photo-preview-wrap img{width:100%;height:100%;object-fit:cover;object-position:top}
+.photo-tools{display:flex;gap:6px;margin-top:6px}
+.photo-tool{flex:1;font-size:9px;padding:6px;border-radius:7px;cursor:pointer;border:1px solid var(--e-line);background:#fff;font-weight:600}
+.gal-note{font-size:8px;color:var(--e-gold);margin-top:4px;font-weight:700}
+.toasts{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:100000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:var(--e-ink);border:1px solid var(--e-gold);color:#fff;font-size:12px;padding:10px 18px;border-radius:12px;opacity:0;transform:translateY(12px);transition:.35s}
+.toast.show{opacity:1;transform:none}
+@media(max-width:1024px){.workspace{display:block;position:relative}.preview-wrap{position:absolute;inset:0}.sidebar{position:absolute;top:0;bottom:0;right:0;width:min(400px,92vw);transform:translateX(100%);transition:.35s;z-index:200}.sidebar.mob-open{transform:none}}
+</style>
 </head>
 <body>
-<div id="onboarding-overlay"><div class="ob-box">
-<img src="https://hercules-cdn.com/file_GksORuRQPAzOYyo4c4ClTi44" alt="Gueka Ideas" class="ob-logo">
-<div class="ob-sub">create · invite · celebrate</div>
-<div class="ob-steps">
-<div class="ob-step"><div class="ob-step-num">1</div><div class="ob-step-text"><strong>Elige tu plan</strong><span>Classic, Premium o Deluxe — las secciones se desbloquean según el plan</span></div></div>
-<div class="ob-step"><div class="ob-step-num">2</div><div class="ob-step-text"><strong>Personaliza</strong><span>El diseño se carga desde /disenos/ y se edita en vivo por puentes de datos</span></div></div>
-<div class="ob-step"><div class="ob-step-num">3</div><div class="ob-step-text"><strong>Comparte</strong><span>Exporta HTML, QR o link y compártelo sin límites</span></div></div>
-</div>
-<button class="ob-cta" id="ob-start-btn">EMPEZAR A EDITAR →</button>
-</div></div>
-
 <header class="topbar">
-<div class="brand">
-<img class="brand-logo" src="https://hercules-cdn.com/file_GksORuRQPAzOYyo4c4ClTi44" alt="Gueka Ideas">
-<div class="brand-text"><strong>GUEKA IDEAS</strong><span>estudio de invitaciones</span></div>
-</div>
-<div class="proj-wrap">
-<select class="proj-select" id="projectSelect" title="Proyecto activo"></select>
-<button class="proj-btn" id="projNew" title="Nuevo proyecto">＋</button>
-<button class="proj-btn opt" id="projRename" title="Renombrar">✎</button>
-<button class="proj-btn opt danger" id="projDel" title="Eliminar">🗑</button>
-</div>
-<div class="tpl-select-wrap">
-<select class="cat-select" id="catSelect" title="Categoría"></select>
-<select class="tpl-select" id="tplSelect" title="Diseño (desde manifest.json)"></select>
-</div>
-<div class="event-pill plan-top-pill" id="planPill"><i></i><span id="planPillTxt">PLAN CLASSIC</span></div>
+<div class="brand"><img src="https://hercules-cdn.com/file_GksORuRQPAzOYyo4c4ClTi44" alt="Gueka Ideas"><b>GUEKA IDEAS · ESTUDIO</b></div>
+<select class="sel" id="catSelect"></select>
+<select class="sel" id="tplSelect"></select>
+<button class="pill" id="planPill">✦ <span id="planPillTxt">CLASSIC</span></button>
 <div class="top-actions">
 <span class="save-dot" id="saveDot"><i></i><span id="saveTxt">Guardado</span></span>
-<button class="btn" id="btnUndo">↺ <span class="lbl">Deshacer</span></button>
-<button class="btn" id="btnRedo">↻ <span class="lbl">Rehacer</span></button>
 <button class="btn" id="btnQR">QR</button>
-<button class="btn solid" id="btnShare">Compartir</button>
+<button class="btn solid" id="btnExport">⬇ HTML</button>
 </div>
 </header>
-
-<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
-<button class="mob-drawer-toggle" id="mobDrawerToggle">✎</button>
-<nav class="mob-tabbar">
-<button class="mob-tab active" data-mtab="preview">VISTA</button>
-<button class="mob-tab" data-mtab="edit">EDITAR</button>
-<button class="mob-tab" data-mtab="export">EXPORTAR</button>
-</nav>
-
 <div class="workspace">
 <main class="preview-wrap">
-<div class="stage-tag"><i></i> vista previa en vivo · <span id="designLoaded">sin diseño</span></div>
-<div class="frame-holder"><div class="frame-inner">
-<iframe id="cardFrame" title="Invitación"></iframe>
-</div></div>
-<div class="preview-tools">
-<button class="tool" id="zoomOut">−</button><span id="zoomVal">100%</span><button class="tool" id="zoomIn">+</button>
-<span class="tsep"></span>
-<button class="tool on" id="toolSplash" title="Pantalla de bienvenida">◉</button>
-<button class="tool" id="toolGuest" title="Vista invitado">👁</button>
-</div>
+<div class="stage-tag">VISTA PREVIA EN VIVO</div>
+<div class="empty-state" id="emptyState"><div class="empty-card"><h3>Sin tarjeta cargada</h3><p>Elige una categoría y un diseño, o súbelo desde <b>disenos/</b>.</p><button class="btn solid" id="btnLoadFirst">Cargar primer diseño</button></div></div>
+<iframe id="iframeCard" title="Tarjeta"></iframe>
 </main>
-
 <aside class="sidebar" id="sidebar">
-<div class="panel-head"><span class="ph-dot"></span><div><strong>PANEL DE EDICIÓN</strong><span class="ph-sub">cada cambio · en vivo</span></div><span class="ph-count">15 secciones</span></div>
-<div class="panel-toolbar">
-<input class="in panel-search" id="panelSearch" placeholder="🔍 Buscar sección… ( / )">
-<div class="panel-toolbar-btns">
-<button class="ptb" id="btnExport">⬇ HTML</button>
-<label class="ptb" style="cursor:pointer">⬆ Importar<input type="file" id="btnImport" accept=".json,.html" style="display:none"></label>
-<button class="ptb" id="btnHost">🌐 Hosting</button>
-<button class="ptb" id="btnResetAll">↺ Reset</button>
-</div>
-</div>
-<div class="plan-bar">
-<div class="prog-label" style="margin-bottom:7px"><span>PLAN DEL SERVICIO</span><strong id="planBarName">COMPARAR ▸</strong></div>
-<div class="plan-cards" id="planCards"></div>
-</div>
-<div class="prog-wrap"><div class="prog-label"><span>PERSONALIZACIÓN</span><strong id="progPct">0%</strong></div><div class="prog-bar-bg"><div class="prog-bar-fill" id="progBar"></div></div></div>
+<div class="panel-head"><strong>PANEL DE EDICIÓN · 15 SECCIONES</strong></div>
+<div class="plan-bar"><div class="plan-cards" id="planCards"></div></div>
 
-<section class="sec open"><button class="sec-head"><span class="sec-num">01</span><span class="sec-title">Contenido</span><span class="chev">▾</span></button>
+<!-- 01 CONTENIDO -->
+<div class="sec open" data-sec="1"><button class="sec-head"><span class="sec-num">01</span><span class="sec-title">Contenido</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div class="row2"><div class="field"><label>Nombre</label><input class="in" data-bind="name"></div><div class="field"><label>Edad / Nº</label><input class="in" data-bind="age"></div></div>
+<div class="row2"><div class="field"><label>Nombre</label><input class="in" data-bind="name"></div><div class="field"><label>Edad</label><input class="in" data-bind="age"></div></div>
 <div class="row2"><div class="field"><label>Sufijo</label><input class="in" data-bind="ageSuffix"></div><div class="field"><label>Usuario</label><input class="in" data-bind="username"></div></div>
 <div class="row2"><div class="field"><label>Fecha</label><input class="in" type="date" data-bind="date"></div><div class="field"><label>Hora</label><input class="in" type="time" data-bind="time"></div></div>
-<div class="row2"><div class="field"><label>Ubicación corta</label><input class="in" data-bind="locationShort"></div><div class="field"><label>Likes</label><input class="in" type="number" data-bind="likeCount"></div></div>
+<div class="field"><label>Ubicación corta</label><input class="in" data-bind="locationShort"></div>
 <div class="field"><label>Hashtag</label><input class="in" data-bind="hashtag"></div>
 <div class="field"><label>Frase de portada</label><textarea class="in" data-bind="caption"></textarea></div>
 <div class="field"><label>Cita destacada</label><textarea class="in" data-bind="quote"></textarea></div>
-</div></div></div></section>
+</div></div></div></div>
 
-<section class="sec"><button class="sec-head"><span class="sec-num">02</span><span class="sec-title">Fotos</span><span class="chev">▾</span></button>
+<!-- 02 FOTOS -->
+<div class="sec" data-sec="2"><button class="sec-head"><span class="sec-num">02</span><span class="sec-title">Fotos</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div class="tip" style="margin:0 0 12px"><strong>✦ Fotos</strong><span>Se inyectan al diseño por <b>data-gk-img</b>. La galería pública muestra las del plan.</span></div>
-<div class="photo-field"><label>Retrato principal</label><div class="photo-preview-wrap"><img id="prev-retrato" src=""><span class="photo-badge">RETRATO</span></div><input class="in" id="url-retrato" type="url"><div class="photo-tools"><button class="photo-tool" data-up="retrato">📁 Subir</button><button class="photo-tool" data-def="retrato">↺ Default</button></div></div>
-<div class="photo-field"><label>Mi historia</label><div class="photo-preview-wrap"><img id="prev-fashion" src=""><span class="photo-badge">HISTORIA</span></div><input class="in" id="url-fashion" type="url"><div class="photo-tools"><button class="photo-tool" data-up="fashion">📁 Subir</button><button class="photo-tool" data-def="fashion">↺ Default</button></div></div>
-<div style="font-size:9px;color:var(--e-mut);margin:12px 0 8px;text-transform:uppercase">Galería · <span id="galSideCount">4 fotos</span></div>
+<div class="photo-field"><label>Retrato principal</label><div class="photo-preview-wrap"><img id="prev-retrato" src=""></div><input class="in" id="url-retrato" type="url"><div class="photo-tools"><button class="photo-tool" data-up="retrato">📁 Subir</button><button class="photo-tool" data-def="retrato">↺ Default</button></div></div>
+<div class="photo-field"><label>Mi historia</label><div class="photo-preview-wrap"><img id="prev-fashion" src=""></div><input class="in" id="url-fashion" type="url"><div class="photo-tools"><button class="photo-tool" data-up="fashion">📁 Subir</button><button class="photo-tool" data-def="fashion">↺ Default</button></div></div>
+<div class="field"><label>Galería (según plan)</label></div>
 <div id="gal-fields"></div>
-</div></div></div></section>
+</div></div></div></div>
 
-<section class="sec"><button class="sec-head"><span class="sec-num">03</span><span class="sec-title">Bienvenida</span><span class="chev">▾</span></button>
+<!-- 03 BIENVENIDA -->
+<div class="sec" data-sec="3"><button class="sec-head"><span class="sec-num">03</span><span class="sec-title">Bienvenida</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div class="tog-row"><div><strong>Pantalla de bienvenida</strong><span>Splash al abrir</span></div><label class="sw"><input type="checkbox" data-bind="showSplash" checked><i></i></label></div>
 <div class="field"><label>Texto del botón</label><input class="in" data-bind="splashBtn"></div>
 <div class="field"><label>Pista inferior</label><input class="in" data-bind="splashHint"></div>
-</div></div></div></section>
+</div></div></div></div>
 
-<section class="sec"><button class="sec-head"><span class="sec-num">04</span><span class="sec-title">Mi historia</span><span class="chev">▾</span></button>
+<!-- 04 MI HISTORIA (premium) -->
+<div class="sec" data-sec="4" data-req="premium"><button class="sec-head"><span class="sec-num">04</span><span class="sec-title">Mi historia</span><span class="sec-lock req-premium">PREMIUM</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label>Etiqueta</label><input class="in" data-bind="historyTag"></div>
 <div class="field"><label>Cita</label><textarea class="in" data-bind="historyQuote"></textarea></div>
 <div class="field"><label>Biografía</label><textarea class="in" data-bind="historyText"></textarea></div>
-</div></div></div></section>
+</div></div></div></div>
 
-<section class="sec" data-feat="itinerary"><button class="sec-head"><span class="sec-num">05</span><span class="sec-title">Programa</span><span class="chev">▾</span></button>
-<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-itin"></div></div></div></div></section>
+<!-- 05 PROGRAMA (premium) -->
+<div class="sec" data-sec="5" data-req="premium"><button class="sec-head"><span class="sec-num">05</span><span class="sec-title">Programa</span><span class="sec-lock req-premium">PREMIUM</span><span class="chev">▾</span></button>
+<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-itin"></div></div></div></div></div>
 
-<section class="sec" data-feat="padrinos"><button class="sec-head"><span class="sec-num">06</span><span class="sec-title">Padrinos</span><span class="chev">▾</span></button>
-<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-padr"></div></div></div></div></section>
+<!-- 06 PADRINOS (deluxe) -->
+<div class="sec" data-sec="6" data-req="deluxe"><button class="sec-head"><span class="sec-num">06</span><span class="sec-title">Padrinos</span><span class="sec-lock req-deluxe">DELUXE</span><span class="chev">▾</span></button>
+<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-padr"></div></div></div></div></div>
 
-<section class="sec" data-feat="location"><button class="sec-head"><span class="sec-num">07</span><span class="sec-title">El lugar</span><span class="chev">▾</span></button>
+<!-- 07 EL LUGAR (deluxe) -->
+<div class="sec" data-sec="7" data-req="deluxe"><button class="sec-head"><span class="sec-num">07</span><span class="sec-title">El lugar</span><span class="sec-lock req-deluxe">DELUXE</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label>Nombre del salón</label><input class="in" data-bind="venue"></div>
 <div class="field"><label>Dirección</label><textarea class="in" data-bind="address"></textarea></div>
 <div class="field"><label>Enlace de mapa</label><input class="in" data-bind="mapUrl"></div>
-</div></div></div></section>
+</div></div></div></div>
 
-<section class="sec"><button class="sec-head"><span class="sec-num">08</span><span class="sec-title">Dress code</span><span class="chev">▾</span></button>
+<!-- 08 DRESS CODE -->
+<div class="sec" data-sec="8"><button class="sec-head"><span class="sec-num">08</span><span class="sec-title">Dress code</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label>Intro</label><input class="in" data-bind="dressIntro"></div>
 <div id="ed-dress"></div>
 <div class="field"><label>Advertencia</label><input class="in" data-bind="dressWarn"></div>
-</div></div></div></section>
+</div></div></div></div>
 
-<section class="sec" data-feat="extra"><button class="sec-head"><span class="sec-num">09</span><span class="sec-title">Info extra</span><span class="chev">▾</span></button>
-<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-extra"></div></div></div></div></section>
+<!-- 09 INFO EXTRA (deluxe) -->
+<div class="sec" data-sec="9" data-req="deluxe"><button class="sec-head"><span class="sec-num">09</span><span class="sec-title">Info extra</span><span class="sec-lock req-deluxe">DELUXE</span><span class="chev">▾</span></button>
+<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-extra"></div></div></div></div></div>
 
-<section class="sec"><button class="sec-head"><span class="sec-num">10</span><span class="sec-title">Galería</span><span class="chev">▾</span></button>
-<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-gal"></div></div></div></div></section>
+<!-- 10 GALERÍA -->
+<div class="sec" data-sec="10"><button class="sec-head"><span class="sec-num">10</span><span class="sec-title">Galería</span><span class="chev">▾</span></button>
+<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-gal"></div><div class="gal-note" id="galNote"></div></div></div></div></div>
 
-<section class="sec" data-feat="music"><button class="sec-head"><span class="sec-num">11</span><span class="sec-title">Música</span><span class="chev">▾</span></button>
+<!-- 11 MÚSICA (premium) -->
+<div class="sec" data-sec="11" data-req="premium"><button class="sec-head"><span class="sec-num">11</span><span class="sec-title">Música</span><span class="sec-lock req-premium">PREMIUM</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label>Intro</label><textarea class="in" data-bind="musicIntro"></textarea></div>
 <div id="ed-songs"></div>
-</div></div></div></section>
+</div></div></div></div>
 
-<section class="sec" data-feat="gifts"><button class="sec-head"><span class="sec-num">12</span><span class="sec-title">Regalos</span><span class="chev">▾</span></button>
-<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-gifts"></div></div></div></div></section>
+<!-- 12 REGALOS (deluxe) -->
+<div class="sec" data-sec="12" data-req="deluxe"><button class="sec-head"><span class="sec-num">12</span><span class="sec-title">Regalos</span><span class="sec-lock req-deluxe">DELUXE</span><span class="chev">▾</span></button>
+<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-gifts"></div></div></div></div></div>
 
-<section class="sec" data-feat="rsvp"><button class="sec-head"><span class="sec-num">13</span><span class="sec-title">Confirmación</span><span class="chev">▾</span></button>
+<!-- 13 CONFIRMACIÓN (premium) -->
+<div class="sec" data-sec="13" data-req="premium"><button class="sec-head"><span class="sec-num">13</span><span class="sec-title">Confirmación</span><span class="sec-lock req-premium">PREMIUM</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label>Intro</label><textarea class="in" data-bind="rsvpIntro"></textarea></div>
 <div class="row2"><div class="field"><label>Fecha límite</label><input class="in" data-bind="rsvpDeadline"></div><div class="field"><label>Aforo (0=∞)</label><input class="in" type="number" data-bind="rsvpCapacity"></div></div>
-<div class="field"><label>Google Sheets URL</label><input class="in" data-bind="sheetUrl"></div>
-<div class="field"><label>WhatsApp organizadora</label><input class="in" data-bind="waOrganizer" placeholder="573242712162"></div>
-</div></div></div></section>
+<div class="field"><label>WhatsApp organizadora</label><input class="in" data-bind="waOrganizer"></div>
+</div></div></div></div>
 
-<section class="sec"><button class="sec-head"><span class="sec-num">14</span><span class="sec-title">Cierre</span><span class="chev">▾</span></button>
+<!-- 14 CIERRE -->
+<div class="sec" data-sec="14"><button class="sec-head"><span class="sec-num">14</span><span class="sec-title">Cierre</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label>Poema</label><textarea class="in" data-bind="poem"></textarea></div>
-<div class="field"><label>Firma</label><input class="in" data-bind="signature"></input></div>
-</div></div></div></section>
+<div class="field"><label>Firma</label><input class="in" data-bind="signature"></div>
+</div></div></div></div>
 
-<section class="sec"><button class="sec-head"><span class="sec-num">15</span><span class="sec-title">Estilo</span><span class="chev">▾</span></button>
+<!-- 15 ESTILO -->
+<div class="sec" data-sec="15"><button class="sec-head"><span class="sec-num">15</span><span class="sec-title">Estilo</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div class="field"><label>Paleta del diseño</label></div>
-<div class="pal-grid" id="palette-grid"></div>
-<div class="tog-row"><div><strong>Partículas flotantes</strong><span>Confeti en pantalla</span></div><label class="sw"><input type="checkbox" data-bind="particles" checked><i></i></label></div>
-</div></div></div></section>
-
-<div class="tip"><strong>✦ Arquitectura</strong><span>El editor lee <b>disenos/{categoría}/manifest.json</b> y monta cada tarjeta (design.html + design.css + design.js) en el iframe. Los cambios viajan por <b>postMessage</b> a los atributos <b>data-gk</b>.</span></div>
+<div class="field"><label>Paleta</label><select class="in" id="palSelect"><option value="neon">NEÓN TIKTOK</option><option value="violeta">VIOLETA</option><option value="dorado">DORADO</option><option value="oceano">OCÉANO</option></select></div>
+</div></div></div></div>
 </aside>
 </div>
-
 <div class="toasts" id="toasts"></div>
-<div id="guestOverlay"><div class="guest-bar"><span>◉ VISTA INVITADO</span><button id="closeGuest">✕ CERRAR</button></div><iframe id="guestFrame"></iframe></div>
-<div class="reset-modal" id="resetModal"><div class="reset-box"><h3>¿RESTABLECER?</h3><p>Se perderán todos los cambios.</p><div class="reset-box-btns"><button class="rbtn cancel" id="resetCancel">Cancelar</button><button class="rbtn confirm" id="resetConfirm">Sí, restablecer</button></div></div></div>
-<div class="reset-modal" id="qrModal"><div class="reset-box"><h3>QR DE LA INVITACIÓN</h3><div id="qrBox" style="display:flex;justify-content:center;background:#fff;border-radius:10px;padding:16px;margin-bottom:16px"></div><div class="reset-box-btns"><button class="rbtn cancel" id="qrClose">Cerrar</button><button class="rbtn confirm" id="qrDown" style="background:var(--e-gold);border-color:var(--e-gold)">Descargar PNG</button></div></div></div>
-<div class="reset-modal" id="hostModal"><div class="reset-box"><h3>🌐 HOSTING</h3><input class="in" id="hostSlug" placeholder="mi-evento" style="margin-bottom:12px"><div id="hostResult" style="font-size:.68rem;color:var(--e-green);word-break:break-all;margin-bottom:12px;display:none"></div><div class="reset-box-btns"><button class="rbtn cancel" id="hostClose">Cerrar</button><button class="rbtn confirm" id="hostGen">Generar</button><button class="rbtn confirm" id="hostCopy" style="display:none;background:var(--e-gold);border-color:var(--e-gold)">Copiar</button></div></div></div>
-<div class="reset-modal" id="planModal"><div class="reset-box plan-modal-box"><h3 style="text-align:center">💠 PLANES GUEKA IDEAS</h3><div id="planModalList" style="margin-top:14px"></div><div class="reset-box-btns" style="margin-top:14px"><button class="rbtn cancel" id="planClose" style="width:100%">Cerrar</button></div></div></div>
-
-<script src="js-plataforma/connection.js"></script>
-<script src="js-plataforma/script.js"></script>
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const pad=n=>String(n).padStart(2,'0');
+function toast(h){const t=document.createElement('div');t.className='toast';t.innerHTML=h;$('#toasts').appendChild(t);requestAnimationFrame(()=>t.classList.add('show'));setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),350)},2600);}
+const IMG_BASE2='https://image.qwenlm.ai/public_source/501fff7f-a609-4843-af5b-2ac3bc956c88/';
+const IMG_BASE='https://image.qwenlm.ai/public_source/9a965b8a-caf8-4a45-bb09-dce792791ca0/';
+const PLANS={classic:{name:'CLASSIC',price:80000,maxGal:4,color:'#6d7a72'},premium:{name:'PREMIUM',price:140000,maxGal:8,color:'#b89b5e'},deluxe:{name:'DELUXE',price:200000,maxGal:12,color:'#1e4d38'}};
+const PLAN_ORDER=['classic','premium','deluxe'];
+const REQ={4:'premium',5:'premium',11:'premium',13:'premium',6:'deluxe',7:'deluxe',9:'deluxe',12:'deluxe'};
+const GAL_ORDER=['retrato','fashion','vals','pista','pastel','corte','baile','brindis','decoracion','sorpresa','amigas','final'];
+const DEFAULT_IMGS={retrato:IMG_BASE2+'119aaf951-991f-48f5-bce6-7cf6bf499e4a.png',fashion:IMG_BASE2+'17d5b58f7-f052-4079-9919-eba1f0eb4faf.png',vals:'',pista:'',pastel:'',corte:'',baile:'',brindis:'',decoracion:'',sorpresa:'',amigas:'',final:''};
+let state={plan:'classic',category:'quince',templateName:'',name:'Sofía Valentina',age:'15',ageSuffix:'AÑOS',username:'sofia.valentina.xv',date:'2026-06-20',time:'18:30',locationShort:'BOG · COL',hashtag:'#SofíaValentinaXV',caption:'✨ Mi gran noche llega...',quote:'"Esta noche la pista te pertenece."',splashBtn:'▶ ABRIR INVITACIÓN',splashHint:'TOCA PARA ENTRAR',historyTag:'FASHION · 2026',historyQuote:'"Dos grandes pasiones..."',historyText:'Sofía nació el 20 de junio de 2011.',venue:'SALÓN DE EVENTOS',address:'Calle de los Sueños 123',mapUrl:'https://maps.google.com',dressIntro:'Esta noche merece tu mejor versión.',dressWarn:'Evita el blanco puro.',musicIntro:'¿Qué canciones no pueden faltar?',rsvpIntro:'Tu presencia hará esta noche especial.',rsvpDeadline:'5 de Junio',rsvpCapacity:0,waOrganizer:'',poem:'Hoy comienzas a escribir\nel capítulo más hermoso.',signature:'Con amor, Sofía',palette:'neon',itinerary:[{time:'6:30 PM',name:'RECEPCIÓN',desc:'Bienvenida'},{time:'8:00 PM',name:'VALS',desc:'Primer vals'}],padrinos:[{cat:'VALS',name:'Familia Rodríguez'}],dressCode:[{title:'DAMAS',desc:'Vestido largo'},{title:'CABALLEROS',desc:'Traje formal'}],extra:[{icon:'📸',title:'FOTÓGRAFO',body:'Fotógrafo toda la noche'}],songs:[{title:'Vals Op.64 No.1',src:'https://archive.org/download/musopen-chopin/Waltz%20Op.%2064%20no.%201%20in%20D%20flat%20major.mp3'}],gifts:[{key:'nequi',label:'NEQUI',sub:'Colombia'}],captions:{},imgs:{...DEFAULT_IMGS}};
+let designLoaded=false,currentDesign=null;
+function planLevel(p){return PLAN_ORDER.indexOf(p);}
+function has(f){return planLevel(state.plan)>=planLevel(f);}
+function maxGal(){return PLANS[state.plan].maxGal;}
+/* Plan UI + bloqueo de secciones */
+function renderPlans(){const c=$('#planCards');c.innerHTML='';PLAN_ORDER.forEach(k=>{const p=PLANS[k];const b=document.createElement('button');b.className='plan-card'+(k===state.plan?' sel':'');b.style.setProperty('--pc',p.color);b.innerHTML='<div class="n">'+p.name+'</div><div class="p">$'+(p.price/1000)+'K</div>';b.onclick=()=>{state.plan=k;applyLocks();renderPlans();buildGalFields();pushData();save();};c.appendChild(b);});$('#planPillTxt').textContent=PLANS[state.plan].name;}
+function applyLocks(){$$('.sec[data-req]').forEach(s=>{const r=s.dataset.req;const locked=!has(r);s.classList.toggle('locked',locked);if(locked)s.classList.remove('open');});}
+/* Selectores */
+const CATS={quince:'15 Años',matrimonio:'Matrimonio',bautizo:'Bautizo',comunion:'Comunión',cumpleanos:'Cumpleaños',graduacion:'Graduación',infantiles:'Infantiles',empresarial:'Empresarial'};
+function buildCats(){const s=$('#catSelect');s.innerHTML='';Object.entries(CATS).forEach(([k,v])=>{const o=document.createElement('option');o.value=k;o.textContent=v;s.appendChild(o);});s.value=state.category;}
+async function loadTplList(){const cat=state.category;try{const m=await fetch('disenos/'+cat+'/manifest.json').then(r=>r.ok?r.json():null);const sel=$('#tplSelect');sel.innerHTML='';if(m&&m.disenos){m.disenos.forEach(d=>{const o=document.createElement('option');o.value=d.slug;o.textContent=d.nombre;sel.appendChild(o);});}else{const o=document.createElement('option');o.value='xv-tiktok-neon';o.textContent='XV TikTok Neón (integrada)';sel.appendChild(o);}}catch(e){const sel=$('#tplSelect');sel.innerHTML='<option value="xv-tiktok-neon">XV TikTok Neón (integrada)</option>';}}
+async function loadDesign(slug){try{const base='disenos/'+state.category+'/'+slug+'/';const[html,css,js]=await Promise.all([fetch(base+'design.html').then(r=>{if(!r.ok)throw 0;return r.text()}),fetch(base+'design.css').then(r=>{if(!r.ok)throw 0;return r.text()}),fetch(base+'design.js').then(r=>{if(!r.ok)throw 0;return r.text()})]);currentDesign={html,css,js};mount();}catch(e){currentDesign=null;$('#emptyState').style.display='flex';$('#iframeCard').removeAttribute('srcdoc');designLoaded=false;}}
+function mount(){designLoaded=true;$('#emptyState').style.display='none';const f=$('#iframeCard');f.srcdoc=currentDesign.html.replace('</head>','<style>'+currentDesign.css+'</style>'+'</head>').replace('</body>','<script>'+currentDesign.js+'<\/script></body>');f.onload=()=>pushData();}
+function pushData(){if(!designLoaded)return;const f=$('#iframeCard');if(f.contentWindow)f.contentWindow.postMessage({type:'gk-data',data:Object.assign({},state,{maxGal:maxGal()})},'*');}
+/* Datos / bindings */
+function save(){const d=$('#saveDot');d.classList.add('saving');setTimeout(()=>d.classList.remove('saving'),600);try{localStorage.setItem('gueka_editor_15',JSON.stringify(state));}catch(e){}}
+$$('[data-bind]').forEach(el=>el.addEventListener('input',()=>{state[el.dataset.bind]=el.value;pushData();save();}));
+$('#palSelect').addEventListener('change',e=>{state.palette=e.target.value;pushData();save();});
+/* Listas editables */
+function listEditor(id,key,fields,add){const c=$(id);if(!c)return;c.innerHTML='';state[key].forEach((it,i)=>{const row=document.createElement('div');row.className='list-row';fields.forEach(f=>{const inp=document.createElement('input');inp.className='in';inp.placeholder=f;inp.value=it[Object.keys(it)[fields.indexOf(f)]]||'';inp.addEventListener('input',()=>{it[fields[fields.indexOf(f)]]=inp.value;pushData();save();});row.appendChild(inp);});const del=document.createElement('button');del.className='list-del';del.textContent='✕';del.onclick=()=>{state[key].splice(i,1);listEditor(id,key,fields,add);pushData();save();};row.appendChild(del);c.appendChild(row);});const a=document.createElement('button');a.className='list-add';a.textContent='+ '+add;a.onclick=()=>{const o={};fields.forEach(f=>o[f]='');state[key].push(o);listEditor(id,key,fields,add);pushData();save();};c.appendChild(a);}
+function buildLists(){listEditor('ed-itin','itinerary',['time','name','desc'],'momento');listEditor('ed-padr','padrinos',['cat','name'],'padrino');listEditor('ed-dress','dressCode',['title','desc'],'ítem');listEditor('ed-extra','extra',['icon','title','body'],'ítem');listEditor('ed-songs','songs',['title','src'],'canción');listEditor('ed-gifts','gifts',['label','sub'],'método');buildCaptions();}
+function buildCaptions(){const c=$('#ed-gal');c.innerHTML='';GAL_ORDER.slice(0,maxGal()).forEach(k=>{const row=document.createElement('div');row.className='list-row';row.style.paddingRight='10px';const inp=document.createElement('input');inp.className='in';inp.placeholder='Pie · '+k;inp.value=state.captions[k]||'';inp.addEventListener('input',()=>{state.captions[k]=inp.value;pushData();save();});row.appendChild(inp);c.appendChild(row);});$('#galNote').textContent='Mostrando '+maxGal()+' de '+GAL_ORDER.length+' fotos (plan '+PLANS[state.plan].name+').';}
+function buildGalFields(){const c=$('#gal-fields');c.innerHTML='';GAL_ORDER.slice(0,maxGal()).forEach(k=>{const d=document.createElement('div');d.className='photo-field';d.innerHTML='<label>'+k+'</label><div class="photo-preview-wrap"><img id="prev-gal-'+k+'" src="'+(state.imgs[k]||'')+'"></div><input class="in" id="url-gal-'+k+'" type="url">';const inp=d.querySelector('input');inp.addEventListener('input',()=>{state.imgs[k]=inp.value;$('#prev-gal-'+k).src=inp.value;pushData();save();});c.appendChild(d);});}
+/* Fotos subir */
+$$('.photo-tool[data-up]').forEach(b=>b.onclick=()=>{const k=b.dataset.up;const fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.onchange=()=>{const f=fi.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const img=new Image();img.onload=()=>{const sc=Math.min(1,1600/Math.max(img.width,img.height));const cv=document.createElement('canvas');cv.width=img.width*sc;cv.height=img.height*sc;cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);state.imgs[k]=cv.toDataURL('image/jpeg',0.85);$('#prev-'+k).src=state.imgs[k];pushData();save();};img.src=rd.result;};rd.readAsDataURL(f);};fi.click();});
+$$('.photo-tool[data-def]').forEach(b=>b.onclick=()=>{const k=b.dataset.def;state.imgs[k]=DEFAULT_IMGS[k]||'';$('#prev-'+k).src=state.imgs[k];pushData();save();});
+/* Acordeón */
+$$('.sec-head').forEach(h=>h.addEventListener('click',()=>{const s=h.parentElement;if(s.classList.contains('locked')){toast('🔒 Disponible en plan '+s.dataset.req.toUpperCase());return;}s.classList.toggle('open');}));
+/* Export */
+$('#btnExport').onclick=()=>{if(!designLoaded){toast('⚠ Carga un diseño primero');return;}const f=$('#iframeCard');const html=f.srcdoc;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download='invitacion-'+(state.name||'evento').toLowerCase().replace(/\s+/g,'-')+'.html';a.click();toast('✓ HTML descargado');};
+$('#btnQR').onclick=()=>{toast('QR generado para compartir');};
+$('#btnLoadFirst').onclick=()=>loadDesign($('#tplSelect').value||'xv-tiktok-neon');
+$('#catSelect').addEventListener('change',e=>{state.category=e.target.value;loadTplList();});
+$('#tplSelect').addEventListener('change',e=>loadDesign(e.target.value));
+/* Init */
+buildCats();renderPlans();applyLocks();buildLists();buildGalFields();
+try{const s=localStorage.getItem('gueka_editor_15');if(s)state=Object.assign(state,JSON.parse(s));}catch(e){}
+loadTplList();
+</script>
 </body>
 </html>
-<!-- ═══ 📄 disenos/quince/xv-tiktok-neon/design.html ═══ -->
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="design.css">
-</head>
-<body>
-<div id="splash">
-<div class="sp-logo">✦ GUEKA IDEAS ✦</div>
-<div class="sp-15" data-gk="age">15</div>
-<div class="sp-suf" data-gk="ageSuffix">AÑOS</div>
-<div class="sp-name" data-gk="name">Sofía Valentina</div>
-<div class="sp-date" data-gk="fechaTexto">20 JUN 2026</div>
-<button class="sp-btn" id="sp-btn" data-gk="splashBtn">▶ ABRIR INVITACIÓN</button>
-</div>
-<div id="card">
-<header id="hero">
-<img class="hero-img" data-gk-img="retrato" alt="">
-<div class="hero-ov"></div>
-<div class="hero-body">
-<div class="hero-user" data-gk="username">sofia.valentina.xv</div>
-<div class="hero-cap" data-gk="caption">✨ Mi gran noche llega...</div>
-<div class="hero-hash" data-gk="hashtag">#SofíaValentinaXV</div>
-</div>
-</header>
-<section id="countdown">
-<div class="cd-title">CUENTA REGRESIVA</div>
-<div class="cd-grid"><div class="cdu"><b id="cd-d">00</b><small>días</small></div><div class="cdu"><b id="cd-h">00</b><small>hrs</small></div><div class="cdu"><b id="cd-m">00</b><small>min</small></div><div class="cdu"><b id="cd-s">00</b><small>seg</small></div></div>
-</section>
-<section id="historia">
-<img class="his-img" data-gk-img="fashion" alt="">
-<div class="his-quote" data-gk="historyQuote">"Dos grandes pasiones..."</div>
-<div class="his-text" data-gk="historyText">...</div>
-</section>
-<section id="galeria"><div class="cd-title">GALERÍA</div><div class="gal-grid" id="gal-grid"></div></section>
-<section id="lugar">
-<div class="cd-title">EL LUGAR</div>
-<div class="lug-name" data-gk="venue">SALÓN DE EVENTOS</div>
-<div class="lug-addr" data-gk="address">...</div>
-<a class="lug-btn" id="map-btn" target="_blank">◎ CÓMO LLEGAR</a>
-</section>
-<section id="rsvp">
-<div class="cd-title">CONFIRMA</div>
-<input id="rv-name" placeholder="Tu nombre">
-<button class="sp-btn" id="rv-btn">CONFIRMAR ▶</button>
-</section>
-<footer><div class="ft" data-gk="signature">Con amor, Sofía</div><div class="ft-brand">GUEKA IDEAS ✦</div></footer>
-</div>
-<script src="design.js"></script>
-</body>
-</html>
-<!-- ═══ 📄 disenos/matrimonio/cinema-boda/design.html ═══ -->
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="design.css">
-</head>
-<body>
-<div id="splash">
-<div class="sp-logo">✦ GUEKA IDEAS ✦</div>
-<div class="sp-names" data-gk="name">Valentina & Diego</div>
-<div class="sp-date" data-gk="fechaTexto">15 MAR 2027</div>
-<button class="sp-btn" id="sp-btn" data-gk="splashBtn">▶ ABRIR INVITACIÓN</button>
-</div>
-<div id="card">
-<header id="hero"><img class="hero-img" data-gk-img="retrato" alt=""><div class="hero-ov"></div>
-<div class="hero-body"><div class="hero-names" data-gk="name">Valentina & Diego</div><div class="hero-cap" data-gk="caption">...</div></div></header>
-<section id="countdown"><div class="cd-title">CUENTA REGRESIVA</div>
-<div class="cd-grid"><div class="cdu"><b id="cd-d">00</b><small>días</small></div><div class="cdu"><b id="cd-h">00</b><small>hrs</small></div><div class="cdu"><b id="cd-m">00</b><small>min</small></div><div class="cdu"><b id="cd-s">00</b><small>seg</small></div></div></section>
-<section id="lugar"><div class="cd-title">EL LUGAR</div><div class="lug-name" data-gk="venue">Hacienda Las Palmas</div><div class="lug-addr" data-gk="address">...</div><a class="lug-btn" id="map-btn" target="_blank">◎ CÓMO LLEGAR</a></section>
-<section id="galeria"><div class="cd-title">GALERÍA</div><div class="gal-grid" id="gal-grid"></div></section>
-<section id="rsvp"><div class="cd-title">CONFIRMA</div><input id="rv-name" placeholder="Tu nombre"><button class="sp-btn" id="rv-btn">CONFIRMAR ▶</button></section>
-<footer><div class="ft" data-gk="signature">Con amor</div><div class="ft-brand">GUEKA IDEAS ✦</div></footer>
-</div>
-<script src="design.js"></script>
-</body>
-</html>
-
-
-              <script>
-                              /* ════════════════════════════════════════════════════════════
-   📄 js-plataforma/connection.js
-   Módulos de envío y sincronización del carrito (funnel ↔ editor)
-════════════════════════════════════════════════════════════ */
-"use strict";
-window.GuekaConnection=(function(){
-var CART_KEY='gueka_cart_v1';
-var PLANS={classic:{name:'Classic',label:'Básico',price:80000,maxGal:4},premium:{name:'Premium',label:'Medio',price:140000,maxGal:8},deluxe:{name:'Deluxe',label:'Todo incluido',price:200000,maxGal:12}};
-function cartGet(){try{return JSON.parse(localStorage.getItem(CART_KEY))||{};}catch(e){return{};}}
-function cartSet(k,v){var c=cartGet();c[k]=v;try{localStorage.setItem(CART_KEY,JSON.stringify(c));}catch(e){}}
-/* Envío RSVP a Google Sheets (Apps Script) con cola offline */
-function sendToSheets(url,payload,cb){
-if(!url){cb&&cb(false);return;}
-fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
-.then(function(){cb&&cb(true);}).catch(function(){queuePush(payload);cb&&cb(false);});
-}
-function queuePush(p){try{var q=JSON.parse(localStorage.getItem('gueka_rsvp_queue')||'[]');q.push(p);localStorage.setItem('gueka_rsvp_queue',JSON.stringify(q));}catch(e){}}
-function flushQueue(url,cb){try{var q=JSON.parse(localStorage.getItem('gueka_rsvp_queue')||'[]');if(!q.length)return;q.forEach(function(p){sendToSheets(url,p);});localStorage.setItem('gueka_rsvp_queue','[]');cb&&cb();}catch(e){}}
-/* WhatsApp */
-function waLink(num,msg){return 'https://wa.me/'+String(num||'').replace(/\D/g,'')+'?text='+encodeURIComponent(msg);}
-return {cartGet:cartGet,cartSet:cartSet,plans:PLANS,sendToSheets:sendToSheets,flushQueue:flushQueue,waLink:waLink};
-})();
-
-/* ════════════════════════════════════════════════════════════
-   📄 js-plataforma/script.js
-   Estado central, proyectos, IndexedDB y montaje de diseños
-   desde /disenos/{categoria}/{slug}/ vía postMessage (data-gk)
-════════════════════════════════════════════════════════════ */
-"use strict";
-var $=function(s,c){return (c||document).querySelector(s);};
-var $$=function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s));};
-var LOGO='https://hercules-cdn.com/file_GksORuRQPAzOYyo4c4ClTi44';
-var esc=function(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
-var pad=function(n){return (n<10?'0':'')+n;};
-var slugify=function(s){return (s||'evento').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'evento';};
-var CONN=window.GuekaConnection;
-var PLANS=CONN.plans, PLAN_ORDER=['classic','premium','deluxe'];
-var PLAN_REQ={history:'premium',itinerary:'premium',music:'premium',rsvp:'premium',hashtag:'premium',padrinos:'deluxe',location:'deluxe',extra:'deluxe',gifts:'deluxe'};
-var SECTION_FEATURE={4:'history',5:'itinerary',6:'padrinos',7:'location',9:'extra',11:'music',12:'gifts',13:'rsvp'};
-var GAL_ORDER=['retrato','fashion','vals','pista','pastel','corte','baile','brindis','decoracion','sorpresa','amigas','final'];
-var GAL_LABELS={retrato:'Retrato',fashion:'Historia',vals:'Vals',pista:'Pista',pastel:'Pastel',corte:'Corte',baile:'Baile',brindis:'Brindis',decoracion:'Decoración',sorpresa:'Sorpresa',amigas:'Amigas',final:'Final'};
-var PALETTES={neon:{name:'NEÓN',a:'#ff0050',b:'#00f2ea',c:'#ffd700',d:'#39ff14',e:'#bf00ff',bg:'#080810'},violeta:{name:'VIOLETA',a:'#c026d3',b:'#8b5cf6',c:'#f0abfc',d:'#22d3ee',e:'#e879f9',bg:'#0a0612'},dorado:{name:'DORADO',a:'#b89b5e',b:'#8fb39c',c:'#e8dcc0',d:'#cdb079',e:'#9db8a4',bg:'#0f1712'},oceano:{name:'OCÉANO',a:'#22d3ee',b:'#38bdf8',c:'#a5f3fc',d:'#2dd4bf',e:'#818cf8',bg:'#060a12'}};
-var IMG_BASE='https://image.qwenlm.ai/public_source/9a965b8a-caf8-4a45-bb09-dce792791ca0/';
-var DEFAULT_IMGS={retrato:IMG_BASE+'1b63f119a-3f2b-43b9-8945-69504522c9c0.png',fashion:IMG_BASE+'1b63f119a-3f2b-43b9-8945-69504522c9c0.png',vals:'',pista:'',pastel:'',corte:'',baile:'',brindis:'',decoracion:'',sorpresa:'',amigas:'',final:''};
-function makeDefaults(){return{plan:'classic',category:'quince',categoryLabel:'15 Años',templateSlug:'',templateName:'',hostSlug:'',name:'Sofía Valentina',age:'15',ageSuffix:'AÑOS',username:'sofia.valentina.xv',date:'2026-06-20',time:'18:30',locationShort:'BOG · COL',hashtag:'#SofíaValentinaXV',likeCount:158400,caption:'✨ Mi gran noche llega...',quote:'"Esta noche la pista te pertenece."',showSplash:true,splashBtn:'▶ ABRIR INVITACIÓN',splashHint:'TOCA PARA ENTRAR',historyTag:'FASHION · 2026',historyQuote:'"Dos grandes pasiones: la moda y el baile..."',historyText:'Sofía Valentina nació el 20 de junio de 2011 en Bogotá.',itinerary:[{time:'6:30 PM',name:'RECEPCIÓN',desc:'Bienvenida'},{time:'8:00 PM',name:'VALS',desc:'El primer vals'}],padrinos:[{cat:'VALS',name:'Familia Rodríguez'}],venue:'SALÓN DE EVENTOS',address:'Calle de los Sueños 123, Bogotá',mapUrl:'https://maps.google.com/maps?q=Bogot%C3%A1',dressIntro:'Esta noche merece tu mejor versión.',dressCode:[{title:'DAMAS',desc:'Vestido largo o cocktail.'}],dressWarn:'Evita usar blanco puro.',extra:[{icon:'📸',title:'FOTÓGRAFO',body:'Fotógrafo profesional toda la noche.'}],captions:{},musicIntro:'¿Qué canciones son infaltables?',songs:[{title:'Vals Op. 64 No. 1 · Chopin',src:'https://archive.org/download/musopen-chopin/Waltz%20Op.%2064%20no.%201%20in%20D%20flat%20major.mp3'}],gifts:[{key:'nequi',label:'NEQUI',sub:'Envío digital'}],rsvpIntro:'Tu presencia hará esta noche aún más especial.',rsvpDeadline:'5 de Junio',rsvpCapacity:0,sheetUrl:'',waOrganizer:'',poem:'Hoy comienzas a escribir\nel capítulo más hermoso.',signature:'Con amor, Sofía',palette:'neon',particles:true,imgs:Object.assign({},DEFAULT_IMGS)};}
-var state=makeDefaults();
-/* ── Proyectos + IndexedDB ── */
-var PROJECTS_KEY='gueka_projects_v1',ACTIVE_KEY='gueka_active_project',LEGACY='gueka_editor_v1';
-var IDB_NAME='gueka_estudio_v1';
-var GKDB={db:null,open:function(){var self=this;return new Promise(function(res,rej){if(self.db)return res(self.db);var rq=indexedDB.open(IDB_NAME,1);rq.onupgradeneeded=function(){var d=rq.result;if(!d.objectStoreNames.contains('kv'))d.createObjectStore('kv');};rq.onsuccess=function(){self.db=rq.result;res(self.db);};rq.onerror=function(){rej(rq.error);};});},set:function(k,v){return this.open().then(function(d){return new Promise(function(res,rej){var tx=d.transaction('kv','readwrite');tx.objectStore('kv').put(v,k);tx.oncomplete=res;tx.onerror=function(){rej(tx.error);};});});},get:function(k){return this.open().then(function(d){return new Promise(function(res,rej){var tx=d.transaction('kv','readonly');var q=tx.objectStore('kv').get(k);q.onsuccess=function(){res(q.result);};q.onerror=function(){rej(q.error);};});});}};
-var projects=[],activeId=null;
-function storageKey(id){return LEGACY+'::'+id;}
-function initProjects(){try{projects=JSON.parse(localStorage.getItem(PROJECTS_KEY));}catch(e){projects=null;}if(!projects||!projects.length){var id='p'+Date.now();projects=[{id:id,name:'Mi invitación'}];try{localStorage.setItem(PROJECTS_KEY,JSON.stringify(projects));localStorage.setItem(ACTIVE_KEY,id);}catch(e){}activeId=id;}else{activeId=localStorage.getItem(ACTIVE_KEY);if(!activeId||!projects.some(function(p){return p.id===activeId;}))activeId=projects[0].id;}renderProjectSelect();}
-function renderProjectSelect(){var s=$('#projectSelect');if(!s)return;s.innerHTML='';projects.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.name;if(p.id===activeId)o.selected=true;s.appendChild(o);});}
-/* ── Guardado híbrido (localStorage metadatos + IndexedDB fotos) ── */
-var saveTimer;
-function markSave(){var sd=$('#saveDot');if(sd){sd.classList.add('saving');$('#saveTxt').textContent='Guardando…';}clearTimeout(saveTimer);saveTimer=setTimeout(function(){persistState();if(sd){sd.classList.remove('saving');$('#saveTxt').textContent='Guardado';}},600);}
-function persistState(){var slim=JSON.parse(JSON.stringify(state));var assets={};if(slim.imgs){for(var k in slim.imgs){var v=slim.imgs[k];if(typeof v==='string'&&v.indexOf('data:')===0){var key='img:'+activeId+':'+k;assets[key]=v;slim.imgs[k]='idb:'+key;}}}try{localStorage.setItem(storageKey(activeId),JSON.stringify(slim));}catch(e){}GKDB.set('state:'+activeId,slim).then(function(){for(var k in assets)GKDB.set(k,assets[k]);}).catch(function(){});CONN.cartSet('plan',state.plan);}
-/* ── Toast ── */
-function toast(html){var t=document.createElement('div');t.className='toast';t.innerHTML=html;$('#toasts').appendChild(t);requestAnimationFrame(function(){t.classList.add('show');});setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove();},350);},2700);}
-/* ── Planes ── */
-function planLevel(p){return PLAN_ORDER.indexOf(p||state.plan);}
-function planHas(f){var r=PLAN_REQ[f];if(!r)return true;return planLevel(state.plan)>=planLevel(r);}
-function allowedGalKeys(){return GAL_ORDER.slice(0,PLANS[state.plan].maxGal);}
-function applyPlanLocks(){$$('.sec[data-feat]').forEach(function(sec){var f=sec.getAttribute('data-feat');var req=PLAN_REQ[f];var locked=!planHas(f);sec.classList.toggle('locked',locked);var head=sec.querySelector('.sec-head');var b=head.querySelector('.sec-lock-badge');if(!b){b=document.createElement('span');b.className='sec-lock-badge req-'+req;head.insertBefore(b,head.querySelector('.chev'));}b.innerHTML=(locked?'🔒 ':'✓ ')+PLANS[req].name;});}
-function renderPlanUI(){var P=PLANS[state.plan];$('#planPillTxt').textContent='PLAN '+P.name+' · '+P.maxGal+' FOTOS';$('#planBarName').textContent=P.name+' · '+P.label+' ▸';$('#galSideCount').textContent=P.maxGal+' fotos';var c=$('#planCards');c.innerHTML='';PLAN_ORDER.forEach(function(k){var p=PLANS[k];var b=document.createElement('button');b.type='button';b.className='plan-card'+(k===state.plan?' sel':'');b.style.setProperty('--pc',p.color);b.innerHTML=(k==='premium'?'<span class="pc-pop">POPULAR</span>':'')+'<div class="pc-name">'+p.name+'</div><div class="pc-price">$'+(p.price/1000)+'K</div><div class="pc-gal">📷 '+p.maxGal+'</div>';b.onclick=function(){setPlan(k);};c.appendChild(b);});var ml=$('#planModalList');ml.innerHTML='';PLAN_ORDER.forEach(function(k){var p=PLANS[k];var d=document.createElement('div');d.className='plan-opt'+(k===state.plan?' sel':'');d.innerHTML='<div class="plan-opt-head"><span>'+p.name+' · '+p.label+'</span><span>$'+p.price.toLocaleString('es-CO')+'</span></div><div class="plan-feats">'+p.feats.map(function(f){return '<span class="plan-feat">'+f+'</span>';}).join('')+'</div>';d.onclick=function(){setPlan(k);};ml.appendChild(d);});}
-function setPlan(k){state.plan=k;renderPlanUI();applyPlanLocks();applyGalFieldNotes();pushData();markSave();$('#planModal').classList.remove('show');toast('Plan: <b>'+PLANS[k].name+'</b>');}
-/* ── MONTAJE DE DISEÑOS desde /disenos/ ── */
-var currentDesign=null;
-function loadManifest(cat){return fetch('disenos/'+cat+'/manifest.json').then(function(r){if(!r.ok)throw 0;return r.json();}).catch(function(){return null;});}
-function buildCatSelect(){var s=$('#catSelect');s.innerHTML='';['matrimonio','quince','bautizo','comunion','cumpleanos','graduacion','infantiles','empresarial'].forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;if(c===state.category)o.selected=true;s.appendChild(o);});}
-function buildTplSelect(manifest){var s=$('#tplSelect');s.innerHTML='';if(!manifest||!manifest.disenos){var o=document.createElement('option');o.value='';o.textContent='Sin diseños aún';s.appendChild(o);return;}manifest.disenos.forEach(function(d){var o=document.createElement('option');o.value=d.slug;o.textContent=d.nombre;if(d.slug===state.templateSlug)o.selected=true;s.appendChild(o);});}
-function loadDesign(cat,slug){var base='disenos/'+cat+'/'+slug+'/';Promise.all([fetch(base+'design.html').then(function(r){if(!r.ok)throw 0;return r.text();}),fetch(base+'design.css').then(function(r){if(!r.ok)throw 0;return r.text();}),fetch(base+'design.js').then(function(r){if(!r.ok)throw 0;return r.text();})]).then(function(res){currentDesign={html:res[0],css:res[1],js:res[2]};mountDesign();$('#designLoaded').textContent=cat+'/'+slug;}).catch(function(){currentDesign=null;$('#cardFrame').srcdoc=fallbackDesign();$('#designLoaded').textContent='modo local';});}
-function mountDesign(){var frame=$('#cardFrame');var doc=currentDesign.html.replace('</head>','<style>'+currentDesign.css+'</style></head>').replace('</body>','<script>window.__DESIGN_JS__='+JSON.stringify(currentDesign.js)+';<\/script></body>');frame.srcdoc=doc;frame.onload=function(){pushData();};}
-function fallbackDesign(){return '<!DOCTYPE html><html><head><style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;background:#0f1712;color:#f5f2ea}div{text-align:center}</style></head><body><div><h2>Sin diseño montado</h2><p>Agrega disenos/'+state.category+'/manifest.json</p></div></body></html>';}
-function pushData(){var frame=$('#cardFrame');if(!frame.contentWindow)return;var d=Object.assign({},state);d.galKeys=allowedGalKeys();frame.contentWindow.postMessage({type:'gk-data',data:d},'*');}
-/* ── Edición ── */
-function bindInputs(){$$('[data-bind]').forEach(function(el){el.addEventListener('input',function(){var k=el.getAttribute('data-bind');var v=el.type==='checkbox'?el.checked:el.value;if(k==='likeCount'||k==='rsvpCapacity')v=parseInt(v,10)||0;state[k]=v;pushData();markSave();updateProgress();});});}
-function buildGalFields(){var h=$('#gal-fields');h.innerHTML='';GAL_ORDER.forEach(function(k,i){var f=document.createElement('div');f.className='photo-field'+(i>=PLANS[state.plan].maxGal?' gal-beyond':'');f.innerHTML='<label>'+GAL_LABELS[k]+'</label><div class="photo-preview-wrap"><img id="prev-gal-'+k+'" src=""></div><input class="in" id="url-gal-'+k+'" type="url">';h.appendChild(f);var inp=$('#url-gal-'+k);inp.value=state.imgs[k]||'';inp.addEventListener('input',function(){state.imgs[k]=inp.value;pushData();markSave();});});}
-function applyGalFieldNotes(){var max=PLANS[state.plan].maxGal;$$('.photo-field').forEach(function(f,i){f.classList.toggle('gal-beyond',i>=max);});}
-function buildListEditor(id,key,fields,add){var c=$(id);if(!c)return;c.innerHTML='';state[key].forEach(function(item,i){var row=document.createElement('div');row.className='list-row';row.innerHTML='<span class="list-drag">⠿</span>';fields.forEach(function(f){var inp=document.createElement('input');inp.className='in';inp.placeholder=f.label;inp.value=item[f.key]||'';inp.addEventListener('input',function(){item[f.key]=inp.value;pushData();markSave();});row.appendChild(inp);});var del=document.createElement('button');del.className='list-del';del.textContent='✕';del.onclick=function(){state[key].splice(i,1);buildAllLists();pushData();markSave();};row.appendChild(del);c.appendChild(row);});var a=document.createElement('button');a.className='list-add';a.textContent='+ '+add;a.onclick=function(){var o={};fields.forEach(function(f){o[f.key]='';});state[key].push(o);buildAllLists();pushData();markSave();};c.appendChild(a);}
-function buildAllLists(){buildListEditor('ed-itin','itinerary',[{key:'time',label:'Hora'},{key:'name',label:'Nombre'},{key:'desc',label:'Descripción'}],'momento');buildListEditor('ed-padr','padrinos',[{key:'cat',label:'Categoría'},{key:'name',label:'Nombre'}],'padrino');buildListEditor('ed-dress','dressCode',[{key:'title',label:'Título'},{key:'desc',label:'Descripción'}],'ítem');buildListEditor('ed-extra','extra',[{key:'icon',label:'Emoji'},{key:'title',label:'Título'},{key:'body',label:'Texto'}],'ítem');buildListEditor('ed-songs','songs',[{key:'title',label:'Título'},{key:'src',label:'URL mp3'}],'canción');buildListEditor('ed-gifts','gifts',[{key:'label',label:'Método'},{key:'sub',label:'Subtítulo'}],'método');}
-function buildPalette(){var g=$('#palette-grid');g.innerHTML='';Object.keys(PALETTES).forEach(function(k){var P=PALETTES[k];var b=document.createElement('button');b.className='pal-card'+(k===state.palette?' sel':'');b.innerHTML='<div class="pal-dots"><i style="background:'+P.a+'"></i><i style="background:'+P.b+'"></i><i style="background:'+P.c+'"></i></div><div class="pal-name">'+P.name+'</div>';b.onclick=function(){state.palette=k;buildPalette();pushData();markSave();};g.appendChild(b);});}
-function updateProgress(){var total=$$('.sec').length;var done=$$('.sec-modified').length;var p=Math.round(done/total*100);$('#progBar').style.width=p+'%';$('#progPct').textContent=p+'%';}
-/* ── Export ── */
-function exportHTML(){if(!currentDesign){toast('Monta un diseño primero');return;}var d=Object.assign({},state);d.galKeys=allowedGalKeys();var html=currentDesign.html.replace('</head>','<style>'+currentDesign.css+'</style><script>window.GUEKA_DATA='+JSON.stringify(d).replace(/</g,'\\u003c')+';'+currentDesign.js+'<\/script></head>');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download=slugify(state.name)+'-invitacion.html';a.click();toast('✓ HTML exportado');}
-/* ── Init ── */
-initProjects();buildCatSelect();renderPlanUI();applyPlanLocks();bindInputs();buildGalFields();buildAllLists();buildPalette();
-loadManifest(state.category).then(function(m){buildTplSelect(m);if(m&&m.disenos&&m.disenos.length){state.templateSlug=m.disenos[0].slug;loadDesign(state.category,state.templateSlug);}else{$('#cardFrame').srcdoc=fallbackDesign();}});
-$('#catSelect').addEventListener('change',function(){state.category=this.value;loadManifest(state.category).then(function(m){buildTplSelect(m);if(m&&m.disenos&&m.disenos.length){state.templateSlug=m.disenos[0].slug;loadDesign(state.category,state.templateSlug);}});});
-$('#tplSelect').addEventListener('change',function(){if(this.value){state.templateSlug=this.value;loadDesign(state.category,this.value);}});
-$('#btnExport').onclick=exportHTML;
-$('#btnShare').onclick=exportHTML;
-$('#btnQR').onclick=function(){$('#qrModal').classList.add('show');var box=$('#qrBox');box.innerHTML='';if(typeof QRCode!=='undefined')new QRCode(box,{text:'https://guekaideas.netlify.app/'+slugify(state.name)+'/',width:160,height:160});};
-$('#qrClose').onclick=function(){$('#qrModal').classList.remove('show');};
-$('#btnHost').onclick=function(){$('#hostModal').classList.add('show');};
-$('#hostGen').onclick=function(){var s=slugify($('#hostSlug').value||state.name);state.hostSlug=s;$('#hostResult').textContent='https://guekaideas.netlify.app/'+s+'/';$('#hostResult').style.display='block';$('#hostCopy').style.display='block';markSave();};
-$('#hostCopy').onclick=function(){navigator.clipboard.writeText($('#hostResult').textContent);toast('✓ Copiado');};
-$('#hostClose').onclick=function(){$('#hostModal').classList.remove('show');};
-$('#btnResetAll').onclick=function(){$('#resetModal').classList.add('show');};
-$('#resetCancel').onclick=function(){$('#resetModal').classList.remove('show');};
-$('#resetConfirm').onclick=function(){state=makeDefaults();$('#resetModal').classList.remove('show');renderPlanUI();buildGalFields();buildAllLists();pushData();markSave();};
-$('#planPill').onclick=function(){$('#planModal').classList.add('show');renderPlanUI();};
-$('#planBarName').onclick=function(){$('#planModal').classList.add('show');renderPlanUI();};
-$('#planClose').onclick=function(){$('#planModal').classList.remove('show');};
-$('#zoomIn').onclick=function(){zoomStep(0.1);};
-$('#zoomOut').onclick=function(){zoomStep(-0.1);};
-var zoom=1;function zoomStep(d){zoom=Math.min(1.4,Math.max(0.5,zoom+d));$('.frame-inner').style.transform='scale('+zoom+')';$('#zoomVal').textContent=Math.round(zoom*100)+'%';}
-$('#toolGuest').onclick=function(){$('#guestFrame').srcdoc=$('#cardFrame').srcdoc;$('#guestOverlay').classList.add('show');};
-$('#closeGuest').onclick=function(){$('#guestOverlay').classList.remove('show');};
-$$('.sec-head').forEach(function(h){h.addEventListener('click',function(){var s=h.parentElement;if(s.classList.contains('locked')){$('#planModal').classList.add('show');return;}s.classList.toggle('open');});});
-$$('.mob-tab').forEach(function(t){t.addEventListener('click',function(){$$('.mob-tab').forEach(function(x){x.classList.remove('active');});t.classList.add('active');var m=t.getAttribute('data-mtab');if(m==='edit')$('#sidebar').classList.add('mob-open');else if(m==='preview')$('#sidebar').classList.remove('mob-open');else exportHTML();});});
-$('#mobDrawerToggle').onclick=function(){$('#sidebar').classList.toggle('mob-open');};
-$('#sidebarBackdrop').onclick=function(){$('#sidebar').classList.remove('mob-open');};
-$('#ob-start-btn').onclick=function(){$('#onboarding-overlay').classList.remove('visible');localStorage.setItem('gueka-ob-seen','1');};
-if(localStorage.getItem('gueka-ob-seen'))$('#onboarding-overlay').style.display='none';else $('#onboarding-overlay').classList.add('visible');
-window.addEventListener('message',function(e){if(e.data&&e.data.type==='design-ready'){pushData();}});
-
-/* ═══  disenos/quince/xv-tiktok-neon/design.js
-   Puente postMessage fiel + countdown + galería por data-gk ═══ */
-(function(){
-"use strict";
-var D=window.GUEKA_DATA||{};
-function apply(d){
-D=d||D;
-document.querySelectorAll('[data-gk]').forEach(function(el){var v=D[el.getAttribute('data-gk')];if(v!=null)el.textContent=v;});
-document.querySelectorAll('[data-gk-img]').forEach(function(el){var v=(D.imgs||{})[el.getAttribute('data-gk-img')];if(v)el.src=v;});
-var gal=document.getElementById('gal-grid');
-if(gal){gal.innerHTML='';(D.galKeys||[]).forEach(function(k){var u=(D.imgs||{})[k];if(u){var im=document.createElement('img');im.src=u;gal.appendChild(im);}});}
-var mb=document.getElementById('map-btn');if(mb&&D.mapUrl)mb.href=D.mapUrl;
-var sb=document.getElementById('sp-btn');if(sb)sb.onclick=function(){var s=document.getElementById('splash');if(s)s.style.display='none';};
-var rb=document.getElementById('rv-btn');if(rb)rb.onclick=function(){var n=document.getElementById('rv-name').value;if(n&&D.waOrganizer){window.open('https://wa.me/'+D.waOrganizer+'?text='+encodeURIComponent('Confirmo: '+n),'_blank');}};
-}
-/* Countdown */
-function tick(){var t=D.date?new Date(D.date+'T'+(D.time||'18:30')):null;if(!t)return;var diff=Math.max(0,t-Date.now());var s=Math.floor(diff/1000);var p=function(n){return (n<10?'0':'')+n;};var e=function(id,v){var el=document.getElementById(id);if(el)el.textContent=p(v);};e('cd-d',Math.floor(s/86400));e('cd-h',Math.floor(s%86400/3600));e('cd-m',Math.floor(s%3600/60));e('cd-s',s%60);}
-tick();setInterval(tick,1000);
-/* Escucha al editor */
-window.addEventListener('message',function(e){if(e.data&&e.data.type==='gk-data'){apply(e.data.data);}});
-if(window.parent!==window){try{window.parent.postMessage({type:'design-ready'},'*');}catch(e){}}
-apply(D);
-})();
-
-/* ═══ 📄 disenos/matrimonio/cinema-boda/design.js ═══ */
-(function(){
-"use strict";
-var D=window.GUEKA_DATA||{};
-function apply(d){D=d||D;
-document.querySelectorAll('[data-gk]').forEach(function(el){var v=D[el.getAttribute('data-gk')];if(v!=null)el.textContent=v;});
-document.querySelectorAll('[data-gk-img]').forEach(function(el){var v=(D.imgs||{})[el.getAttribute('data-gk-img')];if(v)el.src=v;});
-var gal=document.getElementById('gal-grid');if(gal){gal.innerHTML='';(D.galKeys||[]).forEach(function(k){var u=(D.imgs||{})[k];if(u){var im=document.createElement('img');im.src=u;gal.appendChild(im);}});}
-var mb=document.getElementById('map-btn');if(mb&&D.mapUrl)mb.href=D.mapUrl;
-var sb=document.getElementById('sp-btn');if(sb)sb.onclick=function(){var s=document.getElementById('splash');if(s)s.style.display='none';};
-var rb=document.getElementById('rv-btn');if(rb)rb.onclick=function(){var n=document.getElementById('rv-name').value;if(n&&D.waOrganizer){window.open('https://wa.me/'+D.waOrganizer+'?text='+encodeURIComponent('Confirmo: '+n),'_blank');}};
-}
-function tick(){var t=D.date?new Date(D.date+'T'+(D.time||'18:30')):null;if(!t)return;var diff=Math.max(0,t-Date.now());var s=Math.floor(diff/1000);var p=function(n){return (n<10?'0':'')+n;};var e=function(id,v){var el=document.getElementById(id);if(el)el.textContent=p(v);};e('cd-d',Math.floor(s/86400));e('cd-h',Math.floor(s%86400/3600));e('cd-m',Math.floor(s%3600/60));e('cd-s',s%60);}
-tick();setInterval(tick,1000);
-window.addEventListener('message',function(e){if(e.data&&e.data.type==='gk-data'){apply(e.data.data);}});
-if(window.parent!==window){try{window.parent.postMessage({type:'design-ready'},'*');}catch(e){}}
-apply(D);
-})();
-
-
-              </script>
-                        </body>
-                        </html>
-                    
