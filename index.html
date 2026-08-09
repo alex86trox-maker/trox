@@ -3,6 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<!-- SEGURIDAD: Content Security Policy para bloquear XSS y recursos no autorizados -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+  style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+  font-src https://cdn.jsdelivr.net;
+  img-src 'self' data: blob: https://i.ibb.co https://image.qwenlm.ai https://hercules-cdn.com;
+  connect-src 'self' https://api.imgbb.com https://hook.make.com;
+  frame-src 'none';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+">
 <title>Gueka Ideas · Estudio de Invitaciones</title>
 <meta name="description" content="Editor de invitaciones digitales Gueka Ideas — 15 secciones, fotos en IndexedDB, RSVP y funnel de compra.">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -17,7 +30,9 @@
 <link href="https://cdn.jsdelivr.net/fontsource/css/noto-serif@latest/400.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/fontsource/css/noto-serif@latest/400-italic.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/fontsource/css/jetbrains-mono@latest/400.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<!-- SEGURIDAD: SRI (Subresource Integrity) para verificar integridad de scripts externos -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"
+  integrity="sha256-HD7NKWZ1BKpV7s8pf/sHHSBrIBBHFkFfqvlQFJyTf7c=" crossorigin="anonymous"></script>
 <style>
 /* ═══════════════════════════════════════════════════════════
    GUEKA IDEAS · ESTUDIO DE INVITACIONES
@@ -52,7 +67,6 @@ body{font-family:var(--fb);background:var(--e-bg);color:var(--e-ink);display:fle
   z-index:40;
 }
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-/* Botón HTML oculto — solo visible en modo admin (?admin=true) */
 #btnExport{display:none !important;}
 .modo-admin #btnExport{display:inline-flex !important;}
 .brand-logo-wrap{
@@ -120,7 +134,6 @@ body{font-family:var(--fb);background:var(--e-bg);color:var(--e-ink);display:fle
   z-index:5;pointer-events:none;white-space:nowrap;
 }
 #preview-scroll{position:absolute;inset:0;overflow-y:auto;padding:44px 24px 40px}
-/* marco de teléfono */
 .phone-frame{
   width:390px;max-width:100%;
   margin:0 auto;
@@ -265,7 +278,6 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
   gap:12px;padding:10px 0;
 }
 .tog-row strong{font-size:11.5px;font-weight:600;color:var(--e-ink)}
-/* toggle switch */
 .sw{position:relative;width:40px;height:23px;flex:0 0 auto}
 .sw input{position:absolute;opacity:0;inset:0;cursor:pointer;margin:0}
 .sw i{position:absolute;inset:0;border-radius:999px;background:#d0d9cf;transition:.26s}
@@ -310,7 +322,6 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
   font-size:9px;letter-spacing:.1em;color:var(--e-mut);
   pointer-events:none;
 }
-.photo-preview-wrap img[src=""] + span{display:block}
 .photo-tools{display:flex;gap:7px;margin-top:8px}
 .photo-tool{
   flex:1;font-size:9.5px;font-weight:700;
@@ -464,19 +475,19 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
         <div id="card-wrapper" data-theme="neon">
 <canvas id="particle-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.55"></canvas>
 <section id="splash"><div class="splash-15" id="sp-15">15</div><div class="splash-name" id="sp-name">Sofía Valentina</div><div class="splash-date" id="sp-date"></div><button class="splash-btn" id="sp-btn">▶ ABRIR INVITACIÓN</button></section>
-<section><img class="cover-img" id="pv-retrato" src="" alt=""><h2 id="pv-nombre">Sofía Valentina</h2><div class="card-cap" id="pv-caption"></div></section>
+<section><img class="cover-img" id="pv-retrato" src="" alt="Foto principal de la invitada"><h2 id="pv-nombre">Sofía Valentina</h2><div class="card-cap" id="pv-caption"></div></section>
 <section><h2>CUENTA REGRESIVA</h2><div id="cd" style="font-size:1.6rem;font-weight:900">00:00:00:00</div></section>
 <section data-plan="premium" id="pv-cal-sec">
-  <a id="pv-cal-btn" href="#" target="_blank" rel="noopener" style="display:inline-block;padding:10px 22px;border-radius:20px;background:var(--c-a);color:#fff;text-decoration:none;font-weight:700;font-size:0.85rem;letter-spacing:.08em">📅 AGENDAR EN MI CALENDARIO</a>
+  <a id="pv-cal-btn" href="#" rel="noopener noreferrer" style="display:inline-block;padding:10px 22px;border-radius:20px;background:var(--c-a);color:#fff;text-decoration:none;font-weight:700;font-size:0.85rem;letter-spacing:.08em">📅 AGENDAR EN MI CALENDARIO</a>
 </section>
-<section data-plan="premium"><h2>MI HISTORIA</h2><img class="cover-img" id="pv-fashion" src="" alt="" style="height:320px;border-radius:12px"><div class="card-cap" id="pv-history"></div></section>
+<section data-plan="premium"><h2>MI HISTORIA</h2><img class="cover-img" id="pv-fashion" src="" alt="Foto de historia" style="height:320px;border-radius:12px"><div class="card-cap" id="pv-history"></div></section>
 <section data-plan="premium"><h2>PROGRAMA</h2><div class="card-list" id="pv-itin"></div></section>
 <section data-plan="deluxe"><h2>PADRINOS</h2><div class="card-list" id="pv-padr"></div></section>
 <section><h2>GALERÍA</h2><div class="gal-prev" id="pv-galeria"></div></section>
 <section data-plan="premium" id="pv-album-sec">
   <h2>📸 CAPTURA EL MOMENTO</h2>
   <div class="card-cap" style="margin-bottom:12px">¡Ayúdanos a capturar cada momento! Sube tus fotos y videos desde tu celular</div>
-  <a id="pv-album-btn" href="#" target="_blank" rel="noopener" style="display:inline-block;padding:10px 22px;border-radius:20px;background:var(--c-b);color:#fff;text-decoration:none;font-weight:700;font-size:0.85rem;letter-spacing:.08em">📁 SUBIR MIS FOTOS</a>
+  <a id="pv-album-btn" href="#" rel="noopener noreferrer" style="display:inline-block;padding:10px 22px;border-radius:20px;background:var(--c-b);color:#fff;text-decoration:none;font-weight:700;font-size:0.85rem;letter-spacing:.08em">📁 SUBIR MIS FOTOS</a>
 </section>
 <section data-plan="premium"><h2>MÚSICA</h2><div class="card-list" id="pv-songs"></div></section>
 <section data-plan="deluxe"><h2>MESA DE REGALOS</h2><div class="card-list" id="pv-gifts"></div></section>
@@ -486,10 +497,10 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 <section data-plan="deluxe" id="pv-custom-sec"><h2 id="pv-custom-title">SECCIÓN LIBRE</h2><div class="card-cap" id="pv-custom-text"></div></section>
 <section data-plan="premium"><h2>RSVP</h2>
   <form id="rsvp-form" novalidate>
-    <input id="rsvp-nombre" placeholder="Nombre y apellido" required>
+    <input id="rsvp-nombre" placeholder="Nombre y apellido" required maxlength="120" autocomplete="name">
     <select id="rsvp-asiste"><option value="Sí, asistiré">Sí, asistiré</option><option value="No podré asistir">No podré asistir</option></select>
-    <input id="rsvp-acomp" type="number" min="0" value="0" placeholder="Acompañantes">
-    <textarea id="rsvp-msg" placeholder="Mensaje para la festejada (opcional)"></textarea>
+    <input id="rsvp-acomp" type="number" min="0" max="20" value="0" placeholder="Acompañantes">
+    <textarea id="rsvp-msg" placeholder="Mensaje para la festejada (opcional)" maxlength="500"></textarea>
     <button type="submit">CONFIRMAR POR WHATSAPP</button>
     <div id="rsvp-qr-wrap" style="display:none;margin-top:18px;text-align:center">
       <div style="font-size:0.8rem;letter-spacing:.1em;margin-bottom:8px;color:var(--c-a)">TU PASE DE ACCESO</div>
@@ -522,29 +533,29 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 
 <div class="sec open"><button class="sec-head"><span class="sec-num">1</span><span class="sec-title">Contenido</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div class="row2"><div class="field"><label>Nombre</label><input class="in" data-bind="name"></div><div class="field"><label>Edad</label><input class="in" data-bind="age"></div></div>
+<div class="row2"><div class="field"><label>Nombre</label><input class="in" data-bind="name" maxlength="80" autocomplete="off"></div><div class="field"><label>Edad</label><input class="in" data-bind="age" maxlength="4"></div></div>
 <div class="row2"><div class="field"><label>Fecha</label><input class="in" type="date" data-bind="date"></div><div class="field"><label>Hora</label><input class="in" type="time" data-bind="time"></div></div>
-<div class="field" data-plan="premium"><label>Hashtag</label><input class="in" data-bind="hashtag"></div>
-<div class="field"><label>Frase de portada</label><textarea class="in" data-bind="caption"></textarea></div>
+<div class="field" data-plan="premium"><label>Hashtag</label><input class="in" data-bind="hashtag" maxlength="60" autocomplete="off"></div>
+<div class="field"><label>Frase de portada</label><textarea class="in" data-bind="caption" maxlength="300"></textarea></div>
 </div></div></div></div>
 
 <div class="sec"><button class="sec-head"><span class="sec-num">2</span><span class="sec-title">Fotos</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div class="photo-field"><label>Retrato principal</label><div class="photo-preview-wrap"><img id="prev-retrato" src=""></div><div class="photo-tools"><button class="photo-tool" data-up="retrato">📁 Subir foto</button><button class="photo-tool" data-def="retrato">↺ Default</button></div></div>
-<div class="photo-field" data-plan="premium"><label>Mi historia</label><div class="photo-preview-wrap"><img id="prev-fashion" src=""></div><div class="photo-tools"><button class="photo-tool" data-up="fashion">📁 Subir foto</button><button class="photo-tool" data-def="fashion">↺ Default</button></div></div>
-<div class="field"><label>Galería (múltiple) · <span id="galLimitTxt">máx 4</span></label><input type="file" id="cantidad_fotos" accept="image/*" multiple></div>
+<div class="photo-field"><label>Retrato principal</label><div class="photo-preview-wrap"><img id="prev-retrato" src="" alt="Vista previa retrato"></div><div class="photo-tools"><button class="photo-tool" data-up="retrato">📁 Subir foto</button><button class="photo-tool" data-def="retrato">↺ Default</button></div></div>
+<div class="photo-field" data-plan="premium"><label>Mi historia</label><div class="photo-preview-wrap"><img id="prev-fashion" src="" alt="Vista previa historia"></div><div class="photo-tools"><button class="photo-tool" data-up="fashion">📁 Subir foto</button><button class="photo-tool" data-def="fashion">↺ Default</button></div></div>
+<div class="field"><label>Galería (múltiple) · <span id="galLimitTxt">máx 4</span></label><input type="file" id="cantidad_fotos" accept="image/jpeg,image/png,image/webp,image/gif" multiple></div>
 <div class="db-status" id="dbStatus"></div>
 </div></div></div></div>
 
 <div class="sec"><button class="sec-head"><span class="sec-num">3</span><span class="sec-title">Bienvenida</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="tog-row"><div><strong>Pantalla de bienvenida</strong></div><label class="sw"><input type="checkbox" data-bind="showSplash" checked><i></i></label></div>
-<div class="field"><label>Texto del botón</label><input class="in" data-bind="splashBtn"></div>
+<div class="field"><label>Texto del botón</label><input class="in" data-bind="splashBtn" maxlength="60"></div>
 </div></div></div></div>
 
 <div class="sec" data-plan="premium"><button class="sec-head"><span class="sec-num">4</span><span class="sec-title">Mi historia</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div class="field"><label>Biografía</label><textarea class="in" data-bind="historyText"></textarea></div>
+<div class="field"><label>Biografía</label><textarea class="in" data-bind="historyText" maxlength="800"></textarea></div>
 </div></div></div></div>
 
 <div class="sec" data-plan="premium"><button class="sec-head"><span class="sec-num">5</span><span class="sec-title">Programa</span><span class="chev">▾</span></button>
@@ -555,9 +566,9 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 
 <div class="sec"><button class="sec-head"><span class="sec-num">7</span><span class="sec-title">El lugar</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div class="field"><label>Salón</label><input class="in" data-bind="venue"></div>
-<div class="field"><label>Dirección</label><textarea class="in" data-bind="address"></textarea></div>
-<div class="field" data-plan="deluxe"><label>Enlace de Google Maps</label><input class="in" data-bind="mapUrl" placeholder="https://maps.google.com/..."></div>
+<div class="field"><label>Salón</label><input class="in" data-bind="venue" maxlength="120"></div>
+<div class="field"><label>Dirección</label><textarea class="in" data-bind="address" maxlength="300"></textarea></div>
+<div class="field" data-plan="deluxe"><label>Enlace de Google Maps</label><input class="in" data-bind="mapUrl" placeholder="https://maps.google.com/..." maxlength="500"></div>
 </div></div></div></div>
 
 <div class="sec"><button class="sec-head"><span class="sec-num">8</span><span class="sec-title">Dress code</span><span class="chev">▾</span></button>
@@ -565,9 +576,9 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 
 <div class="sec" data-plan="deluxe"><button class="sec-head"><span class="sec-num">9</span><span class="sec-title">Info extra</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-extra"></div>
-<div class="field" data-plan="premium"><label>Enlace álbum compartido (Google Drive / Dropbox)</label><input class="in" data-bind="albumUrl" placeholder="https://drive.google.com/..."></div>
-<div class="field" style="margin-top:12px"><label>Título de sección libre</label><input class="in" data-bind="customTitle" placeholder="SECCIÓN LIBRE"></div>
-<div class="field"><label>Texto de sección libre</label><textarea class="in" data-bind="customText"></textarea></div>
+<div class="field" data-plan="premium"><label>Enlace álbum compartido (Google Drive / Dropbox)</label><input class="in" data-bind="albumUrl" placeholder="https://drive.google.com/..." maxlength="500"></div>
+<div class="field" style="margin-top:12px"><label>Título de sección libre</label><input class="in" data-bind="customTitle" placeholder="SECCIÓN LIBRE" maxlength="80"></div>
+<div class="field"><label>Texto de sección libre</label><textarea class="in" data-bind="customText" maxlength="600"></textarea></div>
 </div></div></div></div>
 
 <div class="sec"><button class="sec-head"><span class="sec-num">10</span><span class="sec-title">Galería</span><span class="chev">▾</span></button>
@@ -581,16 +592,16 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 
 <div class="sec" data-plan="premium"><button class="sec-head"><span class="sec-num">13</span><span class="sec-title">Confirmación</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div class="field"><label>WhatsApp organizadora</label><input class="in" data-bind="waOrganizer" placeholder="573001234567"></div>
-<div class="field"><label>Aforo (0=∞)</label><input class="in" type="number" data-bind="rsvpCapacity"></div>
-<div class="field" data-plan="deluxe"><label>Nombre en pase (desde URL: ?para=Familia-Perez)</label><input class="in" data-bind="rsvpPara" placeholder="Ej: Familia Pérez · 4 pases"></div>
-<div class="field" data-plan="deluxe"><label>Pases máximos (bloquea el selector RSVP)</label><input class="in" type="number" data-bind="rsvpMaxPases" placeholder="4"></div>
+<div class="field"><label>WhatsApp organizadora</label><input class="in" data-bind="waOrganizer" placeholder="573001234567" maxlength="20" pattern="[0-9]+"></div>
+<div class="field"><label>Aforo (0=∞)</label><input class="in" type="number" min="0" max="99999" data-bind="rsvpCapacity"></div>
+<div class="field" data-plan="deluxe"><label>Nombre en pase (desde URL: ?para=Familia-Perez)</label><input class="in" data-bind="rsvpPara" placeholder="Ej: Familia Pérez · 4 pases" maxlength="80"></div>
+<div class="field" data-plan="deluxe"><label>Pases máximos (bloquea el selector RSVP)</label><input class="in" type="number" min="0" max="100" data-bind="rsvpMaxPases" placeholder="4"></div>
 </div></div></div></div>
 
 <div class="sec"><button class="sec-head"><span class="sec-num">14</span><span class="sec-title">Cierre</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div class="field"><label>Poema</label><textarea class="in" data-bind="poem"></textarea></div>
-<div class="field"><label>Firma</label><input class="in" data-bind="signature"></div>
+<div class="field"><label>Poema</label><textarea class="in" data-bind="poem" maxlength="400"></textarea></div>
+<div class="field"><label>Firma</label><input class="in" data-bind="signature" maxlength="80"></div>
 </div></div></div></div>
 
 <div class="sec open"><button class="sec-head"><span class="sec-num">15</span><span class="sec-title">Estilo</span><span class="chev">▾</span></button>
@@ -608,14 +619,70 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 "use strict";
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
-const esc=s=>(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const pad=n=>String(n).padStart(2,'0');
-function toast(h){const t=document.createElement('div');t.className='toast';t.innerHTML=h;$('#toasts').appendChild(t);requestAnimationFrame(()=>t.classList.add('show'));setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),350);},2700);}
 
 /* ════════════════════════════════════════════════════════════
-   📦 CONFIGURACIÓN DE LA BASE DE DATOS LOCAL (IndexedDB)
+   SEGURIDAD: Funciones de sanitización y validación
+════════════════════════════════════════════════════════════ */
+// Escapar HTML para prevenir XSS al insertar texto en el DOM
+const esc=s=>(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+const pad=n=>String(n).padStart(2,'0');
+
+// SEGURIDAD: Validar que una URL sea segura (solo https:// o http://)
+// Previene inyección de javascript: o data: en atributos href
+function safeUrl(url){
+  if(!url||typeof url!=='string')return '#';
+  const trimmed=url.trim();
+  if(!trimmed)return '#';
+  try{
+    const parsed=new URL(trimmed);
+    if(parsed.protocol==='https:'||parsed.protocol==='http:')return trimmed;
+    return '#'; // bloquea javascript:, data:, vbscript:, etc.
+  }catch(e){return '#';}
+}
+
+// SEGURIDAD: Validar número de teléfono (solo dígitos, 7-15 caracteres)
+function safePhone(wa){
+  const cleaned=String(wa||'').replace(/\D/g,'');
+  if(cleaned.length<7||cleaned.length>15)return '';
+  return cleaned;
+}
+
+// SEGURIDAD: Sanitizar parámetros de URL para prevenir XSS via querystring
+function safeUrlParam(val){
+  if(!val||typeof val!=='string')return '';
+  // Solo letras, números, espacios, guiones, puntos, comas y paréntesis
+  return val.replace(/[^\w\s\-.,()áéíóúÁÉÍÓÚñÑüÜ]/g,'').substring(0,120);
+}
+
+// SEGURIDAD: Rate limiting para el formulario RSVP (máx 3 envíos por minuto)
+const rsvpRateLimit={count:0,resetAt:0};
+function checkRateLimit(){
+  const now=Date.now();
+  if(now>rsvpRateLimit.resetAt){rsvpRateLimit.count=0;rsvpRateLimit.resetAt=now+60000;}
+  if(rsvpRateLimit.count>=3)return false;
+  rsvpRateLimit.count++;
+  return true;
+}
+
+function toast(h){
+  const t=document.createElement('div');
+  t.className='toast';
+  // SEGURIDAD: usar textContent en vez de innerHTML para evitar XSS en toasts
+  t.textContent=h;
+  $('#toasts').appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),350);},2700);
+}
+
+/* ════════════════════════════════════════════════════════════
+   📦 BASE DE DATOS LOCAL (IndexedDB)
 ════════════════════════════════════════════════════════════ */
 const DB_NAME="GuekaEditorDB", DB_VERSION=1, STORE_NAME="fotos_proyecto";
+// SEGURIDAD: límite de tamaño de archivo: 10 MB por foto
+const MAX_FILE_SIZE_BYTES=10*1024*1024;
+// SEGURIDAD: tipos MIME permitidos para imágenes
+const ALLOWED_MIME_TYPES=['image/jpeg','image/png','image/webp','image/gif'];
+
 let db=null;
 function inicializarBaseDatosLocal(){
   return new Promise((resolve,reject)=>{
@@ -628,6 +695,15 @@ function inicializarBaseDatosLocal(){
     };
   });
 }
+
+// SEGURIDAD: Validar archivo antes de guardar
+function validarArchivo(file){
+  if(!file)return'Archivo no válido.';
+  if(!ALLOWED_MIME_TYPES.includes(file.type))return'Tipo de archivo no permitido. Solo se aceptan imágenes JPG, PNG, WebP o GIF.';
+  if(file.size>MAX_FILE_SIZE_BYTES)return'La imagen supera el límite de 10 MB.';
+  return null; // sin errores
+}
+
 function guardarFotoLocal(idFoto,fileBlob){
   return new Promise((resolve,reject)=>{
     if(!db)return reject("Base de datos no inicializada.");
@@ -662,17 +738,44 @@ const PALETTES={
   esmeralda:{a:'#10b981',b:'#34d399',c:'#6ee7b7',d:'#059669',e:'#a7f3d0',bg:'#022c22'},
   fuego:   {a:'#f97316',b:'#ef4444',c:'#fbbf24',d:'#dc2626',e:'#fb923c',bg:'#160500'}
 };
+
 function makeDefaults(){return{plan:'classic',category:'quince',templateName:'',name:'Sofía Valentina',age:'15',date:'2026-06-20',time:'18:30',hashtag:'#SofíaValentinaXV',caption:'✨ Mi gran noche llega...',historyText:'Sofía Valentina nació el 20 de junio de 2011.',venue:'SALÓN DE EVENTOS',address:'Calle de los Sueños 123, Bogotá',mapUrl:'',customTitle:'SECCIÓN LIBRE',customText:'',waOrganizer:'',rsvpCapacity:0,albumUrl:'',rsvpPara:'',rsvpMaxPases:0,poem:'Hoy comienzas a escribir\nel capítulo más hermoso.',signature:'Con amor, Sofía',palette:'neon',particles:'ninguna',showSplash:true,splashBtn:'▶ ABRIR INVITACIÓN',itinerary:[{v:'6:30 PM · RECEPCIÓN'},{v:'8:00 PM · VALS'}],padrinos:[{v:'VALS · Familia Rodríguez'}],dressCode:[{v:'DAMAS · Vestido largo'}],extra:[{v:'📸 FOTÓGRAFO · Fotógrafo toda la noche'}],songs:[{v:'Vals Op.64 No.1'}],gifts:[{v:'NEQUI · Colombia'}],captions:{},imgs:{retrato:'',fashion:''},gal:[]};}
+
 let state=makeDefaults();
-try{const s=localStorage.getItem('gueka_editor_v2');if(s)state=Object.assign(makeDefaults(),JSON.parse(s));}catch(e){}
+// SEGURIDAD: try/catch al leer localStorage para manejar datos corruptos o manipulados
+try{
+  const s=localStorage.getItem('gueka_editor_v2');
+  if(s){
+    const parsed=JSON.parse(s);
+    // Solo mezclar si es un objeto plano (no array ni null)
+    if(parsed&&typeof parsed==='object'&&!Array.isArray(parsed)){
+      state=Object.assign(makeDefaults(),parsed);
+    }
+  }
+}catch(e){console.warn('localStorage inválido, usando defaults.');}
 
 const urlParams=new URLSearchParams(window.location.search);
-const planValidado=(urlParams.get('plan')||state.plan||'classic').toLowerCase();
-state.plan=PLANS[planValidado]?planValidado:'classic';
-const ORDER={id:urlParams.get('order')||urlParams.get('pedido')||'',cliente:urlParams.get('cliente')||'',tel:urlParams.get('tel')||''};
+// SEGURIDAD: Validar que el plan sea uno de los permitidos, ignorar valores no válidos
+const planRaw=(urlParams.get('plan')||state.plan||'classic').toLowerCase();
+state.plan=PLANS[planRaw]?planRaw:'classic';
+
+const ORDER={
+  // SEGURIDAD: sanitizar parámetros de URL
+  id:safeUrlParam(urlParams.get('order')||urlParams.get('pedido')||''),
+  cliente:safeUrlParam(urlParams.get('cliente')||''),
+  tel:safePhone(urlParams.get('tel')||'')
+};
 if(urlParams.get('admin')==='true'){document.body.classList.add('modo-admin');}
 
-function markSave(){const d=$('#saveDot');d.classList.add('saving');clearTimeout(markSave.t);markSave.t=setTimeout(()=>{try{localStorage.setItem('gueka_editor_v2',JSON.stringify(state));}catch(e){}d.classList.remove('saving');},600);}
+function markSave(){
+  const d=$('#saveDot');d.classList.add('saving');
+  clearTimeout(markSave.t);
+  markSave.t=setTimeout(()=>{
+    try{localStorage.setItem('gueka_editor_v2',JSON.stringify(state));}
+    catch(e){console.warn('No se pudo guardar en localStorage.');}
+    d.classList.remove('saving');
+  },600);
+}
 
 /* ═══ HELPER: CALENDAR URL ═══ */
 function buildCalendarUrl(){
@@ -687,51 +790,103 @@ function buildCalendarUrl(){
 
 /* ═══ RENDER VISTA PREVIA ═══ */
 function renderPreview(){
-$('#sp-15').textContent=state.age;$('#sp-name').textContent=state.name;$('#sp-btn').textContent=state.splashBtn;
-$('#splash').style.display=state.showSplash?'flex':'none';
-const d=new Date(state.date+'T'+(state.time||'18:30'));$('#sp-date').textContent=d.toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'});
-$('#pv-nombre').textContent=state.name;
-$('#pv-caption').textContent=state.caption;
-$('#pv-history').textContent=state.historyText;
-$('#pv-poem').textContent=state.poem;
-$('#pv-sign').textContent=state.signature;
-$('#pv-retrato').src=state.imgs.retrato||'https://image.qwenlm.ai/public_source/501fff7f-a609-4843-af5b-2ac3bc956c88/119aaf951-991f-48f5-bce6-7cf6bf499e4a.png';
-$('#pv-fashion').src=state.imgs.fashion||state.imgs.retrato||'https://image.qwenlm.ai/public_source/501fff7f-a609-4843-af5b-2ac3bc956c88/119aaf951-991f-48f5-bce6-7cf6bf499e4a.png';
-$('#prev-retrato').src=$('#pv-retrato').src;$('#prev-fashion').src=$('#pv-fashion').src;
-$('#pv-lugar').innerHTML=esc(state.venue)+'<br>'+esc(state.address)+(state.mapUrl?'<br><a href="'+esc(state.mapUrl)+'" target="_blank" style="color:var(--c-a)">Ver mapa e indicaciones</a>':'');
-// RSVP note — pase personalizado (DELUXE) o mensaje estándar
-const paraUrl=urlParams.get('para')||'';
-const paraLabel=paraUrl?paraUrl.replace(/-/g,' '):(state.rsvpPara||'');
-const maxPases=parseInt(state.rsvpMaxPases)||0;
-const rsvpNote=$('#pv-rsvp');
-if(rsvpNote){
-  let rsvpTxt='Confirmaciones al WhatsApp '+(state.waOrganizer||'(pendiente)')+' · Aforo: '+(state.rsvpCapacity||'∞');
-  if(PLAN_RANK[state.plan]>=3&&paraLabel){
-    rsvpTxt='¡Hola '+paraLabel+'!'+(maxPases?' Tienen '+maxPases+' pases reservados.':'')+' Confirma tu asistencia al WhatsApp '+(state.waOrganizer||'(pendiente)');
+  $('#sp-15').textContent=state.age;
+  $('#sp-name').textContent=state.name;
+  $('#sp-btn').textContent=state.splashBtn;
+  $('#splash').style.display=state.showSplash?'flex':'none';
+  const d=new Date(state.date+'T'+(state.time||'18:30'));
+  $('#sp-date').textContent=d.toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'});
+  $('#pv-nombre').textContent=state.name;
+  $('#pv-caption').textContent=state.caption;
+  $('#pv-history').textContent=state.historyText;
+  $('#pv-poem').textContent=state.poem;
+  $('#pv-sign').textContent=state.signature;
+  $('#pv-retrato').src=state.imgs.retrato||'https://image.qwenlm.ai/public_source/501fff7f-a609-4843-af5b-2ac3bc956c88/119aaf951-991f-48f5-bce6-7cf6bf499e4a.png';
+  $('#pv-fashion').src=state.imgs.fashion||state.imgs.retrato||'https://image.qwenlm.ai/public_source/501fff7f-a609-4843-af5b-2ac3bc956c88/119aaf951-991f-48f5-bce6-7cf6bf499e4a.png';
+  $('#prev-retrato').src=$('#pv-retrato').src;
+  $('#prev-fashion').src=$('#pv-fashion').src;
+
+  // SEGURIDAD: construir el bloque de "Lugar" sin innerHTML con texto libre
+  const lugarDiv=$('#pv-lugar');
+  lugarDiv.innerHTML='';
+  const venueNode=document.createTextNode(state.venue||'');
+  lugarDiv.appendChild(venueNode);
+  lugarDiv.appendChild(document.createElement('br'));
+  lugarDiv.appendChild(document.createTextNode(state.address||''));
+  if(state.mapUrl){
+    const validMapUrl=safeUrl(state.mapUrl);
+    if(validMapUrl!=='#'){
+      lugarDiv.appendChild(document.createElement('br'));
+      const a=document.createElement('a');
+      a.href=validMapUrl;
+      a.rel='noopener noreferrer';
+      a.target='_blank';
+      a.style.color='var(--c-a)';
+      a.textContent='Ver mapa e indicaciones';
+      lugarDiv.appendChild(a);
+    }
   }
-  rsvpNote.textContent=rsvpTxt;
+
+  // RSVP note
+  // SEGURIDAD: sanitizar parámetro `para` de la URL
+  const paraUrl=safeUrlParam(urlParams.get('para')||'');
+  const paraLabel=paraUrl?paraUrl.replace(/-/g,' '):(state.rsvpPara||'');
+  const maxPases=parseInt(state.rsvpMaxPases)||0;
+  const rsvpNote=$('#pv-rsvp');
+  if(rsvpNote){
+    let rsvpTxt='Confirmaciones al WhatsApp '+(state.waOrganizer||'(pendiente)')+' · Aforo: '+(state.rsvpCapacity||'∞');
+    if(PLAN_RANK[state.plan]>=3&&paraLabel){
+      rsvpTxt='¡Hola '+paraLabel+'!'+(maxPases?' Tienen '+maxPases+' pases reservados.':'')+' Confirma tu asistencia al WhatsApp '+(state.waOrganizer||'(pendiente)');
+    }
+    rsvpNote.textContent=rsvpTxt;
+  }
+  const acompInput=$('#rsvp-acomp');
+  if(acompInput&&PLAN_RANK[state.plan]>=3&&maxPases>0){
+    acompInput.max=maxPases;acompInput.value=maxPases;acompInput.readOnly=true;
+  }else if(acompInput){acompInput.removeAttribute('max');acompInput.readOnly=false;}
+
+  // Listas (ya usaban esc())
+  $('#pv-itin').innerHTML=(state.itinerary||[]).map(it=>'<div>'+esc(it.v||'')+'</div>').join('');
+  $('#pv-padr').innerHTML=(state.padrinos||[]).map(it=>'<div>'+esc(it.v||'')+'</div>').join('');
+  $('#pv-dress').innerHTML=(state.dressCode||[]).map(it=>'<div>'+esc(it.v||'')+'</div>').join('');
+  $('#pv-extra').innerHTML=(state.extra||[]).map(it=>'<div>'+esc(it.v||'')+'</div>').join('');
+  $('#pv-songs').innerHTML=(state.songs||[]).map(it=>'<div>♪ '+esc(it.v||'')+'</div>').join('');
+  $('#pv-gifts').innerHTML=(state.gifts||[]).map(it=>'<div>'+esc(it.v||'')+'</div>').join('');
+  $('#pv-custom-title').textContent=state.customTitle||'SECCIÓN LIBRE';
+  $('#pv-custom-text').textContent=state.customText||'';
+
+  const g=$('#pv-galeria');g.innerHTML='';
+  (state.gal||[]).slice(0,PLANS[state.plan].maxGal).forEach(u=>{
+    // SEGURIDAD: solo renderizar imágenes con src blob: o https:
+    const safeGalUrl=u&&(u.startsWith('blob:')||u.startsWith('https://'))?u:'';
+    if(!safeGalUrl)return;
+    const im=document.createElement('img');
+    im.src=safeGalUrl;
+    im.alt='Foto de galería';
+    g.appendChild(im);
+  });
+
+  const cw=$('#card-wrapper');
+  cw.dataset.theme=({quince:'neon',matrimonio:'elegante',bautizo:'pastel',comunion:'pastel',graduacion:'elegante',empresarial:'elegante',cumpleanos:'neon',infantiles:'pastel'})[state.category]||'neon';
+  const P=PALETTES[state.palette]||PALETTES.neon;
+  cw.style.setProperty('--c-a',P.a);cw.style.setProperty('--c-b',P.b);cw.style.setProperty('--c-c',P.c);cw.style.setProperty('--c-d',P.d);cw.style.setProperty('--c-e',P.e);cw.style.setProperty('--c-bg',P.bg);
+
+  // Botón calendario (PREMIUM)
+  const calBtn=$('#pv-cal-btn');
+  if(calBtn){calBtn.href=buildCalendarUrl();calBtn.target='_blank';}
+
+  // Álbum de fotos (PREMIUM) — SEGURIDAD: validar URL del álbum
+  const albumBtn=$('#pv-album-btn');
+  if(albumBtn){
+    const safeAlbum=safeUrl(state.albumUrl);
+    albumBtn.href=safeAlbum;
+    albumBtn.style.opacity=safeAlbum!=='#'?'1':'0.4';
+    if(safeAlbum!=='#')albumBtn.target='_blank';
+  }
+  const albumSec=$('#pv-album-sec');
+  if(albumSec)albumSec.style.display=(state.albumUrl&&safeUrl(state.albumUrl)!=='#')?'':'none';
 }
-const acompInput=$('#rsvp-acomp');
-if(acompInput&&PLAN_RANK[state.plan]>=3&&maxPases>0){
-  acompInput.max=maxPases;acompInput.value=maxPases;acompInput.readOnly=true;
-}else if(acompInput){acompInput.removeAttribute('max');acompInput.readOnly=false;}
-$('#pv-itin').innerHTML=(state.itinerary||[]).map(it=>'<div>'+esc(it.v||'')+'</div>').join('');
-$('#pv-padr').innerHTML=(state.padrinos||[]).map(it=>'<div>'+esc(it.v||'')+'</div>').join('');
-$('#pv-dress').innerHTML=(state.dressCode||[]).map(it=>'<div>'+esc(it.v||'')+'</div>').join('');
-$('#pv-extra').innerHTML=(state.extra||[]).map(it=>'<div>'+esc(it.v||'')+'</div>').join('');
-$('#pv-songs').innerHTML=(state.songs||[]).map(it=>'<div>♪ '+esc(it.v||'')+'</div>').join('');
-$('#pv-gifts').innerHTML=(state.gifts||[]).map(it=>'<div>'+esc(it.v||'')+'</div>').join('');
-$('#pv-custom-title').textContent=state.customTitle||'SECCIÓN LIBRE';
-$('#pv-custom-text').textContent=state.customText||'';
-const g=$('#pv-galeria');g.innerHTML='';(state.gal||[]).slice(0,PLANS[state.plan].maxGal).forEach(u=>{const im=document.createElement('img');im.src=u;g.appendChild(im);});
-const cw=$('#card-wrapper');cw.dataset.theme=({quince:'neon',matrimonio:'elegante',bautizo:'pastel',comunion:'pastel',graduacion:'elegante',empresarial:'elegante',cumpleanos:'neon',infantiles:'pastel'})[state.category]||'neon';
-const P=PALETTES[state.palette]||PALETTES.neon;cw.style.setProperty('--c-a',P.a);cw.style.setProperty('--c-b',P.b);cw.style.setProperty('--c-c',P.c);cw.style.setProperty('--c-d',P.d);cw.style.setProperty('--c-e',P.e);cw.style.setProperty('--c-bg',P.bg);
-// Botón calendario (PREMIUM)
-const calBtn=$('#pv-cal-btn');if(calBtn)calBtn.href=buildCalendarUrl();
-// Álbum de fotos (PREMIUM)
-const albumBtn=$('#pv-album-btn');if(albumBtn){albumBtn.href=state.albumUrl||'#';albumBtn.style.opacity=state.albumUrl?'1':'0.4';}
-const albumSec=$('#pv-album-sec');if(albumSec)albumSec.style.display=state.albumUrl?'':'none';
-}
+
 setInterval(()=>{let t=new Date(state.date+'T'+(state.time||'18:30'))-Date.now();if(t<0)t=0;const dd=Math.floor(t/864e5),h=Math.floor(t%864e5/36e5),m=Math.floor(t%36e5/6e4),s=Math.floor(t%6e4/1e3);const c=$('#cd');if(c)c.textContent=pad(dd)+':'+pad(h)+':'+pad(m)+':'+pad(s);},1000);
 
 /* ═══ PLANES / SELECTORES ═══ */
@@ -751,6 +906,7 @@ function aplicarPlanEnPanel(){
   const pc=document.getElementById('phBadge');if(pc)pc.textContent=visibles+' secciones';
   const gl=$('#galLimitTxt');if(gl)gl.textContent='máx '+PLANS[state.plan].maxGal;
 }
+
 function renderPlans(){
   const c=$('#planCards');c.innerHTML='';
   Object.keys(PLANS).forEach(k=>{
@@ -758,7 +914,8 @@ function renderPlans(){
     const b=document.createElement('button');
     b.className='plan-card'+(k===state.plan?' sel':'');
     b.style.setProperty('--pc',p.color);
-    b.innerHTML=(p.tag?'<span class="pc-tag">'+p.tag+'</span>':'')+'<div class="pc-name">'+p.name+'</div><div class="pc-price">$'+(p.price/1000)+'K</div><div class="pc-gal">📷 '+p.maxGal+' fotos</div>';
+    // SEGURIDAD: usar esc() al inyectar en innerHTML
+    b.innerHTML=(p.tag?'<span class="pc-tag">'+esc(p.tag)+'</span>':'')+'<div class="pc-name">'+esc(p.name)+'</div><div class="pc-price">$'+(p.price/1000)+'K</div><div class="pc-gal">📷 '+p.maxGal+' fotos</div>';
     b.onclick=()=>{
       state.plan=k;
       if((state.gal||[]).length>p.maxGal){state.gal=state.gal.slice(0,p.maxGal);buildLists();}
@@ -768,12 +925,24 @@ function renderPlans(){
     c.appendChild(b);
   });
   const P=PLANS[state.plan];
-  $('#planDetail').innerHTML='<h4>PLAN '+P.name+' · $'+P.price.toLocaleString('es-CO')+' COP</h4><div class="pd-eta">'+P.eta+'</div><ul>'+P.feats.map(f=>'<li>'+esc(f)+'</li>').join('')+'</ul>';
+  $('#planDetail').innerHTML='<h4>PLAN '+esc(P.name)+' · $'+P.price.toLocaleString('es-CO')+' COP</h4><div class="pd-eta">'+esc(P.eta)+'</div><ul>'+P.feats.map(f=>'<li>'+esc(f)+'</li>').join('')+'</ul>';
   $('#planBarSub').textContent='Hasta '+P.maxGal+' fotos de galería';
   $('#planPillTxt').textContent='PLAN '+P.name;
   aplicarPlanEnPanel();
 }
-function buildSelectors(){$('#tplSelect').innerHTML=['quince','matrimonio','bautizo','comunion','cumpleanos','graduacion','infantiles','empresarial'].map(c=>'<option value="'+c+'">'+c+'</option>').join('');$('#tplSelect').value=state.category;$('#tplSelect').onchange=e=>{state.category=e.target.value;renderPreview();markSave();};}
+
+function buildSelectors(){
+  // SEGURIDAD: lista de categorías permitidas (whitelist)
+  const CATEGORIAS=['quince','matrimonio','bautizo','comunion','cumpleanos','graduacion','infantiles','empresarial'];
+  $('#tplSelect').innerHTML=CATEGORIAS.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join('');
+  $('#tplSelect').value=state.category;
+  $('#tplSelect').onchange=e=>{
+    const val=e.target.value;
+    // Solo aceptar valores de la lista blanca
+    if(CATEGORIAS.includes(val)){state.category=val;renderPreview();markSave();}
+  };
+}
+
 function buildPalette(){
   const NAMES={neon:'Neón',violeta:'Violeta',dorado:'Dorado',oceano:'Océano',rosas:'Rosas',esmeralda:'Esmeralda',fuego:'Fuego'};
   const g=$('#palette-grid');g.innerHTML='';
@@ -781,42 +950,88 @@ function buildPalette(){
     const P=PALETTES[k];
     const b=document.createElement('button');
     b.className='pal-card'+(k===state.palette?' sel':'');
-    b.innerHTML='<div class="pal-dots"><i style="background:'+P.a+'"></i><i style="background:'+P.b+'"></i><i style="background:'+P.c+'"></i></div><div class="pal-name">'+(NAMES[k]||k)+'</div>';
+    b.innerHTML='<div class="pal-dots"><i style="background:'+esc(P.a)+'"></i><i style="background:'+esc(P.b)+'"></i><i style="background:'+esc(P.c)+'"></i></div><div class="pal-name">'+esc(NAMES[k]||k)+'</div>';
     b.onclick=()=>{state.palette=k;buildPalette();renderPreview();startParticles(state.particles||'ninguna');markSave();};
     g.appendChild(b);
   });
 }
+
 function buildLists(){
-const mk=(id,key,ph,add)=>{const c=$(id);if(!c)return;c.innerHTML='';(state[key]||[]).forEach((it,i)=>{const r=document.createElement('div');r.className='list-row';const inp=document.createElement('input');inp.className='in';inp.placeholder=ph;inp.value=it.v||'';inp.oninput=()=>{it.v=inp.value;renderPreview();markSave();};r.appendChild(inp);const del=document.createElement('button');del.className='list-del';del.textContent='✕';del.onclick=()=>{state[key].splice(i,1);buildLists();renderPreview();markSave();};r.appendChild(del);c.appendChild(r);});const a=document.createElement('button');a.className='list-add';a.textContent='+ '+add;a.onclick=()=>{state[key].push({v:''});buildLists();markSave();};c.appendChild(a);};
-mk('#ed-itin','itinerary','Hora · Momento','momento');
-mk('#ed-padr','padrinos','Categoría · Nombre','padrino');
-mk('#ed-dress','dressCode','Título · Descripción','ítem');
-mk('#ed-extra','extra','Emoji · Título · Descripción','ítem');
-mk('#ed-songs','songs','Título de la canción','canción');
-mk('#ed-gifts','gifts','Método de pago','método');
-const g=$('#ed-gal');g.innerHTML='';(state.gal||[]).forEach((u,i)=>{const r=document.createElement('div');r.className='list-row';const inp=document.createElement('input');inp.className='in';inp.value=u;inp.oninput=()=>{state.gal[i]=inp.value;renderPreview();markSave();};r.appendChild(inp);const del=document.createElement('button');del.className='list-del';del.textContent='✕';del.onclick=()=>{state.gal.splice(i,1);buildLists();renderPreview();markSave();};r.appendChild(del);g.appendChild(r);});
+  const mk=(id,key,ph,add)=>{
+    const c=$(id);if(!c)return;c.innerHTML='';
+    (state[key]||[]).forEach((it,i)=>{
+      const r=document.createElement('div');r.className='list-row';
+      const inp=document.createElement('input');inp.className='in';inp.placeholder=ph;inp.value=it.v||'';
+      inp.maxLength=200;
+      inp.oninput=()=>{it.v=inp.value;renderPreview();markSave();};
+      r.appendChild(inp);
+      const del=document.createElement('button');del.className='list-del';del.textContent='✕';
+      del.onclick=()=>{state[key].splice(i,1);buildLists();renderPreview();markSave();};
+      r.appendChild(del);c.appendChild(r);
+    });
+    const a=document.createElement('button');a.className='list-add';a.textContent='+ '+add;
+    a.onclick=()=>{state[key].push({v:''});buildLists();markSave();};
+    c.appendChild(a);
+  };
+  mk('#ed-itin','itinerary','Hora · Momento','momento');
+  mk('#ed-padr','padrinos','Categoría · Nombre','padrino');
+  mk('#ed-dress','dressCode','Título · Descripción','ítem');
+  mk('#ed-extra','extra','Emoji · Título · Descripción','ítem');
+  mk('#ed-songs','songs','Título de la canción','canción');
+  mk('#ed-gifts','gifts','Método de pago','método');
+  const g=$('#ed-gal');g.innerHTML='';
+  (state.gal||[]).forEach((u,i)=>{
+    const r=document.createElement('div');r.className='list-row';
+    const inp=document.createElement('input');inp.className='in';inp.value=u;inp.maxLength=500;
+    inp.oninput=()=>{state.gal[i]=inp.value;renderPreview();markSave();};
+    r.appendChild(inp);
+    const del=document.createElement('button');del.className='list-del';del.textContent='✕';
+    del.onclick=()=>{state.gal.splice(i,1);buildLists();renderPreview();markSave();};
+    r.appendChild(del);g.appendChild(r);
+  });
 }
 
 /* ═══ BIND ═══ */
-$$('[data-bind]').forEach(el=>{el.addEventListener('input',()=>{const k=el.dataset.bind;state[k]=el.type==='checkbox'?el.checked:el.value;renderPreview();markSave();});});
+$$('[data-bind]').forEach(el=>{
+  el.addEventListener('input',()=>{
+    const k=el.dataset.bind;
+    state[k]=el.type==='checkbox'?el.checked:el.value;
+    renderPreview();markSave();
+  });
+});
 $$('.sec-head').forEach(h=>h.addEventListener('click',()=>h.parentElement.classList.toggle('open')));
 function hydrateInputs(){$$('[data-bind]').forEach(el=>{const v=state[el.dataset.bind];if(el.type==='checkbox')el.checked=!!v;else el.value=v==null?'':v;});}
 
 /* ═══ RSVP ═══ */
 $('#rsvp-form').addEventListener('submit',(ev)=>{
   ev.preventDefault();
-  const wa=String(state.waOrganizer||'').replace(/\D/g,'');
+
+  // SEGURIDAD: rate limiting para prevenir spam
+  if(!checkRateLimit()){toast('⚠ Demasiados envíos. Espera un minuto e intenta de nuevo.');return;}
+
+  const wa=safePhone(state.waOrganizer);
   if(!wa){toast('⚠ Falta el WhatsApp de la organizadora (sección 13)');return;}
-  const nombre=$('#rsvp-nombre').value.trim();
+
+  const nombre=$('#rsvp-nombre').value.trim().substring(0,120);
   if(!nombre){toast('⚠ Escribe tu nombre');return;}
-  const msg='*Confirmación de asistencia*\n'
+
+  // SEGURIDAD: validar que el nombre no contenga solo caracteres especiales
+  if(!/\p{L}/u.test(nombre)){toast('⚠ El nombre no es válido');return;}
+
+  const acompRaw=parseInt($('#rsvp-acomp').value||'0');
+  const acomp=isNaN(acompRaw)||acompRaw<0?0:Math.min(acompRaw,20);
+  const msg=encodeURIComponent(
+    '*Confirmación de asistencia*\n'
     +'Evento: '+state.name+' ('+state.age+')\n'
     +'Invitado: '+nombre+'\n'
     +'Respuesta: '+$('#rsvp-asiste').value+'\n'
-    +'Acompañantes: '+($('#rsvp-acomp').value||'0')+'\n'
-    +($('#rsvp-msg').value.trim()?('Mensaje: '+$('#rsvp-msg').value.trim()+'\n'):'')
-    +(state.hashtag||'');
-  window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(msg),'_blank');
+    +'Acompañantes: '+acomp+'\n'
+    +($('#rsvp-msg').value.trim()?('Mensaje: '+$('#rsvp-msg').value.trim().substring(0,500)+'\n'):'')
+    +(state.hashtag||'')
+  );
+  // SEGURIDAD: construir URL de WhatsApp con número validado
+  window.open('https://wa.me/'+wa+'?text='+msg,'_blank','noopener,noreferrer');
+
   // QR de acceso — solo plan DELUXE
   if(PLAN_RANK[state.plan]>=3&&typeof QRCode!=='undefined'){
     const qrWrap=$('#rsvp-qr-wrap');
@@ -833,47 +1048,112 @@ $('#rsvp-form').addEventListener('submit',(ev)=>{
 
 /* ═══ SUBIDA DE FOTOS → IndexedDB ═══ */
 async function restaurarFotos(){
-try{
-await inicializarBaseDatosLocal();
-const fotos=await obtenerFotosLocales();
-if(fotos&&fotos.length){state.gal=state.gal||[];fotos.slice(0,PLANS[state.plan].maxGal).forEach(f=>{const url=URL.createObjectURL(f.blob);if(!state.gal.includes(url))state.gal.push(url);});renderPreview();}
-}catch(e){$('#dbStatus').textContent='⚠ IndexedDB no disponible';}
+  try{
+    await inicializarBaseDatosLocal();
+    const fotos=await obtenerFotosLocales();
+    if(fotos&&fotos.length){
+      state.gal=state.gal||[];
+      fotos.slice(0,PLANS[state.plan].maxGal).forEach(f=>{
+        const url=URL.createObjectURL(f.blob);
+        if(!state.gal.includes(url))state.gal.push(url);
+      });
+      renderPreview();
+    }
+  }catch(e){$('#dbStatus').textContent='⚠ IndexedDB no disponible';}
 }
+
 document.getElementById("cantidad_fotos").addEventListener("change",async(ev)=>{
-const archivos=Array.from(ev.target.files);if(!archivos.length)return;
-const max=PLANS[state.plan].maxGal;
-if((state.gal||[]).length+archivos.length>max){toast('⚠ Tu plan '+PLANS[state.plan].name+' permite máximo '+max+' fotos');ev.target.value='';return;}
-for(let i=0;i<archivos.length;i++){
-const archivo=archivos[i];
-const idUnico='foto_'+Date.now()+'_'+i;
-await guardarFotoLocal(idUnico,archivo);
-const urlPreviewLocal=URL.createObjectURL(archivo);
-state.gal=state.gal||[];state.gal.push(urlPreviewLocal);
-}
-renderPreview();markSave();
-toast('✨ Fotos guardadas en IndexedDB');
-ev.target.value='';
+  const archivos=Array.from(ev.target.files);if(!archivos.length)return;
+  const max=PLANS[state.plan].maxGal;
+  if((state.gal||[]).length+archivos.length>max){
+    toast('⚠ Tu plan '+PLANS[state.plan].name+' permite máximo '+max+' fotos');
+    ev.target.value='';return;
+  }
+  for(let i=0;i<archivos.length;i++){
+    const archivo=archivos[i];
+    // SEGURIDAD: validar tipo y tamaño antes de guardar
+    const error=validarArchivo(archivo);
+    if(error){toast('⚠ '+error);continue;}
+    const idUnico='foto_'+Date.now()+'_'+i;
+    await guardarFotoLocal(idUnico,archivo);
+    const urlPreviewLocal=URL.createObjectURL(archivo);
+    state.gal=state.gal||[];state.gal.push(urlPreviewLocal);
+  }
+  renderPreview();markSave();
+  toast('✨ Fotos guardadas en IndexedDB');
+  ev.target.value='';
 });
-$$('.photo-tool[data-up]').forEach(b=>b.onclick=()=>{const k=b.dataset.up;const fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.onchange=async()=>{const f=fi.files[0];if(!f)return;const id='foto_'+k+'_'+Date.now();await guardarFotoLocal(id,f);const url=URL.createObjectURL(f);state.imgs[k]=url;$('#prev-'+k).src=url;renderPreview();markSave();toast('✓ Foto guardada en IndexedDB');};fi.click();});
+
+$$('.photo-tool[data-up]').forEach(b=>b.onclick=()=>{
+  const k=b.dataset.up;
+  const fi=document.createElement('input');fi.type='file';
+  // SEGURIDAD: accept más estricto que solo image/*
+  fi.accept='image/jpeg,image/png,image/webp,image/gif';
+  fi.onchange=async()=>{
+    const f=fi.files[0];if(!f)return;
+    // SEGURIDAD: validar tipo y tamaño
+    const error=validarArchivo(f);
+    if(error){toast('⚠ '+error);return;}
+    const id='foto_'+k+'_'+Date.now();
+    await guardarFotoLocal(id,f);
+    const url=URL.createObjectURL(f);
+    state.imgs[k]=url;$('#prev-'+k).src=url;renderPreview();markSave();
+    toast('✓ Foto guardada en IndexedDB');
+  };
+  fi.click();
+});
+
 $$('.photo-tool[data-def]').forEach(b=>b.onclick=()=>{const k=b.dataset.def;state.imgs[k]='';renderPreview();markSave();});
 
 /* ═══ EXPORT / RESET / UNDO ═══ */
 async function exportarHTML(){
   try{await sincronizarFotosANube();}catch(e){}
   const html=document.documentElement.outerHTML;
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download='invitacion.html';a.click();toast('✓ HTML descargado');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
+  a.download='invitacion.html';a.click();
+  toast('✓ HTML descargado');
 }
 $('#btnExport').onclick=exportarHTML;
-$('#btnResetAll').onclick=()=>{const plan=state.plan;state=makeDefaults();state.plan=plan;hydrateInputs();renderPreview();renderPlans();buildLists();buildParticles();startParticles('ninguna');markSave();toast('Restablecido');};
-$('#btnUndo').onclick=()=>toast('↺ Deshacer');$('#btnRedo').onclick=()=>toast('↻ Rehacer');
-$('#btnQR').onclick=()=>{if(typeof QRCode!=='undefined'){const w=window.open('','_blank');w.document.write('<div id="q"></div><script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script><script>new QRCode(document.getElementById("q"),{text:"https://guekaideas.com/invitacion",width:200,height:200});<\/script>');} };
+$('#btnResetAll').onclick=()=>{
+  const plan=state.plan;state=makeDefaults();state.plan=plan;
+  hydrateInputs();renderPreview();renderPlans();buildLists();buildParticles();startParticles('ninguna');
+  markSave();toast('Restablecido');
+};
+$('#btnUndo').onclick=()=>toast('↺ Deshacer');
+$('#btnRedo').onclick=()=>toast('↻ Rehacer');
+
+// SEGURIDAD: reemplazar document.write por construcción con DOM API
+$('#btnQR').onclick=()=>{
+  if(typeof QRCode==='undefined')return;
+  const w=window.open('','_blank','noopener,noreferrer');
+  if(!w)return;
+  // Construir el documento sin document.write
+  const doc=w.document;
+  doc.open();
+  const container=doc.createElement('div');container.id='q';
+  doc.body.appendChild(container);
+  // Cargar QRCode dinámicamente
+  const script=doc.createElement('script');
+  script.src='https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js';
+  script.onload=()=>{
+    new w.QRCode(container,{text:'https://guekaideas.com/invitacion',width:200,height:200});
+  };
+  doc.head.appendChild(script);
+  doc.close();
+};
 $('#mobFab').onclick=()=>$('#sidebar').classList.toggle('mob-open');
 
 /* ════════════════════════════════════════════════════════════════
    🔌 PUENTE DE PRODUCCIÓN
+   SEGURIDAD: Las API keys NUNCA deben quedar en código cliente.
+   Configúralas en un servidor backend (Node.js / Convex) y llama
+   a ese endpoint desde aquí con fetch + autenticación.
 ════════════════════════════════════════════════════════════════ */
-const IMGBB_API_KEY="TU_API_KEY_DE_IMGBB";
-const SHEETS_WEBHOOK="https://hook.make.com/TU_WEBHOOK";
+// ⚠ REEMPLAZAR con llamada a tu propio backend seguro.
+// Exponer una API key real aquí la haría visible a cualquier usuario.
+const IMGBB_API_KEY="";      // Mover a backend
+const SHEETS_WEBHOOK="";     // Mover a backend / variable de entorno
 const WA_GUEKA="573000000000";
 
 const CLOUD_CACHE_KEY="gueka_cloud_urls_v1";
@@ -885,19 +1165,21 @@ function blobABase64(blob){return new Promise((resolve,reject)=>{const fr=new Fi
 async function subirFotoANube(registro){
   const cache=leerCache();
   if(cache[registro.id])return cache[registro.id];
-  if(!IMGBB_API_KEY||IMGBB_API_KEY.indexOf('TU_')===0)throw new Error('Falta configurar IMGBB_API_KEY');
+  if(!IMGBB_API_KEY)throw new Error('API de imágenes no configurada. Contacta al administrador.');
   const base64=await blobABase64(registro.blob);
   const body=new FormData();
   body.append('key',IMGBB_API_KEY);
   body.append('image',base64);
   body.append('name',registro.id);
   const res=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body});
+  if(!res.ok)throw new Error('Error al subir imagen ('+res.status+')');
   const json=await res.json();
   if(!json||!json.success)throw new Error('ImgBB rechazó la imagen '+registro.id);
   const url=json.data.display_url||json.data.url;
   cache[registro.id]=url;guardarCache(cache);
   return url;
 }
+
 async function sincronizarFotosANube(){
   const resultado={retrato:'',fashion:'',galeria:[]};
   let registros=[];
@@ -927,7 +1209,7 @@ async function sincronizarFotosANube(){
 }
 
 function construirPayload(fotos){
-  return {
+  return{
     estado:'Pendiente de actualización',
     enviado_en:new Date().toISOString(),
     pedido_id:ORDER.id,cliente:ORDER.cliente,telefono_cliente:ORDER.tel,
@@ -952,9 +1234,12 @@ function construirPayload(fotos){
     album_fotos:state.albumUrl||''
   };
 }
+
 async function enviarAProduccion(payload){
-  if(!SHEETS_WEBHOOK||SHEETS_WEBHOOK.indexOf('TU_WEBHOOK')>-1)throw new Error('Falta configurar SHEETS_WEBHOOK');
-  await fetch(SHEETS_WEBHOOK,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  if(!SHEETS_WEBHOOK)throw new Error('Webhook de producción no configurado.');
+  // SEGURIDAD: no usar mode:'no-cors' si se puede evitar, ya que oculta errores del servidor
+  const res=await fetch(SHEETS_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  if(!res.ok&&res.status!==0)throw new Error('Error al enviar a producción ('+res.status+')');
   return true;
 }
 
@@ -967,15 +1252,19 @@ $('#btnPublish').addEventListener('click',async()=>{
     const fotos=await sincronizarFotosANube();
     const payload=construirPayload(fotos);
     log('📤 Enviando tu diseño a producción…');
-    try{await enviarAProduccion(payload);}catch(e){toast('⚠ '+e.message+' · te llevamos a WhatsApp igualmente');}
-    const msg='✦ *Diseño listo para publicar* ✦\n'
-      +'Plan: '+payload.plan+'\n'
-      +'Evento: '+payload.nombre+' ('+payload.categoria+')\n'
-      +'Fecha: '+payload.fecha+' '+payload.hora+'\n'
-      +(payload.pedido_id?('Pedido: '+payload.pedido_id+'\n'):'')
-      +'Fotos publicadas: '+payload.galeria.length+'\n'
-      +'Por favor confirmen la publicación de mi invitación.';
-    window.open('https://wa.me/'+WA_GUEKA+'?text='+encodeURIComponent(msg),'_blank');
+    try{await enviarAProduccion(payload);}
+    catch(e){toast('⚠ '+e.message+' · te llevamos a WhatsApp igualmente');}
+    const waGueka=safePhone(WA_GUEKA);
+    if(waGueka){
+      const msg='✦ *Diseño listo para publicar* ✦\n'
+        +'Plan: '+payload.plan+'\n'
+        +'Evento: '+payload.nombre+' ('+payload.categoria+')\n'
+        +'Fecha: '+payload.fecha+' '+payload.hora+'\n'
+        +(payload.pedido_id?('Pedido: '+payload.pedido_id+'\n'):'')
+        +'Por favor confirmen la publicación de mi invitación.';
+      // SEGURIDAD: abrir ventana con noopener,noreferrer
+      window.open('https://wa.me/'+waGueka+'?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');
+    }
     log('✓ Diseño enviado · revisa WhatsApp');
     toast('✦ Diseño enviado a producción');
   }catch(e){
@@ -1024,12 +1313,12 @@ function startParticles(type){
         ctx.beginPath();
         for(let i=0;i<5;i++){ctx.lineTo(Math.cos((18+i*72)*Math.PI/180)*s,Math.sin((18+i*72)*Math.PI/180)*s);ctx.lineTo(Math.cos((54+i*72)*Math.PI/180)*s*.45,Math.sin((54+i*72)*Math.PI/180)*s*.45);}
         ctx.closePath();ctx.fill();
-      } else if(type==='burbujas'){
+      }else if(type==='burbujas'){
         ctx.strokeStyle=p.color;ctx.lineWidth=1.2;
         ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.stroke();
         ctx.fillStyle=p.color;ctx.globalAlpha=p.op*.15;
         ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
-      } else {
+      }else{
         ctx.fillStyle=p.color;
         ctx.translate(p.x,p.y);ctx.rotate(p.a);
         ctx.beginPath();ctx.ellipse(0,0,p.r*1.8,p.r*.9,0,0,Math.PI*2);ctx.fill();
@@ -1043,13 +1332,14 @@ function startParticles(type){
   }
   draw();
 }
+
 function buildParticles(){
   const g=$('#particles-grid');if(!g)return;g.innerHTML='';
   Object.keys(PAR_TYPES).forEach(k=>{
     const T=PAR_TYPES[k];
     const b=document.createElement('button');
     b.className='pal-card'+(k===state.particles?' sel':'');
-    b.innerHTML='<div style="font-size:1.3rem;margin-bottom:6px">'+T.icon+'</div><div class="pal-name">'+T.label+'</div>';
+    b.innerHTML='<div style="font-size:1.3rem;margin-bottom:6px">'+esc(T.icon)+'</div><div class="pal-name">'+esc(T.label)+'</div>';
     b.onclick=()=>{state.particles=k;buildParticles();startParticles(k);markSave();};
     g.appendChild(b);
   });
