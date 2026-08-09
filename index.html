@@ -70,31 +70,39 @@ body{font-family:var(--fb);background:var(--e-bg);color:var(--e-ink);display:fle
 .brand{display:flex;align-items:center;gap:0;text-decoration:none}
 #btnExport{display:none !important;}
 .modo-admin #btnExport{display:inline-flex !important;}
-/* Logo corporativo — CSS zoom preciso sin canvas */
+/* Logo tipográfico — replica la identidad con fuentes cargadas */
 .brand-logo-wrap{
   flex-shrink:0;
-  width:215px;
-  height:68px;
-  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:6px 16px;
   border-radius:10px;
-  background:#faf8f4;
-  border:1px solid rgba(184,155,94,.2);
-  position:relative;
+  background:linear-gradient(135deg,#faf8f4 0%,#f5f1e8 100%);
+  border:1px solid rgba(184,155,94,.3);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+  min-width:0;
+  white-space:nowrap;
 }
-/* Ocultar canvas (no usado por CORS) */
 #logo-canvas{display:none}
-.brand-logo{
-  /* Imagen 1536×1024.
-     Target: mostrar x=380..1156, y=210..590 (w=776, h=380) en 215×68
-     Escala: 215/776 = 0.277 → img width en pantalla = 1536*0.277 = 426px, height = 284px
-     Posición: left = -(380*0.277) = -105px, top = -(210*0.277) = -58px */
+.brand-logo{display:none} /* imagen original oculta, usamos tipografía */
+.brand-logo-type{
+  font-family:'Great Vibes',cursive;
+  font-size:26px;
+  line-height:1;
+  color:#7a5c2e;
+  letter-spacing:.02em;
   display:block;
-  position:absolute;
-  width:426px;
-  height:auto;
-  left:-105px;
-  top:-58px;
-  filter:brightness(0.58) sepia(0.15) saturate(1.7) contrast(1.12);
+}
+.brand-logo-sub{
+  font-family:'Marcellus',Georgia,serif;
+  font-size:6.5px;
+  letter-spacing:.32em;
+  color:var(--e-gold);
+  text-transform:uppercase;
+  display:block;
+  margin-top:1px;
 }
 .brand-divider{width:1px;height:28px;background:var(--e-line);flex:0 0 auto;margin:0 12px}
 /* Subtítulo del editor alineado con la identidad */
@@ -451,10 +459,22 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
   .brand-text strong{font-size:12px}
 }
 @media(max-width:480px){
-  .topbar{padding:0 14px;gap:8px}
-  .brand-logo{height:26px}
-  .brand-logo-wrap{padding:4px 10px;border-radius:7px;height:36px}
+  .topbar{padding:0 10px;gap:6px;height:58px}
+  /* logo compacto en móvil */
+  .brand-logo-wrap{padding:5px 12px}
+  .brand-logo-type{font-size:20px}
+  .brand-logo-sub{font-size:5.5px;letter-spacing:.22em}
+  /* ocultar texto brand y divisor para ahorrar espacio */
+  .brand-divider,.brand-text{display:none}
+  /* plan pill compacto */
+  .plan-pill{font-size:8px;padding:4px 8px;letter-spacing:.06em}
+  /* selector tipo compacto */
+  .tpl-select{font-size:10px;padding:5px 7px}
+  .tpl-label{display:none}
+  /* botones top-right compactos — solo íconos */
+  .tbtn{padding:5px 9px;font-size:10px}
   .tbtn span{display:none}
+  .top-right{gap:4px}
 }
 @media print{
   .sidebar,.topbar,.toasts,.mob-fab,.phone-notch,.preview-label{display:none!important}
@@ -470,8 +490,10 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 <header class="topbar">
 <div class="brand">
   <div class="brand-logo-wrap">
-    <canvas id="logo-canvas" aria-label="Gueka Ideas · Create Invite Celebrate"></canvas>
-    <img class="brand-logo" src="https://hercules-cdn.com/file_KfprHrRsr97FoC77KKs4GFyz" alt="Gueka Ideas" id="logo-src-img" crossorigin="anonymous">
+    <canvas id="logo-canvas" aria-label="Gueka Ideas · Create Invite Celebrate" style="display:none"></canvas>
+    <img class="brand-logo" src="https://hercules-cdn.com/file_KfprHrRsr97FoC77KKs4GFyz" alt="Gueka Ideas" id="logo-src-img" crossorigin="anonymous" style="display:none">
+    <span class="brand-logo-type">gueka ideas</span>
+    <span class="brand-logo-sub">create · invite · celebrate</span>
   </div>
   <div class="brand-divider"></div>
   <div class="brand-text"><strong>ESTUDIO DE INVITACIONES</strong><span>create · invite · celebrate</span></div>
