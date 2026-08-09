@@ -145,6 +145,7 @@ textarea.in{resize:vertical;min-height:52px}
 <button class="btn" id="btnUndo">↺</button>
 <button class="btn" id="btnRedo">↻</button>
 <button class="btn" id="btnQR">QR</button>
+<button class="btn" id="btnResetAll">↺ Reset</button>
 <button class="btn solid" id="btnExport">⬇ HTML</button>
 </div>
 </header>
@@ -181,12 +182,6 @@ textarea.in{resize:vertical;min-height:52px}
   <div class="publish-log" id="publishLog"></div>
   <div class="publish-note">Subimos tus fotos a la nube, enviamos tu diseño a producción y abrimos WhatsApp con Gueka Ideas.</div>
 </div>
-
-<div class="panel-toolbar"><div class="panel-toolbar-btns">
-<button class="ptb" id="btnExport2">⬇ HTML</button>
-<label class="ptb" style="cursor:pointer">⬆ Importar<input type="file" id="btnImport" accept=".json,.html" style="display:none"></label>
-<button class="ptb" id="btnResetAll">↺ Reset</button>
-</div></div>
 
 <div class="plan-locked" id="planLocked"><strong id="planLockedTxt">ESTÁS EDITANDO TU PLAN CLASSIC</strong><span id="planLockedSub">Hasta 4 fotos de galería</span></div>
 <div class="plan-bar"><div class="plan-cards" id="planCards"></div></div>
@@ -424,11 +419,10 @@ async function exportarHTML(){
   const html=document.documentElement.outerHTML;
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download='invitacion.html';a.click();toast('✓ HTML descargado');
 }
-$('#btnExport').onclick=exportarHTML;$('#btnExport2').onclick=exportarHTML;
+$('#btnExport').onclick=exportarHTML;
 $('#btnResetAll').onclick=()=>{const plan=state.plan;state=makeDefaults();state.plan=plan;hydrateInputs();renderPreview();renderPlans();buildLists();markSave();toast('Restablecido');};
 $('#btnUndo').onclick=()=>toast('↺ Deshacer');$('#btnRedo').onclick=()=>toast('↻ Rehacer');
 $('#btnQR').onclick=()=>{if(typeof QRCode!=='undefined'){const w=window.open('','_blank');w.document.write('<div id="q"></div><script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script><script>new QRCode(document.getElementById("q"),{text:"https://guekaideas.com/invitacion",width:200,height:200});<\/script>');} };
-$('#btnImport').onchange=function(){const f=this.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const plan=state.plan;state=Object.assign(makeDefaults(),JSON.parse(e.target.result));state.plan=plan;hydrateInputs();renderPreview();renderPlans();buildLists();markSave();toast('✓ Importado');}catch(e){toast('⚠ Archivo no válido');}};r.readAsText(f);};
 $('#mobFab').onclick=()=>$('#sidebar').classList.toggle('mob-open');
 
 /* ════════════════════════════════════════════════════════════════
