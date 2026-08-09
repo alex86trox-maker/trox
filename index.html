@@ -58,36 +58,43 @@ body{font-family:var(--fb);background:var(--e-bg);color:var(--e-ink);display:fle
 
 /* ── TOPBAR ── */
 .topbar{
-  height:64px;flex:0 0 auto;
+  height:80px;flex:0 0 auto;
   display:flex;align-items:center;gap:10px;
   padding:0 22px;
   border-bottom:1px solid var(--e-line);
   background:linear-gradient(to right,#fff 0%,#fdfcf9 100%);
   box-shadow:0 1px 14px rgba(184,155,94,.09),0 1px 3px rgba(22,33,27,.05);
   z-index:40;
+  overflow:visible;
 }
 .brand{display:flex;align-items:center;gap:0;text-decoration:none}
 #btnExport{display:none !important;}
 .modo-admin #btnExport{display:inline-flex !important;}
-/* Logo corporativo con imagen de marca de agua sobre fondo marfil cálido */
+/* Logo corporativo — CSS zoom preciso sin canvas */
 .brand-logo-wrap{
-  background:linear-gradient(135deg,#faf8f4 0%,#f3efe8 100%);
-  border-radius:10px;
-  padding:4px 16px;
-  display:flex;align-items:center;justify-content:center;
   flex-shrink:0;
-  border:1px solid rgba(184,155,94,.22);
-  box-shadow:0 1px 6px rgba(184,155,94,.12);
-  height:50px;
+  width:215px;
+  height:68px;
+  overflow:hidden;
+  border-radius:10px;
+  background:#faf8f4;
+  border:1px solid rgba(184,155,94,.2);
+  position:relative;
 }
+/* Ocultar canvas (no usado por CORS) */
+#logo-canvas{display:none}
 .brand-logo{
-  height:44px;
-  width:auto;
-  object-fit:contain;
+  /* Imagen 1536×1024.
+     Target: mostrar x=380..1156, y=210..590 (w=776, h=380) en 215×68
+     Escala: 215/776 = 0.277 → img width en pantalla = 1536*0.277 = 426px, height = 284px
+     Posición: left = -(380*0.277) = -105px, top = -(210*0.277) = -58px */
   display:block;
-  /* La imagen es beige/dorado sobre fondo blanco — usamos multiply para integrarla naturalmente */
-  mix-blend-mode:multiply;
-  filter:contrast(1.05) saturate(0.9);
+  position:absolute;
+  width:426px;
+  height:auto;
+  left:-105px;
+  top:-58px;
+  filter:brightness(0.58) sepia(0.15) saturate(1.7) contrast(1.12);
 }
 .brand-divider{width:1px;height:28px;background:var(--e-line);flex:0 0 auto;margin:0 12px}
 /* Subtítulo del editor alineado con la identidad */
@@ -462,7 +469,10 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 <body>
 <header class="topbar">
 <div class="brand">
-  <div class="brand-logo-wrap"><img class="brand-logo" src="https://hercules-cdn.com/file_KfprHrRsr97FoC77KKs4GFyz" alt="Gueka Ideas · Create Invite Celebrate"></div>
+  <div class="brand-logo-wrap">
+    <canvas id="logo-canvas" aria-label="Gueka Ideas · Create Invite Celebrate"></canvas>
+    <img class="brand-logo" src="https://hercules-cdn.com/file_KfprHrRsr97FoC77KKs4GFyz" alt="Gueka Ideas" id="logo-src-img" crossorigin="anonymous">
+  </div>
   <div class="brand-divider"></div>
   <div class="brand-text"><strong>ESTUDIO DE INVITACIONES</strong><span>create · invite · celebrate</span></div>
 </div>
@@ -1360,6 +1370,28 @@ function buildParticles(){
 }
 
 hydrateInputs();renderPlans();buildSelectors();buildPalette();buildParticles();buildLists();renderPreview();restaurarFotos();
+
+/* ── LOGO CANVAS: recortar automáticamente el logo de la imagen fuente ── */
+(function(){
+  const img=document.getElementById('logo-src-img');
+  const cv=document.getElementById('logo-canvas');
+  if(!img||!cv)return;
+  function recortarLogo(){
+    const W=img.naturalWidth,H=img.naturalHeight;
+    if(!W||!H)return;
+    // La imagen es 1536×1024. El logo script ocupa la zona central más apretada.
+    // Recortamos más ajustado: x=380, y=210, w=776, h=380
+    const sx=380,sy=210,sw=776,sh=380;
+    // Canvas destino: mismo ratio que recorte, altura fija 62px
+    const outH=62,outW=Math.round(sw/sh*outH);
+    cv.width=outW;cv.height=outH;
+    const ctx=cv.getContext('2d');
+    ctx.filter='brightness(0.58) sepia(0.15) saturate(1.7) contrast(1.12)';
+    ctx.drawImage(img,sx,sy,sw,sh,0,0,outW,outH);
+  }
+  if(img.complete&&img.naturalWidth)recortarLogo();
+  else img.onload=recortarLogo;
+})();
 </script>
 </body>
 </html>
