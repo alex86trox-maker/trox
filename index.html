@@ -276,6 +276,37 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 .tpl-opt{display:block;width:100%;text-align:left;font:inherit;font-size:11.5px;font-weight:600;color:var(--e-ink);padding:8px 10px;border:0;background:none;border-radius:8px;cursor:pointer;transition:background .15s}
 .tpl-opt:hover,.tpl-opt.hovered{background:var(--e-sage)}
 
+/* ── PROGRESO DE COMPLETITUD ── */
+.progress-widget{display:flex;align-items:center;gap:9px;padding:6px 12px;border-radius:99px;border:1.5px solid var(--e-line);background:#fff;cursor:pointer;transition:border-color .18s,box-shadow .18s;flex-shrink:0}
+.progress-widget:hover{border-color:var(--e-gold2);box-shadow:0 4px 12px rgba(184,155,94,.16)}
+.progress-track{position:relative;width:64px;height:7px;border-radius:99px;background:var(--e-sage);overflow:hidden;flex:0 0 auto}
+.progress-fill{position:absolute;inset:0;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--e-gold2),var(--e-green2));transition:width .35s ease}
+.progress-fill.done{background:linear-gradient(90deg,var(--e-green2),var(--e-green))}
+.progress-label{font-size:10px;font-weight:800;letter-spacing:.05em;color:var(--e-green);white-space:nowrap}
+@media(max-width:900px){.progress-widget{padding:5px 9px}.progress-track{width:44px}.progress-label{font-size:9px}}
+@media(max-width:640px){.progress-widget{order:5}}
+
+/* ── TOOLTIPS DE AYUDA ── */
+.field-label-row{display:flex;align-items:center;gap:5px}
+.help-btn{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--e-gold);background:#fff;color:var(--e-gold);font-size:8.5px;font-weight:900;display:inline-grid;place-items:center;cursor:help;flex:0 0 auto;padding:0;line-height:1;transition:background .15s,color .15s}
+.help-btn:hover,.help-btn:focus{background:var(--e-gold);color:#fff}
+#field-tooltip{position:fixed;z-index:99999;max-width:230px;background:var(--e-ink);color:#fff;font-size:10.5px;font-weight:500;line-height:1.55;padding:10px 13px;border-radius:11px;box-shadow:0 14px 30px rgba(22,33,27,.38);opacity:0;pointer-events:none;transform:translateY(5px);transition:opacity .15s,transform .15s}
+#field-tooltip.show{opacity:1;transform:none}
+
+/* ── TOUR GUIADO ── */
+.tour-spotlight{position:fixed;z-index:99990;pointer-events:none;border-radius:14px;box-shadow:0 0 0 9999px rgba(13,18,14,.62);transition:top .35s ease,left .35s ease,width .35s ease,height .35s ease;border:2px solid var(--e-gold)}
+.tour-card{position:fixed;z-index:99995;width:270px;background:#fff;border-radius:16px;padding:18px 18px 16px;box-shadow:0 24px 60px rgba(22,33,27,.4);border:1.5px solid var(--e-gold2);transition:top .35s ease,left .35s ease}
+.tour-step-num{font-size:8.5px;font-weight:900;letter-spacing:.16em;color:var(--e-gold);text-transform:uppercase;margin-bottom:6px}
+.tour-card h3{font-family:var(--fd);font-size:15px;color:var(--e-green);margin-bottom:6px;letter-spacing:.02em}
+.tour-card p{font-size:11.5px;line-height:1.55;color:var(--e-ink);margin-bottom:14px}
+.tour-actions{display:flex;align-items:center;gap:8px}
+.tour-skip{font:inherit;font-size:10px;font-weight:700;color:var(--e-mut);background:none;border:0;cursor:pointer;padding:6px 2px}
+.tour-skip:hover{color:var(--e-red)}
+.tour-nav{font:inherit;font-size:11px;font-weight:800;padding:8px 14px;border-radius:99px;border:1.5px solid var(--e-line);background:#fff;color:var(--e-ink);cursor:pointer;transition:all .15s}
+.tour-nav.primary{background:linear-gradient(135deg,#f0dc9e,var(--e-gold) 55%,#8a6f30);color:#1a1100;border-color:transparent;box-shadow:0 6px 16px rgba(184,155,94,.35)}
+.tour-nav:hover{border-color:var(--e-gold)}
+@media(max-width:480px){.tour-card{width:calc(100vw - 32px);left:16px!important}}
+
 /* ── SPLIT ADAPTATIVO (tablet) ── */
 @media(min-width:641px) and (max-width:1200px){
   .workspace{grid-template-columns:1fr 340px}
@@ -337,6 +368,10 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 </div>
 <div class="plan-pill" id="planPill"><span class="plan-pill-dot"></span><span id="planPillTxt">PLAN CLASSIC</span></div>
 <div class="top-right">
+  <button class="progress-widget" id="progressWidget" type="button" title="Ver secciones vacías">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-label" id="progressLabel">0/15 secciones</span>
+  </button>
   <span class="save-indicator" id="saveDot"><i></i><span>Guardado</span></span>
   <button class="tbtn" id="btnUndo">Undo</button>
   <button class="tbtn" id="btnRedo">Redo</button>
@@ -475,7 +510,7 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
   <div class="field"><label>Fecha</label><input class="in" type="date" data-bind="date"></div>
   <div class="field"><label>Hora</label><input class="in" type="time" data-bind="time"></div>
 </div>
-<div class="field" data-plan="premium"><label>Hashtag</label><input class="in" data-bind="hashtag" maxlength="60" autocomplete="off"></div>
+<div class="field" data-plan="premium"><div class="field-label-row"><label style="margin:0">Hashtag</label><button type="button" class="help-btn" data-help="Es la palabra clave que tus invitados usarán en redes sociales para etiquetar sus fotos del evento, por ejemplo #SofíaValentinaXV. Aparecerá en la invitación digital.">?</button></div><input class="in" data-bind="hashtag" maxlength="60" autocomplete="off"></div>
 <div class="field"><label>Frase de portada</label><textarea class="in" data-bind="caption" maxlength="300"></textarea></div>
 </div></div></div></div>
 <!-- SEC 2: Fotos -->
@@ -529,11 +564,13 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label>Salón</label><input class="in" data-bind="venue" maxlength="120"></div>
 <div class="field"><label>Dirección</label><textarea class="in" data-bind="address" maxlength="300"></textarea></div>
-<div class="field" data-plan="deluxe"><label>Enlace Google Maps</label><input class="in" data-bind="mapUrl" placeholder="https://maps.google.com/..." maxlength="500"></div>
+<div class="field" data-plan="deluxe"><div class="field-label-row"><label style="margin:0">Enlace Google Maps</label><button type="button" class="help-btn" data-help="Pega aquí el enlace para ubicar el lugar del evento en Google Maps. Tus invitados podrán tocarlo desde la invitación para llegar sin perderse.">?</button></div><input class="in" data-bind="mapUrl" placeholder="https://maps.google.com/..." maxlength="500"></div>
 </div></div></div></div>
 <!-- SEC 8: Dress code -->
 <div class="sec"><button class="sec-head"><span class="sec-num">8</span><span class="sec-title">Dress code</span><span class="chev">▾</span></button>
-<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-dress"></div></div></div></div></div>
+<div class="sec-body"><div class="sec-inner"><div class="sec-pad">
+<div class="field-label-row" style="margin-bottom:8px"><span style="font-size:8.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--e-mut)">Código de vestimenta</span><button type="button" class="help-btn" data-help="Indica a tus invitados cómo vestir para el evento (formal, casual, colores a evitar, etc). Se mostrará como una lista en la invitación.">?</button></div>
+<div id="ed-dress"></div></div></div></div></div>
 <!-- SEC 9: Info extra -->
 <div class="sec" data-plan="deluxe"><button class="sec-head"><span class="sec-num">9</span><span class="sec-title">Info extra</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
@@ -615,6 +652,8 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
   <div class="tpl-hover-dots" id="tplHoverDots"></div>
 </div></div>
 <div class="toasts" id="toasts"></div>
+<div id="field-tooltip"></div>
+<div id="tour-root"></div>
 <script>
 "use strict";
 const $=s=>document.querySelector(s);
@@ -956,6 +995,7 @@ function renderPreview(){
 
   // Paleta en card-wrapper
   applyPaletteToCard(state.palette);
+  updateCompletionProgress();
 }
 
 /* ── PALETA ── */
@@ -1840,6 +1880,165 @@ function initPreviewZoom(){
   applyZoom(1);
 }
 
+/* ── TOOLTIPS DE AYUDA CONTEXTUAL ── */
+function bindHelpTooltips(){
+  const tip=$('#field-tooltip');
+  if(!tip)return;
+  function show(btn){
+    tip.textContent=btn.getAttribute('data-help')||'';
+    const r=btn.getBoundingClientRect();
+    const w=Math.min(230,window.innerWidth-24);
+    tip.style.maxWidth=w+'px';
+    let left=r.left+r.width/2-w/2;
+    left=Math.max(10,Math.min(left,window.innerWidth-w-10));
+    tip.style.left=left+'px';
+    tip.style.top=Math.max(8,r.top-8)+'px';
+    tip.style.transform='translateY(calc(-100% - 6px))';
+    tip.classList.add('show');
+  }
+  function hide(){tip.classList.remove('show');}
+  document.addEventListener('mouseover',(e)=>{
+    const btn=e.target.closest('.help-btn');
+    if(btn)show(btn);
+  });
+  document.addEventListener('mouseout',(e)=>{
+    if(e.target.closest('.help-btn'))hide();
+  });
+  document.addEventListener('focusin',(e)=>{
+    const btn=e.target.closest('.help-btn');
+    if(btn)show(btn);
+  });
+  document.addEventListener('focusout',(e)=>{
+    if(e.target.closest('.help-btn'))hide();
+  });
+  document.addEventListener('click',(e)=>{
+    const btn=e.target.closest('.help-btn');
+    if(btn){e.preventDefault();e.stopPropagation();show(btn);setTimeout(hide,3200);}
+  });
+}
+
+/* ── PROGRESO DE COMPLETITUD ── */
+const SECTION_COMPLETION=[
+  {num:1,title:'Contenido',check:()=>!!(state.name&&state.date&&state.time)},
+  {num:2,title:'Fotos',check:()=>!!blobURLs.retrato},
+  {num:3,title:'Bienvenida',check:()=>!!state.splashBtn},
+  {num:4,title:'Mi historia',check:()=>!!(state.historyText&&state.historyText.trim())},
+  {num:5,title:'Programa',check:()=>(state.itinerary||[]).some(i=>i.v&&i.v.trim())},
+  {num:6,title:'Padrinos',check:()=>(state.padrinos||[]).some(i=>i.v&&i.v.trim())},
+  {num:7,title:'El lugar',check:()=>!!(state.venue&&state.address)},
+  {num:8,title:'Dress code',check:()=>(state.dressCode||[]).some(i=>i.v&&i.v.trim())},
+  {num:9,title:'Info extra',check:()=>(state.extra||[]).some(i=>i.v&&i.v.trim())||!!state.customText},
+  {num:10,title:'Galería',check:()=>(blobURLs.gal||[]).length>0},
+  {num:11,title:'Música',check:()=>!!state.audioKey||(state.songs||[]).some(i=>i.v&&i.v.trim())},
+  {num:12,title:'Regalos',check:()=>(state.gifts||[]).some(i=>i.v&&i.v.trim())},
+  {num:13,title:'Confirmación',check:()=>!!state.waOrganizer},
+  {num:14,title:'Cierre',check:()=>!!(state.poem&&state.signature)},
+  {num:15,title:'Estilo',check:()=>!!(state.palette&&state.typography)}
+];
+function updateCompletionProgress(){
+  const fill=$('#progressFill');const label=$('#progressLabel');
+  if(!fill||!label)return;
+  const done=SECTION_COMPLETION.filter(s=>{try{return s.check();}catch(e){return false;}}).length;
+  const total=SECTION_COMPLETION.length;
+  fill.style.width=Math.round((done/total)*100)+'%';
+  fill.classList.toggle('done',done===total);
+  label.textContent=done+'/'+total+' secciones';
+}
+function goToFirstEmptySection(){
+  const empty=SECTION_COMPLETION.find(s=>{try{return !s.check();}catch(e){return true;}});
+  if(!empty){toast('✓ ¡Todas las secciones están completas!');return;}
+  const secs=$$('.sec');
+  const target=secs[empty.num-1];
+  if(!target)return;
+  // Abrir el panel en móvil si está cerrado
+  if(window.innerWidth<=640){
+    $('#sidebar').classList.add('mob-open');
+    $('#mobFab').classList.add('editing');
+  }
+  target.classList.add('open');
+  setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),80);
+  toast('→ Sección "'+empty.title+'" pendiente de completar');
+}
+
+/* ── TOUR GUIADO (5 PASOS) ── */
+const TOUR_STORAGE_KEY='gueka_tour_done_v1';
+const TOUR_STEPS=[
+  {selector:'#tplSelectBtn',title:'1 · Elige una plantilla',text:'Empieza escogiendo una plantilla lista para tu tipo de evento. Puedes pasar el cursor sobre cada opción para verla antes de aplicarla.',fallback:'.tpl-dropdown-wrap'},
+  {selector:'[data-up="retrato"]',title:'2 · Sube tu foto principal',text:'Sube el retrato que aparecerá en la portada de tu invitación. Podrás recortarla al instante antes de guardarla.',openSection:2},
+  {selector:'#palette-grid',title:'3 · Cambia la paleta de colores',text:'Elige la combinación de colores que mejor represente tu celebración. Se aplica al instante en la vista previa.',openSection:15},
+  {selector:'[data-bind="date"]',title:'4 · Configura fecha y hora',text:'Define cuándo será tu evento. Esta información alimenta la cuenta regresiva de tu invitación.',openSection:1},
+  {selector:'#btnPublish',title:'5 · Publica tu invitación',text:'Cuando todo esté listo, finaliza aquí para enviar tu diseño a producción y compartirlo con tus invitados.'}
+];
+let tourStep=0;
+function startTour(force){
+  if(!force&&localStorage.getItem(TOUR_STORAGE_KEY))return;
+  tourStep=0;
+  renderTourStep();
+}
+function endTour(){
+  localStorage.setItem(TOUR_STORAGE_KEY,'1');
+  const root=$('#tour-root');if(root)root.innerHTML='';
+}
+function renderTourStep(){
+  const root=$('#tour-root');
+  if(!root)return;
+  const step=TOUR_STEPS[tourStep];
+  if(!step){endTour();return;}
+  // Abrir secciones necesarias y el panel en móvil
+  if(window.innerWidth<=640){
+    $('#sidebar').classList.add('mob-open');
+    $('#mobFab').classList.add('editing');
+  }
+  if(step.openSection){
+    const secs=$$('.sec');
+    const sec=secs[step.openSection-1];
+    if(sec)sec.classList.add('open');
+  }
+  root.innerHTML='';
+  setTimeout(()=>{
+    let target=document.querySelector(step.selector)||(step.fallback&&document.querySelector(step.fallback));
+    const spot=document.createElement('div');
+    spot.className='tour-spotlight';
+    const card=document.createElement('div');
+    card.className='tour-card';
+    card.innerHTML='<div class="tour-step-num">Paso '+(tourStep+1)+' de '+TOUR_STEPS.length+'</div>'+
+      '<h3>'+esc(step.title)+'</h3><p>'+esc(step.text)+'</p>'+
+      '<div class="tour-actions">'+
+        '<button type="button" class="tour-skip" id="tourSkip">Saltar tour</button>'+
+        '<div style="margin-left:auto;display:flex;gap:8px">'+
+        (tourStep>0?'<button type="button" class="tour-nav" id="tourPrev">Atrás</button>':'')+
+        '<button type="button" class="tour-nav primary" id="tourNext">'+(tourStep===TOUR_STEPS.length-1?'Finalizar':'Siguiente')+'</button>'+
+        '</div></div>';
+    root.appendChild(spot);
+    root.appendChild(card);
+    function position(){
+      if(target){
+        const r=target.getBoundingClientRect();
+        const pad=8;
+        spot.style.top=Math.max(4,r.top-pad)+'px';
+        spot.style.left=Math.max(4,r.left-pad)+'px';
+        spot.style.width=(r.width+pad*2)+'px';
+        spot.style.height=(r.height+pad*2)+'px';
+        target.scrollIntoView({behavior:'smooth',block:'center'});
+        let cardTop=r.bottom+16;
+        if(cardTop+180>window.innerHeight)cardTop=Math.max(12,r.top-190);
+        let cardLeft=Math.min(Math.max(12,r.left),window.innerWidth-282);
+        card.style.top=cardTop+'px';
+        card.style.left=cardLeft+'px';
+      }else{
+        spot.style.display='none';
+        card.style.top='50%';card.style.left='50%';
+        card.style.transform='translate(-50%,-50%)';
+      }
+    }
+    position();
+    $('#tourSkip').addEventListener('click',endTour);
+    const prevBtn=$('#tourPrev');
+    if(prevBtn)prevBtn.addEventListener('click',()=>{tourStep--;renderTourStep();});
+    $('#tourNext').addEventListener('click',()=>{tourStep++;renderTourStep();});
+  },120);
+}
+
 /* ── COUNTDOWN ── */
 function startCountdown(){
   function update(){
@@ -2078,6 +2277,12 @@ async function init(){
     const isOpen=$('#sidebar').classList.toggle('mob-open');
     $('#mobFab').classList.toggle('editing',isOpen);
   });
+  // Ayuda contextual y progreso de completitud
+  bindHelpTooltips();
+  updateCompletionProgress();
+  $('#progressWidget').addEventListener('click',goToFirstEmptySection);
+  // Tour guiado (solo la primera vez)
+  startTour(false);
 }
 
 init();
