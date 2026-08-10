@@ -328,7 +328,39 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
   <div class="card-cap" style="margin-bottom:12px">¡Ayúdanos a capturar cada momento!</div>
   <a id="pv-album-btn" href="#" rel="noopener noreferrer" style="display:inline-block;padding:10px 22px;border-radius:20px;background:var(--c-b);color:#fff;text-decoration:none;font-weight:700;font-size:0.85rem;letter-spacing:.08em">📁 SUBIR MIS FOTOS</a>
 </section>
-<section data-plan="premium"><h2>MÚSICA</h2><div class="card-list" id="pv-songs"></div></section>
+<section data-plan="premium" id="pv-music-sec">
+  <h2>🎵 MÚSICA</h2>
+  <!-- Player de fondo -->
+  <div id="pv-audio-wrap" style="display:none;margin-bottom:18px">
+    <div id="pv-audio-player" style="background:rgba(255,255,255,.07);border:1px solid var(--c-line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button id="pv-play-btn" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--c-a),var(--c-b));border:none;cursor:pointer;font-size:1.2rem;flex:0 0 auto;display:grid;place-items:center;color:#fff">▶</button>
+        <div style="flex:1;min-width:0">
+          <div id="pv-track-name" style="font-size:.78rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--c-text)"></div>
+          <div id="pv-track-time" style="font-family:var(--c-mono);font-size:.62rem;color:var(--c-dim);margin-top:2px">0:00 / 0:00</div>
+        </div>
+        <div id="pv-vol-wrap" style="display:flex;align-items:center;gap:4px">
+          <span style="font-size:.7rem">🔊</span>
+          <input id="pv-vol" type="range" min="0" max="1" step="0.05" value="0.7" style="width:52px;accent-color:var(--c-a)">
+        </div>
+      </div>
+      <input id="pv-seek" type="range" min="0" max="100" value="0" step="0.1" style="width:100%;accent-color:var(--c-a);height:4px">
+    </div>
+    <audio id="pv-audio" preload="none" loop></audio>
+  </div>
+  <!-- Playlist de referencia -->
+  <div class="card-list" id="pv-songs" style="margin-bottom:16px"></div>
+  <!-- Sugerencias de invitados -->
+  <div id="pv-song-suggest-wrap" style="display:none">
+    <div style="font-size:.7rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--c-a);margin-bottom:10px">🎶 SUGIERE UNA CANCIÓN</div>
+    <form id="song-suggest-form" style="display:flex;flex-direction:column;gap:8px;font-family:var(--c-mono)">
+      <div id="song-inputs"></div>
+      <button type="button" id="song-add-btn" style="font:inherit;font-size:.72rem;font-weight:700;padding:8px;border:1.5px dashed var(--c-a);border-radius:10px;background:transparent;color:var(--c-a);cursor:pointer">+ Agregar canción</button>
+      <button type="submit" style="font:inherit;font-weight:800;padding:12px;border:0;border-radius:99px;cursor:pointer;background:linear-gradient(135deg,var(--c-a),var(--c-b));color:var(--c-bg)">ENVIAR SUGERENCIAS</button>
+    </form>
+    <div id="song-suggest-ok" style="display:none;text-align:center;padding:14px;font-size:.78rem;color:var(--c-b)">✓ ¡Gracias! Tus sugerencias fueron enviadas.</div>
+  </div>
+</section>
 <section data-plan="deluxe"><h2>MESA DE REGALOS</h2><div class="card-list" id="pv-gifts"></div></section>
 <section data-plan="deluxe"><h2>INFO EXTRA</h2><div class="card-list" id="pv-extra"></div></section>
 <section><h2>DRESS CODE</h2><div class="card-list" id="pv-dress"></div></section>
@@ -447,7 +479,37 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-gal"></div></div></div></div></div>
 <!-- SEC 11: Música -->
 <div class="sec" data-plan="premium"><button class="sec-head"><span class="sec-num">11</span><span class="sec-title">Música</span><span class="chev">▾</span></button>
-<div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-songs"></div></div></div></div></div>
+<div class="sec-body"><div class="sec-inner"><div class="sec-pad">
+
+<div style="font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:8px">🎵 CANCIÓN DE FONDO</div>
+<div style="font-size:10px;color:var(--e-mut);line-height:1.5;margin-bottom:10px">Sube el audio que sonará al abrir la invitación (MP3, OGG, WAV · máx 15MB).</div>
+<div class="photo-preview-wrap" id="wrap-audio" style="height:52px;display:flex;align-items:center;justify-content:center">
+  <span id="audio-filename" style="font-size:9px;color:var(--e-mut);pointer-events:none">Sin audio cargado</span>
+</div>
+<div class="photo-tools" style="margin-top:8px">
+  <button class="photo-tool" id="btn-audio-upload">📁 Subir audio</button>
+  <button class="photo-tool" id="btn-audio-remove">✕ Quitar</button>
+</div>
+<div style="font-size:8px;color:var(--e-mut);margin-top:6px">El audio se guarda localmente y se reproduce en loop con el player de la invitación.</div>
+
+<div style="height:1px;background:var(--e-line);margin:16px 0"></div>
+
+<div style="font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:8px">📋 PLAYLIST DE REFERENCIA</div>
+<div style="font-size:10px;color:var(--e-mut);line-height:1.5;margin-bottom:10px">Lista de canciones que quieres en la fiesta (referencia para el DJ).</div>
+<div id="ed-songs"></div>
+
+<div style="height:1px;background:var(--e-line);margin:16px 0"></div>
+
+<div style="font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:8px">🎶 SUGERENCIAS DE INVITADOS</div>
+<div style="font-size:10px;color:var(--e-mut);line-height:1.5;margin-bottom:10px">Activa para que los invitados sugieran hasta 3 canciones desde la invitación.</div>
+<div class="tog-row"><strong>Permitir sugerencias</strong><label class="sw"><input type="checkbox" data-bind="songSuggestEnabled"><i></i></label></div>
+<div class="field" id="song-wa-field" style="margin-top:8px;display:none">
+  <label>WhatsApp para recibir sugerencias</label>
+  <input class="in" data-bind="songSuggestWa" placeholder="573001234567" maxlength="20" pattern="[0-9]+">
+  <div style="font-size:8px;color:var(--e-mut);margin-top:4px">Las sugerencias se enviarán a este número por WhatsApp.</div>
+</div>
+
+</div></div></div></div>
 <!-- SEC 12: Regalos -->
 <div class="sec" data-plan="deluxe"><button class="sec-head"><span class="sec-num">12</span><span class="sec-title">Regalos</span><span class="chev">▾</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-gifts"></div></div></div></div></div>
@@ -647,6 +709,10 @@ function makeDefaults(){
     gifts:[{v:'NEQUI · Colombia'}],
     galCaptions:[],
     typography:'montserrat',
+    songSuggestEnabled:false,
+    songSuggestWa:'',
+    // audio key en IndexedDB
+    audioKey:'',
     // imgs guarda keys de IndexedDB, NO blob URLs
     imgKeys:{retrato:'',fashion:''},
     // gal guarda array de keys de IndexedDB
@@ -661,7 +727,7 @@ try{
 }catch(e){console.warn('localStorage inválido');}
 
 // blobURLs en memoria (nunca en localStorage)
-const blobURLs={retrato:'',fashion:'',gal:[]};
+const blobURLs={retrato:'',fashion:'',gal:[],audio:''};
 
 const urlParams=new URLSearchParams(window.location.search);
 const planRaw=(urlParams.get('plan')||state.plan||'classic').toLowerCase();
@@ -807,8 +873,7 @@ function renderPreview(){
     const albumSec=$('#pv-album-sec');
     if(albumSec)albumSec.style.display=(PLAN_RANK[state.plan]>=2&&state.albumUrl)?'':'none';
   }
-
-  // Custom section
+  syncSongSuggestUI();
   const cusEl=$('#pv-custom-title');
   if(cusEl)cusEl.textContent=state.customTitle||'SECCIÓN LIBRE';
   const cusText=$('#pv-custom-text');
@@ -943,6 +1008,184 @@ function applyParticles(type){
   loop();
 }
 
+/* ── AUDIO PLAYER ── */
+const AUDIO_MIME=['audio/mpeg','audio/ogg','audio/wav','audio/mp4','audio/aac','audio/flac'];
+const MAX_AUDIO_SIZE=15*1024*1024;
+
+function syncAudioPlayer(){
+  const wrap=$('#pv-audio-wrap');
+  const audioEl=$('#pv-audio');
+  const trackName=$('#pv-track-name');
+  const wrapPanel=$('#wrap-audio');
+  const filename=$('#audio-filename');
+  if(!wrap||!audioEl)return;
+  if(blobURLs.audio){
+    wrap.style.display='block';
+    if(audioEl.src!==blobURLs.audio){
+      audioEl.src=blobURLs.audio;
+      audioEl.volume=0.7;
+    }
+    if(trackName)trackName.textContent=state.audioName||'Canción de fondo';
+    if(wrapPanel)wrapPanel.classList.add('has-img');
+    if(filename)filename.textContent=state.audioName||'Audio cargado';
+  }else{
+    wrap.style.display='none';
+    audioEl.pause();audioEl.src='';
+    if(wrapPanel)wrapPanel.classList.remove('has-img');
+    if(filename)filename.textContent='Sin audio cargado';
+  }
+}
+
+function initAudioPlayerControls(){
+  const audioEl=$('#pv-audio');
+  const playBtn=$('#pv-play-btn');
+  const seekEl=$('#pv-seek');
+  const timeEl=$('#pv-track-time');
+  const volEl=$('#pv-vol');
+  if(!audioEl||!playBtn)return;
+
+  function fmtTime(s){
+    if(!isFinite(s))return'0:00';
+    const m=Math.floor(s/60);const ss=Math.floor(s%60);
+    return m+':'+(ss<10?'0':'')+ss;
+  }
+  playBtn.addEventListener('click',()=>{
+    if(audioEl.paused){audioEl.play().catch(()=>{});playBtn.textContent='⏸';}
+    else{audioEl.pause();playBtn.textContent='▶';}
+  });
+  audioEl.addEventListener('timeupdate',()=>{
+    if(!audioEl.duration)return;
+    if(seekEl)seekEl.value=(audioEl.currentTime/audioEl.duration)*100;
+    if(timeEl)timeEl.textContent=fmtTime(audioEl.currentTime)+' / '+fmtTime(audioEl.duration);
+  });
+  audioEl.addEventListener('ended',()=>{if(playBtn)playBtn.textContent='▶';});
+  if(seekEl){
+    seekEl.addEventListener('input',()=>{
+      if(audioEl.duration)audioEl.currentTime=(seekEl.value/100)*audioEl.duration;
+    });
+  }
+  if(volEl){
+    volEl.addEventListener('input',()=>{audioEl.volume=parseFloat(volEl.value);});
+  }
+}
+
+function bindAudioUpload(){
+  const uploadBtn=$('#btn-audio-upload');
+  const removeBtn=$('#btn-audio-remove');
+  if(uploadBtn){
+    uploadBtn.addEventListener('click',()=>{
+      const inp=document.createElement('input');
+      inp.type='file';inp.accept='audio/mpeg,audio/ogg,audio/wav,audio/mp4,audio/aac,audio/flac';
+      inp.style.display='none';document.body.appendChild(inp);
+      inp.addEventListener('change',async()=>{
+        const file=inp.files[0];inp.remove();
+        if(!file)return;
+        if(!AUDIO_MIME.includes(file.type)&&!file.name.match(/\.(mp3|ogg|wav|m4a|aac|flac)$/i)){toast('⚠ Formato no soportado. Usa MP3, OGG, WAV o AAC.');return;}
+        if(file.size>MAX_AUDIO_SIZE){toast('⚠ El archivo supera 15MB.');return;}
+        pushHistory();
+        await guardarFotoLocal('audio_bg',file);
+        if(blobURLs.audio&&blobURLs.audio.startsWith('blob:'))URL.revokeObjectURL(blobURLs.audio);
+        blobURLs.audio=URL.createObjectURL(file);
+        state.audioKey='audio_bg';
+        state.audioName=file.name.replace(/\.[^.]+$/,'');
+        syncAudioPlayer();markSave();toast('✓ Audio guardado');
+      });
+      inp.click();
+    });
+  }
+  if(removeBtn){
+    removeBtn.addEventListener('click',async()=>{
+      if(!blobURLs.audio)return;
+      pushHistory();
+      await eliminarFotoLocal('audio_bg').catch(()=>{});
+      if(blobURLs.audio&&blobURLs.audio.startsWith('blob:'))URL.revokeObjectURL(blobURLs.audio);
+      blobURLs.audio='';state.audioKey='';state.audioName='';
+      const audioEl=$('#pv-audio');if(audioEl){audioEl.pause();audioEl.src='';}
+      const playBtn=$('#pv-play-btn');if(playBtn)playBtn.textContent='▶';
+      syncAudioPlayer();markSave();toast('↺ Audio eliminado');
+    });
+  }
+}
+
+/* ── SUGERENCIAS DE CANCIONES ── */
+function syncSongSuggestUI(){
+  const wrap=$('#pv-song-suggest-wrap');
+  const waField=$('#song-wa-field');
+  const show=!!(state.songSuggestEnabled&&PLAN_RANK[state.plan]>=2);
+  if(wrap)wrap.style.display=show?'block':'none';
+  if(waField)waField.style.display=state.songSuggestEnabled?'block':'none';
+  if(show)initSongSuggestInputs();
+}
+
+function initSongSuggestInputs(){
+  const container=$('#song-inputs');
+  const addBtn=$('#song-add-btn');
+  const okDiv=$('#song-suggest-ok');
+  if(!container)return;
+  // Inicializar con 1 campo si está vacío
+  if(container.children.length===0)addSongInput();
+  if(addBtn){
+    // Evitar listeners dobles
+    const newBtn=addBtn.cloneNode(true);
+    addBtn.replaceWith(newBtn);
+    newBtn.addEventListener('click',()=>{
+      const count=container.querySelectorAll('input').length;
+      if(count>=3){toast('Máximo 3 canciones por invitado.');return;}
+      addSongInput();
+    });
+  }
+  const form=$('#song-suggest-form');
+  if(form){
+    const newForm=form.cloneNode(false);
+    // Re-montar children en newForm
+    [...form.children].forEach(c=>newForm.appendChild(c));
+    form.replaceWith(newForm);
+    newForm.id='song-suggest-form';
+    newForm.addEventListener('submit',e=>{
+      e.preventDefault();
+      const inputs=[...$('#song-inputs').querySelectorAll('input')];
+      const songs=inputs.map(i=>i.value.trim()).filter(Boolean);
+      if(songs.length===0){toast('Escribe al menos una canción.');return;}
+      const wa=safePhone(state.songSuggestWa||state.waOrganizer||'');
+      if(!wa){toast('⚠ Configura el WhatsApp para recibir sugerencias.');return;}
+      const msg='🎵 *SUGERENCIAS DE CANCIONES*\nPara la fiesta de *'+state.name+'* ('+state.date+')\n\n'+songs.map((s,i)=>'🎶 '+(i+1)+'. '+s).join('\n');
+      window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(msg),'_blank');
+      const okDiv=$('#song-suggest-ok');
+      const formEl=$('#song-suggest-form');
+      if(formEl)formEl.style.display='none';
+      if(okDiv)okDiv.style.display='block';
+      setTimeout(()=>{
+        if(formEl)formEl.style.display='flex';
+        if(okDiv)okDiv.style.display='none';
+        const cont=$('#song-inputs');if(cont){cont.innerHTML='';addSongInput();}
+      },3000);
+    });
+  }
+}
+
+function addSongInput(){
+  const container=$('#song-inputs');
+  if(!container)return;
+  const count=container.querySelectorAll('input').length;
+  if(count>=3){toast('Máximo 3 canciones.');return;}
+  const wrap=document.createElement('div');
+  wrap.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:7px';
+  const inp=document.createElement('input');
+  inp.type='text';inp.maxLength=100;
+  inp.placeholder='Artista – Canción';
+  inp.style.cssText='flex:1;font:inherit;font-size:.78rem;padding:9px 11px;border-radius:10px;border:1px solid var(--c-line);background:rgba(255,255,255,.07);color:var(--c-text)';
+  const del=document.createElement('button');
+  del.type='button';del.textContent='✕';
+  del.style.cssText='width:28px;height:28px;border-radius:50%;border:1px solid var(--c-line);background:rgba(255,255,255,.08);color:var(--c-dim);cursor:pointer;flex:0 0 auto;font-size:11px';
+  del.addEventListener('click',()=>{
+    wrap.remove();
+    // Siempre al menos 1
+    if($('#song-inputs').querySelectorAll('input').length===0)addSongInput();
+  });
+  wrap.appendChild(inp);wrap.appendChild(del);
+  container.appendChild(wrap);
+}
+
 /* ── PLAN UI ── */
 function renderPlanUI(){
   const cards=$('#planCards');
@@ -1069,23 +1312,25 @@ async function cargarFotosDesdeDB(){
     // Liberar blob URLs anteriores
     if(blobURLs.retrato&&blobURLs.retrato.startsWith('blob:'))URL.revokeObjectURL(blobURLs.retrato);
     if(blobURLs.fashion&&blobURLs.fashion.startsWith('blob:'))URL.revokeObjectURL(blobURLs.fashion);
+    if(blobURLs.audio&&blobURLs.audio.startsWith('blob:'))URL.revokeObjectURL(blobURLs.audio);
     blobURLs.gal.forEach(u=>{if(u&&u.startsWith('blob:'))URL.revokeObjectURL(u);});
-    blobURLs.retrato='';blobURLs.fashion='';blobURLs.gal=[];
+    blobURLs.retrato='';blobURLs.fashion='';blobURLs.gal=[];blobURLs.audio='';
 
     fotos.forEach(foto=>{
       const url=URL.createObjectURL(foto.blob);
       if(foto.id==='retrato'){blobURLs.retrato=url;state.imgKeys.retrato='retrato';}
       else if(foto.id==='fashion'){blobURLs.fashion=url;state.imgKeys.fashion='fashion';}
+      else if(foto.id==='audio_bg'){blobURLs.audio=url;state.audioKey='audio_bg';}
       else if(foto.id.startsWith('gal_')){
         const idx=parseInt(foto.id.split('_')[1])||0;
         blobURLs.gal[idx]=url;
       }
     });
-    // Ordenar gal
     blobURLs.gal=blobURLs.gal.filter(Boolean);
+    syncAudioPlayer();
     const statusEl=$('#dbStatus');
     if(statusEl){
-      const total=fotos.length;
+      const total=fotos.filter(f=>f.id!=='audio_bg').length;
       statusEl.textContent=total>0?'📦 '+total+' foto(s) guardada(s) localmente':'';
     }
   }catch(e){console.warn('Error cargando fotos desde DB',e);}
@@ -1402,6 +1647,15 @@ async function init(){
   populateTemplateSelect();
   applyParticles(state.particles||'ninguna');
   renderFontGrid();applyFont(state.typography||'montserrat');
+  initAudioPlayerControls();
+  bindAudioUpload();
+  syncAudioPlayer();
+  syncSongSuggestUI();
+  // Escuchar cambio del toggle de sugerencias
+  const suggestChk=document.querySelector('[data-bind="songSuggestEnabled"]');
+  if(suggestChk){
+    suggestChk.addEventListener('change',()=>{syncSongSuggestUI();});
+  }
   pushHistory();// snapshot inicial
 
   // Botones foto upload
@@ -1451,6 +1705,9 @@ async function init(){
     pushHistory();
     await limpiarDB().catch(()=>{});
     blobURLs.retrato='';blobURLs.fashion='';blobURLs.gal=[];
+    if(blobURLs.audio&&blobURLs.audio.startsWith('blob:'))URL.revokeObjectURL(blobURLs.audio);
+    blobURLs.audio='';
+    const audioEl=$('#pv-audio');if(audioEl){audioEl.pause();audioEl.src='';}
     state=makeDefaults();
     markSave();
     bindInputValues();renderPlanUI();renderListEditors();renderPaletteGrid();renderParticlesGrid();renderFontGrid();applyFont(state.typography||'montserrat');renderPreview();updatePlanLock();renderGalThumbPreview();
