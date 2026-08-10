@@ -213,6 +213,7 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
   --c-head:'Montserrat',sans-serif;--c-serif:'Noto Serif',serif;
   --c-mono:'JetBrains Mono',monospace;--c-script:'Great Vibes',cursive;
   width:100%;background:var(--c-bg);color:var(--c-text);font-family:var(--c-head);
+  position:relative;
 }
 #card-wrapper[data-theme="elegante"]{--c-bg:#0c1510;--c-a:#c4a86a;--c-b:#8fb39c;--c-c:#e8dcc0;--c-d:#cdb079;--c-e:#9db8a4;--c-head:'Marcellus',serif;--c-serif:'Marcellus',serif;--c-mono:'Figtree',sans-serif}
 #card-wrapper[data-theme="pastel"]{--c-bg:#f8f6f1;--c-text:#16211b;--c-dim:rgba(22,33,27,.5);--c-line:rgba(22,33,27,.12);--c-a:#b89b5e;--c-b:#7fa08c;--c-c:#8a6d3b;--c-d:#5c7a68;--c-e:#a3803e;--c-head:'Marcellus',serif;--c-serif:'Marcellus',serif;--c-mono:'Figtree',sans-serif}
@@ -295,7 +296,7 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
       <div class="phone-notch"></div>
       <div id="preview-stage">
         <div id="card-wrapper" data-theme="neon">
-<canvas id="particle-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.55"></canvas>
+<canvas id="particle-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.55"></canvas>
 <section id="splash">
   <div class="splash-15" id="sp-15">15</div>
   <div class="splash-name" id="sp-name">Sofía Valentina</div>
@@ -711,7 +712,7 @@ function makeDefaults(){
     songSuggestEnabled:false,
     songSuggestWa:'',
     // audio key en IndexedDB
-    audioKey:'',
+    audioKey:'',audioName:'',
     // imgs guarda keys de IndexedDB, NO blob URLs
     imgKeys:{retrato:'',fashion:''},
     // gal guarda array de keys de IndexedDB
@@ -739,10 +740,11 @@ const ORDER={
 if(urlParams.get('admin')==='true')document.body.classList.add('modo-admin');
 
 /* ── GUARDAR ── */
+let markSaveTimer=null;
 function markSave(){
   const d=$('#saveDot');d.classList.add('saving');
-  clearTimeout(markSave.t);
-  markSave.t=setTimeout(()=>{
+  clearTimeout(markSaveTimer);
+  markSaveTimer=setTimeout(()=>{
     try{
       // Guardar todo excepto blobURLs
       localStorage.setItem('gueka_editor_v2',JSON.stringify(state));
@@ -752,13 +754,13 @@ function markSave(){
 }
 
 /* ── UNDO / REDO ── */
-const history=[];let histIdx=-1;
+const undoStack=[];let undoIdx=-1;
 function pushHistory(){
   const snap=JSON.stringify(state);
-  history.splice(histIdx+1);
-  history.push(snap);
-  if(history.length>50)history.shift();
-  histIdx=history.length-1;
+  undoStack.splice(undoIdx+1);
+  undoStack.push(snap);
+  if(undoStack.length>50)undoStack.shift();
+  undoIdx=undoStack.length-1;
 }
 function applyHistory(snap){
   state=Object.assign(makeDefaults(),JSON.parse(snap));
@@ -770,7 +772,7 @@ function applyHistory(snap){
 /* ── CALENDAR URL ── */
 function buildCalendarUrl(){
   const start=(state.date||'').replace(/-/g,'')+'T'+(state.time||'1800').replace(':','')+'00';
-  const d=new Date((state.date+'T'+state.time)||'2026-01-01T18:00');
+  const d=new Date(state.date&&state.time?state.date+'T'+state.time:'2026-01-01T18:00');
   d.setHours(d.getHours()+4);
   const end=d.toISOString().replace(/[-:]/g,'').split('.')[0];
   const title=encodeURIComponent('🎉 '+state.name+(state.age?' · '+state.age+' años':''));
@@ -962,8 +964,9 @@ function applyParticles(type){
   if(!canvas)return;
   if(particleAnim){cancelAnimationFrame(particleAnim);particleAnim=null;}
   const ctx=canvas.getContext('2d');
-  canvas.width=canvas.offsetWidth||390;
-  canvas.height=canvas.offsetHeight||800;
+  const cwr=$('#card-wrapper');
+  canvas.width=(cwr?cwr.offsetWidth:0)||390;
+  canvas.height=(cwr?cwr.offsetHeight:0)||800;
   ctx.clearRect(0,0,canvas.width,canvas.height);
   if(type==='ninguna'){canvas.style.opacity='0';return;}
   canvas.style.opacity='0.55';
@@ -1119,7 +1122,6 @@ function syncSongSuggestUI(){
 function initSongSuggestInputs(){
   const container=$('#song-inputs');
   const addBtn=$('#song-add-btn');
-  const okDiv=$('#song-suggest-ok');
   if(!container)return;
   // Inicializar con 1 campo si está vacío
   if(container.children.length===0)addSongInput();
@@ -1540,6 +1542,7 @@ function generarQR(){
 function exportarHTML(){
   const cw=$('#card-wrapper');
   if(!cw){toast('Error al exportar');return;}
+  const selFont=TYPOGRAPHY_OPTS.find(f=>f.key===(state.typography||'montserrat'))||TYPOGRAPHY_OPTS[0];
   const html='<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(state.name)+' · Invitación Digital</title>'
     +'<link href="https://cdn.jsdelivr.net/npm/@fontsource/great-vibes/400.css" rel="stylesheet">'
     +'<link href="https://cdn.jsdelivr.net/npm/@fontsource/marcellus/400.css" rel="stylesheet">'
@@ -1547,7 +1550,17 @@ function exportarHTML(){
     +'<link href="https://cdn.jsdelivr.net/fontsource/css/montserrat@latest/900.css" rel="stylesheet">'
     +'<link href="https://cdn.jsdelivr.net/fontsource/css/noto-serif@latest/400.css" rel="stylesheet">'
     +'<link href="https://cdn.jsdelivr.net/fontsource/css/jetbrains-mono@latest/400.css" rel="stylesheet">'
-    +'<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#080810}</style>'
+    +'<link href="https://cdn.jsdelivr.net/fontsource/css/playfair-display@latest/400.css" rel="stylesheet">'
+    +'<link href="https://cdn.jsdelivr.net/fontsource/css/cormorant-garamond@latest/400.css" rel="stylesheet">'
+    +'<link href="https://cdn.jsdelivr.net/fontsource/css/cinzel@latest/400.css" rel="stylesheet">'
+    +'<link href="https://cdn.jsdelivr.net/fontsource/css/raleway@latest/400.css" rel="stylesheet">'
+    +'<link href="https://cdn.jsdelivr.net/fontsource/css/josefin-sans@latest/400.css" rel="stylesheet">'
+    +'<link href="https://cdn.jsdelivr.net/fontsource/css/eb-garamond@latest/400.css" rel="stylesheet">'
+    +'<link href="https://cdn.jsdelivr.net/fontsource/css/abril-fatface@latest/400.css" rel="stylesheet">'
+    +'<link href="https://cdn.jsdelivr.net/fontsource/css/dm-serif-display@latest/400.css" rel="stylesheet">'
+    +'<link href="https://cdn.jsdelivr.net/npm/@fontsource/alex-brush/400.css" rel="stylesheet">'
+    +'<link href="https://cdn.jsdelivr.net/npm/@fontsource/sacramento/400.css" rel="stylesheet">'
+    +'<style>*{margin:0;padding:0;box-sizing:border-box}body{background:var(--c-bg,#080810)}#card-wrapper{--c-head:'+selFont.family+'}</style>'
     +'</head><body>'+cw.outerHTML+'</body></html>';
   const blob=new Blob([html],{type:'text/html'});
   const a=document.createElement('a');
@@ -1689,11 +1702,11 @@ async function init(){
   }
   // Undo / Redo
   $('#btnUndo').addEventListener('click',()=>{
-    if(histIdx>0){histIdx--;applyHistory(history[histIdx]);}
+    if(undoIdx>0){undoIdx--;applyHistory(undoStack[undoIdx]);}
     else toast('No hay más acciones para deshacer');
   });
   $('#btnRedo').addEventListener('click',()=>{
-    if(histIdx<history.length-1){histIdx++;applyHistory(history[histIdx]);}
+    if(undoIdx<undoStack.length-1){undoIdx++;applyHistory(undoStack[undoIdx]);}
     else toast('No hay más acciones para rehacer');
   });
   // QR
