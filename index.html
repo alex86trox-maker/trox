@@ -82,9 +82,36 @@ body{font-family:var(--fb);background:var(--e-bg);color:var(--e-ink);display:fle
 .overflow-item-danger:hover{background:#fef1f1}
 .overflow-item-icon{font-size:13px;width:16px;text-align:center;flex:0 0 auto}
 .overflow-divider{height:1px;background:var(--e-line);margin:4px 0}
-.save-indicator{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--e-mut);padding:0 6px}
-.save-indicator i{width:6px;height:6px;border-radius:50%;background:var(--e-green);flex:0 0 auto}
+.save-indicator{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--e-mut);padding:0 6px;transition:opacity .3s}
+.save-indicator i{width:6px;height:6px;border-radius:50%;background:var(--e-green);flex:0 0 auto;transition:background .3s}
 .save-indicator.saving i{background:var(--e-gold);animation:blink 1s ease infinite}
+.save-indicator.unsaved{opacity:1!important}
+.save-indicator.unsaved i{background:var(--e-gold)}
+/* ── save-toast banner ── */
+#saveToast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);
+  background:#1e4d38;color:#fff;font-size:12px;font-weight:600;
+  padding:9px 20px;border-radius:99px;
+  box-shadow:0 4px 18px rgba(0,0,0,.18);
+  opacity:0;pointer-events:none;
+  transition:opacity .3s,transform .3s;
+  z-index:9999;white-space:nowrap;
+  display:flex;align-items:center;gap:8px;
+}
+#saveToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#saveToast svg{flex:0 0 auto}
+/* ── unsaved-changes banner (beforeunload fallback) ── */
+#unsavedBanner{
+  position:fixed;top:0;left:0;right:0;z-index:10000;
+  background:#7c4a0a;color:#fff;font-size:13px;font-weight:600;
+  padding:10px 20px;text-align:center;
+  display:none;align-items:center;justify-content:center;gap:12px;
+}
+#unsavedBanner button{
+  background:#fff;color:#7c4a0a;border:none;border-radius:99px;
+  font-size:12px;font-weight:700;padding:5px 14px;cursor:pointer;
+}
+#unsavedBanner .ub-dismiss{background:transparent;color:#fff;font-size:18px;padding:2px 8px;font-weight:400;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .tbtn{font:inherit;font-size:10.5px;font-weight:600;padding:6px 12px;border-radius:99px;border:1.5px solid var(--e-line);background:#fff;color:var(--e-ink);cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:all .18s;}
 .tbtn:hover{border-color:var(--e-green);color:var(--e-green)}
@@ -114,12 +141,81 @@ body{font-family:var(--fb);background:var(--e-bg);color:var(--e-ink);display:fle
 .btn-publish.ready{animation:readyPulse 2s ease-in-out infinite}
 .publish-log{margin-top:8px;font-size:10px;font-weight:700;color:var(--e-green);min-height:14px;text-align:center;letter-spacing:.04em}
 .publish-note{margin-top:6px;font-size:9px;line-height:1.55;color:var(--e-mut);text-align:center}
-.progress-bar-wrap{padding:10px 18px 12px;background:#fff;border-bottom:1px solid var(--e-line)}
+.progress-bar-wrap{padding:10px 18px 12px;background:#fff;border-bottom:1px solid var(--e-line);position:relative}
 .progress-bar-track{height:5px;background:var(--e-line);border-radius:99px;overflow:hidden}
-.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--e-green2),var(--e-gold));border-radius:99px;transition:width .4s ease}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--e-green2),var(--e-gold));border-radius:99px;transition:width .4s cubic-bezier(.34,1.56,.64,1)}
+/* ── field-done micro-feedback ── */
+.field-done-chip{
+  position:absolute;left:50%;transform:translateX(-50%) translateY(0);
+  background:var(--e-green);color:#fff;
+  font-size:10px;font-weight:800;letter-spacing:.06em;
+  padding:4px 11px;border-radius:99px;
+  white-space:nowrap;pointer-events:none;z-index:9999;
+  box-shadow:0 3px 12px rgba(30,77,56,.28);
+  animation:fieldDoneIn .18s cubic-bezier(.34,1.56,.64,1) forwards,
+             fieldDoneOut .3s ease .95s forwards;
+}
+@keyframes fieldDoneIn{from{opacity:0;transform:translateX(-50%) translateY(6px) scale(.85)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
+@keyframes fieldDoneOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(-6px)}}
 .progress-bar-label{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
 .progress-bar-label span{font-size:9px;font-weight:700;color:var(--e-mut);letter-spacing:.06em}
 .progress-pct{color:var(--e-green);font-weight:900!important}
+/* ── MINI-COMPARATIVO DE PLANES ── */
+#planCompare{
+  background:#fff;border-bottom:1px solid var(--e-line);
+  padding:12px 14px 10px;
+}
+.pc-compare-title{
+  font-size:8px;font-weight:800;letter-spacing:.14em;color:var(--e-mut);
+  text-transform:uppercase;margin-bottom:8px;
+}
+.pc-compare-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
+}
+.pc-col{
+  border:1.5px solid var(--e-line);border-radius:12px;
+  padding:9px 7px 8px;text-align:center;
+  cursor:pointer;transition:all .2s;background:#fff;
+  position:relative;
+}
+.pc-col:hover{border-color:var(--col-c,var(--e-gold2));box-shadow:0 3px 10px rgba(184,155,94,.15);}
+.pc-col.pc-col-active{
+  border-color:var(--col-c,var(--e-gold));
+  box-shadow:0 0 0 2px var(--col-c,var(--e-gold)),0 4px 14px rgba(184,155,94,.2);
+  background:linear-gradient(160deg,rgba(var(--col-rgb,184,155,94),.08),#fff 70%);
+}
+.pc-col-tag{
+  position:absolute;top:-7px;left:50%;transform:translateX(-50%);
+  font-size:7px;font-weight:900;letter-spacing:.08em;white-space:nowrap;
+  padding:2px 7px;border-radius:99px;
+  background:var(--col-c,var(--e-gold));color:#fff;
+}
+.pc-col-name{
+  font-family:var(--fd);font-size:9px;letter-spacing:.18em;
+  color:var(--e-green);text-transform:uppercase;font-weight:700;
+  margin-top:2px;
+}
+.pc-col-price{
+  font-size:11px;font-weight:900;color:var(--col-c,var(--e-green));
+  margin:3px 0 5px;letter-spacing:-.01em;
+}
+.pc-col-feats{
+  list-style:none;padding:0;margin:0;
+  display:flex;flex-direction:column;gap:3px;
+}
+.pc-col-feats li{
+  font-size:8.5px;color:var(--e-txt);line-height:1.35;
+  display:flex;align-items:center;gap:4px;justify-content:center;
+}
+.pc-col-feats li.feat-locked{color:var(--e-mut);opacity:.55;}
+.pc-col-feats li::before{content:'✓';font-size:7px;font-weight:900;color:var(--e-green);flex:0 0 auto;}
+.pc-col-feats li.feat-locked::before{content:'–';color:var(--e-mut);}
+.pc-col-active .pc-col-name{color:var(--col-c,var(--e-gold));}
+.pc-compare-hint{
+  margin-top:7px;font-size:8px;color:var(--e-mut);text-align:center;
+  letter-spacing:.03em;
+}
+/* ─── */
 .plan-bar{border-bottom:1px solid var(--e-line);background:#fff}
 .plan-bar-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 18px;background:none;border:0;cursor:pointer;font:inherit;text-align:left;transition:background .18s}
 .plan-bar-toggle:hover{background:rgba(30,77,56,.04)}
@@ -265,6 +361,28 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 #card-wrapper section{padding:48px 22px;text-align:center}
 #card-wrapper h2{font-weight:900;font-size:1.6rem;letter-spacing:.1em;margin-bottom:18px}
 .cover-img{width:100%;height:420px;object-fit:cover;object-position:top}
+/* ── overlay de foto de portada ── */
+#pv-retrato-wrap{position:relative;display:block;width:100%;}
+#pv-retrato-wrap .cover-tap-hint{
+  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:6px;
+  background:rgba(0,0,0,.54);backdrop-filter:blur(4px);
+  color:#fff;font-size:10px;font-weight:700;letter-spacing:.06em;
+  padding:6px 14px;border-radius:99px;
+  white-space:nowrap;pointer-events:none;
+  opacity:0;transition:opacity .22s;
+}
+#pv-retrato-wrap:hover .cover-tap-hint,
+#pv-retrato-wrap:focus-visible .cover-tap-hint{opacity:1;}
+#pv-retrato-wrap::after{
+  content:'';position:absolute;inset:0;cursor:pointer;
+  border-radius:0;
+}
+#pv-retrato-wrap:focus-visible{outline:2px solid var(--e-gold);outline-offset:2px;}
+.pv-retrato-btn{
+  display:block;width:100%;padding:0;border:0;background:none;cursor:pointer;
+  position:relative;
+}
 .gal-prev{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .gal-prev img{width:100%;height:120px;object-fit:cover;border-radius:8px}
 .card-cap{font-family:var(--c-serif);font-size:.95rem;line-height:1.7;color:var(--c-dim);margin-top:14px;white-space:pre-line}
@@ -291,6 +409,20 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 .cropper-stage:active{cursor:grabbing}
 .cropper-stage img{position:absolute;top:0;left:0;max-width:none;max-height:none;user-select:none;-webkit-user-drag:none;pointer-events:none;will-change:transform}
 .cropper-frame{position:absolute;inset:0;border:2px solid rgba(255,255,255,.9);box-shadow:0 0 0 2000px rgba(8,10,7,.42);pointer-events:none;border-radius:9px}
+/* ── guías de encuadre ── */
+.cropper-guide-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;border-radius:9px;transition:opacity .25s;}
+.cropper-guide-svg.hidden{opacity:0;}
+.cropper-guide-toggle{
+  font:inherit;font-size:8.5px;font-weight:800;letter-spacing:.06em;
+  padding:4px 9px;border-radius:7px;border:1.5px solid var(--e-line);
+  background:#fff;color:var(--e-mut);cursor:pointer;flex:0 0 auto;
+  transition:all .18s;white-space:nowrap;
+}
+.cropper-guide-toggle.active{background:var(--e-green);color:#fff;border-color:var(--e-green);}
+.cropper-hint{
+  font-size:8px;color:var(--e-mut);font-weight:600;letter-spacing:.04em;
+  text-align:center;margin-top:6px;line-height:1.4;
+}
 .cropper-tools{display:flex;align-items:center;gap:9px;margin-top:9px}
 .cropper-tools label{font-size:8px;font-weight:800;letter-spacing:.1em;color:var(--e-mut);text-transform:uppercase;flex:0 0 auto}
 .cropper-tools input[type=range]{flex:1;accent-color:var(--e-green)}
@@ -369,6 +501,247 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
   .plan-cards::-webkit-scrollbar-thumb{background:var(--e-line);border-radius:99px}
   .plan-card{flex:1 1 90px;min-width:88px;scroll-snap-align:start;}
 }
+/* ── ONBOARDING MODAL ── */
+.ob-overlay{
+  position:fixed;inset:0;z-index:200000;
+  background:rgba(10,16,12,.72);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  animation:obFadeIn .32s ease;
+}
+@keyframes obFadeIn{from{opacity:0}to{opacity:1}}
+.ob-box{
+  position:relative;background:#fff;border-radius:24px;
+  max-width:520px;width:100%;
+  box-shadow:0 40px 90px rgba(10,16,12,.55),0 0 0 1px rgba(184,155,94,.28);
+  overflow:hidden;
+}
+.ob-shimmer{
+  position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--e-green),var(--e-gold),var(--e-green));
+  background-size:200% 100%;
+  animation:obShimmer 2.4s linear infinite;
+}
+@keyframes obShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.ob-header{
+  padding:30px 28px 0;
+  display:flex;align-items:center;gap:12px;
+}
+.ob-logo{height:48px;width:auto;object-fit:contain;flex:0 0 auto}
+.ob-header-text{}
+.ob-header-title{font-family:var(--fd);font-size:18px;letter-spacing:.06em;color:var(--e-green);line-height:1.2}
+.ob-header-sub{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--e-gold);margin-top:3px}
+.ob-steps-track{
+  display:flex;gap:0;padding:28px 28px 0;
+  position:relative;
+}
+.ob-steps-track::before{
+  content:'';position:absolute;
+  top:42px;left:calc(28px + 20px);right:calc(28px + 20px);
+  height:2px;background:var(--e-line);z-index:0;
+}
+.ob-step{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:0;
+  position:relative;z-index:1;
+  transition:opacity .4s;
+}
+.ob-step:not(.ob-step-active){opacity:.45}
+.ob-step-dot{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;
+  background:var(--e-sage);border:2px solid var(--e-line);
+  transition:all .36s cubic-bezier(.34,1.56,.64,1);
+  flex:0 0 auto;
+}
+.ob-step-active .ob-step-dot{
+  background:linear-gradient(135deg,#f0dc9e,var(--e-gold) 55%,#9a7c3e);
+  border-color:var(--e-gold);
+  box-shadow:0 6px 20px rgba(184,155,94,.45);
+  transform:scale(1.12);
+}
+.ob-step-label{
+  margin-top:8px;font-size:9px;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--e-mut);text-align:center;
+  line-height:1.3;
+}
+.ob-step-active .ob-step-label{color:var(--e-green)}
+.ob-content{
+  padding:22px 28px 0;min-height:148px;
+  position:relative;overflow:hidden;
+}
+.ob-slide{
+  position:absolute;inset:22px 28px 0;
+  display:flex;flex-direction:column;gap:10px;
+  transition:opacity .28s ease,transform .28s ease;
+}
+.ob-slide.ob-hidden-left{opacity:0;transform:translateX(-22px);pointer-events:none}
+.ob-slide.ob-hidden-right{opacity:0;transform:translateX(22px);pointer-events:none}
+.ob-slide.ob-visible{opacity:1;transform:none;pointer-events:auto}
+.ob-slide-icon{font-size:32px;line-height:1;flex:0 0 auto}
+.ob-slide-title{font-family:var(--fd);font-size:16px;color:var(--e-ink);letter-spacing:.02em;line-height:1.3}
+.ob-slide-title strong{color:var(--e-green)}
+.ob-slide-body{font-size:12.5px;line-height:1.65;color:var(--e-mut)}
+.ob-slide-body b{color:var(--e-ink);font-weight:700}
+.ob-slide-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.ob-tag{
+  font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  padding:4px 10px;border-radius:99px;
+  background:var(--e-sage);color:var(--e-green);border:1px solid rgba(30,77,56,.18);
+}
+.ob-tag.gold{background:rgba(184,155,94,.14);color:#7a6030;border-color:rgba(184,155,94,.35)}
+.ob-footer{
+  padding:20px 28px 24px;display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid var(--e-line);margin-top:22px;gap:12px;
+}
+.ob-dots{display:flex;gap:6px}
+.ob-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--e-line);
+  transition:all .28s cubic-bezier(.34,1.56,.64,1);
+  border:0;padding:0;cursor:pointer;
+}
+.ob-dot.on{background:var(--e-gold);width:20px;border-radius:99px}
+.ob-skip{
+  font:inherit;font-size:10px;font-weight:700;color:var(--e-mut);
+  background:none;border:0;cursor:pointer;padding:4px 0;
+  transition:color .18s;
+}
+.ob-skip:hover{color:var(--e-red)}
+.ob-nav{display:flex;gap:8px;margin-left:auto}
+.ob-prev{
+  font:inherit;font-size:11px;font-weight:700;padding:9px 16px;
+  border-radius:99px;border:1.5px solid var(--e-line);background:#fff;
+  color:var(--e-ink);cursor:pointer;transition:all .18s;
+}
+.ob-prev:hover{border-color:var(--e-green);color:var(--e-green)}
+.ob-next{
+  font:inherit;font-size:11.5px;font-weight:900;padding:10px 22px;
+  border-radius:99px;border:0;cursor:pointer;
+  background:linear-gradient(135deg,#f0dc9e,var(--e-gold) 55%,#8a6f30);
+  color:#1a1100;letter-spacing:.04em;
+  box-shadow:0 6px 20px rgba(184,155,94,.4);
+  transition:transform .18s,box-shadow .18s;
+}
+.ob-next:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(184,155,94,.55)}
+.ob-next:active{transform:none}
+@media(max-width:480px){
+  .ob-box{border-radius:18px}
+  .ob-header{padding:22px 20px 0}
+  .ob-steps-track{padding:22px 20px 0}
+  .ob-content{padding:18px 20px 0;min-height:136px}
+  .ob-footer{padding:16px 20px 20px}
+  .ob-slide{inset:18px 20px 0}
+  .ob-slide-title{font-size:14px}
+  .ob-slide-body{font-size:11.5px}
+}
+
+/* ── MODAL CONFIRMAR PUBLICACIÓN ── */
+.pub-overlay{
+  position:fixed;inset:0;z-index:180000;
+  background:rgba(10,16,12,.68);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  display:flex;align-items:flex-end;justify-content:center;
+  animation:pubOverlayIn .28s ease;
+}
+@keyframes pubOverlayIn{from{opacity:0}to{opacity:1}}
+@media(min-width:540px){.pub-overlay{align-items:center}}
+.pub-box{
+  background:#fff;width:100%;max-width:480px;
+  border-radius:24px 24px 0 0;
+  box-shadow:0 -20px 60px rgba(10,16,12,.4),0 0 0 1px rgba(184,155,94,.22);
+  overflow:hidden;
+  animation:pubBoxUp .32s cubic-bezier(.32,1.2,.4,1);
+}
+@media(min-width:540px){.pub-box{border-radius:24px;animation:pubBoxIn .28s cubic-bezier(.32,1.2,.4,1)}}
+@keyframes pubBoxUp{from{transform:translateY(100%)}to{transform:none}}
+@keyframes pubBoxIn{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+.pub-top-stripe{
+  height:4px;
+  background:linear-gradient(90deg,var(--e-green),var(--e-gold) 55%,var(--e-green));
+  background-size:200% 100%;
+  animation:obShimmer 2.4s linear infinite;
+}
+.pub-drag-handle{
+  width:36px;height:4px;border-radius:99px;background:var(--e-line);
+  margin:10px auto 0;
+}
+@media(min-width:540px){.pub-drag-handle{display:none}}
+.pub-header{
+  padding:20px 24px 0;display:flex;align-items:flex-start;gap:14px;
+}
+.pub-icon-wrap{
+  width:52px;height:52px;border-radius:16px;flex:0 0 auto;
+  background:linear-gradient(135deg,rgba(184,155,94,.15),rgba(30,77,56,.08));
+  border:1.5px solid rgba(184,155,94,.3);
+  display:grid;place-items:center;font-size:22px;
+}
+.pub-header-text{}
+.pub-header-title{font-family:var(--fd);font-size:17px;color:var(--e-ink);letter-spacing:.02em;line-height:1.25;margin-bottom:4px}
+.pub-header-sub{font-size:11px;line-height:1.55;color:var(--e-mut)}
+.pub-steps{
+  margin:18px 24px 0;
+  display:flex;flex-direction:column;gap:0;
+  border:1.5px solid var(--e-line);border-radius:14px;overflow:hidden;
+}
+.pub-step{
+  display:flex;align-items:flex-start;gap:12px;padding:13px 14px;
+  border-bottom:1px solid var(--e-line);
+}
+.pub-step:last-child{border-bottom:0}
+.pub-step-num{
+  width:24px;height:24px;border-radius:50%;flex:0 0 auto;
+  display:grid;place-items:center;font-size:10px;font-weight:900;
+  background:var(--e-sage);color:var(--e-green);border:1.5px solid rgba(30,77,56,.18);
+}
+.pub-step-body{}
+.pub-step-title{font-size:11.5px;font-weight:800;color:var(--e-ink);line-height:1.3}
+.pub-step-desc{font-size:10px;line-height:1.5;color:var(--e-mut);margin-top:2px}
+.pub-step-badge{
+  display:inline-flex;align-items:center;gap:5px;margin-top:5px;
+  font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 9px;border-radius:99px;
+  background:rgba(30,77,56,.08);color:var(--e-green);border:1px solid rgba(30,77,56,.18);
+}
+.pub-step-badge.gold{background:rgba(184,155,94,.12);color:#7a6030;border-color:rgba(184,155,94,.35)}
+.pub-summary{
+  margin:16px 24px 0;
+  background:var(--e-sage);border:1.5px solid var(--e-line);border-radius:14px;
+  padding:13px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;
+}
+.pub-summary-item{}
+.pub-summary-label{font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:2px}
+.pub-summary-val{font-size:12px;font-weight:700;color:var(--e-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pub-summary-val.plan-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;border-radius:99px;font-size:10px;font-weight:900;
+  background:linear-gradient(135deg,rgba(184,155,94,.18),rgba(30,77,56,.07));
+  color:var(--e-green);border:1px solid rgba(184,155,94,.4);
+}
+.pub-footer{
+  padding:16px 24px 22px;display:flex;flex-direction:column;gap:8px;margin-top:4px;
+}
+.pub-confirm-btn{
+  position:relative;overflow:hidden;width:100%;font:inherit;font-weight:900;
+  font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  padding:16px 12px;border:0;border-radius:14px;color:#1a1100;cursor:pointer;
+  background:linear-gradient(135deg,#f0dc9e 0%,var(--e-gold) 48%,#8a6f30 100%);
+  box-shadow:0 8px 24px rgba(184,155,94,.42),inset 0 1px 0 rgba(255,255,255,.3);
+  transition:transform .18s,box-shadow .18s;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.pub-confirm-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.22),transparent 55%);pointer-events:none}
+.pub-confirm-btn:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(184,155,94,.55)}
+.pub-confirm-btn:disabled{opacity:.55;cursor:progress;transform:none}
+.pub-cancel-btn{
+  font:inherit;font-size:11px;font-weight:700;padding:10px;
+  border-radius:14px;border:1.5px solid var(--e-line);background:#fff;
+  color:var(--e-mut);cursor:pointer;transition:all .18s;
+}
+.pub-cancel-btn:hover{border-color:var(--e-mut);color:var(--e-ink)}
+.pub-disclaimer{font-size:9.5px;line-height:1.55;color:var(--e-mut);text-align:center;padding:0 4px}
+@media(max-width:380px){
+  .pub-summary{grid-template-columns:1fr}
+  .pub-header-title{font-size:15px}
+}
+
 @media print{
   .sidebar,.topbar,.toasts,.mob-fab,.phone-notch,.preview-label{display:none!important}
   body{overflow:visible}.workspace{display:block}
@@ -397,35 +770,35 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 </div>
 <div class="plan-pill" id="planPill" aria-live="polite"><span class="plan-pill-dot" aria-hidden="true"></span><span id="planPillTxt">PLAN CLASSIC</span></div>
 <div class="top-right">
-  <span class="save-indicator" id="saveDot" aria-live="polite" aria-label="Estado de guardado" style="opacity:0;transition:opacity .3s"><i aria-hidden="true"></i><span>Guardado</span></span>
+  <span class="save-indicator" id="saveDot" aria-live="polite" aria-label="Estado de guardado" style="opacity:0;transition:opacity .3s"><i aria-hidden="true"></i><span id="saveDotTxt">Guardado</span></span>
   <button class="tbtn" id="btnTour" type="button" aria-label="Iniciar tour guiado">Tour</button>
   <div class="undo-redo-group" role="group" aria-label="Deshacer y rehacer">
-    <button class="tbtn undo-redo-btn" id="btnUndo" type="button" aria-label="Deshacer (Ctrl+Z)" title="Deshacer (Ctrl+Z)">↩</button>
-    <button class="tbtn undo-redo-btn" id="btnRedo" type="button" aria-label="Rehacer (Ctrl+Y)" title="Rehacer (Ctrl+Y)">↪</button>
+    <button class="tbtn undo-redo-btn" id="btnUndo" type="button" aria-label="Deshacer (Ctrl+Z)" title="Deshacer (Ctrl+Z)">&#8617;</button>
+    <button class="tbtn undo-redo-btn" id="btnRedo" type="button" aria-label="Rehacer (Ctrl+Y)" title="Rehacer (Ctrl+Y)">&#8618;</button>
   </div>
   <div class="overflow-menu-wrap" id="overflowMenuWrap">
-    <button class="tbtn overflow-menu-btn" id="btnOverflow" type="button" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">•••</button>
+    <button class="tbtn overflow-menu-btn" id="btnOverflow" type="button" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">&bull;&bull;&bull;</button>
     <div class="overflow-menu" id="overflowMenu" role="menu" style="display:none">
       <button class="overflow-item" id="btnQR" type="button" role="menuitem">
-        <span class="overflow-item-icon">⬛</span> Generar QR
+        <span class="overflow-item-icon">&#x2b1b;</span> Generar QR
       </button>
       <div class="overflow-divider"></div>
       <button class="overflow-item overflow-item-danger" id="btnResetAll" type="button" role="menuitem">
-        <span class="overflow-item-icon">↺</span> Resetear todo
+        <span class="overflow-item-icon">&#x21ba;</span> Resetear todo
       </button>
     </div>
   </div>
-  <button class="tbtn gold" id="btnExport" type="button" aria-label="Exportar HTML">⬇ <span>HTML</span></button>
+  <button class="tbtn gold" id="btnExport" type="button" aria-label="Exportar HTML">&#x2b07; <span>HTML</span></button>
 </div>
 </header>
 <div class="workspace">
 <main class="preview-wrap" role="main" aria-label="Vista previa en tiempo real">
-  <div class="preview-label" aria-hidden="true">VISTA PREVIA · TIEMPO REAL</div>
+  <div class="preview-label" aria-hidden="true">VISTA PREVIA &middot; TIEMPO REAL</div>
   <div class="zoom-controls" id="zoomControls" aria-label="Controles de zoom">
     <button class="zoom-btn" id="zoomIn" type="button" title="Acercar" aria-label="Acercar">+</button>
     <div class="zoom-pct" id="zoomPct" aria-live="polite">100%</div>
-    <button class="zoom-btn" id="zoomOut" type="button" title="Alejar" aria-label="Alejar">−</button>
-    <button class="zoom-btn" id="zoomReset" type="button" title="Restablecer zoom" aria-label="Restablecer zoom" style="font-size:9px;font-weight:800">1:1</button>
+    <button class="zoom-btn" id="zoomOut" type="button" title="Alejar" aria-label="Alejar">&minus;</button>
+    <button class="zoom-btn" id="zoomReset" type="button" title="Auto-ajustar zoom" aria-label="Auto-ajustar zoom" style="font-size:9px;font-weight:800">&#8942;</button>
   </div>
   <div id="preview-scroll">
     <div id="preview-zoom-wrap">
@@ -438,10 +811,13 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
   <div class="splash-15" id="sp-15" aria-hidden="true">15</div>
   <div class="splash-name" id="sp-name">Sofía Valentina</div>
   <div class="splash-date" id="sp-date"></div>
-  <button class="splash-btn" id="sp-btn" type="button">▶ ABRIR INVITACIÓN</button>
+  <button class="splash-btn" id="sp-btn" type="button">&#9654; ABRIR INVITACI&Oacute;N</button>
 </section>
 <section aria-label="Foto principal y nombre">
-  <img class="cover-img" id="pv-retrato" src="" alt="Foto principal de la festejada" loading="lazy">
+  <button id="pv-retrato-wrap" class="pv-retrato-btn" type="button" aria-label="Cambiar foto principal — clic para subir" title="Clic para cambiar la foto">
+    <img class="cover-img" id="pv-retrato" src="" alt="Foto principal de la festejada" loading="lazy">
+    <span class="cover-tap-hint" aria-hidden="true">&#128247; Cambiar foto</span>
+  </button>
   <h2 id="pv-nombre">Sofía Valentina</h2>
   <div class="card-cap" id="pv-caption"></div>
 </section>
@@ -450,7 +826,7 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
   <div id="cd" style="font-size:1.6rem;font-weight:900;font-family:var(--c-mono)" aria-live="polite" aria-label="Tiempo restante">00:00:00:00</div>
 </section>
 <section data-plan="premium" id="pv-cal-sec" aria-label="Agendar en calendario">
-  <a id="pv-cal-btn" href="#" rel="noopener noreferrer" target="_blank" style="display:inline-block;padding:10px 22px;border-radius:20px;background:var(--c-a);color:#fff;text-decoration:none;font-weight:700;font-size:0.85rem;letter-spacing:.08em">📅 AGENDAR EN MI CALENDARIO</a>
+  <a id="pv-cal-btn" href="#" rel="noopener noreferrer" target="_blank" style="display:inline-block;padding:10px 22px;border-radius:20px;background:var(--c-a);color:#fff;text-decoration:none;font-weight:700;font-size:0.85rem;letter-spacing:.08em">&#128197; AGENDAR EN MI CALENDARIO</a>
 </section>
 <section data-plan="premium" aria-label="Mi historia">
   <h2>MI HISTORIA</h2>
@@ -459,24 +835,24 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 </section>
 <section data-plan="premium" aria-label="Programa del evento"><h2>PROGRAMA</h2><div class="card-list" id="pv-itin"></div></section>
 <section data-plan="deluxe" aria-label="Padrinos"><h2>PADRINOS</h2><div class="card-list" id="pv-padr"></div></section>
-<section aria-label="Galería de fotos"><h2>GALERÍA</h2><div class="gal-prev" id="pv-galeria"></div></section>
+<section aria-label="Galería de fotos"><h2>GALER&Iacute;A</h2><div class="gal-prev" id="pv-galeria"></div></section>
 <section data-plan="premium" id="pv-album-sec" aria-label="Álbum compartido">
-  <h2>📸 CAPTURA EL MOMENTO</h2>
+  <h2>&#128248; CAPTURA EL MOMENTO</h2>
   <div class="card-cap" style="margin-bottom:12px">¡Ayúdanos a capturar cada momento!</div>
-  <a id="pv-album-btn" href="#" rel="noopener noreferrer" target="_blank" style="display:inline-block;padding:10px 22px;border-radius:20px;background:var(--c-b);color:#fff;text-decoration:none;font-weight:700;font-size:0.85rem;letter-spacing:.08em">📁 SUBIR MIS FOTOS</a>
+  <a id="pv-album-btn" href="#" rel="noopener noreferrer" target="_blank" style="display:inline-block;padding:10px 22px;border-radius:20px;background:var(--c-b);color:#fff;text-decoration:none;font-weight:700;font-size:0.85rem;letter-spacing:.08em">&#128193; SUBIR MIS FOTOS</a>
 </section>
 <section data-plan="premium" id="pv-music-sec" aria-label="Música">
-  <h2>🎵 MÚSICA</h2>
+  <h2>&#127925; M&Uacute;SICA</h2>
   <div id="pv-audio-wrap" style="display:none;margin-bottom:18px">
     <div id="pv-audio-player" style="background:rgba(255,255,255,.07);border:1px solid var(--c-line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
       <div style="display:flex;align-items:center;gap:12px">
-        <button id="pv-play-btn" type="button" aria-label="Reproducir / Pausar" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--c-a),var(--c-b));border:none;cursor:pointer;font-size:1.2rem;flex:0 0 auto;display:grid;place-items:center;color:#fff">▶</button>
+        <button id="pv-play-btn" type="button" aria-label="Reproducir / Pausar" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--c-a),var(--c-b));border:none;cursor:pointer;font-size:1.2rem;flex:0 0 auto;display:grid;place-items:center;color:#fff">&#9654;</button>
         <div style="flex:1;min-width:0">
           <div id="pv-track-name" style="font-size:.78rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--c-text)"></div>
           <div id="pv-track-time" style="font-family:var(--c-mono);font-size:.62rem;color:var(--c-dim);margin-top:2px" aria-live="polite">0:00 / 0:00</div>
         </div>
         <div id="pv-vol-wrap" style="display:flex;align-items:center;gap:4px">
-          <span style="font-size:.7rem" aria-hidden="true">🔊</span>
+          <span style="font-size:.7rem" aria-hidden="true">&#128266;</span>
           <input id="pv-vol" type="range" min="0" max="1" step="0.05" value="0.7" style="width:52px;accent-color:var(--c-a)" aria-label="Volumen">
         </div>
       </div>
@@ -486,20 +862,20 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
   </div>
   <div class="card-list" id="pv-songs" style="margin-bottom:16px"></div>
   <div id="pv-song-suggest-wrap" style="display:none">
-    <div style="font-size:.7rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--c-a);margin-bottom:10px">🎶 SUGIERE UNA CANCIÓN</div>
+    <div style="font-size:.7rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--c-a);margin-bottom:10px">&#127926; SUGIERE UNA CANCI&Oacute;N</div>
     <form id="song-suggest-form" style="display:flex;flex-direction:column;gap:8px;font-family:var(--c-mono)" novalidate>
       <div id="song-inputs"></div>
-      <button type="button" id="song-add-btn" style="font:inherit;font-size:.72rem;font-weight:700;padding:8px;border:1.5px dashed var(--c-a);border-radius:10px;background:transparent;color:var(--c-a);cursor:pointer">+ Agregar canción</button>
+      <button type="button" id="song-add-btn" style="font:inherit;font-size:.72rem;font-weight:700;padding:8px;border:1.5px dashed var(--c-a);border-radius:10px;background:transparent;color:var(--c-a);cursor:pointer">+ Agregar canci&oacute;n</button>
       <button type="submit" style="font:inherit;font-weight:800;padding:12px;border:0;border-radius:99px;cursor:pointer;background:linear-gradient(135deg,var(--c-a),var(--c-b));color:var(--c-bg)">ENVIAR SUGERENCIAS</button>
     </form>
-    <div id="song-suggest-ok" style="display:none;text-align:center;padding:14px;font-size:.78rem;color:var(--c-b)" aria-live="polite">✓ ¡Gracias! Tus sugerencias fueron enviadas.</div>
+    <div id="song-suggest-ok" style="display:none;text-align:center;padding:14px;font-size:.78rem;color:var(--c-b)" aria-live="polite">&#10003; ¡Gracias! Tus sugerencias fueron enviadas.</div>
   </div>
 </section>
 <section data-plan="deluxe" aria-label="Mesa de regalos"><h2>MESA DE REGALOS</h2><div class="card-list" id="pv-gifts"></div></section>
 <section data-plan="deluxe" aria-label="Información extra"><h2>INFO EXTRA</h2><div class="card-list" id="pv-extra"></div></section>
 <section aria-label="Dress code"><h2>DRESS CODE</h2><div class="card-list" id="pv-dress"></div></section>
 <section aria-label="Lugar del evento"><h2>LUGAR</h2><div id="pv-lugar" style="font-family:var(--c-mono)"></div></section>
-<section data-plan="deluxe" id="pv-custom-sec" aria-label="Sección libre"><h2 id="pv-custom-title">SECCIÓN LIBRE</h2><div class="card-cap" id="pv-custom-text"></div></section>
+<section data-plan="deluxe" id="pv-custom-sec" aria-label="Sección libre"><h2 id="pv-custom-title">SECCI&Oacute;N LIBRE</h2><div class="card-cap" id="pv-custom-text"></div></section>
 <section data-plan="premium" aria-label="Confirmación de asistencia RSVP"><h2>RSVP</h2>
   <form id="rsvp-form" novalidate aria-label="Formulario de confirmación de asistencia">
     <input id="rsvp-nombre" placeholder="Nombre y apellido" required maxlength="120" autocomplete="name" aria-label="Tu nombre completo" spellcheck="false">
@@ -524,23 +900,24 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
   </div>
 </main>
 <aside class="sidebar" id="sidebar" aria-label="Panel de edición">
-<div class="panel-head"><strong>PANEL DE EDICIÓN</strong><span class="ph-badge" id="phBadge">15 secciones</span></div>
+<div class="panel-head"><strong>PANEL DE EDICI&Oacute;N</strong><span class="ph-badge" id="phBadge">15 secciones</span></div>
 <div class="progress-bar-wrap" id="progressBarWrap" aria-label="Progreso del diseño">
   <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
   <div class="progress-bar-label"><span id="progressLabel">Completa los datos para publicar</span><span id="progressPct" class="progress-pct">0%</span></div>
 </div>
+<div id="planCompare" aria-label="Comparativo de planes"></div>
 <div class="plan-bar" id="planBarWrap">
   <button class="plan-bar-toggle" id="planBarToggle" type="button" aria-expanded="false" aria-controls="planBarBody">
     <div class="plan-bar-toggle-left">
-      <span class="plan-bar-icon" aria-hidden="true">✦</span>
+      <span class="plan-bar-icon" aria-hidden="true">&#10022;</span>
       <div>
         <div class="plan-bar-toggle-title">ELIGE TU PLAN</div>
         <div class="plan-bar-toggle-sub" id="planBarSub">Hasta 4 fotos de galería</div>
       </div>
     </div>
     <div class="plan-bar-toggle-right">
-      <span class="plan-bar-current-pill" id="planBarCurrentPill">CLASSIC · $80.000</span>
-      <span class="chev plan-bar-chev" aria-hidden="true">▾</span>
+      <span class="plan-bar-current-pill" id="planBarCurrentPill">CLASSIC &middot; $80.000</span>
+      <span class="chev plan-bar-chev" aria-hidden="true">&#9662;</span>
     </div>
   </button>
   <div class="plan-bar-body" id="planBarBody">
@@ -552,7 +929,39 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
     </div>
   </div>
 </div>
-<div class="sec open"><button class="sec-head" type="button" aria-expanded="true" title="Nombre, edad, fecha, hora, hashtag y frase de portada"><span class="sec-num" aria-hidden="true">1</span><span class="sec-title">Contenido</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec open"><button class="sec-head" type="button" aria-expanded="true" title="Foto principal, mi historia y galería"><span class="sec-num" aria-hidden="true">1</span><span class="sec-title">Fotos</span><span class="chev" aria-hidden="true">&#9662;</span></button>
+<div class="sec-body"><div class="sec-inner"><div class="sec-pad">
+<div class="photo-field">
+  <label>Retrato principal</label>
+  <div class="photo-preview-wrap" id="wrap-retrato"><img id="prev-retrato" src="" alt="Vista previa del retrato principal" loading="lazy"></div>
+  <div class="photo-tools">
+    <button class="photo-tool" data-up="retrato" type="button" aria-label="Subir foto de retrato">&#128193; Subir foto</button>
+    <button class="photo-tool" data-def="retrato" type="button" aria-label="Restaurar foto default de retrato">&#8634; Default</button>
+  </div>
+  <div id="cropper-retrato"></div>
+</div>
+<div class="photo-field" data-plan="premium">
+  <label>Mi historia</label>
+  <div class="photo-preview-wrap" id="wrap-fashion"><img id="prev-fashion" src="" alt="Vista previa de foto de historia" loading="lazy"></div>
+  <div class="photo-tools">
+    <button class="photo-tool" data-up="fashion" type="button" aria-label="Subir foto de historia">&#128193; Subir foto</button>
+    <button class="photo-tool" data-def="fashion" type="button" aria-label="Restaurar foto default de historia">&#8634; Default</button>
+  </div>
+  <div id="cropper-fashion"></div>
+</div>
+<div class="field">
+  <label for="cantidad_fotos">Galería (múltiple) · <span id="galLimitTxt">máx 4</span></label>
+  <button type="button" id="gal-upload-btn" class="photo-tool" style="width:100%;margin-bottom:4px" aria-label="Seleccionar fotos para galería">&#128193; Seleccionar fotos de galería</button>
+  <input type="file" id="cantidad_fotos" accept="image/jpeg,image/png,image/webp,image/gif" multiple style="display:none" aria-hidden="true">
+  <div id="cropper-gal"></div>
+  <div id="gal-thumb-preview" class="gal-thumb-list" role="list" aria-label="Fotos de galería"></div>
+  <div id="gal-caption-hint" style="display:none;margin-top:8px;font-size:9px;color:var(--e-mut);background:var(--e-sage);padding:6px 10px;border-radius:7px;border:1px solid var(--e-line)">
+    &#9999;&#65039; Para agregar texto a cada foto, ve a <button type="button" id="btn-go-captions" style="background:none;border:none;padding:0;font-size:9px;font-weight:700;color:var(--e-gold);cursor:pointer;text-decoration:underline">&sect;10 Galería &middot; Captions</button>
+  </div>
+</div>
+<div class="db-status" id="dbStatus" aria-live="polite"></div>
+</div></div></div></div>
+<div class="sec open"><button class="sec-head" type="button" aria-expanded="true" title="Nombre, edad, fecha, hora, hashtag y frase de portada"><span class="sec-num" aria-hidden="true">2</span><span class="sec-title">Contenido</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="row2">
   <div class="field"><label for="in-name">Nombre</label><input id="in-name" class="in" data-bind="name" maxlength="80" autocomplete="off" spellcheck="false" aria-label="Nombre de la festejada"></div>
@@ -565,88 +974,56 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
 <div class="field" data-plan="premium"><div class="field-label-row"><label style="margin:0" for="in-hashtag">Hashtag</label><button type="button" class="help-btn" aria-label="Ayuda sobre hashtag" data-help="Es la palabra clave que tus invitados usarán en redes sociales para etiquetar sus fotos del evento, por ejemplo #SofíaValentinaXV.">?</button></div><input id="in-hashtag" class="in" data-bind="hashtag" maxlength="60" autocomplete="off" spellcheck="false" aria-label="Hashtag del evento"></div>
 <div class="field"><label for="in-caption">Frase de portada</label><textarea id="in-caption" class="in" data-bind="caption" maxlength="300" aria-label="Frase de portada"></textarea></div>
 </div></div></div></div>
-<div class="sec"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">2</span><span class="sec-title">Fotos</span><span class="chev" aria-hidden="true">▾</span></button>
-<div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div class="photo-field">
-  <label>Retrato principal</label>
-  <div class="photo-preview-wrap" id="wrap-retrato"><img id="prev-retrato" src="" alt="Vista previa del retrato principal" loading="lazy"></div>
-  <div class="photo-tools">
-    <button class="photo-tool" data-up="retrato" type="button" aria-label="Subir foto de retrato">📁 Subir foto</button>
-    <button class="photo-tool" data-def="retrato" type="button" aria-label="Restaurar foto default de retrato">↺ Default</button>
-  </div>
-  <div id="cropper-retrato"></div>
-</div>
-<div class="photo-field" data-plan="premium">
-  <label>Mi historia</label>
-  <div class="photo-preview-wrap" id="wrap-fashion"><img id="prev-fashion" src="" alt="Vista previa de foto de historia" loading="lazy"></div>
-  <div class="photo-tools">
-    <button class="photo-tool" data-up="fashion" type="button" aria-label="Subir foto de historia">📁 Subir foto</button>
-    <button class="photo-tool" data-def="fashion" type="button" aria-label="Restaurar foto default de historia">↺ Default</button>
-  </div>
-  <div id="cropper-fashion"></div>
-</div>
-<div class="field">
-  <label for="cantidad_fotos">Galería (múltiple) · <span id="galLimitTxt">máx 4</span></label>
-  <button type="button" id="gal-upload-btn" class="photo-tool" style="width:100%;margin-bottom:4px" aria-label="Seleccionar fotos para galería">📁 Seleccionar fotos de galería</button>
-  <input type="file" id="cantidad_fotos" accept="image/jpeg,image/png,image/webp,image/gif" multiple style="display:none" aria-hidden="true">
-  <div id="cropper-gal"></div>
-  <div id="gal-thumb-preview" class="gal-thumb-list" role="list" aria-label="Fotos de galería"></div>
-  <div id="gal-caption-hint" style="display:none;margin-top:8px;font-size:9px;color:var(--e-mut);background:var(--e-sage);padding:6px 10px;border-radius:7px;border:1px solid var(--e-line)">
-    ✏️ Para agregar texto a cada foto, ve a <button type="button" id="btn-go-captions" style="background:none;border:none;padding:0;font-size:9px;font-weight:700;color:var(--e-gold);cursor:pointer;text-decoration:underline">§10 Galería · Captions</button>
-  </div>
-</div>
-<div class="db-status" id="dbStatus" aria-live="polite"></div>
-</div></div></div></div>
-<div class="sec"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">3</span><span class="sec-title">Bienvenida</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">3</span><span class="sec-title">Bienvenida</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="tog-row"><div><strong>Pantalla de bienvenida</strong></div><label class="sw" aria-label="Activar pantalla de bienvenida"><input type="checkbox" data-bind="showSplash"><i aria-hidden="true"></i></label></div>
 <div class="field"><label for="in-splashBtn">Texto del botón</label><input id="in-splashBtn" class="in" data-bind="splashBtn" maxlength="60" aria-label="Texto del botón de bienvenida"></div>
 </div></div></div></div>
-<div class="sec" data-plan="premium"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">4</span><span class="sec-title">Mi historia</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec" data-plan="premium"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">4</span><span class="sec-title">Mi historia</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label for="in-historyText">Biografía</label><textarea id="in-historyText" class="in" data-bind="historyText" maxlength="800" aria-label="Biografía de la festejada"></textarea></div>
 </div></div></div></div>
-<div class="sec" data-plan="premium"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">5</span><span class="sec-title">Programa</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec" data-plan="premium"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">5</span><span class="sec-title">Programa</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-itin"></div></div></div></div></div>
-<div class="sec" data-plan="deluxe"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">6</span><span class="sec-title">Padrinos</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec" data-plan="deluxe"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">6</span><span class="sec-title">Padrinos</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-padr"></div></div></div></div></div>
-<div class="sec"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">7</span><span class="sec-title">El lugar</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">7</span><span class="sec-title">El lugar</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label for="in-venue">Salón</label><input id="in-venue" class="in" data-bind="venue" maxlength="120" aria-label="Nombre del salón"></div>
 <div class="field"><label for="in-address">Dirección</label><textarea id="in-address" class="in" data-bind="address" maxlength="300" aria-label="Dirección del evento"></textarea></div>
 <div class="field" data-plan="deluxe"><div class="field-label-row"><label style="margin:0" for="in-mapUrl">Enlace Google Maps</label><button type="button" class="help-btn" aria-label="Ayuda enlace mapa" data-help="Pega aquí el enlace de Google Maps para que los invitados encuentren el lugar fácilmente.">?</button></div><input id="in-mapUrl" class="in" data-bind="mapUrl" placeholder="https://maps.google.com/..." maxlength="500" autocomplete="off" spellcheck="false" aria-label="Enlace de Google Maps"></div>
 </div></div></div></div>
-<div class="sec"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">8</span><span class="sec-title">Dress code</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">8</span><span class="sec-title">Dress code</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field-label-row" style="margin-bottom:8px"><span style="font-size:8.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--e-mut)">Código de vestimenta</span><button type="button" class="help-btn" aria-label="Ayuda dress code" data-help="Indica a tus invitados cómo vestir (formal, casual, colores a evitar, etc). Se muestra como lista.">?</button></div>
 <div id="ed-dress"></div></div></div></div></div>
-<div class="sec" data-plan="deluxe"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">9</span><span class="sec-title">Info extra</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec" data-plan="deluxe"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">9</span><span class="sec-title">Info extra</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div id="ed-extra"></div>
 <div class="field" data-plan="premium"><label for="in-albumUrl">Enlace álbum compartido</label><input id="in-albumUrl" class="in" data-bind="albumUrl" placeholder="https://drive.google.com/..." maxlength="500" autocomplete="off" spellcheck="false" aria-label="Enlace del álbum compartido"></div>
 <div class="field" style="margin-top:12px"><label for="in-customTitle">Título sección libre</label><input id="in-customTitle" class="in" data-bind="customTitle" placeholder="SECCIÓN LIBRE" maxlength="80" aria-label="Título sección libre"></div>
 <div class="field"><label for="in-customText">Texto sección libre</label><textarea id="in-customText" class="in" data-bind="customText" maxlength="600" aria-label="Texto sección libre"></textarea></div>
 </div></div></div></div>
-<div class="sec"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">10</span><span class="sec-title">Galería · Captions</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">10</span><span class="sec-title">Galería &middot; Captions</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-gal"></div></div></div></div></div>
-<div class="sec" data-plan="premium"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">11</span><span class="sec-title">Música</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec" data-plan="premium"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">11</span><span class="sec-title">Música</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
-<div style="font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:8px">🎵 CANCIÓN DE FONDO</div>
-<div style="font-size:10px;color:var(--e-mut);line-height:1.5;margin-bottom:10px">Sube el audio que sonará al abrir la invitación (MP3, OGG, WAV · máx 15MB).</div>
+<div style="font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:8px">&#127925; CANCI&Oacute;N DE FONDO</div>
+<div style="font-size:10px;color:var(--e-mut);line-height:1.5;margin-bottom:10px">Sube el audio que sonará al abrir la invitación (MP3, OGG, WAV &middot; máx 15MB).</div>
 <div class="photo-preview-wrap has-img" id="wrap-audio" style="height:52px;display:flex;align-items:center;justify-content:center">
   <span id="audio-filename" style="font-size:9px;color:var(--e-mut);pointer-events:none">Sin audio cargado</span>
 </div>
 <div class="photo-tools" style="margin-top:8px">
-  <button class="photo-tool" id="btn-audio-upload" type="button" aria-label="Subir archivo de audio">📁 Subir audio</button>
-  <button class="photo-tool" id="btn-audio-remove" type="button" aria-label="Quitar audio">✕ Quitar</button>
+  <button class="photo-tool" id="btn-audio-upload" type="button" aria-label="Subir archivo de audio">&#128193; Subir audio</button>
+  <button class="photo-tool" id="btn-audio-remove" type="button" aria-label="Quitar audio">&#10005; Quitar</button>
 </div>
 <div style="font-size:8px;color:var(--e-mut);margin-top:6px">El audio se guarda localmente y se reproduce en loop.</div>
 <div style="height:1px;background:var(--e-line);margin:16px 0"></div>
-<div style="font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:8px">📋 PLAYLIST DE REFERENCIA</div>
+<div style="font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:8px">&#128203; PLAYLIST DE REFERENCIA</div>
 <div style="font-size:10px;color:var(--e-mut);line-height:1.5;margin-bottom:10px">Lista de canciones para el DJ.</div>
 <div id="ed-songs"></div>
 <div style="height:1px;background:var(--e-line);margin:16px 0"></div>
-<div style="font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:8px">🎶 SUGERENCIAS DE INVITADOS</div>
+<div style="font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:8px">&#127926; SUGERENCIAS DE INVITADOS</div>
 <div style="font-size:10px;color:var(--e-mut);line-height:1.5;margin-bottom:10px">Activa para que los invitados sugieran canciones.</div>
 <div class="tog-row"><strong>Permitir sugerencias</strong><label class="sw" aria-label="Permitir sugerencias de canciones"><input type="checkbox" data-bind="songSuggestEnabled"><i aria-hidden="true"></i></label></div>
 <div class="field" id="song-wa-field" style="margin-top:8px;display:none">
@@ -655,33 +1032,33 @@ textarea.in{resize:vertical;min-height:56px;line-height:1.5}
   <div style="font-size:8px;color:var(--e-mut);margin-top:4px">Las sugerencias se enviarán a este número por WhatsApp.</div>
 </div>
 </div></div></div></div>
-<div class="sec" data-plan="deluxe"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">12</span><span class="sec-title">Regalos</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec" data-plan="deluxe"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">12</span><span class="sec-title">Regalos</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad"><div id="ed-gifts"></div></div></div></div></div>
-<div class="sec" data-plan="premium"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">13</span><span class="sec-title">Confirmación</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec" data-plan="premium"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">13</span><span class="sec-title">Confirmación</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label for="in-waOrganizer">WhatsApp organizadora</label><input id="in-waOrganizer" class="in" data-bind="waOrganizer" placeholder="573001234567" maxlength="20" pattern="[0-9]+" autocomplete="off" spellcheck="false" aria-label="WhatsApp organizadora"></div>
-<div class="field"><label for="in-rsvpCapacity">Aforo (0=∞)</label><input id="in-rsvpCapacity" class="in" type="number" min="0" max="99999" data-bind="rsvpCapacity" aria-label="Capacidad máxima"></div>
+<div class="field"><label for="in-rsvpCapacity">Aforo (0=&#8734;)</label><input id="in-rsvpCapacity" class="in" type="number" min="0" max="99999" data-bind="rsvpCapacity" aria-label="Capacidad máxima"></div>
 <div class="field" data-plan="deluxe"><label for="in-rsvpPara">Nombre en pase (?para=Familia-Perez)</label><input id="in-rsvpPara" class="in" data-bind="rsvpPara" placeholder="Ej: Familia Pérez · 4 pases" maxlength="80" aria-label="Nombre destinatario del pase"></div>
 <div class="field" data-plan="deluxe"><label for="in-rsvpMaxPases">Pases máximos</label><input id="in-rsvpMaxPases" class="in" type="number" min="0" max="100" data-bind="rsvpMaxPases" placeholder="4" aria-label="Número máximo de pases"></div>
 </div></div></div></div>
-<div class="sec"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">14</span><span class="sec-title">Cierre</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec"><button class="sec-head" type="button" aria-expanded="false"><span class="sec-num" aria-hidden="true">14</span><span class="sec-title">Cierre</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div class="field"><label for="in-poem">Poema</label><textarea id="in-poem" class="in" data-bind="poem" maxlength="400" aria-label="Poema de cierre"></textarea></div>
 <div class="field"><label for="in-signature">Firma</label><input id="in-signature" class="in" data-bind="signature" maxlength="80" aria-label="Firma"></div>
 </div></div></div></div>
-<div class="sec open"><button class="sec-head" type="button" aria-expanded="true"><span class="sec-num" aria-hidden="true">15</span><span class="sec-title">Estilo</span><span class="chev" aria-hidden="true">▾</span></button>
+<div class="sec open"><button class="sec-head" type="button" aria-expanded="true"><span class="sec-num" aria-hidden="true">15</span><span class="sec-title">Estilo</span><span class="chev" aria-hidden="true">&#9662;</span></button>
 <div class="sec-body"><div class="sec-inner"><div class="sec-pad">
 <div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin-bottom:8px">PALETA DE COLORES</div>
 <div class="pal-grid" id="palette-grid" role="group" aria-label="Paletas de color"></div>
-<div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin:18px 0 8px">TIPOGRAFÍA</div>
+<div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin:18px 0 8px">TIPOGRAF&Iacute;A</div>
 <div class="font-grid" id="font-grid" role="group" aria-label="Opciones de tipografía"></div>
-<div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin:18px 0 8px">EFECTO DE PARTÍCULAS</div>
+<div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--e-mut);margin:18px 0 8px">EFECTO DE PART&Iacute;CULAS</div>
 <div class="pal-grid" id="particles-grid" role="group" aria-label="Efectos de partículas"></div>
 </div></div></div></div>
 <div class="publish-wrap" id="publishWrap">
-  <button class="btn-publish" id="btnPublish" type="button">Finalizar y Publicar Invitación</button>
+  <button class="btn-publish" id="btnPublish" type="button">&#10003; Revisar y Enviar Pedido</button>
   <div class="publish-log" id="publishLog" aria-live="polite"></div>
-  <div class="publish-note">Subimos tus fotos a la nube, enviamos tu diseño a producción y abrimos WhatsApp con Gueka Ideas.</div>
+  <div class="publish-note">Verás un resumen con los 3 pasos del proceso antes de confirmar.</div>
 </div>
 </aside>
 </div>
@@ -752,9 +1129,8 @@ function confirmDialog(msg,onConfirm,onCancel){
 
 /* ── INDEXEDDB ── */
 const DB_NAME='GuekaEditorDB',DB_VERSION=1,STORE_NAME='fotos_proyecto';
-const MAX_FILE_SIZE=10*1024*1024;        // 10 MB por archivo
-const MAX_AUDIO_SIZE=15*1024*1024;       // 15 MB para audio
-/* FIX #5: límite total de 100 MB en IndexedDB para evitar rechazos silenciosos en móviles */
+const MAX_FILE_SIZE=10*1024*1024;
+const MAX_AUDIO_SIZE=15*1024*1024;
 const MAX_TOTAL_DB_SIZE=100*1024*1024;
 const ALLOWED_MIME=['image/jpeg','image/png','image/webp','image/gif'];
 let db=null;
@@ -769,7 +1145,6 @@ function inicializarDB(){
   });
 }
 
-/* Verifica si hay cuota disponible antes de guardar un nuevo archivo */
 async function checkDBQuota(newFileSize){
   try{
     const fotos=await obtenerFotosLocales();
@@ -782,7 +1157,6 @@ async function checkDBQuota(newFileSize){
     }
     return true;
   }catch(e){
-    // Si no podemos estimar, permitimos y dejamos que IndexedDB falle de forma normal
     return true;
   }
 }
@@ -960,15 +1334,56 @@ if(urlParams.get('admin')==='true')document.body.classList.add('modo-admin');
 
 /* ── GUARDAR ── */
 let markSaveTimer=null;
+let _saveDotFadeTimer=null;
+let _hasPendingChanges=false;
+let _saveToastTimer=null;
+
+function _showSaveToast(){
+  const t=$('#saveToast');if(!t)return;
+  t.classList.add('show');
+  clearTimeout(_saveToastTimer);
+  _saveToastTimer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+function _forceSave(){
+  clearTimeout(markSaveTimer);
+  try{localStorage.setItem('gueka_editor_v2',JSON.stringify(state));}catch(e){console.warn('Error guardando en localStorage');}
+  _hasPendingChanges=false;
+  const d=$('#saveDot');const txt=$('#saveDotTxt');
+  if(d){d.classList.remove('saving','unsaved');if(txt)txt.textContent='Guardado';}
+  _showSaveToast();
+  clearTimeout(_saveDotFadeTimer);
+  _saveDotFadeTimer=setTimeout(()=>{if(d)d.style.opacity='0';},3000);
+}
+
+/* Rastrear qué campos estaban completos en la llamada anterior */
+let _prevProgressKeys={};
+function _showFieldDoneChip(labelText){
+  const wrap=$('#progressBarWrap');if(!wrap)return;
+  const old=wrap.querySelector('.field-done-chip');if(old)old.remove();
+  const chip=document.createElement('div');
+  chip.className='field-done-chip';
+  chip.setAttribute('aria-live','polite');
+  chip.innerHTML='&#10003; '+labelText+' completado';
+  wrap.appendChild(chip);
+  /* animationend sólo dispara en la última animación (fieldDoneOut) */
+  chip.addEventListener('animationend',()=>{if(!chip.getAnimations||!chip.getAnimations().length)chip.remove();},{once:true});
+  setTimeout(()=>chip.remove(),1500);
+}
 function updateProgress(){
   const checkList=[
-    {ok:!!state.name,label:'nombre'},
-    {ok:!!state.date,label:'fecha'},
-    {ok:!!state.time,label:'hora'},
-    {ok:!!(state.venue||state.address),label:'lugar'},
-    {ok:!!(blobURLs.retrato||(state.imgKeys&&state.imgKeys.retrato)),label:'foto'},
-    {ok:!!state.waOrganizer,label:'WhatsApp'}
+    {ok:!!state.name,key:'name',label:'Nombre'},
+    {ok:!!state.date,key:'date',label:'Fecha'},
+    {ok:!!state.time,key:'time',label:'Hora'},
+    {ok:!!(state.venue||state.address),key:'lugar',label:'Lugar'},
+    {ok:!!(blobURLs.retrato||(state.imgKeys&&state.imgKeys.retrato)),key:'retrato',label:'Foto'},
+    {ok:!!state.waOrganizer,key:'wa',label:'WhatsApp'}
   ];
+  /* Detectar campos recién completados */
+  checkList.forEach(c=>{
+    if(c.ok&&!_prevProgressKeys[c.key]){_showFieldDoneChip(c.label);}
+    _prevProgressKeys[c.key]=c.ok;
+  });
   const done=checkList.filter(c=>c.ok).length;
   const pct=Math.round((done/checkList.length)*100);
   const fill=$('#progressFill'),label=$('#progressLabel'),pctEl=$('#progressPct');
@@ -977,7 +1392,7 @@ function updateProgress(){
   if(label){
     if(pct===100){label.textContent='¡Listo para publicar! ✓';label.style.color='var(--e-green)';}
     else{
-      const missing=checkList.filter(c=>!c.ok).map(c=>c.label);
+      const missing=checkList.filter(c=>!c.ok).map(c=>c.label.toLowerCase());
       const missingStr=missing.length<=2?missing.join(' y '):missing.slice(0,-1).join(', ')+' y '+missing[missing.length-1];
       label.textContent='Falta completar: '+missingStr;label.style.color='var(--e-mut)';
     }
@@ -987,11 +1402,24 @@ function updateProgress(){
 }
 function markSave(){
   updateProgress();
-  const d=$('#saveDot');if(d){d.style.opacity='1';d.classList.add('saving');}
+  const d=$('#saveDot');const txt=$('#saveDotTxt');
+  if(d){
+    d.style.opacity='1';
+    d.classList.add('saving');
+    d.classList.remove('unsaved');
+    if(txt)txt.textContent='Guardando…';
+  }
+  _hasPendingChanges=true;
   clearTimeout(markSaveTimer);
   markSaveTimer=setTimeout(()=>{
     try{localStorage.setItem('gueka_editor_v2',JSON.stringify(state));}catch(e){console.warn('Error guardando en localStorage');}
-    if(d)d.classList.remove('saving');
+    _hasPendingChanges=false;
+    if(d){d.classList.remove('saving','unsaved');if(txt)txt.textContent='Guardado';}
+    // Show save toast briefly
+    _showSaveToast();
+    // Fade out the indicator after 3s
+    clearTimeout(_saveDotFadeTimer);
+    _saveDotFadeTimer=setTimeout(()=>{if(d)d.style.opacity='0';},3000);
   },600);
 }
 
@@ -1015,13 +1443,10 @@ function applyHistory(snap){
   markSave();
 }
 
-/* ── CALENDAR URL ──
-   FIX #D: usar aritmética de milisegundos para manejar correctamente
-   el cruce de medianoche (ej: evento a las 22:00 → fin a las 02:00 del día siguiente) */
+/* ── CALENDAR URL ── */
 function buildCalendarUrl(){
   const start=(state.date||'').replace(/-/g,'')+'T'+(state.time||'1800').replace(':','')+'00';
   const d=new Date(state.date&&state.time?state.date+'T'+state.time:'2026-01-01T18:00');
-  // Suma 4 horas en ms — maneja automáticamente el cruce de medianoche y cambios de día
   d.setTime(d.getTime()+4*60*60*1000);
   const end=d.toISOString().replace(/[-:]/g,'').split('.')[0];
   const title=encodeURIComponent('🎉 '+state.name+(state.age?' · '+state.age+' años':''));
@@ -1169,9 +1594,7 @@ function applyFont(key){
   if(opt.family.includes('cursive')||opt.family.includes('serif'))cw.style.setProperty('--c-serif',opt.family);
 }
 
-/* ── PARTÍCULAS ──
-   FIX #C: redibujar partículas usando scrollHeight actualizado.
-   La función se llama desde ResizeObserver y desde bindAcordeon tras cada toggle. */
+/* ── PARTÍCULAS ── */
 let particleAnim=null;
 function applyParticles(type){
   const canvas=$('#particle-canvas');if(!canvas)return;
@@ -1179,10 +1602,8 @@ function applyParticles(type){
   const ctx=canvas.getContext('2d');if(!ctx)return;
   const cwr=$('#card-wrapper');
   const W=cwr?cwr.offsetWidth||390:390;
-  // scrollHeight captura el alto real del contenido incluyendo secciones expandidas
   const H=cwr?cwr.scrollHeight||800:800;
   canvas.width=W;canvas.height=H;
-  // Sincronizar tamaño CSS del canvas con el contenido
   canvas.style.width='100%';canvas.style.height=H+'px';
   ctx.clearRect(0,0,W,H);
   if(type==='ninguna'){canvas.style.opacity='0';return;}
@@ -1248,7 +1669,6 @@ function bindAudioUpload(){
         const file=inp.files[0];inp.remove();if(!file)return;
         if(!AUDIO_MIME.includes(file.type)&&!file.name.match(/\.(mp3|ogg|wav|m4a|aac|flac)$/i)){toast('⚠ Formato no soportado. Usa MP3, OGG, WAV o AAC.');return;}
         if(file.size>MAX_AUDIO_SIZE){toast('⚠ El archivo supera 15MB.');return;}
-        /* FIX #5: verificar cuota total antes de guardar audio */
         const ok=await checkDBQuota(file.size);if(!ok)return;
         pushHistory();
         try{
@@ -1274,9 +1694,7 @@ function bindAudioUpload(){
   }
 }
 
-/* ── SUGERENCIAS DE CANCIONES ──
-   FIX #B: usar data attribute en el form para marcar si ya fue vinculado,
-   en lugar de una variable global que no se resetea entre renders. */
+/* ── SUGERENCIAS DE CANCIONES ── */
 function syncSongSuggestUI(){
   const wrap=$('#pv-song-suggest-wrap'),waField=$('#song-wa-field');
   const show=!!(state.songSuggestEnabled&&PLAN_RANK[state.plan]>=2);
@@ -1288,7 +1706,6 @@ function initSongSuggestInputs(){
   const container=$('#song-inputs');if(!container)return;
   if(container.children.length===0)addSongInput();
   const form=$('#song-suggest-form');
-  // Solo vincular una vez usando data attribute — evita duplicar listeners al re-renderizar
   if(!form||form.dataset.bound==='1')return;
   form.dataset.bound='1';
   const addBtn=$('#song-add-btn');
@@ -1318,10 +1735,78 @@ function addSongInput(){
   setTimeout(()=>inp.focus(),50);
 }
 
+/* ── PLAN COMPARE (mini-comparativo siempre visible) ── */
+const PLAN_COMPARE_FEATS={
+  classic:[
+    {label:'Portada + cuenta regresiva',plans:['classic','premium','deluxe']},
+    {label:'Fecha, hora y lugar',        plans:['classic','premium','deluxe']},
+    {label:'Dress code',                 plans:['classic','premium','deluxe']},
+    {label:'Galería de fotos',           plans:['classic','premium','deluxe']},
+    {label:'Música de fondo',            plans:['premium','deluxe']},
+    {label:'RSVP online',                plans:['premium','deluxe']},
+    {label:'Mesa de regalos + QR',       plans:['deluxe']},
+    {label:'Mapa interactivo',           plans:['deluxe']},
+  ]
+};
+const PLAN_COL_COLORS={classic:'#6d7a72',premium:'#b89b5e',deluxe:'#1e4d38'};
+const PLAN_COL_RGB={classic:'109,122,114',premium:'184,155,94',deluxe:'30,77,56'};
+
+function renderPlanCompare(){
+  const wrap=$('#planCompare');if(!wrap)return;
+  const planKeys=Object.keys(PLANS);
+  const rows=PLAN_COMPARE_FEATS.classic;
+
+  const cols=planKeys.map(key=>{
+    const p=PLANS[key];
+    const isActive=state.plan===key;
+    const col=PLAN_COL_COLORS[key]||'#b89b5e';
+    const rgb=PLAN_COL_RGB[key]||'184,155,94';
+    const tagHtml=p.tag?'<span class="pc-col-tag">'+esc(p.tag.replace(/⭐\s*/,''))+'</span>':'';
+
+    /* Solo mostrar 4 features clave para mantener compacto */
+    const featRows=rows.slice(0,6).map(f=>{
+      const unlocked=f.plans.includes(key);
+      return '<li class="'+(unlocked?'':'feat-locked')+'">'+esc(f.label)+'</li>';
+    }).join('');
+
+    return '<button type="button" class="pc-col'+(isActive?' pc-col-active':'')+'" '+
+      'style="--col-c:'+col+';--col-rgb:'+rgb+';" '+
+      'aria-pressed="'+(isActive?'true':'false')+'" '+
+      'aria-label="Seleccionar plan '+p.name+'" '+
+      'data-plan-key="'+key+'">'+
+      tagHtml+
+      '<div class="pc-col-name">'+esc(p.name)+'</div>'+
+      '<div class="pc-col-price">$'+p.price.toLocaleString('es-CO')+'</div>'+
+      '<ul class="pc-col-feats" aria-label="Características">'+featRows+'</ul>'+
+    '</button>';
+  }).join('');
+
+  wrap.innerHTML=
+    '<div class="pc-compare-title">&#9733; Elige tu plan</div>'+
+    '<div class="pc-compare-grid">'+cols+'</div>'+
+    '<p class="pc-compare-hint">Toca un plan para cambiarlo &#8212; puedes cambiarlo en cualquier momento</p>';
+
+  wrap.querySelectorAll('[data-plan-key]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const key=btn.getAttribute('data-plan-key');
+      if(!key||!PLANS[key])return;
+      pushHistory();state.plan=key;markSave();
+      renderPlanUI();updatePlanLock();renderPreview();renderListEditors();
+      if(state.galKeys.length>PLANS[key].maxGal){
+        const toRemove=state.galKeys.splice(PLANS[key].maxGal);
+        toRemove.forEach(k=>eliminarFotoLocal(k).catch(()=>{}));
+        renderGalThumbPreview();
+      }
+      toast('Plan '+PLANS[key].name+' seleccionado');
+    });
+  });
+}
+
 /* ── PLAN UI ── */
 function renderPlanUI(){
   const cards=$('#planCards'),detail=$('#planDetail');
   if(!cards||!detail)return;
+  renderPlanCompare();
   cards.innerHTML='';
   Object.entries(PLANS).forEach(([key,p])=>{
     const btn=document.createElement('button');
@@ -1368,7 +1853,7 @@ function openLockTooltip(badge,req){
     pushHistory();state.plan=req;markSave();renderPlanUI();updatePlanLock();renderPreview();renderListEditors();
     const planBarBody=$('#planBarBody'),planBarWrap=$('#planBarWrap'),planBarToggle=$('#planBarToggle');
     if(planBarWrap&&planBarWrap.getAttribute('data-open')!=='true'){if(planBarToggle)planBarToggle.setAttribute('aria-expanded','true');if(planBarWrap)planBarWrap.setAttribute('data-open','true');}
-    planBarWrap?.scrollIntoView({behavior:'smooth',block:'start'});
+    planBarWrap&&planBarWrap.scrollIntoView({behavior:'smooth',block:'start'});
     toast('✓ Plan cambiado a '+plan.name);
   });
   badge.appendChild(tip);_openLockTooltip=tip;
@@ -1435,7 +1920,7 @@ function renderListEditors(){
   renderGalCaptionEditor();
 }
 
-/* ── GALERÍA CAPTION EDITOR (§10) ── */
+/* ── GALERÍA CAPTION EDITOR ── */
 function renderGalCaptionEditor(){
   const cont=$('#ed-gal');if(!cont)return;
   cont.innerHTML='';
@@ -1445,10 +1930,10 @@ function renderGalCaptionEditor(){
     empty.style.cssText='text-align:center;padding:18px 10px;background:var(--e-sage);border-radius:10px;border:1.5px dashed var(--e-line)';
     empty.innerHTML='<div style="font-size:22px;margin-bottom:8px">🖼️</div><div style="font-size:11px;font-weight:700;color:var(--e-ink);margin-bottom:4px">No hay fotos en la galería</div><div style="font-size:10px;color:var(--e-mut);line-height:1.5;margin-bottom:12px">Primero sube tus fotos en la sección <strong>§2 Fotos</strong> y luego vuelve aquí para añadir captions.</div><button type="button" class="photo-tool" id="btn-go-fotos" style="font-size:10px;padding:6px 14px">→ Ir a §2 Fotos</button>';
     cont.appendChild(empty);
-    cont.querySelector('#btn-go-fotos')?.addEventListener('click',()=>{
-      const secFotos=[...document.querySelectorAll('.sec')].find(s=>s.querySelector('.sec-num')?.textContent?.trim()==='2');
-      if(secFotos&&!secFotos.classList.contains('open'))secFotos.querySelector('.sec-head')?.click();
-      secFotos?.scrollIntoView({behavior:'smooth',block:'start'});
+    cont.querySelector('#btn-go-fotos')&&cont.querySelector('#btn-go-fotos').addEventListener('click',()=>{
+      const secFotos=[...document.querySelectorAll('.sec')].find(s=>s.querySelector('.sec-num')&&s.querySelector('.sec-num').textContent.trim()==='1');
+      if(secFotos&&!secFotos.classList.contains('open'))secFotos.querySelector('.sec-head')&&secFotos.querySelector('.sec-head').click();
+      secFotos&&secFotos.scrollIntoView({behavior:'smooth',block:'start'});
     });
     return;
   }
@@ -1509,9 +1994,9 @@ function renderGalThumbPreview(){
   const btnGoCaptions=$('#btn-go-captions');
   if(btnGoCaptions){
     btnGoCaptions.onclick=()=>{
-      const sec10=[...document.querySelectorAll('.sec')].find(s=>s.querySelector('.sec-num')?.textContent?.trim()==='10');
-      if(sec10&&!sec10.classList.contains('open'))sec10.querySelector('.sec-head')?.click();
-      sec10?.scrollIntoView({behavior:'smooth',block:'start'});
+      const sec10=[...document.querySelectorAll('.sec')].find(s=>s.querySelector('.sec-num')&&s.querySelector('.sec-num').textContent.trim()==='10');
+      if(sec10&&!sec10.classList.contains('open'))sec10.querySelector('.sec-head')&&sec10.querySelector('.sec-head').click();
+      sec10&&sec10.scrollIntoView({behavior:'smooth',block:'start'});
     };
   }
   renderGalCaptionEditor();
@@ -1555,28 +2040,133 @@ async function reindexGalDB(){
   }catch(e){console.warn('Error reindexando galería',e);}
 }
 
-/* ── CROPPER INLINE ──
-   FIX #A: usar IDs únicos por instancia en lugar del ID fijo #crop-zoom-range
-   para evitar colisiones si se abrieran dos croppers en rápida sucesión. */
+/* ── CROPPER INLINE ── */
 let cropperUIDCounter=0;
 let activeCropper=null;
 function closeCropper(){if(activeCropper&&activeCropper.container)activeCropper.container.innerHTML='';activeCropper=null;}
-function openInlineCropper(containerEl,file,onConfirm,onCancel){
+
+/* Construye el SVG de guías según el tipo:
+   'portrait' → regla de tercios + círculo de cabeza centrado en el tercio superior
+   'thirds'   → solo regla de tercios
+   null       → sin guías */
+function buildGuideSVG(type){
+  const ns='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox','0 0 100 100');
+  svg.setAttribute('preserveAspectRatio','none');
+  svg.classList.add('cropper-guide-svg');
+  svg.setAttribute('aria-hidden','true');
+
+  const lineColor='rgba(255,255,255,0.38)';
+  const accentColor='rgba(255,220,80,0.70)';
+
+  function line(x1,y1,x2,y2,color,dash){
+    const l=document.createElementNS(ns,'line');
+    l.setAttribute('x1',x1);l.setAttribute('y1',y1);
+    l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+    l.setAttribute('stroke',color||lineColor);
+    l.setAttribute('stroke-width','0.5');
+    if(dash)l.setAttribute('stroke-dasharray',dash);
+    svg.appendChild(l);
+  }
+
+  if(type==='thirds'||type==='portrait'){
+    /* Regla de tercios — 2 líneas verticales + 2 horizontales */
+    line(33.3,0,33.3,100,lineColor);
+    line(66.6,0,66.6,100,lineColor);
+    line(0,33.3,100,33.3,lineColor);
+    line(0,66.6,100,66.6,lineColor);
+    /* Puntos de intersección */
+    [[33.3,33.3],[66.6,33.3],[33.3,66.6],[66.6,66.6]].forEach(([cx,cy])=>{
+      const c=document.createElementNS(ns,'circle');
+      c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r','1.4');
+      c.setAttribute('fill','rgba(255,255,255,0.55)');c.setAttribute('stroke','none');
+      svg.appendChild(c);
+    });
+  }
+
+  if(type==='portrait'){
+    /* Línea central vertical punteada */
+    line(50,0,50,100,'rgba(255,220,80,0.30)','2,2');
+    /* Círculo guía de cabeza: centrado, ocupa ~32% de ancho, posicionado
+       para que la cara quede en el tercio superior (centro en y≈28) */
+    const ellipse=document.createElementNS(ns,'ellipse');
+    ellipse.setAttribute('cx','50');
+    ellipse.setAttribute('cy','26');
+    ellipse.setAttribute('rx','16');
+    ellipse.setAttribute('ry','20');
+    ellipse.setAttribute('fill','none');
+    ellipse.setAttribute('stroke',accentColor);
+    ellipse.setAttribute('stroke-width','0.7');
+    ellipse.setAttribute('stroke-dasharray','3,2');
+    svg.appendChild(ellipse);
+    /* Etiqueta */
+    const txt=document.createElementNS(ns,'text');
+    txt.setAttribute('x','50');txt.setAttribute('y','8');
+    txt.setAttribute('text-anchor','middle');
+    txt.setAttribute('font-size','5');
+    txt.setAttribute('fill','rgba(255,220,80,0.80)');
+    txt.setAttribute('font-family','sans-serif');
+    txt.setAttribute('font-weight','700');
+    txt.textContent='Cara aquí';
+    svg.appendChild(txt);
+  }
+
+  return svg;
+}
+
+function openInlineCropper(containerEl,file,onConfirm,onCancel,guideType){
   if(!containerEl)return;closeCropper();containerEl.innerHTML='';
-  // ID único para el range de zoom de esta instancia de cropper
-  const uid='crop-zoom-'+( ++cropperUIDCounter);
+  const uid='crop-zoom-'+(++cropperUIDCounter);
   const wrap=document.createElement('div');wrap.className='cropper-wrap';
   const stage=document.createElement('div');stage.className='cropper-stage';stage.setAttribute('role','img');stage.setAttribute('aria-label','Área de recorte. Arrastra para mover, rueda para zoom');
   const img=document.createElement('img');img.alt='Imagen a recortar';
   const frame=document.createElement('div');frame.className='cropper-frame';frame.setAttribute('aria-hidden','true');
+
+  /* Guías SVG */
+  let guideSVG=null;
+  let guidesVisible=true;
+  if(guideType){
+    guideSVG=buildGuideSVG(guideType);
+    frame.appendChild(guideSVG);
+  }
+
   stage.appendChild(img);stage.appendChild(frame);
   const tools=document.createElement('div');tools.className='cropper-tools';
-  tools.innerHTML='<label for="'+uid+'">Zoom</label><input id="'+uid+'" type="range" min="1" max="3" step="0.01" value="1" aria-label="Zoom del recorte">';
+
+  /* Hint por tipo */
+  const hintText=guideType==='portrait'
+    ? '&#128247; Centra el rostro dentro del círculo dorado'
+    : guideType==='thirds'
+    ? '&#9974;&#65039; Coloca el sujeto principal en una intersección'
+    : '';
+
+  tools.innerHTML='<label for="'+uid+'">Zoom</label><input id="'+uid+'" type="range" min="1" max="3" step="0.01" value="1" aria-label="Zoom del recorte">'
+    +(guideType?'<button type="button" class="cropper-guide-toggle active" id="guideToggle-'+uid+'" aria-pressed="true" title="Mostrar / ocultar guías">&#127919; Guías</button>':'');
+
   const actions=document.createElement('div');actions.className='cropper-actions';
   const btnCancel=document.createElement('button');btnCancel.type='button';btnCancel.className='crop-cancel';btnCancel.textContent='Cancelar';
   const btnConfirm=document.createElement('button');btnConfirm.type='button';btnConfirm.className='crop-confirm';btnConfirm.textContent='✓ Confirmar recorte';
   actions.appendChild(btnCancel);actions.appendChild(btnConfirm);
-  wrap.appendChild(stage);wrap.appendChild(tools);wrap.appendChild(actions);containerEl.appendChild(wrap);
+
+  wrap.appendChild(stage);wrap.appendChild(tools);
+  if(hintText){const hint=document.createElement('div');hint.className='cropper-hint';hint.innerHTML=hintText;wrap.appendChild(hint);}
+  wrap.appendChild(actions);
+  containerEl.appendChild(wrap);
+
+  /* Toggle de guías */
+  if(guideType&&guideSVG){
+    const toggleBtn=tools.querySelector('#guideToggle-'+uid);
+    if(toggleBtn){
+      toggleBtn.addEventListener('click',()=>{
+        guidesVisible=!guidesVisible;
+        guideSVG.classList.toggle('hidden',!guidesVisible);
+        toggleBtn.classList.toggle('active',guidesVisible);
+        toggleBtn.setAttribute('aria-pressed',guidesVisible?'true':'false');
+      });
+    }
+  }
+
   const objUrl=URL.createObjectURL(file);
   const st={scale:1,minScale:1,x:0,y:0,natW:0,natH:0,stageW:0,stageH:0};
   const zoomRange=tools.querySelector('#'+uid);
@@ -1616,7 +2206,7 @@ function openInlineCropper(containerEl,file,onConfirm,onCancel){
   activeCropper={container:containerEl};
   setTimeout(()=>btnConfirm.focus(),100);
 }
-function cropFileAsync(containerEl,file){return new Promise((resolve)=>{openInlineCropper(containerEl,file,(blob)=>resolve(blob),()=>resolve(null));});}
+function cropFileAsync(containerEl,file,guideType){return new Promise((resolve)=>{openInlineCropper(containerEl,file,(blob)=>resolve(blob),()=>resolve(null),guideType||'thirds');});}
 
 /* ── UPLOADS ── */
 function handlePhotoUpload(key){
@@ -1625,8 +2215,9 @@ function handlePhotoUpload(key){
     const file=inp.files[0];if(!file){inp.remove();return;}
     const err=validarArchivo(file);if(err){toast('⚠ '+err);inp.remove();return;}
     const containerEl=$('#cropper-'+key);if(!containerEl){inp.remove();return;}
+    /* Guía según tipo de foto */
+    const guideType=(key==='retrato'||key==='fashion')?'portrait':'thirds';
     openInlineCropper(containerEl,file,async(croppedBlob)=>{
-      /* FIX #5: verificar cuota antes de guardar la foto recortada */
       const ok=await checkDBQuota(croppedBlob.size);if(!ok)return;
       try{
         pushHistory();await guardarFotoLocal(key,croppedBlob);
@@ -1637,7 +2228,7 @@ function handlePhotoUpload(key){
         if(statusEl){const fotos=await obtenerFotosLocales();statusEl.textContent='📦 '+fotos.filter(f=>f.id!=='audio_bg').length+' foto(s) guardada(s) localmente';}
         toast('✓ Foto recortada y guardada');
       }catch(e){toast('⚠ Error al guardar foto');console.error(e);}
-    });
+    },null,guideType);
     inp.remove();
   });
   inp.click();
@@ -1651,7 +2242,6 @@ async function handleGalUpload(files){
     try{
       let blobToSave=file;
       if(containerEl){const cropped=await cropFileAsync(containerEl,file);if(!cropped){toast('↺ Foto de galería omitida');continue;}blobToSave=cropped;}
-      /* FIX #5: verificar cuota antes de cada foto de galería */
       const ok=await checkDBQuota(blobToSave.size);if(!ok)break;
       const idx=blobURLs.gal.length;await guardarFotoLocal('gal_'+idx,blobToSave);
       blobURLs.gal.push(URL.createObjectURL(blobToSave));state.galKeys.push('gal_'+idx);added++;
@@ -1690,16 +2280,15 @@ function bindInputs(){
 function populateTemplateSelect(){
   const btn=$('#tplSelectBtn'),menu=$('#tplDropdownMenu'),wrap=$('#tplDropdownWrap'),hoverPrev=$('#tpl-hover-preview');
   if(!btn||!menu||!wrap)return;
-  // 8 categorías con iconos
   const cats={
-    quince:   {label:'XV A\xF1os',       icon:'&#x2728;'},
-    boda:     {label:'Boda',              icon:'&#x1F48D;'},
-    cumple:   {label:'Cumplea\xF1os',     icon:'&#x1F382;'},
-    bautizo:  {label:'Bautizo',           icon:'&#x1FAB7;'},
-    comunion: {label:'1\xAA Comuni\xF3n', icon:'&#x1F54A;'},
-    babyshower:{label:'Baby Shower',      icon:'&#x1F476;'},
-    aniversario:{label:'Aniversario',     icon:'&#x1F491;'},
-    graduacion:{label:'Graduaci\xF3n',    icon:'&#x1F393;'}
+    quince:    {label:'XV Años',         icon:'&#x2728;'},
+    boda:      {label:'Boda',            icon:'&#x1F48D;'},
+    cumple:    {label:'Cumpleaños',      icon:'&#x1F382;'},
+    bautizo:   {label:'Bautizo',         icon:'&#x1FAB7;'},
+    comunion:  {label:'1ª Comunión',     icon:'&#x1F54A;'},
+    babyshower:{label:'Baby Shower',     icon:'&#x1F476;'},
+    aniversario:{label:'Aniversario',    icon:'&#x1F491;'},
+    graduacion:{label:'Graduación',      icon:'&#x1F393;'}
   };
   function hideTplHoverPreview(){if(hoverPrev)hoverPrev.classList.remove('show');}
   function showTplHoverPreview(tpl,anchorEl){
@@ -1707,7 +2296,7 @@ function populateTemplateSelect(){
     const pal=PALETTES[tpl.preset.palette]||PALETTES.neon;
     const inner=hoverPrev.querySelector('.tpl-hover-inner');if(inner)inner.style.background=pal.bg;
     const ageEl=$('#tplHoverAge'),nameEl=$('#tplHoverName'),capEl=$('#tplHoverCap'),dotsEl=$('#tplHoverDots');
-    if(ageEl){ageEl.textContent=tpl.preset.age||'\u2022';ageEl.style.textShadow='2px 2px 0 '+pal.b+',-2px -2px 0 '+pal.a;}
+    if(ageEl){ageEl.textContent=tpl.preset.age||'•';ageEl.style.textShadow='2px 2px 0 '+pal.b+',-2px -2px 0 '+pal.a;}
     if(nameEl){nameEl.textContent=tpl.preset.name||'';nameEl.style.color=pal.c;}
     if(capEl)capEl.textContent=tpl.preset.caption||'';
     if(dotsEl)dotsEl.innerHTML='<i style="background:'+pal.a+'"></i><i style="background:'+pal.b+'"></i><i style="background:'+pal.c+'"></i>';
@@ -1720,29 +2309,21 @@ function populateTemplateSelect(){
     menu.style.top=(r.bottom+6)+'px';
     menu.style.left=Math.min(r.left,window.innerWidth-232)+'px';
     menu.style.display='block';menu.style.animation='dropDown .18s ease';
-    btn.setAttribute('aria-expanded','true');menu.querySelector('button')?.focus();
+    btn.setAttribute('aria-expanded','true');const firstBtn=menu.querySelector('button');if(firstBtn)firstBtn.focus();
   }
   function closeTplDropdown(){menu.style.display='none';btn.setAttribute('aria-expanded','false');hideTplHoverPreview();}
-
-  // Construir menú con grid 2 columnas por categoria
   menu.innerHTML='';
-  // Header del menú
   const menuHdr=document.createElement('div');
   menuHdr.style.cssText='padding:8px 12px 4px;font-size:8px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:var(--e-mut);border-bottom:1px solid var(--e-line);margin-bottom:4px';
-  menuHdr.textContent='Elige una categor\xEDa';
+  menuHdr.textContent='Elige una categoría';
   menu.appendChild(menuHdr);
-
   Object.entries(cats).forEach(([cat,info])=>{
-    // Botón de categoría
     const catBtn=document.createElement('button');
     catBtn.type='button';
     catBtn.style.cssText='display:flex;align-items:center;gap:7px;width:100%;text-align:left;font:inherit;font-size:11px;font-weight:700;color:var(--e-ink);background:none;border:0;border-radius:8px;padding:8px 10px 4px;cursor:pointer;';
-    catBtn.innerHTML='<span style="font-size:14px;line-height:1;flex:0 0 auto">'+info.icon+'</span><span style="flex:1">'+info.label+'</span><span style="font-size:9px;color:var(--e-mut);font-weight:600;margin-right:4px">'+(TEMPLATES[cat]||[]).length+'</span><span class="cat-chev" style="font-size:9px;color:var(--e-mut);transition:transform .2s">▶</span>';
-
-    // Submenu de plantillas para esta categoría
+    catBtn.innerHTML='<span style="font-size:14px;line-height:1;flex:0 0 auto">'+info.icon+'</span><span style="flex:1">'+info.label+'</span><span style="font-size:9px;color:var(--e-mut);font-weight:600;margin-right:4px">'+(TEMPLATES[cat]||[]).length+'</span><span class="cat-chev" style="font-size:9px;color:var(--e-mut);transition:transform .2s">&#9654;</span>';
     const subWrap=document.createElement('div');
     subWrap.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:2px 6px 8px 6px;border-bottom:1px solid var(--e-line);margin-bottom:2px';
-
     let subOpen=false;
     function toggleSub(){
       subOpen=!subOpen;subWrap.style.display=subOpen?'grid':'none';
@@ -1751,9 +2332,7 @@ function populateTemplateSelect(){
       const chev=catBtn.querySelector('.cat-chev');if(chev)chev.style.transform=subOpen?'rotate(90deg)':'rotate(0deg)';
     }
     subWrap.style.display='none';
-
     catBtn.addEventListener('click',(e)=>{e.stopPropagation();toggleSub();});
-
     (TEMPLATES[cat]||[]).forEach((tpl)=>{
       const opt=document.createElement('button');opt.type='button';
       opt.style.cssText='font:inherit;font-size:10px;font-weight:600;color:var(--e-ink);background:#fff;border:1.5px solid var(--e-line);border-radius:8px;padding:7px 8px;cursor:pointer;text-align:left;line-height:1.3;transition:all .15s;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
@@ -1765,23 +2344,18 @@ function populateTemplateSelect(){
       opt.addEventListener('blur',hideTplHoverPreview);
       opt.addEventListener('click',(e)=>{
         e.stopPropagation();
-        pushHistory();Object.assign(state,tpl.preset);state.category=cat;state.templateLabel=info.label+' \u2014 '+tpl.label;markSave();
-        // Actualizar label del botón con icono + nombre de plantilla
-        const lbl=$('#tplSelectLabel');
-        if(lbl)lbl.textContent=state.templateLabel;
+        pushHistory();Object.assign(state,tpl.preset);state.category=cat;state.templateLabel=info.label+' — '+tpl.label;markSave();
+        const lbl=$('#tplSelectLabel');if(lbl)lbl.textContent=state.templateLabel;
         bindInputValues();renderPaletteGrid();renderPreview();
-        toast('\u2713 Plantilla aplicada: '+tpl.label);closeTplDropdown();
+        toast('✓ Plantilla aplicada: '+tpl.label);closeTplDropdown();
       });
       subWrap.appendChild(opt);
     });
-
     menu.appendChild(catBtn);
     menu.appendChild(subWrap);
   });
   menu.style.minWidth='280px';
-  // Restaurar label desde estado guardado (p.ej. tras recargar página)
   if(state.templateLabel){const lbl=$('#tplSelectLabel');if(lbl)lbl.textContent=state.templateLabel;}
-
   btn.addEventListener('click',(e)=>{e.stopPropagation();if(menu.style.display==='block')closeTplDropdown();else openTplDropdown();});
   menu.addEventListener('keydown',(e)=>{if(e.key==='Escape')closeTplDropdown();});
   document.addEventListener('click',(e)=>{if(!wrap.contains(e.target))closeTplDropdown();});
@@ -1792,17 +2366,49 @@ function initPreviewZoom(){
   const scrollEl=$('#preview-scroll'),zoomWrap=$('#preview-zoom-wrap'),pctEl=$('#zoomPct');
   const btnIn=$('#zoomIn'),btnOut=$('#zoomOut'),btnReset=$('#zoomReset');
   if(!scrollEl||!zoomWrap)return;
-  const MIN_ZOOM=0.5,MAX_ZOOM=2.2;let zoom=1;
-  function applyZoom(newZoom){zoom=Math.min(MAX_ZOOM,Math.max(MIN_ZOOM,newZoom));zoomWrap.style.transform='scale('+zoom+')';if(pctEl)pctEl.textContent=Math.round(zoom*100)+'%';}
-  scrollEl.addEventListener('wheel',(e)=>{if(!e.ctrlKey)return;e.preventDefault();applyZoom(zoom-e.deltaY*0.01);},{passive:false});
+  const MIN_ZOOM=0.5,MAX_ZOOM=2.2;
+  let zoom=1;
+  let autoZoomEnabled=true;
+
+  function applyZoom(newZoom,fromUser){
+    if(fromUser)autoZoomEnabled=false;
+    zoom=Math.min(MAX_ZOOM,Math.max(MIN_ZOOM,newZoom));
+    zoomWrap.style.transform='scale('+zoom+')';
+    if(pctEl)pctEl.textContent=Math.round(zoom*100)+'%';
+  }
+
+  /* Zoom ideal: el marco del teléfono (390+bordes × ~864+bordes) ocupa
+     el 88% del alto disponible, sin exceder el ancho. Clamp [0.65, 1.6] */
+  function calcAutoZoom(){
+    const availH=scrollEl.clientHeight;
+    const availW=scrollEl.clientWidth;
+    const phoneW=390+22;
+    const phoneH=864+22;
+    const scaleByH=(availH*0.88)/phoneH;
+    const scaleByW=(availW-48)/phoneW;
+    return Math.min(1.6,Math.max(0.65,Math.min(scaleByH,scaleByW)));
+  }
+
+  function autoZoom(){if(autoZoomEnabled)applyZoom(calcAutoZoom(),false);}
+
+  scrollEl.addEventListener('wheel',(e)=>{if(!e.ctrlKey)return;e.preventDefault();applyZoom(zoom-e.deltaY*0.01,true);},{passive:false});
   let pinchStartDist=0,pinchStartZoom=1;
   scrollEl.addEventListener('touchstart',(e)=>{if(e.touches.length===2){pinchStartDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);pinchStartZoom=zoom;}},{passive:true});
-  scrollEl.addEventListener('touchmove',(e)=>{if(e.touches.length===2&&pinchStartDist>0){e.preventDefault();const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);applyZoom(pinchStartZoom*(dist/pinchStartDist));}},{passive:false});
+  scrollEl.addEventListener('touchmove',(e)=>{if(e.touches.length===2&&pinchStartDist>0){e.preventDefault();const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);applyZoom(pinchStartZoom*(dist/pinchStartDist),true);}},{passive:false});
   scrollEl.addEventListener('touchend',(e)=>{if(e.touches.length<2)pinchStartDist=0;});
-  if(btnIn)btnIn.addEventListener('click',()=>applyZoom(zoom+0.15));
-  if(btnOut)btnOut.addEventListener('click',()=>applyZoom(zoom-0.15));
-  if(btnReset)btnReset.addEventListener('click',()=>applyZoom(1));
-  applyZoom(1);
+  if(btnIn)btnIn.addEventListener('click',()=>applyZoom(zoom+0.15,true));
+  if(btnOut)btnOut.addEventListener('click',()=>applyZoom(zoom-0.15,true));
+  /* Botón reset → vuelve al auto-zoom */
+  if(btnReset)btnReset.addEventListener('click',()=>{autoZoomEnabled=true;autoZoom();});
+
+  /* Arrancar con auto-zoom y recalcular en resize */
+  autoZoom();
+  if(typeof ResizeObserver!=='undefined'){
+    const ro=new ResizeObserver(()=>autoZoom());
+    ro.observe(scrollEl);
+  } else {
+    window.addEventListener('resize',autoZoom);
+  }
 }
 
 /* ── TOOLTIPS ── */
@@ -1826,7 +2432,7 @@ function bindHelpTooltips(){
 const TOUR_STORAGE_KEY='gueka_tour_done_v1';
 const TOUR_STEPS=[
   {selector:'#tplSelectBtn',fallback:'#tplDropdownWrap',title:'Elige una plantilla',text:'Haz clic aquí y elige tu tipo de evento (XV Años, Boda, Cumpleaños...). Luego selecciona el diseño que más te guste — pasa el cursor para ver una vista previa.'},
-  {selector:'[data-up="retrato"]',fallback:'#wrap-retrato',title:'Sube tu foto principal',text:'Sube el retrato que aparecerá en la portada. Podrás recortarlo al instante antes de guardarlo.',openSection:2},
+  {selector:'[data-up="retrato"]',fallback:'#wrap-retrato',title:'Sube tu foto principal',text:'Sube el retrato que aparecerá en la portada. Podrás recortarlo al instante antes de guardarlo.',openSection:1},
   {selector:'#palette-grid',title:'Cambia la paleta de colores',text:'Elige la combinación de colores que mejor represente tu celebración. Se aplica al instante en la vista previa.',openSection:15},
   {selector:'[data-bind="date"]',title:'Configura fecha y hora',text:'Define cuándo será tu evento. Esta información alimenta la cuenta regresiva de la invitación.',openSection:1},
   {selector:'#btnPublish',title:'Publica tu invitación',text:'Cuando todo esté listo, finaliza aquí para enviar tu diseño a producción y compartirlo con tus invitados.'}
@@ -1869,9 +2475,9 @@ function renderTourStep(){
     '<button type="button" class="tour-nav primary" data-tour="next">'+(tourStep===TOUR_STEPS.length-1?'Finalizar':'Siguiente')+'</button>'+
     '</div></div>';
   root.appendChild(spot);root.appendChild(card);
-  card.querySelector('[data-tour="skip"]')?.addEventListener('click',()=>endTour());
-  card.querySelector('[data-tour="prev"]')?.addEventListener('click',()=>goTourStep(-1));
-  card.querySelector('[data-tour="next"]')?.addEventListener('click',()=>goTourStep(1));
+  card.querySelector('[data-tour="skip"]')&&card.querySelector('[data-tour="skip"]').addEventListener('click',()=>endTour());
+  card.querySelector('[data-tour="prev"]')&&card.querySelector('[data-tour="prev"]').addEventListener('click',()=>goTourStep(-1));
+  card.querySelector('[data-tour="next"]')&&card.querySelector('[data-tour="next"]').addEventListener('click',()=>goTourStep(1));
   const nextBtn=card.querySelector('[data-tour="next"]');if(nextBtn)setTimeout(()=>nextBtn.focus(),50);
   const target=document.querySelector(step.selector)||(step.fallback?document.querySelector(step.fallback):null);
   function position(){
@@ -1998,19 +2604,98 @@ async function exportarHTML(){
   finally{if(exportBtn)exportBtn.disabled=false;}
 }
 
+/* ── MODAL CONFIRMAR PUBLICACIÓN ── */
+function mostrarModalPublicacion(){
+  const old=$('#pub-modal-overlay');if(old)old.remove();
+  const plan=PLANS[state.plan]||PLANS.classic;
+  const totalFotos=blobURLs.gal.length+(blobURLs.retrato?1:0)+(blobURLs.fashion?1:0);
+  const fechaFmt=state.date?new Date(state.date+'T12:00').toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'}):'(sin fecha)';
+  const overlay=document.createElement('div');
+  overlay.className='pub-overlay';overlay.id='pub-modal-overlay';
+  overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Confirmar envío de pedido');
+  overlay.innerHTML=
+    '<div class="pub-box">'+
+      '<div class="pub-top-stripe" aria-hidden="true"></div>'+
+      '<div class="pub-drag-handle" aria-hidden="true"></div>'+
+      '<div class="pub-header">'+
+        '<div class="pub-icon-wrap" aria-hidden="true">&#127881;</div>'+
+        '<div class="pub-header-text">'+
+          '<div class="pub-header-title">&#191;Listo para enviar?</div>'+
+          '<div class="pub-header-sub">Revisa qu&eacute; va a pasar cuando confirmes</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="pub-steps" role="list">'+
+        '<div class="pub-step" role="listitem">'+
+          '<div class="pub-step-num" aria-hidden="true">1</div>'+
+          '<div class="pub-step-body">'+
+            '<div class="pub-step-title">&#128228; Enviamos tu dise&ntilde;o a producci&oacute;n</div>'+
+            '<div class="pub-step-desc">Tus datos y fotos llegan al equipo de Gueka Ideas para armar tu invitaci&oacute;n.</div>'+
+            '<span class="pub-step-badge">&#128336; '+esc(plan.eta)+'</span>'+
+          '</div>'+
+        '</div>'+
+        '<div class="pub-step" role="listitem">'+
+          '<div class="pub-step-num" aria-hidden="true">2</div>'+
+          '<div class="pub-step-body">'+
+            '<div class="pub-step-title">&#128242; Abre WhatsApp con Gueka Ideas</div>'+
+            '<div class="pub-step-desc">Se abre un mensaje listo para enviar. T&uacute; lo confirmas con un tap — nada se env&iacute;a solo.</div>'+
+            '<span class="pub-step-badge gold">&#128172; Solo necesitas un tap</span>'+
+          '</div>'+
+        '</div>'+
+        '<div class="pub-step" role="listitem">'+
+          '<div class="pub-step-num" aria-hidden="true">3</div>'+
+          '<div class="pub-step-body">'+
+            '<div class="pub-step-title">&#128279; Recibes tu link de invitaci&oacute;n</div>'+
+            '<div class="pub-step-desc">El equipo te env&iacute;a por WhatsApp el enlace listo para compartir con tus invitados.</div>'+
+            '<span class="pub-step-badge">&#128247; Link personalizado</span>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="pub-summary" aria-label="Resumen del pedido">'+
+        '<div class="pub-summary-item"><div class="pub-summary-label">Nombre</div><div class="pub-summary-val">'+esc(state.name||'—')+'</div></div>'+
+        '<div class="pub-summary-item"><div class="pub-summary-label">Plan</div><div class="pub-summary-val plan-chip">'+esc(plan.name)+' &middot; $'+plan.price.toLocaleString('es-CO')+'</div></div>'+
+        '<div class="pub-summary-item"><div class="pub-summary-label">Fecha</div><div class="pub-summary-val">'+esc(fechaFmt)+'</div></div>'+
+        '<div class="pub-summary-item"><div class="pub-summary-label">Fotos</div><div class="pub-summary-val">'+totalFotos+' adjunta'+(totalFotos!==1?'s':'')+'</div></div>'+
+      '</div>'+
+      '<div class="pub-footer">'+
+        '<button type="button" class="pub-confirm-btn" id="pubConfirmBtn">&#128172; Confirmar y abrir WhatsApp</button>'+
+        '<button type="button" class="pub-cancel-btn" id="pubCancelBtn">Cancelar, seguir editando</button>'+
+        '<p class="pub-disclaimer">Al confirmar se abre WhatsApp con un mensaje pre-redactado. Nada se env&iacute;a hasta que t&uacute; presiones "Enviar" en WhatsApp.</p>'+
+      '</div>'+
+    '</div>';
+  function closeModal(){
+    overlay.style.transition='opacity .22s';overlay.style.opacity='0';
+    setTimeout(()=>overlay.remove(),240);
+    const btn=$('#btnPublish'),log=$('#publishLog');
+    if(btn)btn.disabled=false;if(log)log.textContent='';
+  }
+  overlay.addEventListener('click',(e)=>{if(e.target===overlay)closeModal();});
+  overlay.addEventListener('keydown',(e)=>{if(e.key==='Escape')closeModal();});
+  document.body.appendChild(overlay);
+  const cancelBtn=$('#pubCancelBtn');if(cancelBtn)cancelBtn.addEventListener('click',closeModal);
+  const confirmBtn=$('#pubConfirmBtn');
+  if(confirmBtn){
+    confirmBtn.addEventListener('click',async()=>{
+      confirmBtn.disabled=true;confirmBtn.textContent='&#9203; Enviando...';
+      try{
+        const payload={order:ORDER,plan:state.plan,nombre:state.name,fecha:state.date,hora:state.time,venue:state.venue,address:state.address,waOrganizer:state.waOrganizer,hashtag:state.hashtag,totalFotos,timestamp:new Date().toISOString()};
+        try{await fetch(MAKE_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});}catch(_){}
+        const waGueka='573242712162';
+        const msg='Hola Gueka Ideas! 🎉 Acabo de finalizar mi invitación digital para *'+state.name+'* – Plan *'+plan.name+'*'+(ORDER.id?' (Pedido: '+ORDER.id+')':'')+'. Por favor, proceder con la producción. ¡Gracias!';
+        window.open('https://wa.me/'+waGueka+'?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');
+        closeModal();toast('✓ Pedido enviado. ¡Revisa WhatsApp!');
+      }catch(e){confirmBtn.disabled=false;confirmBtn.textContent='&#128172; Confirmar y abrir WhatsApp';toast('⚠ Error al enviar. Intenta de nuevo.');console.error(e);}
+    });
+    setTimeout(()=>confirmBtn.focus(),80);
+  }
+}
+
 /* ── PUBLICAR ── */
 async function publicarInvitacion(){
   const btn=$('#btnPublish'),log=$('#publishLog');if(!btn||!log)return;
-  btn.disabled=true;log.textContent='⏳ Preparando...';
-  try{
-    log.textContent='📤 Subiendo datos...';
-    const payload={order:ORDER,plan:state.plan,nombre:state.name,fecha:state.date,hora:state.time,venue:state.venue,address:state.address,waOrganizer:state.waOrganizer,hashtag:state.hashtag,totalFotos:blobURLs.gal.length+(blobURLs.retrato?1:0)+(blobURLs.fashion?1:0),timestamp:new Date().toISOString()};
-    try{await fetch(MAKE_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});}catch(_){}
-    log.textContent='✓ ¡Enviado! Abriendo WhatsApp...';
-    const waGueka='573242712162';
-    const msg='Hola Gueka Ideas! 🎉 Acabo de finalizar mi invitación digital para *'+state.name+'* – Plan *'+PLANS[state.plan].name+'*'+(ORDER.id?' (Pedido: '+ORDER.id+')':'')+'. Por favor, proceder con la producción. ¡Gracias!';
-    setTimeout(()=>{window.open('https://wa.me/'+waGueka+'?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');toast('✓ Invitación publicada con éxito');btn.disabled=false;log.textContent='';},1200);
-  }catch(e){log.textContent='⚠ Error al publicar. Intenta de nuevo.';btn.disabled=false;console.error('Error en publicarInvitacion:',e);}
+  btn.disabled=true;
+  try{mostrarModalPublicacion();}
+  catch(e){console.error(e);}
+  finally{btn.disabled=false;}
 }
 
 /* ── RSVP ── */
@@ -2039,15 +2724,12 @@ if(rsvpForm){
   });
 }
 
-/* ── ACORDEÓN ──
-   FIX #C: tras abrir/cerrar una sección se redibuja el canvas de partículas
-   con el scrollHeight actualizado (esperar a que termine la transición CSS de .32s). */
+/* ── ACORDEÓN ── */
 function bindAcordeon(){
   $$('.sec-head').forEach(btn=>{
     btn.addEventListener('click',()=>{
       const sec=btn.closest('.sec');if(!sec)return;
       const isOpen=sec.classList.toggle('open');btn.setAttribute('aria-expanded',isOpen?'true':'false');
-      // Redibujar partículas tras la transición de apertura/cierre (320ms + margen)
       if(state.particles&&state.particles!=='ninguna'){
         setTimeout(()=>{
           if(particleAnim){cancelAnimationFrame(particleAnim);particleAnim=null;}
@@ -2078,6 +2760,24 @@ async function init(){
   pushHistory();
 
   $$('[data-up]').forEach(btn=>btn.addEventListener('click',()=>handlePhotoUpload(btn.getAttribute('data-up'))));
+  /* Clic en la foto de portada de la preview → abre §1 Fotos y sube foto */
+  const pvRetratoWrap=$('#pv-retrato-wrap');
+  if(pvRetratoWrap){
+    pvRetratoWrap.addEventListener('click',()=>{
+      /* Abrir §1 Fotos si está cerrado */
+      const sec1=[...$$('.sec')].find(s=>{
+        const num=s.querySelector('.sec-num');
+        return num&&num.textContent.trim()==='1';
+      });
+      if(sec1&&!sec1.classList.contains('open')){
+        const head=sec1.querySelector('.sec-head');
+        if(head)head.click();
+      }
+      if(sec1)sec1.scrollIntoView({behavior:'smooth',block:'start'});
+      /* Disparar subida */
+      setTimeout(()=>handlePhotoUpload('retrato'),320);
+    });
+  }
   $$('[data-def]').forEach(btn=>{
     btn.addEventListener('click',async()=>{
       const key=btn.getAttribute('data-def');pushHistory();
@@ -2105,8 +2805,8 @@ async function init(){
 
   const btnQR=$('#btnQR');if(btnQR)btnQR.addEventListener('click',generarQR);
 
-  const planBarToggle=$('#planBarToggle'),planBarBody=$('#planBarBody'),planBarWrap=$('#planBarWrap');
-  if(planBarToggle&&planBarBody&&planBarWrap){
+  const planBarToggle=$('#planBarToggle'),planBarWrap=$('#planBarWrap');
+  if(planBarToggle&&planBarWrap){
     planBarToggle.addEventListener('click',()=>{
       const open=planBarWrap.getAttribute('data-open')!=='true';
       planBarToggle.setAttribute('aria-expanded',open?'true':'false');planBarWrap.setAttribute('data-open',open?'true':'false');
@@ -2158,12 +2858,51 @@ async function init(){
 
   ['[data-bind="date"]','[data-bind="time"]'].forEach(sel=>{const el=$(sel);if(el)el.addEventListener('input',startCountdown);});
 
-  bindHelpTooltips();updateProgress();
-  // Posponer tour 2.5s para que el usuario pueda ver la interfaz primero
-  setTimeout(()=>startTour(false), 2500);
+  bindHelpTooltips();
+  /* Pre-poblar estado previo con los datos ya cargados para que la
+     primera llamada a updateProgress() no dispare chips de bienvenida */
+  const _initChecks=[
+    {ok:!!state.name,key:'name'},{ok:!!state.date,key:'date'},
+    {ok:!!state.time,key:'time'},{ok:!!(state.venue||state.address),key:'lugar'},
+    {ok:!!(blobURLs.retrato||(state.imgKeys&&state.imgKeys.retrato)),key:'retrato'},
+    {ok:!!state.waOrganizer,key:'wa'}
+  ];
+  _initChecks.forEach(c=>{_prevProgressKeys[c.key]=c.ok;});
+  updateProgress();
+  showOnboarding();
 
-  /* ResizeObserver para redibujar partículas cuando el card cambia de tamaño
-     (incluye cambios por zoom o redimensión de ventana). Se desconecta al descargar. */
+  /* ── BEFOREUNLOAD: alerta si hay cambios pendientes ── */
+  window.addEventListener('beforeunload',(e)=>{
+    if(_hasPendingChanges){
+      // Intentar guardar sincrónicamente antes de salir
+      _forceSave();
+      // Si el guardado fue exitoso, _hasPendingChanges ya es false y no bloqueamos
+      if(!_hasPendingChanges)return;
+      e.preventDefault();
+      e.returnValue='';// Activa el diálogo nativo del navegador
+    }
+  });
+
+  /* ── UNSAVED BANNER: botones "Guardar ahora" y "×" ── */
+  const ubSaveNow=$('#ubSaveNow');
+  const ubDismiss=$('#ubDismiss');
+  const ubBanner=$('#unsavedBanner');
+  if(ubSaveNow)ubSaveNow.addEventListener('click',()=>{
+    _forceSave();
+    if(ubBanner)ubBanner.style.display='none';
+    toast('✓ Cambios guardados');
+  });
+  if(ubDismiss)ubDismiss.addEventListener('click',()=>{
+    if(ubBanner)ubBanner.style.display='none';
+  });
+
+  /* Mostrar el unsaved banner si el usuario sale del viewport (mobile: cambia de app) */
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='hidden'&&_hasPendingChanges){
+      _forceSave();
+    }
+  });
+
   if(typeof ResizeObserver!=='undefined'){
     const cwr=$('#card-wrapper');
     if(cwr){
@@ -2179,7 +2918,123 @@ async function init(){
   }
 }
 
+/* ── ONBOARDING MODAL ── */
+const OB_STORAGE_KEY='gueka_ob_done_v1';
+const OB_STEPS=[
+  {
+    icon:'&#127775;',
+    title:'Bienvenida a <strong>Gueka Ideas</strong>',
+    body:'Aquí creas tu invitación digital en minutos. Verás los cambios en tiempo real en el teléfono de la derecha.',
+    tags:['XV A&ntilde;os','Bodas','Cumplea&ntilde;os','Bautizos','Baby Shower'],
+    labelTop:'Qu&eacute; es',
+    labelStep:'Bienvenida'
+  },
+  {
+    icon:'&#9998;&#65039;',
+    title:'3 pasos para <strong>tu invitaci&oacute;n</strong>',
+    body:'<b>1. Elige una plantilla</b> en el menú superior — pasa el cursor para ver la vista previa.<br><br><b>2. Completa tus datos</b> en el panel derecho: nombre, fecha, fotos y colores.<br><br><b>3. Publica</b> con el botón dorado al final del panel.',
+    tags:['1. Plantilla','2. Datos','3. Publicar'],
+    labelStep:'C&oacute;mo funciona'
+  },
+  {
+    icon:'&#128247;',
+    title:'Tus fotos se guardan <strong>sin internet</strong>',
+    body:'Sube tus fotos directamente desde el celular o computador. Se almacenan en tu dispositivo — <b>nadie más las ve</b> hasta que publiques.',
+    tags:['Privado','Sin servidor','Hasta 10MB c/u'],
+    labelStep:'Tus fotos'
+  }
+];
+function showOnboarding(){
+  if(localStorage.getItem(OB_STORAGE_KEY))return;
+  let step=0;
+  const overlay=document.createElement('div');
+  overlay.className='ob-overlay';
+  overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Bienvenida al editor de invitaciones Gueka Ideas');
+  function html(){
+    return '<div class="ob-box">'+
+      '<div class="ob-shimmer" aria-hidden="true"></div>'+
+      '<div class="ob-header">'+
+        '<img class="ob-logo" src="https://hercules-cdn.com/file_NNb9605ihCeHagp11xprKC3K" alt="Logo Gueka Ideas" loading="eager">'+
+        '<div class="ob-header-text">'+
+          '<div class="ob-header-title">Gueka Ideas</div>'+
+          '<div class="ob-header-sub">Estudio de Invitaciones Digitales</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="ob-steps-track" role="list" aria-label="Pasos del tour">'+
+        OB_STEPS.map((s,i)=>'<div class="ob-step'+(i===step?' ob-step-active':'')+'" role="listitem" aria-current="'+(i===step?'step':'false')+'">'+
+          '<div class="ob-step-dot" aria-hidden="true">'+s.icon+'</div>'+
+          '<div class="ob-step-label">'+s.labelStep+'</div>'+
+        '</div>').join('')+
+      '</div>'+
+      '<div class="ob-content" aria-live="polite" aria-atomic="true">'+
+        OB_STEPS.map((s,i)=>{
+          const cls=i===step?'ob-visible':(i<step?'ob-hidden-left':'ob-hidden-right');
+          return '<div class="ob-slide '+cls+'" aria-hidden="'+(i!==step)+'" id="ob-slide-'+i+'">'+
+            '<div class="ob-slide-title">'+s.title+'</div>'+
+            '<div class="ob-slide-body">'+s.body+'</div>'+
+            '<div class="ob-slide-tags">'+s.tags.map(t=>'<span class="ob-tag">'+t+'</span>').join('')+'</div>'+
+          '</div>';
+        }).join('')+
+      '</div>'+
+      '<div class="ob-footer">'+
+        '<div class="ob-dots" role="tablist" aria-label="Indicadores de paso">'+
+          OB_STEPS.map((_,i)=>'<button type="button" class="ob-dot'+(i===step?' on':'')+'" data-ob-dot="'+i+'" aria-label="Ir al paso '+(i+1)+'" aria-selected="'+(i===step)+'"></button>').join('')+
+        '</div>'+
+        '<button type="button" class="ob-skip" data-ob="skip">Saltar</button>'+
+        '<div class="ob-nav">'+
+          (step>0?'<button type="button" class="ob-prev" data-ob="prev">Atr&aacute;s</button>':'')+
+          '<button type="button" class="ob-next" data-ob="next">'+(step===OB_STEPS.length-1?'&#10003; &#161;Empezar!':'Siguiente')+'</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }
+  function render(){overlay.innerHTML=html();bindBtns();}
+  function close(){
+    overlay.style.transition='opacity .24s';overlay.style.opacity='0';
+    setTimeout(()=>{overlay.remove();},260);
+    localStorage.setItem(OB_STORAGE_KEY,'1');
+    setTimeout(()=>startTour(false),1200);
+  }
+  function goTo(n){
+    if(n<0||n>=OB_STEPS.length)return;
+    step=n;render();
+    const nextBtn=overlay.querySelector('[data-ob="next"]');
+    if(nextBtn)nextBtn.focus();
+  }
+  function bindBtns(){
+    overlay.querySelector('[data-ob="next"]')&&overlay.querySelector('[data-ob="next"]').addEventListener('click',()=>{
+      if(step===OB_STEPS.length-1)close();else goTo(step+1);
+    });
+    overlay.querySelector('[data-ob="prev"]')&&overlay.querySelector('[data-ob="prev"]').addEventListener('click',()=>goTo(step-1));
+    overlay.querySelector('[data-ob="skip"]')&&overlay.querySelector('[data-ob="skip"]').addEventListener('click',close);
+    overlay.querySelectorAll('[data-ob-dot]').forEach(btn=>btn.addEventListener('click',()=>goTo(parseInt(btn.getAttribute('data-ob-dot')))));
+  }
+  overlay.addEventListener('keydown',(e)=>{
+    if(e.key==='Escape')close();
+    if(e.key==='ArrowRight')goTo(step+1);
+    if(e.key==='ArrowLeft')goTo(step-1);
+  });
+  render();
+  document.body.appendChild(overlay);
+  const firstBtn=overlay.querySelector('[data-ob="next"]');
+  if(firstBtn)firstBtn.focus();
+}
+
 init();
 </script>
+
+<!-- Save toast -->
+<div id="saveToast" role="status" aria-live="polite">
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="6.5" stroke="#6ee09e" stroke-width="1.3"/><path d="M4 7l2 2 4-4" stroke="#6ee09e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  Cambios guardados
+</div>
+
+<!-- Unsaved banner (shown only when there are pending changes and user tries to leave) -->
+<div id="unsavedBanner" role="alert">
+  <span>⚠️ Tienes cambios sin guardar</span>
+  <button id="ubSaveNow" type="button">Guardar ahora</button>
+  <button class="ub-dismiss" id="ubDismiss" type="button" aria-label="Cerrar">×</button>
+</div>
+
 </body>
 </html>
