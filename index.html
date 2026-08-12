@@ -287,13 +287,8 @@ nav.scrolled{
 .s-title em{font-style:italic;color:var(--rose-mid)}
 .s-desc{color:rgba(232,221,213,.75);font-size:1.05rem;line-height:1.8;margin-top:16px;max-width:580px}
 
-/* Reveal animations */
-.reveal{opacity:0;transform:translateY(32px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
-.reveal.on{opacity:1;transform:none}
-.reveal-l{opacity:0;transform:translateX(-32px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
-.reveal-l.on{opacity:1;transform:none}
-.reveal-r{opacity:0;transform:translateX(32px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
-.reveal-r.on{opacity:1;transform:none}
+/* Reveal animations — disabled, content always visible */
+.reveal,.reveal-l,.reveal-r{opacity:1;transform:none}
 
 /* ============================
    BOTONES
@@ -856,6 +851,18 @@ footer{
   #cookieBanner{flex-direction:column;align-items:flex-start}
   .cookie-btns{width:100%}
   .cookie-btn-reject,.cookie-btn-accept{flex:1;text-align:center}
+}
+
+/* ============================
+   MODALES LEGALES
+============================ */
+.legal-modal{
+  display:none;position:fixed;inset:0;z-index:9000;
+  align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.modal-backdrop{
+  position:absolute;inset:0;background:rgba(44,0,29,.75);backdrop-filter:blur(4px);
 }
 </style>
 </head>
@@ -1626,8 +1633,8 @@ footer{
   <div class="ft-bot">
     <p class="ft-copy">© 2026 VELVETT. Todos los derechos reservados.</p>
     <div class="ft-legal">
-      <a href="/politica-de-privacidad/" target="_blank" rel="noopener">Política de Privacidad</a>
-      <a href="/terminos-y-condiciones/" target="_blank" rel="noopener">Términos y Condiciones</a>
+      <a href="#" onclick="openModal('modalPrivacy');return false">Política de Privacidad</a>
+      <a href="#" onclick="openModal('modalTerms');return false">Términos y Condiciones</a>
       <a href="#" onclick="openModal('modalAge');return false">Verificación de Edad</a>
     </div>
   </div>
@@ -1761,15 +1768,27 @@ window.addEventListener('scroll', parallaxAll, { passive: true });
 
 // ---- Reveal on scroll ----
 const reveals = document.querySelectorAll('.reveal, .reveal-l, .reveal-r');
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('on');
-      observer.unobserve(e.target);
+// Solo activar animaciones si el dispositivo no prefiere movimiento reducido
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  reveals.forEach(el => {
+    const r = el.getBoundingClientRect();
+    // Solo animar elementos que están FUERA del viewport inicial
+    if (r.top >= window.innerHeight) {
+      el.classList.add('animate');
     }
   });
-}, { threshold: 0.12 });
-reveals.forEach(el => observer.observe(el));
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('on');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => {
+    if (el.classList.contains('animate')) observer.observe(el);
+  });
+}
 
 // ---- FAQ accordion ----
 document.querySelectorAll('.faq-hd').forEach(hd => {
