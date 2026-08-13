@@ -44,7 +44,14 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;font-size:16px;-webkit-overflow-scrolling:touch}
-body{font-family:'Inter',sans-serif;background:#1e0014;color:#e8ddd5;overflow-x:hidden;line-height:1.6}
+body{font-family:'Inter',sans-serif;background:#1e0014;color:#e8ddd5;overflow-x:hidden;line-height:1.6;cursor:none}
+
+/* CUSTOM CURSOR */
+#cursor-dot{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--rose-light);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform .1s var(--ease),opacity .2s;will-change:transform}
+#cursor-ring{position:fixed;top:0;left:0;width:36px;height:36px;border:1.5px solid rgba(185,128,143,.55);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:left .12s var(--ease),top .12s var(--ease),width .25s var(--ease),height .25s var(--ease),border-color .25s;will-change:transform}
+body.cursor-hover #cursor-dot{transform:translate(-50%,-50%) scale(2.2);background:var(--rose-mid)}
+body.cursor-hover #cursor-ring{width:54px;height:54px;border-color:rgba(185,128,143,.9)}
+@media(pointer:coarse){#cursor-dot,#cursor-ring{display:none}body{cursor:auto}}
 :root{
   --rose-light:#D5B1B8;
   --rose-mid:#B9808F;
@@ -665,6 +672,9 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:clamp(
   </div>
 </div>
 
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
 <script>
 // Hero parallax ref
 const heroBg=document.getElementById('heroBg');
@@ -712,6 +722,32 @@ document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
 // Year
 document.getElementById('yr').textContent=new Date().getFullYear();
+
+// Custom cursor
+(function(){
+  const dot=document.getElementById('cursor-dot');
+  const ring=document.getElementById('cursor-ring');
+  if(!dot||!ring)return;
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{
+    mx=e.clientX;my=e.clientY;
+    dot.style.left=mx+'px';dot.style.top=my+'px';
+  },{passive:true});
+  function animRing(){
+    rx+=(mx-rx)*.13;
+    ry+=(my-ry)*.13;
+    ring.style.left=rx+'px';ring.style.top=ry+'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+  const hoverable='a,button,[role="button"],.faq-hd,.wpp-float,.cta-btn,.int-link';
+  document.querySelectorAll(hoverable).forEach(el=>{
+    el.addEventListener('mouseenter',()=>document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave',()=>document.body.classList.remove('cursor-hover'));
+  });
+  document.addEventListener('mouseleave',()=>{dot.style.opacity='0';ring.style.opacity='0';});
+  document.addEventListener('mouseenter',()=>{dot.style.opacity='1';ring.style.opacity='1';});
+})();
 </script>
 </body>
 </html>
