@@ -47,9 +47,9 @@ html{scroll-behavior:smooth;font-size:16px;-webkit-overflow-scrolling:touch}
 body{font-family:'Inter',sans-serif;background:#1e0014;color:#e8ddd5;overflow-x:hidden;line-height:1.6;cursor:none}
 
 /* CUSTOM CURSOR */
-#cursor-dot{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--rose-light);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform .1s var(--ease),opacity .2s;will-change:transform}
-#cursor-ring{position:fixed;top:0;left:0;width:36px;height:36px;border:1.5px solid rgba(185,128,143,.55);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:left .12s var(--ease),top .12s var(--ease),width .25s var(--ease),height .25s var(--ease),border-color .25s;will-change:transform}
-body.cursor-hover #cursor-dot{transform:translate(-50%,-50%) scale(2.2);background:var(--rose-mid)}
+#cursor-dot{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--rose-light);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-4px,-4px);transition:transform .1s var(--ease),opacity .2s;will-change:left,top}
+#cursor-ring{position:fixed;top:0;left:0;width:36px;height:36px;border:1.5px solid rgba(185,128,143,.55);border-radius:50%;pointer-events:none;z-index:99998;transition:width .25s var(--ease),height .25s var(--ease),border-color .25s;will-change:left,top}
+body.cursor-hover #cursor-dot{transform:translate(-4px,-4px) scale(2.2);background:var(--rose-mid)}
 body.cursor-hover #cursor-ring{width:54px;height:54px;border-color:rgba(185,128,143,.9)}
 @media(pointer:coarse){#cursor-dot,#cursor-ring{display:none}body{cursor:auto}}
 :root{
@@ -175,7 +175,7 @@ img{display:block;max-width:100%;height:auto}
 .faq-group-label{display:inline-block;font-size:.62rem;letter-spacing:.25em;text-transform:uppercase;color:var(--rose-mid);margin-bottom:12px;font-weight:500}
 .faq-group-title{font-family:var(--serif);font-size:1.4rem;font-weight:300;color:var(--cream);margin-bottom:1.5rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)}
 .faq-item{border-bottom:1px solid var(--border);transition:border-color .3s}
-.faq-list .faq-item:first-child{border-top:1px solid var(--border)}
+.faq-item.first{border-top:1px solid var(--border)}
 .faq-item:hover{border-color:var(--border-bright)}
 .faq-hd{display:flex;justify-content:space-between;align-items:center;padding:22px 0;cursor:pointer;gap:16px;user-select:none}
 .faq-q{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--cream);transition:color .3s;flex:1;line-height:1.3}
@@ -404,7 +404,7 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:clamp(
       <span class="faq-group-label">Grupo 01</span>
       <h3 class="faq-group-title">Aspectos Legales y Requisitos</h3>
 
-      <div class="faq-item">
+      <div class="faq-item first">
         <div class="faq-hd">
           <h4 class="faq-q">¿Es legal ser modelo webcam en Colombia?</h4>
           <div class="faq-plus"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
@@ -440,7 +440,7 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:clamp(
       <span class="faq-group-label">Grupo 02</span>
       <h3 class="faq-group-title">Ingresos y Modalidades de Trabajo</h3>
 
-      <div class="faq-item">
+      <div class="faq-item first">
         <div class="faq-hd">
           <h4 class="faq-q">¿Cuánto puedo ganar como modelo webcam?</h4>
           <div class="faq-plus"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
@@ -492,7 +492,7 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:clamp(
       <span class="faq-group-label">Grupo 03</span>
       <h3 class="faq-group-title">Seguridad, Formación y Condiciones</h3>
 
-      <div class="faq-item">
+      <div class="faq-item first">
         <div class="faq-hd">
           <h4 class="faq-q">¿Es seguro trabajar como modelo webcam?</h4>
           <div class="faq-plus"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
@@ -731,16 +731,17 @@ document.getElementById('yr').textContent=new Date().getFullYear();
   let mx=0,my=0,rx=0,ry=0;
   document.addEventListener('mousemove',e=>{
     mx=e.clientX;my=e.clientY;
-    dot.style.left=mx+'px';dot.style.top=my+'px';
+    dot.style.left=(mx-4)+'px';dot.style.top=(my-4)+'px';
   },{passive:true});
   function animRing(){
     rx+=(mx-rx)*.13;
     ry+=(my-ry)*.13;
-    ring.style.left=rx+'px';ring.style.top=ry+'px';
+    const r=ring.offsetWidth/2;
+    ring.style.left=(rx-r)+'px';ring.style.top=(ry-r)+'px';
     requestAnimationFrame(animRing);
   }
   animRing();
-  const hoverable='a,button,[role="button"],.faq-hd,.wpp-float,.cta-btn,.int-link';
+  const hoverable='a,button,[role="button"],.faq-hd,.wpp,.cta-btn,.int-link';
   document.querySelectorAll(hoverable).forEach(el=>{
     el.addEventListener('mouseenter',()=>document.body.classList.add('cursor-hover'));
     el.addEventListener('mouseleave',()=>document.body.classList.remove('cursor-hover'));
