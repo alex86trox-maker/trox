@@ -24,12 +24,9 @@
   body{ font-family:'Montserrat',sans-serif; display:flex; justify-content:center; }
   ::selection{ background:rgba(230,200,180,.35); }
 
-  /* ===== Scrollbar (delgada y discreta) ===== */
-  html{ scrollbar-width:thin; scrollbar-color:rgba(230,200,180,.4) transparent; }
-  ::-webkit-scrollbar{ width:6px; height:6px; }
-  ::-webkit-scrollbar-track{ background:transparent; }
-  ::-webkit-scrollbar-thumb{ background:rgba(230,200,180,.35); border-radius:10px; }
-  ::-webkit-scrollbar-thumb:hover{ background:rgba(230,200,180,.55); }
+  /* ===== Scrollbar (oculta para una vista más limpia) ===== */
+  html{ scrollbar-width:none; -ms-overflow-style:none; }
+  html::-webkit-scrollbar, body::-webkit-scrollbar{ display:none; width:0; height:0; }
 
   /* ===== Progress bar ===== */
   #scroll-progress{
@@ -296,6 +293,11 @@
   .fade-in{ opacity:0; transform:translateY(28px); transition:opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1); }
   .fade-in.in-view{ opacity:1; transform:translateY(0); }
 
+  /* ===== Footer marca Gueka Ideas ===== */
+  .gk-footer{ padding:40px 24px 32px; text-align:center; border-top:1px solid var(--c-line); margin-top:20px; }
+  .gk-footer-logo{ width:130px; opacity:.65; margin:0 auto 14px; display:block; filter:grayscale(1) brightness(1.4); }
+  .gk-footer-text{ font-size:10px; line-height:1.7; letter-spacing:.04em; color:var(--c-dim); opacity:.7; }
+
   @media (prefers-reduced-motion: reduce){
     html{ scroll-behavior:auto; }
     .fade-in{ transition:none; opacity:1; transform:none; }
@@ -489,6 +491,12 @@
     <p id="pv-poem" class="card-cap" style="margin-bottom:18px;"></p>
     <div id="pv-sign" class="splash-name"></div>
   </section>
+
+  <!-- ===== FOOTER: marca Gueka Ideas ===== -->
+  <footer class="gk-footer">
+    <img src="https://hercules-cdn.com/file_dObbyNBWgpOBucsEYncNDP8y" alt="Gueka Ideas" class="gk-footer-logo">
+    <p class="gk-footer-text">Esta tarjeta digital es propiedad exclusiva de Gueka Ideas<br>Uso permitido únicamente para fines personales.<br>© 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</p>
+  </footer>
 </div>
 
 <script>
@@ -1058,6 +1066,10 @@
       btn.disabled = false;
       successEl.style.display = 'block';
       showToast('¡Confirmación enviada!');
+      var qrWrap = document.getElementById('rsvp-qr-wrap');
+      if (asiste === 'si' && qrWrap.dataset.eligible === 'true'){
+        qrWrap.style.display = 'flex';
+      }
     }, 450);
   });
 
@@ -1066,15 +1078,16 @@
     var wrap = document.getElementById('rsvp-qr-wrap');
     var canvasEl = document.getElementById('rsvp-qr-canvas');
     canvasEl.innerHTML = '';
-    if (state.plan === 'deluxe' && state.rsvpPara && typeof QRCode !== 'undefined'){
-      wrap.style.display = 'flex';
+    var qrEligible = state.plan === 'deluxe' && state.rsvpPara && typeof QRCode !== 'undefined';
+    if (qrEligible){
       new QRCode(canvasEl, {
         text: 'PASE:' + state.rsvpPara + '|MAX:' + state.rsvpMaxPases + '|EVENTO:' + state.name,
         width: 140, height: 140
       });
-    } else {
-      wrap.style.display = 'none';
     }
+    // El QR solo se revela después de confirmar asistencia por WhatsApp, no antes.
+    wrap.style.display = 'none';
+    wrap.dataset.eligible = qrEligible ? 'true' : 'false';
   }
 
   /* ============ Scroll reveal ============ */
