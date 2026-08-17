@@ -287,24 +287,112 @@
     ============================================= */
     .portrait-sec { text-align: center; }
     #pv-retrato-wrap {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      overflow: hidden;
+      width: 200px;
+      height: 200px;
       margin: 0 auto 24px;
-      border: 2px solid var(--c-a);
-      box-shadow: 0 0 30px rgba(157,0,255,0.4), 0 0 60px rgba(157,0,255,0.15);
+      perspective: 700px;
       cursor: pointer;
       position: relative;
-      transition: transform 0.3s;
     }
-    #pv-retrato-wrap:hover { transform: scale(1.04); }
+    .retrato-flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+      border-radius: 50%;
+    }
+    #pv-retrato-wrap.flipped .retrato-flip-inner {
+      transform: rotateY(180deg);
+    }
+    .retrato-front,
+    .retrato-back {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      backface-visibility: hidden;
+      overflow: hidden;
+      border: 2px solid var(--c-a);
+      box-shadow: 0 0 30px rgba(157,0,255,0.4), 0 0 60px rgba(157,0,255,0.15);
+    }
+    .retrato-front {
+      background: var(--c-bg);
+    }
+    /* glitch overlay frente */
+    .retrato-front::after {
+      content: '';
+      position: absolute; inset: 0; border-radius: 50%;
+      background: linear-gradient(120deg, transparent 55%, rgba(0,229,255,0.18) 60%, transparent 65%);
+      background-size: 200% 200%;
+      animation: retratoGlitch 6s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes retratoGlitch {
+      0%   { background-position: 0 0; }
+      50%  { background-position: 100% 100%; }
+      100% { background-position: 0 0; }
+    }
+    .retrato-back {
+      transform: rotateY(180deg);
+      background: radial-gradient(circle at 50% 40%, rgba(157,0,255,0.25), rgba(5,5,16,0.98) 70%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 14px;
+      text-align: center;
+      gap: 8px;
+    }
+    .retrato-back-age {
+      font-family: var(--c-head);
+      font-size: 1.6rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--c-a), var(--c-b));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 10px var(--c-a));
+      line-height: 1;
+    }
+    .retrato-back-name {
+      font-family: var(--c-script);
+      font-size: 1rem;
+      color: var(--c-text);
+      text-shadow: 0 0 12px var(--c-b);
+      line-height: 1.2;
+    }
+    .retrato-back-divider {
+      width: 30px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--c-b), transparent);
+      margin: 2px auto;
+    }
+    .retrato-back-cap {
+      font-family: var(--c-serif);
+      font-size: 0.62rem;
+      color: var(--c-dim);
+      line-height: 1.5;
+    }
+    .retrato-tap-hint {
+      position: absolute;
+      bottom: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--c-mono);
+      font-size: 0.52rem;
+      letter-spacing: 0.15em;
+      color: var(--c-dim);
+      text-transform: uppercase;
+      white-space: nowrap;
+      opacity: 0.55;
+      animation: tapPulse 2.4s ease-in-out infinite;
+    }
     #pv-nombre {
       font-family: var(--c-script);
       font-size: clamp(2rem, 10vw, 3.2rem);
       color: var(--c-text);
       text-shadow: 0 0 25px var(--c-b);
       margin-bottom: 12px;
+      margin-top: 32px;
     }
 
     /* =============================================
@@ -1124,10 +1212,24 @@
   <section class="portrait-sec">
     <div class="sec-label">la protagonista</div>
     <div id="pv-retrato-wrap">
-      <img id="pv-retrato" class="cover-img" src="" alt="Retrato" style="display:none" />
-      <div class="img-placeholder" id="pv-retrato-ph">FOTO · RETRATO</div>
-      <button class="photo-upload-btn" id="retrato-upload-btn" title="Cambiar foto" type="button">📷</button>
-      <input type="file" id="retrato-file-input" accept="image/*" data-photo-key="retrato" style="display:none" />
+      <div class="retrato-flip-inner">
+        <!-- FRENTE: foto -->
+        <div class="retrato-front">
+          <img id="pv-retrato" class="cover-img" src="" alt="Retrato" style="display:none" />
+          <div class="img-placeholder" id="pv-retrato-ph">FOTO · RETRATO</div>
+          <button class="photo-upload-btn" id="retrato-upload-btn" title="Cambiar foto" type="button">📷</button>
+          <input type="file" id="retrato-file-input" accept="image/*" data-photo-key="retrato" style="display:none" />
+        </div>
+        <!-- REVERSO: nombre + caption -->
+        <div class="retrato-back">
+          <div class="retrato-back-age" id="pv-retrato-age">15</div>
+          <div class="retrato-back-divider"></div>
+          <div class="retrato-back-name" id="pv-retrato-name">Valeria Luna</div>
+          <div class="retrato-back-divider"></div>
+          <div class="retrato-back-cap" id="pv-retrato-cap">Bajo las estrellas, comienza mi historia</div>
+        </div>
+      </div>
+      <div class="retrato-tap-hint">↺ toca para voltear</div>
     </div>
     <div id="pv-nombre">Valeria Luna</div>
     <div id="pv-caption" class="card-cap">Bajo las estrellas, comienza mi historia</div>
@@ -1896,8 +1998,11 @@ function renderPreview() {
   if (spBtn) spBtn.textContent = state.splashBtn;
 
   // Foto + nombre
-  set('pv-nombre',  state.name);
-  set('pv-caption', state.caption);
+  set('pv-nombre',       state.name);
+  set('pv-caption',      state.caption);
+  set('pv-retrato-age',  state.age);
+  set('pv-retrato-name', state.name);
+  set('pv-retrato-cap',  state.caption);
   setRetrato('pv-retrato', 'pv-retrato-ph', state.imgKeys?.retrato);
   setRetrato('pv-fashion',  'pv-fashion-ph',  state.imgKeys?.fashion);
 
@@ -2384,6 +2489,16 @@ window.addEventListener('DOMContentLoaded', () => {
   if (historiaFlip) {
     historiaFlip.addEventListener('click', () => {
       historiaFlip.classList.toggle('flipped');
+    });
+  }
+
+  // Retrato flip card
+  const retratoWrap = document.getElementById('pv-retrato-wrap');
+  if (retratoWrap) {
+    retratoWrap.addEventListener('click', e => {
+      // No voltear si se hace clic en el botón de foto
+      if (e.target.closest('.photo-upload-btn')) return;
+      retratoWrap.classList.toggle('flipped');
     });
   }
 });
