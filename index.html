@@ -872,40 +872,31 @@
     .gift-qr-box img { border-radius: 8px; }
 
     /* =============================================
-       FOTO — área de carga con IndexedDB
+       FOTO — botón flotante de carga (IndexedDB)
     ============================================= */
-    .photo-upload-zone {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
-    }
-    .photo-upload-zone input[type="file"] {
+    .photo-upload-btn {
       position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-    }
-    .photo-upload-hint {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
+      bottom: 12px;
+      right: 12px;
+      z-index: 10;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--c-a);
       background: rgba(0,0,0,0.65);
       color: var(--c-e);
-      font-family: var(--c-mono);
-      font-size: 0.58rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: 20px;
-      white-space: nowrap;
-      pointer-events: none;
-      z-index: 2;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.2s;
+      backdrop-filter: blur(4px);
     }
-    .photo-upload-zone .cover-img { position: relative; z-index: 1; }
+    .photo-upload-btn:hover {
+      background: rgba(157,0,255,0.35);
+      transform: scale(1.12);
+    }
 
     /* =============================================
        SECTION 14 — LUGAR
@@ -1133,12 +1124,10 @@
   <section class="portrait-sec">
     <div class="sec-label">la protagonista</div>
     <div id="pv-retrato-wrap">
-      <label class="photo-upload-zone" title="Toca para cambiar foto">
-        <input type="file" accept="image/*" data-photo-key="retrato" />
-        <img id="pv-retrato" class="cover-img" src="" alt="Retrato" style="display:none" />
-        <div class="img-placeholder" id="pv-retrato-ph">FOTO · RETRATO</div>
-        <span class="photo-upload-hint">📷 Cambiar foto</span>
-      </label>
+      <img id="pv-retrato" class="cover-img" src="" alt="Retrato" style="display:none" />
+      <div class="img-placeholder" id="pv-retrato-ph">FOTO · RETRATO</div>
+      <button class="photo-upload-btn" id="retrato-upload-btn" title="Cambiar foto" type="button">📷</button>
+      <input type="file" id="retrato-file-input" accept="image/*" data-photo-key="retrato" style="display:none" />
     </div>
     <div id="pv-nombre">Valeria Luna</div>
     <div id="pv-caption" class="card-cap">Bajo las estrellas, comienza mi historia</div>
@@ -1178,12 +1167,11 @@
       <div class="historia-flip-inner">
         <!-- FRENTE: foto -->
         <div class="historia-front">
-          <label class="photo-upload-zone" title="Toca para cambiar foto">
-            <input type="file" accept="image/*" data-photo-key="fashion" />
-            <img id="pv-fashion" class="cover-img" src="" alt="Foto de historia" style="display:none" />
-            <div class="img-placeholder" id="pv-fashion-ph">FOTO · HISTORIA</div>
-            <span class="photo-upload-hint">📷 Cambiar foto</span>
-          </label>
+          <img id="pv-fashion" class="cover-img" src="" alt="Foto de historia" style="display:none" />
+          <div class="img-placeholder" id="pv-fashion-ph">FOTO · HISTORIA</div>
+          <!-- Botón de carga pequeño, no interrumpe el flip -->
+          <button class="photo-upload-btn" id="fashion-upload-btn" title="Cambiar foto" type="button">📷</button>
+          <input type="file" id="fashion-file-input" accept="image/*" data-photo-key="fashion" style="display:none" />
           <div class="historia-tap-hint">Toca para leer mi historia</div>
         </div>
         <!-- RESPALDO: texto -->
@@ -1375,7 +1363,7 @@
     <div class="glow-line"></div>
     <div id="pv-poem" class="card-cap"></div>
     <div class="cierre-sign-label">con amor</div>
-    <div id="pv-sign" class="splash-name"></div>
+    <div id="pv-sign"></div>
   </section>
 
   <!-- =========================================
@@ -1402,7 +1390,7 @@ const state = {
   templateName: 'cosmic-neon',
   name: 'Valeria Luna',
   age: '15',
-  date: '2025-12-20',
+  date: '2026-12-20',
   time: '19:00',
   hashtag: '#Vale15',
   caption: 'Bajo las estrellas, comienza mi historia',
@@ -1579,15 +1567,22 @@ function applyFont(key) {
    PARTICLES — canvas
 ================================================================ */
 let particleAnim = null;
-const canvas = document.getElementById('particle-canvas');
-const ctx2d = canvas.getContext('2d');
+let canvas = null;
+let ctx2d   = null;
+
+function initCanvas() {
+  canvas = document.getElementById('particle-canvas');
+  if (!canvas) return;
+  ctx2d = canvas.getContext('2d');
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+}
 
 function resizeCanvas() {
+  if (!canvas) return;
   canvas.width  = window.innerWidth;
   canvas.height = window.innerHeight;
 }
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
 
 function getColors() {
   const w = document.getElementById('card-wrapper');
@@ -1601,6 +1596,7 @@ function getColors() {
 }
 
 function applyParticles(type) {
+  if (!canvas || !ctx2d) return;
   if (particleAnim) { cancelAnimationFrame(particleAnim); particleAnim = null; }
   ctx2d.clearRect(0, 0, canvas.width, canvas.height);
   if (!type || type === 'ninguna') return;
@@ -2023,6 +2019,19 @@ let galTheta = 0;
 let galDragStart = null;
 let galDragActive = false;
 
+// Guardamos las funciones de drag globales para poder removerlas
+let _galMouseMove = null;
+let _galTouchMove = null;
+let _galMouseUp   = null;
+let _galTouchEnd  = null;
+
+function clearGalDragListeners() {
+  if (_galMouseMove) { document.removeEventListener('mousemove', _galMouseMove); _galMouseMove = null; }
+  if (_galTouchMove) { document.removeEventListener('touchmove', _galTouchMove); _galTouchMove = null; }
+  if (_galMouseUp)   { document.removeEventListener('mouseup',   _galMouseUp);   _galMouseUp   = null; }
+  if (_galTouchEnd)  { document.removeEventListener('touchend',  _galTouchEnd);  _galTouchEnd  = null; }
+}
+
 function buildGalCard(index, imgSrc, caption) {
   const card = document.createElement('div');
   card.className = 'gal-card';
@@ -2084,22 +2093,24 @@ function initGalCarousel(container, cards) {
     });
   });
 
-  // Drag / swipe
+  // Drag / swipe — limpiar listeners previos antes de agregar nuevos
+  clearGalDragListeners();
+
   ring.addEventListener('mousedown', e => { galDragStart = e.clientX; galDragActive = false; });
   ring.addEventListener('touchstart', e => { galDragStart = e.touches[0].clientX; galDragActive = false; }, { passive: true });
 
-  document.addEventListener('mousemove', e => {
+  _galMouseMove = e => {
     if (galDragStart === null) return;
     const diff = e.clientX - galDragStart;
     if (Math.abs(diff) > 4) galDragActive = true;
     ring.style.transform = `rotateY(${galTheta + diff * 0.4}deg)`;
-  });
-  document.addEventListener('touchmove', e => {
+  };
+  _galTouchMove = e => {
     if (galDragStart === null) return;
     const diff = e.touches[0].clientX - galDragStart;
     if (Math.abs(diff) > 4) galDragActive = true;
     ring.style.transform = `rotateY(${galTheta + diff * 0.4}deg)`;
-  }, { passive: true });
+  };
 
   function endDrag(clientX) {
     if (galDragStart === null) return;
@@ -2111,8 +2122,13 @@ function initGalCarousel(container, cards) {
     rotateRing();
     setTimeout(() => { galDragActive = false; }, 50);
   }
-  document.addEventListener('mouseup',   e => endDrag(e.clientX));
-  document.addEventListener('touchend',  e => endDrag(e.changedTouches[0].clientX));
+  _galMouseUp  = e => endDrag(e.clientX);
+  _galTouchEnd = e => endDrag(e.changedTouches[0].clientX);
+
+  document.addEventListener('mousemove', _galMouseMove);
+  document.addEventListener('touchmove', _galTouchMove, { passive: true });
+  document.addEventListener('mouseup',   _galMouseUp);
+  document.addEventListener('touchend',  _galTouchEnd);
 
   // Keyboard nav when gallery is focused
   container.setAttribute('tabindex', '0');
@@ -2228,25 +2244,36 @@ async function loadSavedPhotos() {
   }
 }
 
-/* Registra los inputs de carga de fotos */
+/* Registra los botones de carga de fotos (no interfieren con flip card) */
 function initPhotoUploads() {
-  document.querySelectorAll('input[data-photo-key]').forEach(input => {
-    input.addEventListener('change', async function() {
+  // Mapeo: botón → input → ids de imagen
+  const slots = [
+    { btnId: 'retrato-upload-btn', inputId: 'retrato-file-input', key: 'retrato', imgId: 'pv-retrato', phId: 'pv-retrato-ph' },
+    { btnId: 'fashion-upload-btn', inputId: 'fashion-file-input', key: 'fashion', imgId: 'pv-fashion', phId: 'pv-fashion-ph' }
+  ];
+
+  slots.forEach(({ btnId, inputId, key, imgId, phId }) => {
+    const btn   = document.getElementById(btnId);
+    const input = document.getElementById(inputId);
+    if (!btn || !input) return;
+
+    // El botón abre el input, pero detiene el evento para que el flip NO se active
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      input.click();
+    });
+
+    input.addEventListener('change', async function(e) {
+      e.stopPropagation();
       const file = this.files[0];
       if (!file) return;
-      const key  = this.dataset.photoKey;
-      // Determina ids por key
-      const imgId = key === 'retrato' ? 'pv-retrato' : 'pv-fashion';
-      const phId  = key === 'retrato' ? 'pv-retrato-ph' : 'pv-fashion-ph';
       try {
         await savePhotoLocal(key, file);
         const url = await fileToDataURL(file);
         applyPhotoToEl(imgId, phId, url);
       } catch (err) {
         console.warn('No se pudo guardar la foto localmente:', err);
-        // Fallback: mostrar de todas formas aunque no se guarde
-        const url = URL.createObjectURL(file);
-        applyPhotoToEl(imgId, phId, url);
+        applyPhotoToEl(imgId, phId, URL.createObjectURL(file));
       }
     });
   });
@@ -2286,8 +2313,11 @@ function renderGifts() {
 
     el.appendChild(card);
 
-    // Botón toggle QR
-    card.querySelector('.gift-qr-toggle').addEventListener('click', function() {
+    // Botón toggle QR — solo si hay texto válido
+    const toggle = card.querySelector('.gift-qr-toggle');
+    if (!text) { toggle.style.display = 'none'; return; }
+
+    toggle.addEventListener('click', function() {
       const box = document.getElementById(boxId);
       const isOpen = box.classList.toggle('open');
       this.textContent = isOpen ? '▣ Cerrar QR' : '▣ Ver QR';
@@ -2311,6 +2341,9 @@ function renderGifts() {
    INIT — todo arranca aquí, cuando el DOM está listo
 ================================================================ */
 window.addEventListener('DOMContentLoaded', () => {
+  // Canvas de partículas
+  initCanvas();
+
   // Fuentes base
   loadFont('cinzel');
   loadFont('cormorant');
