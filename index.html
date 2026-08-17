@@ -316,28 +316,216 @@
     }
 
     /* =============================================
-       SECTION 8 — GALERÍA
+       SECTION 8 — GALERÍA 3D CAROUSEL
     ============================================= */
     .gal-prev {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-    .gal-prev img, .gal-prev .gal-item {
+      position: relative;
       width: 100%;
-      aspect-ratio: 1;
-      object-fit: cover;
-      border-radius: 10px;
-      border: 1px solid var(--c-line);
-    }
-    .gal-item {
-      background: linear-gradient(135deg, rgba(157,0,255,0.12), rgba(0,229,255,0.08));
+      height: 340px;
+      perspective: 900px;
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
+    }
+
+    /* cosmos stars inside gallery */
+    .gal-stars {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,0.4), transparent),
+        radial-gradient(2px 2px at 80% 20%, rgba(255,255,255,0.3), transparent),
+        radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.5), transparent);
+      background-size: 150px 150px, 220px 220px, 300px 300px, 180px 180px;
+      background-repeat: repeat;
+      animation: galStars 12s linear infinite;
+      pointer-events: none;
+      border-radius: 16px;
+    }
+    @keyframes galStars {
+      from { background-position: 0 0,0 0,0 0,0 0; }
+      to   { background-position: 150px 150px, 220px 220px, 300px 300px, 180px 180px; }
+    }
+
+    /* the actual rotating ring */
+    .gal-carousel {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+
+    /* each card in the ring */
+    .gal-card {
+      position: absolute;
+      width: 160px;
+      height: 200px;
+      left: 50%;
+      top: 50%;
+      margin-left: -80px;
+      margin-top: -100px;
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.175,0.885,0.32,1.275);
+      cursor: pointer;
+    }
+
+    .gal-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .gal-card.flipped .gal-card-inner {
+      transform: rotateY(180deg);
+    }
+    .gal-card:hover .gal-card-inner {
+      transform: translateZ(12px);
+    }
+    .gal-card.flipped:hover .gal-card-inner {
+      transform: rotateY(180deg) translateZ(12px);
+    }
+
+    .gal-card-front,
+    .gal-card-back {
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      backface-visibility: hidden;
+      overflow: hidden;
+      border: 1px solid var(--c-line);
+    }
+    .gal-card-front {
+      background: linear-gradient(135deg, rgba(30,20,50,0.9), rgba(10,10,30,0.95));
+    }
+    .gal-card-back {
+      background: linear-gradient(135deg, rgba(10,10,30,0.95), rgba(20,10,40,0.9));
+      transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      text-align: center;
+    }
+    .gal-card-front img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .gal-card-front .gal-ph {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, rgba(157,0,255,0.15), rgba(0,229,255,0.08));
+    }
+    .gal-card-front .gal-ph-num {
+      font-family: var(--c-head);
+      font-size: 2.2rem;
+      color: var(--c-a);
+      text-shadow: 0 0 20px var(--c-a);
+      line-height: 1;
+    }
+    .gal-card-front .gal-ph-label {
       font-family: var(--c-mono);
-      font-size: 0.6rem;
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
       color: var(--c-dim);
+      text-transform: uppercase;
+    }
+    /* glitch overlay */
+    .gal-card-front::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(45deg, transparent 60%, rgba(157,0,255,0.25) 65%, transparent 70%);
+      background-size: 200% 200%;
+      animation: cardGlitch 4s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes cardGlitch {
+      0%   { background-position: 0 0; }
+      50%  { background-position: 100% 100%; }
+      100% { background-position: 0 0; }
+    }
+    .gal-card-back .gal-back-num {
+      font-family: var(--c-head);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--c-b);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .gal-card-back .gal-back-cap {
+      font-family: var(--c-script);
+      font-size: 1.05rem;
+      color: var(--c-text);
+      line-height: 1.5;
+    }
+    /* card glow on hover */
+    .gal-card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--c-a), var(--c-b), var(--c-c));
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .gal-card:hover::before { opacity: 0.6; }
+
+    /* controls */
+    .gal-controls {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 14px;
+      z-index: 10;
+    }
+    .gal-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--c-a);
+      background: rgba(157,0,255,0.12);
+      color: var(--c-text);
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s;
+      backdrop-filter: blur(4px);
+    }
+    .gal-btn:hover {
+      background: rgba(157,0,255,0.3);
+      box-shadow: 0 0 16px rgba(157,0,255,0.5);
+    }
+    .gal-hint {
+      position: absolute;
+      bottom: 54px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--c-mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.18em;
+      color: var(--c-dim);
+      text-transform: uppercase;
+      white-space: nowrap;
+      opacity: 0.6;
     }
 
     /* =============================================
@@ -976,14 +1164,35 @@ const state = {
     {v:'Amazon: amzn.to/vale15regalos'},
     {v:'Efectivo siempre bienvenido 💕'}
   ],
-  galCaptions: ['Recuerdo 1','Recuerdo 2','Recuerdo 3','Recuerdo 4'],
+  galCaptions: [
+    'Sueños de princesa 👑',
+    'La noche perfecta ✨',
+    'Bajo las estrellas 🌟',
+    'Un momento mágico 💫',
+    'Flores y amor 🌸',
+    'El universo celebra 🌌',
+    'Galaxia de recuerdos 🪐',
+    'Bailando entre estrellas 💃'
+  ],
   typography: 'cinzel',
   songSuggestEnabled: true,
   songSuggestWa: '5215512345678',
   audioKey: '',
   audioName: 'Playlist de Valeria',
-  imgKeys: { retrato: '', fashion: '' },
-  galKeys: [],
+  imgKeys: {
+    retrato: 'https://images.unsplash.com/photo-1775871600151-c7335246a87f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
+    fashion: 'https://images.unsplash.com/photo-1763625650105-9bca6b5509ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800'
+  },
+  galKeys: [
+    'https://images.unsplash.com/photo-1763625642854-9bb2949528c7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
+    'https://images.unsplash.com/photo-1775871299393-2cce027efaa9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
+    'https://images.unsplash.com/photo-1776013114277-d52b9567ce8a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
+    'https://images.unsplash.com/photo-1763625642731-fe68cf5d0d53?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
+    'https://images.unsplash.com/photo-1763625651080-cf6c7295a9db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
+    'https://images.unsplash.com/photo-1566345984367-fa2ba5cedc17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
+    'https://images.unsplash.com/photo-1467685790346-20bfe73a81f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
+    'https://images.unsplash.com/photo-1763959947114-6d1bd4163668?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600'
+  ],
   templateLabel: 'Cosmic Neon'
 };
 
@@ -1522,20 +1731,140 @@ function setRetrato(imgId, phId, key) {
   }
 }
 
+/* ================================================================
+   GALLERY 3D CAROUSEL
+================================================================ */
+let galTheta = 0;
+let galDragStart = null;
+let galDragActive = false;
+
+function buildGalCard(index, imgSrc, caption) {
+  const card = document.createElement('div');
+  card.className = 'gal-card';
+  card.dataset.index = index;
+
+  const frontContent = imgSrc
+    ? `<img src="${imgSrc}" alt="${caption || ''}" loading="lazy" />`
+    : `<div class="gal-ph">
+         <div class="gal-ph-num">${String(index + 1).padStart(2,'0')}</div>
+         <div class="gal-ph-label">Foto</div>
+       </div>`;
+
+  card.innerHTML = `
+    <div class="gal-card-inner">
+      <div class="gal-card-front">${frontContent}</div>
+      <div class="gal-card-back">
+        <div class="gal-back-num">Recuerdo ${String(index + 1).padStart(2,'0')}</div>
+        <div class="gal-back-cap">${caption || 'Un momento especial ✨'}</div>
+      </div>
+    </div>`;
+
+  return card;
+}
+
+function initGalCarousel(container, cards) {
+  const total = cards.length;
+  if (!total) return;
+
+  // Radius based on card count
+  const radius = Math.max(160, Math.round((160 / (2 * Math.sin(Math.PI / total)))));
+  const angleStep = 360 / total;
+
+  // Position each card around the ring
+  cards.forEach((card, i) => {
+    card.style.transform = `rotateY(${angleStep * i}deg) translateZ(${radius}px)`;
+  });
+
+  const ring = container.querySelector('.gal-carousel');
+
+  function rotateRing() {
+    ring.style.transform = `rotateY(${galTheta}deg)`;
+  }
+
+  // Controls
+  const prevBtn = container.querySelector('.gal-btn[data-dir="prev"]');
+  const nextBtn = container.querySelector('.gal-btn[data-dir="next"]');
+  prevBtn.addEventListener('click', () => { galTheta += angleStep; rotateRing(); });
+  nextBtn.addEventListener('click', () => { galTheta -= angleStep; rotateRing(); });
+
+  // Flip on click (only front-facing card)
+  cards.forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (galDragActive) return;
+      const idx = parseInt(card.dataset.index);
+      const currentFront = Math.round(Math.abs(galTheta / angleStep) % total);
+      if (idx === (total - currentFront % total) % total || idx === currentFront % total) {
+        card.classList.toggle('flipped');
+      }
+    });
+  });
+
+  // Drag / swipe
+  ring.addEventListener('mousedown', e => { galDragStart = e.clientX; galDragActive = false; });
+  ring.addEventListener('touchstart', e => { galDragStart = e.touches[0].clientX; galDragActive = false; }, { passive: true });
+
+  document.addEventListener('mousemove', e => {
+    if (galDragStart === null) return;
+    const diff = e.clientX - galDragStart;
+    if (Math.abs(diff) > 4) galDragActive = true;
+    ring.style.transform = `rotateY(${galTheta + diff * 0.4}deg)`;
+  });
+  document.addEventListener('touchmove', e => {
+    if (galDragStart === null) return;
+    const diff = e.touches[0].clientX - galDragStart;
+    if (Math.abs(diff) > 4) galDragActive = true;
+    ring.style.transform = `rotateY(${galTheta + diff * 0.4}deg)`;
+  }, { passive: true });
+
+  function endDrag(clientX) {
+    if (galDragStart === null) return;
+    const diff = clientX - galDragStart;
+    galDragStart = null;
+    if (Math.abs(diff) > 20) {
+      galTheta += diff > 0 ? angleStep : -angleStep;
+    }
+    rotateRing();
+    setTimeout(() => { galDragActive = false; }, 50);
+  }
+  document.addEventListener('mouseup',   e => endDrag(e.clientX));
+  document.addEventListener('touchend',  e => endDrag(e.changedTouches[0].clientX));
+
+  // Keyboard nav when gallery is focused
+  container.setAttribute('tabindex', '0');
+  container.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  { galTheta += angleStep; rotateRing(); }
+    if (e.key === 'ArrowRight') { galTheta -= angleStep; rotateRing(); }
+  });
+}
+
 function renderGallery() {
   const el = document.getElementById('pv-galeria');
   if (!el) return;
   const maxPhotos = state.plan === 'deluxe' ? 12 : state.plan === 'premium' ? 8 : 4;
-  const keys = (state.galKeys || []).slice(0, maxPhotos);
-  if (keys.length > 0) {
-    el.innerHTML = keys.map((k, i) => `<img src="${k}" alt="${state.galCaptions?.[i] || ''}" loading="lazy" />`).join('');
-  } else {
-    // Show placeholder tiles
-    const count = Math.min(4, maxPhotos);
-    el.innerHTML = Array.from({length: count}, (_, i) =>
-      `<div class="gal-item">FOTO ${i+1}</div>`
-    ).join('');
-  }
+  const keys     = (state.galKeys     || []).slice(0, maxPhotos);
+  const captions = (state.galCaptions || []).slice(0, maxPhotos);
+  const count = Math.max(keys.length, 4);
+
+  // Build carousel skeleton
+  el.innerHTML = `
+    <div class="gal-stars"></div>
+    <div class="gal-carousel" id="gal-ring"></div>
+    <div class="gal-hint">← arrastra o toca → · clic para voltear</div>
+    <div class="gal-controls">
+      <button class="gal-btn" data-dir="prev" aria-label="Anterior">◀</button>
+      <button class="gal-btn" data-dir="next" aria-label="Siguiente">▶</button>
+    </div>`;
+
+  const ring = el.querySelector('#gal-ring');
+  galTheta = 0;
+
+  const cards = Array.from({ length: count }, (_, i) => {
+    const card = buildGalCard(i, keys[i] || null, captions[i] || null);
+    ring.appendChild(card);
+    return card;
+  });
+
+  initGalCarousel(el, cards);
 }
 
 /* ================================================================
