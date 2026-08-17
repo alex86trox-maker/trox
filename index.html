@@ -706,6 +706,63 @@
       color:rgba(240,236,228,.12);margin-top:8px;
     }
 
+    /* ── Music Player ── */
+    @keyframes playerSpin{to{transform:rotate(360deg)}}
+    @keyframes playerSlideIn{from{transform:translateY(80px);opacity:0}to{transform:translateY(0);opacity:1}}
+    #music-player{
+      position:fixed;bottom:1.25rem;left:50%;transform:translateX(-50%);
+      z-index:900;
+      display:flex;align-items:center;gap:.75rem;
+      padding:.65rem .9rem .65rem .75rem;
+      background:rgba(10,8,6,.88);
+      border:1px solid var(--border-subtle);
+      border-radius:40px;
+      backdrop-filter:blur(18px);
+      box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 0 1px rgba(201,168,76,.08),0 0 18px rgba(201,168,76,.06);
+      min-width:260px;max-width:360px;width:90vw;
+      animation:playerSlideIn .5s cubic-bezier(.22,1,.36,1) both;
+    }
+    #player-btn{
+      flex-shrink:0;width:36px;height:36px;border-radius:50%;
+      background:linear-gradient(135deg,var(--gold-dark),var(--gold));
+      border:none;color:#0a0808;display:flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      box-shadow:0 2px 10px rgba(201,168,76,.35);
+      transition:transform .15s,box-shadow .15s;
+    }
+    #player-btn:hover{transform:scale(1.08);box-shadow:0 4px 18px rgba(201,168,76,.5)}
+    #player-btn:active{transform:scale(.95)}
+    #player-info{flex:1;min-width:0;overflow:hidden}
+    #player-title{
+      font-family:'Cormorant Garamond',serif;font-size:.82rem;font-weight:600;
+      color:rgba(240,236,228,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      line-height:1.2;
+    }
+    #player-artist{
+      font-family:'Montserrat',sans-serif;font-weight:300;font-size:.42rem;
+      letter-spacing:.22em;color:var(--gold);opacity:.6;margin:.1rem 0 .45rem;
+    }
+    #player-progress-wrap{
+      height:3px;background:rgba(255,255,255,.1);border-radius:3px;
+      cursor:pointer;overflow:hidden;
+    }
+    #player-progress-fill{
+      height:100%;width:0%;
+      background:linear-gradient(90deg,var(--gold-dark),var(--gold));
+      border-radius:3px;transition:width .5s linear;
+    }
+    #player-time{
+      flex-shrink:0;font-family:'Montserrat',sans-serif;font-weight:300;
+      font-size:.44rem;letter-spacing:.05em;color:rgba(240,236,228,.3);
+      min-width:30px;text-align:right;
+    }
+    #player-vol{
+      flex-shrink:0;background:none;border:none;cursor:pointer;
+      color:rgba(240,236,228,.35);padding:0 2px;display:flex;
+      transition:color .2s;
+    }
+    #player-vol:hover{color:var(--gold)}
+
     /* ── Chambelanes ── */
     .chambelan-item{
       display:flex;align-items:center;gap:1rem;
@@ -762,7 +819,28 @@
 <!-- Scroll progress -->
 <div id="scroll-progress"></div>
 
-<!-- Back to top -->
+  <!-- ── MUSIC PLAYER ── -->
+  <div id="music-player" style="display:none">
+    <audio id="player-audio" preload="metadata" loop></audio>
+    <button id="player-btn" onclick="togglePlay()" title="Reproducir / Pausar">
+      <svg id="player-icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+      <svg id="player-icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      <svg id="player-icon-load" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;animation:playerSpin 1s linear infinite"><path d="M12 2a10 10 0 1 1-7.07 2.93"/></svg>
+    </button>
+    <div id="player-info">
+      <div id="player-title"></div>
+      <div id="player-artist"></div>
+      <div id="player-progress-wrap" onclick="seekAudio(event)">
+        <div id="player-progress-fill"></div>
+      </div>
+    </div>
+    <div id="player-time"></div>
+    <button id="player-vol" onclick="toggleMute()" title="Silenciar">
+      <svg id="vol-on" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+      <svg id="vol-off" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="display:none"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+    </button>
+  </div>
+
 <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Subir">↑</button>
 
 <!-- Toast -->
@@ -810,7 +888,7 @@
     <div class="hero-overlay"></div>
     <div class="hero-grid"></div>
     <div class="hero-inner appear">
-      <p class="hero-eyebrow">Estás cordialmente invitada a</p>
+      <p class="hero-eyebrow">Con gran alegría y el corazón lleno de amor,<br>te invitamos a ser parte de esta noche tan especial</p>
       <p class="hero-numeral gold-text">XV</p>
       <p class="hero-anos">Años de</p>
       <p class="hero-name" id="hero-name">Sofía Valentina</p>
@@ -1148,10 +1226,10 @@
       <img src="https://hercules-cdn.com/file_qwfTTf4BD019rdpXBIxlvgXa" alt="Gueka Ideas" />
     </div>
     <p class="footer-legal appear d3" style="margin-top:1.5rem">
-      Esta plantilla digital es propiedad exclusiva de <strong style="font-weight:500;color:rgba(240,236,228,.35)">Gueka Ideas</strong>.<br/>
-      Su uso está permitido únicamente para fines personales.
+      Esta plantilla digital es propiedad exclusiva de <strong style="font-weight:500;color:rgba(240,236,228,.35)">Gueka Ideas</strong>.
+      Su uso está permitido únicamente para fines personales.<br/>
+      © 2026 · <strong style="font-weight:500;color:rgba(240,236,228,.35)">Gueka Ideas</strong> · Todos los derechos reservados
     </p>
-    <p class="footer-copy appear d3" id="footer-year"></p>
   </footer>
 
 </div><!-- /#main-content -->
@@ -1174,6 +1252,7 @@ const DATA = {
   vals: {
     song: 'A Thousand Years',
     artist: 'Christina Perri',
+    audioUrl: '', /* ← pega aquí la URL directa de tu archivo .mp3 o .m4a */
     note: 'Esta canción marcará el primer vals de mi vida adulta,\nbailado junto a quienes más amo.'
   },
   chambelanes: [
@@ -1215,7 +1294,15 @@ const DATA = {
     { src: 'https://images.unsplash.com/photo-1571924849183-a68a3879348d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', cap: 'Elegancia pura' },
     { src: 'https://images.unsplash.com/photo-1571924848943-25c2c95bbb4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', cap: 'Vestido de ensueño' },
     { src: 'https://images.unsplash.com/photo-1603122630570-7fd434d470d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', cap: 'La protagonista' },
-    { src: 'https://images.unsplash.com/photo-1733322991133-2de13aa12c57?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', cap: 'Fashion moment' }
+    { src: 'https://images.unsplash.com/photo-1733322991133-2de13aa12c57?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', cap: 'Fashion moment' },
+    { src: 'https://images.unsplash.com/photo-1519741497674-611481863552?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', cap: 'Una noche mágica' },
+    { src: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', cap: 'Celebración' },
+    { src: 'https://images.unsplash.com/photo-1464207687429-7505649dae38?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', cap: 'Brillo y magia' },
+    { src: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', cap: 'Momentos únicos' },
+    { src: 'https://images.unsplash.com/photo-1543357480-c60d40a4b4ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', cap: 'Recuerdos dorados' },
+    { src: 'https://images.unsplash.com/photo-1602631985686-1bb2b7be1c67?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', cap: 'Detalles perfectos' },
+    { src: 'https://images.unsplash.com/photo-1478145046317-39f10e56b5e9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', cap: 'La gran noche' }
+    /* ↑ Plan Completo: hasta 12 fotos. Reemplaza cada "src" con la URL de tu foto real */
   ]
 };
 
@@ -1541,6 +1628,56 @@ function submitRsvp(){
   showToast('Respuesta enviada — ¡Gracias, '+name+'!');
 }
 
+/* ─ Music Player ─ */
+function initPlayer(){
+  if(!DATA.vals||!DATA.vals.audioUrl) return;
+  const mp=$('music-player');
+  if(!mp) return;
+  const audio=$('player-audio');
+  audio.src=DATA.vals.audioUrl;
+  $('player-title').textContent=DATA.vals.song||'';
+  $('player-artist').textContent=DATA.vals.artist||'';
+  mp.style.display='flex';
+
+  audio.addEventListener('timeupdate',()=>{
+    if(!audio.duration) return;
+    const pct=(audio.currentTime/audio.duration)*100;
+    $('player-progress-fill').style.width=pct+'%';
+    $('player-time').textContent=fmtTime(audio.currentTime);
+  });
+  audio.addEventListener('waiting',()=>setPlayerIcon('load'));
+  audio.addEventListener('playing',()=>setPlayerIcon('pause'));
+  audio.addEventListener('pause',()=>setPlayerIcon('play'));
+  audio.addEventListener('ended',()=>setPlayerIcon('play'));
+}
+function setPlayerIcon(state){
+  ['play','pause','load'].forEach(s=>$('player-icon-'+s).style.display='none');
+  $('player-icon-'+state).style.display='block';
+}
+function togglePlay(){
+  const a=$('player-audio');
+  if(!a.src) return;
+  if(a.paused){setPlayerIcon('load');a.play().catch(()=>setPlayerIcon('play'));}
+  else{a.pause();}
+}
+function toggleMute(){
+  const a=$('player-audio');
+  a.muted=!a.muted;
+  $('vol-on').style.display=a.muted?'none':'block';
+  $('vol-off').style.display=a.muted?'block':'none';
+}
+function seekAudio(e){
+  const a=$('player-audio');
+  if(!a.duration) return;
+  const rect=e.currentTarget.getBoundingClientRect();
+  const pct=(e.clientX-rect.left)/rect.width;
+  a.currentTime=pct*a.duration;
+}
+function fmtTime(s){
+  const m=Math.floor(s/60),sec=Math.floor(s%60);
+  return m+':'+(sec<10?'0':'')+sec;
+}
+
 /* ─ Chambelanes ─ */
 function initChambelanes(){
   const el=$('chambelanes-list');
@@ -1640,6 +1777,7 @@ function initAll(){
   initGifts();
   initRsvp();
   initFooter();
+  initPlayer();
   initReveal();
 }
 
