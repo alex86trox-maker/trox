@@ -150,27 +150,56 @@
     }
 
     /* =============================================
-       SECTION 1 — SPLASH
+       SECTION 1 — SPLASH (fullscreen fijo)
     ============================================= */
     #splash {
-      min-height: 100vh;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 60px 28px;
-      background: radial-gradient(ellipse at 50% 30%, rgba(157,0,255,0.18) 0%, transparent 70%),
-                  radial-gradient(ellipse at 80% 80%, rgba(0,229,255,0.1) 0%, transparent 60%),
-                  var(--c-bg);
+      padding: 40px 28px;
+      background:
+        radial-gradient(ellipse at 50% 30%, rgba(157,0,255,0.22) 0%, transparent 65%),
+        radial-gradient(ellipse at 80% 80%, rgba(0,229,255,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse at 20% 90%, rgba(255,0,229,0.1) 0%, transparent 50%),
+        var(--c-bg);
       border-bottom: none;
-      position: relative;
+      z-index: 9999;
+      transition: opacity 0.7s ease, transform 0.7s ease;
+      overflow: hidden;
+    }
+    /* scan-line overlay */
+    #splash::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.07) 3px,
+        rgba(0,0,0,0.07) 4px
+      );
+      pointer-events: none;
+      z-index: 0;
     }
     #splash::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.4) 100%);
+      background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.5) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* dismiss animation */
+    #splash.splash-hidden {
+      opacity: 0;
+      transform: scale(1.04);
       pointer-events: none;
     }
     .splash-age {
@@ -226,6 +255,31 @@
     #sp-btn:hover {
       background: rgba(157,0,255,0.15);
       box-shadow: 0 0 35px rgba(157,0,255,0.5), inset 0 0 20px rgba(157,0,255,0.1);
+    }
+    /* bouncing arrow */
+    .splash-arrow {
+      position: relative;
+      z-index: 1;
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      animation: splashBounce 1.6s ease-in-out infinite;
+    }
+    .splash-arrow span {
+      display: block;
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid var(--c-b);
+      border-bottom: 2px solid var(--c-b);
+      transform: rotate(45deg);
+      opacity: 0.7;
+    }
+    .splash-arrow span:nth-child(2) { opacity: 0.35; margin-top: -4px; }
+    @keyframes splashBounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(7px); }
     }
 
     /* =============================================
@@ -306,13 +360,96 @@
     /* =============================================
        SECTION 5 — HISTORIA (premium)
     ============================================= */
-    .fashion-img-wrap {
+    /* flip card historia */
+    .historia-flip-wrap {
       width: 100%;
-      height: 260px;
-      border-radius: 16px;
+      perspective: 900px;
+      cursor: pointer;
+    }
+    .historia-flip-inner {
+      position: relative;
+      width: 100%;
+      height: 340px;
+      transform-style: preserve-3d;
+      transition: transform 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+      border-radius: 18px;
+    }
+    .historia-flip-wrap.flipped .historia-flip-inner {
+      transform: rotateY(180deg);
+    }
+    .historia-front,
+    .historia-back {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      backface-visibility: hidden;
       overflow: hidden;
-      margin-bottom: 24px;
       border: 1px solid var(--c-line);
+    }
+    .historia-front { background: var(--c-bg); }
+    .historia-front img,
+    .historia-front .img-placeholder {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block; border-radius: 18px;
+    }
+    .historia-front::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(120deg, transparent 55%, rgba(157,0,255,0.2) 60%, transparent 65%);
+      background-size: 200% 200%;
+      animation: histGlitch 5s linear infinite;
+      pointer-events: none; border-radius: 18px;
+    }
+    @keyframes histGlitch {
+      0%   { background-position: 0 0; }
+      50%  { background-position: 100% 100%; }
+      100% { background-position: 0 0; }
+    }
+    .historia-tap-hint {
+      position: absolute; bottom: 16px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; align-items: center; gap: 7px;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--c-line); border-radius: 30px;
+      padding: 7px 16px;
+      font-family: var(--c-mono); font-size: 0.6rem;
+      letter-spacing: 0.15em; color: var(--c-b);
+      text-transform: uppercase; pointer-events: none;
+      white-space: nowrap;
+      animation: tapPulse 2.4s ease-in-out infinite;
+    }
+    .historia-tap-hint::before { content: '↺'; font-size: 0.85rem; color: var(--c-a); }
+    @keyframes tapPulse {
+      0%, 100% { opacity: 0.85; }
+      50%       { opacity: 0.4; }
+    }
+    .historia-back {
+      transform: rotateY(180deg);
+      background: linear-gradient(160deg, rgba(20,8,40,0.97), rgba(5,5,20,0.98));
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px 28px; text-align: center; gap: 14px;
+    }
+    .historia-back-icon { font-size: 1.6rem; line-height: 1; }
+    .historia-back-title {
+      font-family: var(--c-head); font-size: 0.7rem;
+      letter-spacing: 0.2em; color: var(--c-a);
+      text-transform: uppercase; text-shadow: 0 0 14px var(--c-a);
+    }
+    .historia-back-divider {
+      width: 40px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--c-b), transparent);
+    }
+    #pv-history {
+      font-family: var(--c-script) !important;
+      font-size: 1.05rem; line-height: 1.8;
+      color: var(--c-text); opacity: 0.92;
+    }
+    .historia-back-close {
+      font-family: var(--c-mono); font-size: 0.55rem;
+      letter-spacing: 0.2em; color: var(--c-dim);
+      text-transform: uppercase; opacity: 0.55;
     }
 
     /* =============================================
@@ -816,6 +953,43 @@
     }
 
     /* =============================================
+       GUEKA IDEAS — LOGO & COPYRIGHT
+    ============================================= */
+    .gueka-footer-sec {
+      text-align: center;
+      padding: 40px 28px 36px;
+      border-top: 1px solid var(--c-line);
+      background: rgba(0,0,0,0.25);
+    }
+    .gueka-logo {
+      width: 180px;
+      max-width: 60%;
+      opacity: 0.75;
+      filter: brightness(0) invert(1);
+      margin-bottom: 18px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      transition: opacity 0.3s;
+    }
+    .gueka-logo:hover { opacity: 1; }
+    .gueka-legal {
+      font-family: var(--c-serif);
+      font-size: 0.75rem;
+      color: var(--c-dim);
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+    .gueka-copy {
+      font-family: var(--c-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      color: var(--c-dim);
+      opacity: 0.6;
+      text-transform: uppercase;
+    }
+
+    /* =============================================
        ANIMATIONS
     ============================================= */
     @keyframes fadeInUp {
@@ -859,6 +1033,7 @@
     <div id="sp-name" class="splash-name anim-fade anim-delay-2">Valeria Luna</div>
     <div id="sp-date" class="splash-date anim-fade anim-delay-3">20 · 12 · 2025</div>
     <button id="sp-btn" class="anim-fade anim-delay-4">Abrir invitación ✨</button>
+    <div class="splash-arrow"><span></span><span></span></div>
   </section>
 
   <!-- =========================================
@@ -904,11 +1079,24 @@
     <div class="sec-label">mi historia</div>
     <div class="sec-title">Quién Soy</div>
     <div class="glow-line"></div>
-    <div class="fashion-img-wrap">
-      <img id="pv-fashion" class="cover-img" src="" alt="Foto de moda" style="display:none" />
-      <div class="img-placeholder" id="pv-fashion-ph">FOTO · HISTORIA</div>
+    <div class="historia-flip-wrap" id="historia-flip">
+      <div class="historia-flip-inner">
+        <!-- FRENTE: foto -->
+        <div class="historia-front">
+          <img id="pv-fashion" class="cover-img" src="" alt="Foto de historia" style="display:none" />
+          <div class="img-placeholder" id="pv-fashion-ph">FOTO · HISTORIA</div>
+          <div class="historia-tap-hint">Toca para leer mi historia</div>
+        </div>
+        <!-- RESPALDO: texto -->
+        <div class="historia-back">
+          <div class="historia-back-icon">✨</div>
+          <div class="historia-back-title">Mi Historia</div>
+          <div class="historia-back-divider"></div>
+          <div id="pv-history" class="card-cap">Desde pequeña soñé con este momento...</div>
+          <div class="historia-back-close">↺ toca para voltear</div>
+        </div>
+      </div>
     </div>
-    <div id="pv-history" class="card-cap">Desde pequeña soñé con este momento...</div>
   </section>
 
   <!-- =========================================
@@ -1079,6 +1267,15 @@
       <p>Tu pase de acceso</p>
       <div id="rsvp-qr-canvas"></div>
     </div>
+  </section>
+
+  <!-- =========================================
+       SECCIÓN LOGO & COPYRIGHT — GUEKA IDEAS
+  ========================================= -->
+  <section class="gueka-footer-sec">
+    <img src="https://hercules-cdn.com/file_MfbfNBsb9iGik56LJePu0BFr" alt="Gueka Ideas" class="gueka-logo" />
+    <p class="gueka-legal">Esta tarjeta digital es propiedad exclusiva de Gueka Ideas<br/>Uso permitido únicamente para fines personales.</p>
+    <p class="gueka-copy">© 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</p>
   </section>
 
   <!-- =========================================
@@ -1607,7 +1804,14 @@ function renderPreview() {
 
   // Splash
   const splashEl = document.getElementById('splash');
-  if (splashEl) splashEl.style.display = state.showSplash ? '' : 'none';
+  if (splashEl) {
+    if (!state.showSplash) {
+      splashEl.style.display = 'none';
+    } else {
+      splashEl.style.display = '';
+      splashEl.classList.remove('splash-hidden');
+    }
+  }
   set('sp-15',   state.age);
   set('sp-name', state.name);
   set('sp-date', formatDate(state.date));
@@ -1868,14 +2072,26 @@ function renderGallery() {
 }
 
 /* ================================================================
-   SPLASH BUTTON — scroll to content
+   HISTORIA FLIP CARD
+================================================================ */
+const historiaFlip = document.getElementById('historia-flip');
+if (historiaFlip) {
+  historiaFlip.addEventListener('click', () => {
+    historiaFlip.classList.toggle('flipped');
+  });
+}
+
+/* ================================================================
+   SPLASH BUTTON — oculta el splash con fade y escala
 ================================================================ */
 document.getElementById('sp-btn').addEventListener('click', () => {
   const splash = document.getElementById('splash');
-  if (splash) {
-    const next = splash.nextElementSibling;
-    if (next) next.scrollIntoView({ behavior: 'smooth' });
-  }
+  if (!splash) return;
+  splash.classList.add('splash-hidden');
+  // Tras la transición, remover del flujo para que no bloquee scroll
+  splash.addEventListener('transitionend', () => {
+    splash.style.display = 'none';
+  }, { once: true });
 });
 
 /* ================================================================
