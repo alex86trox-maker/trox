@@ -712,7 +712,8 @@
     #music-player{
       position:fixed;bottom:1.25rem;left:50%;transform:translateX(-50%);
       z-index:900;
-      display:flex;align-items:center;gap:.75rem;
+      display:none; /* shown by initPlayer after splash */
+      align-items:center;gap:.75rem;
       padding:.65rem .9rem .65rem .75rem;
       background:rgba(10,8,6,.88);
       border:1px solid var(--border-subtle);
@@ -820,7 +821,7 @@
 <div id="scroll-progress"></div>
 
   <!-- ── MUSIC PLAYER ── -->
-  <div id="music-player" style="display:none">
+  <div id="music-player">
     <audio id="player-audio" preload="metadata" loop></audio>
     <button id="player-btn" onclick="togglePlay()" title="Reproducir / Pausar">
       <svg id="player-icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
@@ -1630,25 +1631,37 @@ function submitRsvp(){
 
 /* ─ Music Player ─ */
 function initPlayer(){
-  if(!DATA.vals||!DATA.vals.audioUrl) return;
+  if(!DATA.vals) return;
   const mp=$('music-player');
   if(!mp) return;
-  const audio=$('player-audio');
-  audio.src=DATA.vals.audioUrl;
-  $('player-title').textContent=DATA.vals.song||'';
-  $('player-artist').textContent=DATA.vals.artist||'';
-  mp.style.display='flex';
 
+  $('player-title').textContent = DATA.vals.song   || '♪ Canción de vals';
+  $('player-artist').textContent= DATA.vals.artist || '';
+  mp.style.display = 'flex';
+
+  const url = DATA.vals.audioUrl || '';
+  if(!url){
+    /* Sin audio: botón deshabilitado, tooltip orientativo */
+    const btn=$('player-btn');
+    btn.title='Agrega una URL de audio en DATA.vals.audioUrl';
+    btn.style.opacity='.45';
+    btn.style.cursor='default';
+    btn.onclick=null;
+    $('player-time').textContent='--:--';
+    return;
+  }
+
+  const audio=$('player-audio');
+  audio.src = url;
   audio.addEventListener('timeupdate',()=>{
     if(!audio.duration) return;
-    const pct=(audio.currentTime/audio.duration)*100;
-    $('player-progress-fill').style.width=pct+'%';
+    $('player-progress-fill').style.width=(audio.currentTime/audio.duration*100)+'%';
     $('player-time').textContent=fmtTime(audio.currentTime);
   });
-  audio.addEventListener('waiting',()=>setPlayerIcon('load'));
-  audio.addEventListener('playing',()=>setPlayerIcon('pause'));
-  audio.addEventListener('pause',()=>setPlayerIcon('play'));
-  audio.addEventListener('ended',()=>setPlayerIcon('play'));
+  audio.addEventListener('waiting', ()=>setPlayerIcon('load'));
+  audio.addEventListener('playing', ()=>setPlayerIcon('pause'));
+  audio.addEventListener('pause',   ()=>setPlayerIcon('play'));
+  audio.addEventListener('ended',   ()=>setPlayerIcon('play'));
 }
 function setPlayerIcon(state){
   ['play','pause','load'].forEach(s=>$('player-icon-'+s).style.display='none');
