@@ -59,7 +59,7 @@
       max-width: 480px;
       background: var(--c-bg);
       color: var(--c-text);
-      overflow: hidden;
+      overflow-x: clip; /* solo oculta overflow horizontal, no recorta fixed ni 3D */
     }
 
     /* =============================================
@@ -152,7 +152,7 @@
     /* =============================================
        SECTION 1 — SPLASH (fullscreen fijo)
     ============================================= */
-    #splash {
+    #card-wrapper #splash {
       position: fixed;
       inset: 0;
       width: 100vw;
@@ -818,6 +818,96 @@
     /* uses card-list + sec-title — no extra styles needed */
 
     /* =============================================
+       SECTION 11 — MESA DE REGALOS — QR
+    ============================================= */
+    .gift-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px;
+      border-left: 2px solid var(--c-a);
+      background: rgba(255,255,255,0.03);
+      border-radius: 0 12px 12px 0;
+    }
+    .gift-card-text {
+      font-family: var(--c-serif);
+      font-size: 0.95rem;
+      color: var(--c-text);
+      line-height: 1.5;
+    }
+    .gift-qr-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: 1px solid var(--c-a);
+      border-radius: 8px;
+      padding: 5px 12px;
+      color: var(--c-a);
+      font-family: var(--c-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.25s;
+      align-self: flex-start;
+    }
+    .gift-qr-toggle:hover { background: rgba(157,0,255,0.12); }
+    .gift-qr-box {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding-top: 10px;
+    }
+    .gift-qr-box.open { display: flex; }
+    .gift-qr-label {
+      font-family: var(--c-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      color: var(--c-dim);
+      text-transform: uppercase;
+    }
+    .gift-qr-box canvas,
+    .gift-qr-box img { border-radius: 8px; }
+
+    /* =============================================
+       FOTO — área de carga con IndexedDB
+    ============================================= */
+    .photo-upload-zone {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    .photo-upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .photo-upload-hint {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.65);
+      color: var(--c-e);
+      font-family: var(--c-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .photo-upload-zone .cover-img { position: relative; z-index: 1; }
+
+    /* =============================================
        SECTION 14 — LUGAR
     ============================================= */
     .venue-card {
@@ -950,6 +1040,7 @@
       font-size: 2rem;
       color: var(--c-a);
       text-shadow: 0 0 20px var(--c-a);
+      display: block;
     }
 
     /* =============================================
@@ -1042,8 +1133,12 @@
   <section class="portrait-sec">
     <div class="sec-label">la protagonista</div>
     <div id="pv-retrato-wrap">
-      <img id="pv-retrato" class="cover-img" src="" alt="Retrato" style="display:none" />
-      <div class="img-placeholder" id="pv-retrato-ph">FOTO · RETRATO</div>
+      <label class="photo-upload-zone" title="Toca para cambiar foto">
+        <input type="file" accept="image/*" data-photo-key="retrato" />
+        <img id="pv-retrato" class="cover-img" src="" alt="Retrato" style="display:none" />
+        <div class="img-placeholder" id="pv-retrato-ph">FOTO · RETRATO</div>
+        <span class="photo-upload-hint">📷 Cambiar foto</span>
+      </label>
     </div>
     <div id="pv-nombre">Valeria Luna</div>
     <div id="pv-caption" class="card-cap">Bajo las estrellas, comienza mi historia</div>
@@ -1083,8 +1178,12 @@
       <div class="historia-flip-inner">
         <!-- FRENTE: foto -->
         <div class="historia-front">
-          <img id="pv-fashion" class="cover-img" src="" alt="Foto de historia" style="display:none" />
-          <div class="img-placeholder" id="pv-fashion-ph">FOTO · HISTORIA</div>
+          <label class="photo-upload-zone" title="Toca para cambiar foto">
+            <input type="file" accept="image/*" data-photo-key="fashion" />
+            <img id="pv-fashion" class="cover-img" src="" alt="Foto de historia" style="display:none" />
+            <div class="img-placeholder" id="pv-fashion-ph">FOTO · HISTORIA</div>
+            <span class="photo-upload-hint">📷 Cambiar foto</span>
+          </label>
           <div class="historia-tap-hint">Toca para leer mi historia</div>
         </div>
         <!-- RESPALDO: texto -->
@@ -1187,7 +1286,7 @@
     <div class="sec-label">con cariño</div>
     <div class="sec-title">Mesa de Regalos</div>
     <div class="glow-line"></div>
-    <div id="pv-gifts" class="card-list"></div>
+    <div id="pv-gifts"></div>
   </section>
 
   <!-- =========================================
@@ -1270,15 +1369,6 @@
   </section>
 
   <!-- =========================================
-       SECCIÓN LOGO & COPYRIGHT — GUEKA IDEAS
-  ========================================= -->
-  <section class="gueka-footer-sec">
-    <img src="https://hercules-cdn.com/file_MfbfNBsb9iGik56LJePu0BFr" alt="Gueka Ideas" class="gueka-logo" />
-    <p class="gueka-legal">Esta tarjeta digital es propiedad exclusiva de Gueka Ideas<br/>Uso permitido únicamente para fines personales.</p>
-    <p class="gueka-copy">© 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</p>
-  </section>
-
-  <!-- =========================================
        SECTION 17 — CIERRE
   ========================================= -->
   <section class="cierre-sec">
@@ -1287,6 +1377,15 @@
     <div class="cierre-sign-label">con amor</div>
     <div id="pv-sign" class="splash-name"></div>
   </section>
+
+  <!-- =========================================
+       FOOTER — GUEKA IDEAS
+  ========================================= -->
+  <footer class="gueka-footer-sec">
+    <img src="https://hercules-cdn.com/file_MfbfNBsb9iGik56LJePu0BFr" alt="Gueka Ideas" class="gueka-logo" />
+    <p class="gueka-legal">Esta tarjeta digital es propiedad exclusiva de Gueka Ideas<br/>Uso permitido únicamente para fines personales.</p>
+    <p class="gueka-copy">© 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</p>
+  </footer>
 
 </div><!-- /#card-wrapper -->
 
@@ -1667,30 +1766,20 @@ function updateCountdown() {
 }
 
 /* ================================================================
-   AUDIO PLAYER
+   AUDIO PLAYER — init dentro de DOMContentLoaded (ver abajo)
 ================================================================ */
-(function initAudioPlayer() {
+function initAudioPlayer() {
   const audio    = document.getElementById('pv-audio');
   const playBtn  = document.getElementById('pv-play-btn');
-  const trackName= document.getElementById('pv-track-name');
   const trackTime= document.getElementById('pv-track-time');
   const seek     = document.getElementById('pv-seek');
   const vol      = document.getElementById('pv-vol');
-
-  if (!audio) return;
-
+  if (!audio || !playBtn) return;
   audio.volume = 0.7;
-
   playBtn.addEventListener('click', () => {
-    if (audio.paused) {
-      audio.play().catch(() => {});
-      playBtn.textContent = '⏸';
-    } else {
-      audio.pause();
-      playBtn.textContent = '▶';
-    }
+    if (audio.paused) { audio.play().catch(() => {}); playBtn.textContent = '⏸'; }
+    else              { audio.pause();                 playBtn.textContent = '▶'; }
   });
-
   audio.addEventListener('timeupdate', () => {
     if (!audio.duration) return;
     seek.value = (audio.currentTime / audio.duration) * 100;
@@ -1698,90 +1787,82 @@ function updateCountdown() {
     const s = Math.floor(audio.currentTime % 60);
     trackTime.textContent = `${m}:${String(s).padStart(2,'0')}`;
   });
-
   seek.addEventListener('input', () => {
-    if (!audio.duration) return;
-    audio.currentTime = (seek.value / 100) * audio.duration;
+    if (audio.duration) audio.currentTime = (seek.value / 100) * audio.duration;
   });
-
-  vol.addEventListener('input', () => {
-    audio.volume = parseFloat(vol.value);
-  });
-
+  vol.addEventListener('input', () => { audio.volume = parseFloat(vol.value); });
   audio.addEventListener('ended', () => { playBtn.textContent = '▶'; });
-})();
+}
 
 /* ================================================================
-   RSVP — WhatsApp submit + QR
+   RSVP y SONG SUGGEST — registrados en DOMContentLoaded (ver abajo)
 ================================================================ */
-document.getElementById('rsvp-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const nombre   = document.getElementById('rsvp-nombre').value.trim();
-  const asiste   = document.getElementById('rsvp-asiste').value;
-  const acomp    = parseInt(document.getElementById('rsvp-acomp').value) || 0;
-  const msg      = document.getElementById('rsvp-msg').value.trim();
-  const errEl    = document.getElementById('rsvp-error');
+function initRsvp() {
+  const form = document.getElementById('rsvp-form');
+  if (!form) return;
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('rsvp-nombre').value.trim();
+    const asiste = document.getElementById('rsvp-asiste').value;
+    const acomp  = parseInt(document.getElementById('rsvp-acomp').value) || 0;
+    const msg    = document.getElementById('rsvp-msg').value.trim();
+    const errEl  = document.getElementById('rsvp-error');
+    errEl.style.display = 'none';
+    if (!nombre) {
+      errEl.textContent = 'Por favor escribe tu nombre.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (asiste === 'si' && acomp + 1 > state.rsvpCapacity) {
+      errEl.textContent = `Lo sentimos, el aforo máximo es de ${state.rsvpCapacity} personas.`;
+      errEl.style.display = 'block';
+      return;
+    }
+    const asistsStr = asiste === 'si' ? 'Sí asistiré 🎉' : 'No podré asistir 😢';
+    const waText = encodeURIComponent(
+      `*Confirmación de asistencia — XV Años de ${state.name}*\n\n` +
+      `👤 Nombre: ${nombre}\n✅ Asistencia: ${asistsStr}\n👥 Acompañantes: ${acomp}\n` +
+      (msg ? `💬 Mensaje: ${msg}\n` : '') + `\n${state.hashtag || ''}`
+    );
+    window.open(`https://wa.me/${state.waOrganizer}?text=${waText}`, '_blank');
+    if (state.plan === 'deluxe' && state.rsvpPara) {
+      const qrWrap   = document.getElementById('rsvp-qr-wrap');
+      const qrCanvas = document.getElementById('rsvp-qr-canvas');
+      qrCanvas.innerHTML = '';
+      qrWrap.style.display = 'block';
+      new QRCode(qrCanvas, {
+        text: `PASE: ${nombre} | ${state.rsvpPara} | ${state.date}`,
+        width: 160, height: 160,
+        colorDark: '#9d00ff', colorLight: '#050510',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+  });
+}
 
-  errEl.style.display = 'none';
-
-  if (!nombre) {
-    errEl.textContent = 'Por favor escribe tu nombre.';
-    errEl.style.display = 'block';
-    return;
-  }
-  if (asiste === 'si' && acomp + 1 > state.rsvpCapacity) {
-    errEl.textContent = `Lo sentimos, el aforo máximo es de ${state.rsvpCapacity} personas.`;
-    errEl.style.display = 'block';
-    return;
-  }
-
-  const asistsStr = asiste === 'si' ? 'Sí asistiré 🎉' : 'No podré asistir 😢';
-  const waText = encodeURIComponent(
-    `*Confirmación de asistencia — XV Años de ${state.name}*\n\n` +
-    `👤 Nombre: ${nombre}\n` +
-    `✅ Asistencia: ${asistsStr}\n` +
-    `👥 Acompañantes: ${acomp}\n` +
-    (msg ? `💬 Mensaje: ${msg}\n` : '') +
-    `\n${state.hashtag || ''}`
-  );
-  window.open(`https://wa.me/${state.waOrganizer}?text=${waText}`, '_blank');
-
-  // QR pase de acceso (solo plan deluxe)
-  if (state.plan === 'deluxe' && state.rsvpPara) {
-    const qrWrap = document.getElementById('rsvp-qr-wrap');
-    const qrCanvas = document.getElementById('rsvp-qr-canvas');
-    qrCanvas.innerHTML = '';
-    qrWrap.style.display = 'block';
-    new QRCode(qrCanvas, {
-      text: `PASE: ${nombre} | ${state.rsvpPara} | ${state.date}`,
-      width: 160, height: 160,
-      colorDark: '#9d00ff', colorLight: '#050510',
-      correctLevel: QRCode.CorrectLevel.M
+function initSongSuggest() {
+  const addBtn = document.getElementById('song-add-btn');
+  const sugForm = document.getElementById('song-suggest-form');
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.placeholder = 'Artista — Canción';
+      document.getElementById('song-inputs').appendChild(inp);
     });
   }
-});
-
-/* ================================================================
-   SONG SUGGEST
-================================================================ */
-document.getElementById('song-add-btn').addEventListener('click', () => {
-  const inp = document.createElement('input');
-  inp.type = 'text';
-  inp.placeholder = 'Artista — Canción';
-  document.getElementById('song-inputs').appendChild(inp);
-});
-
-document.getElementById('song-suggest-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const inputs = document.querySelectorAll('#song-inputs input');
-  const songs = Array.from(inputs).map(i => i.value.trim()).filter(Boolean);
-  if (!songs.length) return;
-  const list = songs.map((s, i) => `${i+1}. ${s}`).join('\n');
-  const waText = encodeURIComponent(
-    `*Sugerencias de canciones — XV Años de ${state.name}*\n\n${list}`
-  );
-  window.open(`https://wa.me/${state.songSuggestWa}?text=${waText}`, '_blank');
-});
+  if (sugForm) {
+    sugForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const inputs = document.querySelectorAll('#song-inputs input');
+      const songs  = Array.from(inputs).map(i => i.value.trim()).filter(Boolean);
+      if (!songs.length) return;
+      const list   = songs.map((s, i) => `${i+1}. ${s}`).join('\n');
+      const waText = encodeURIComponent(`*Sugerencias de canciones — XV Años de ${state.name}*\n\n${list}`);
+      window.open(`https://wa.me/${state.songSuggestWa}?text=${waText}`, '_blank');
+    });
+  }
+}
 
 /* ================================================================
    PLAN VISIBILITY
@@ -1862,8 +1943,8 @@ function renderPreview() {
   const ssWrap = document.getElementById('pv-song-suggest-wrap');
   if (ssWrap) ssWrap.style.display = state.songSuggestEnabled ? '' : 'none';
 
-  // Gifts
-  renderList('pv-gifts', state.gifts);
+  // Gifts — con QR por item
+  renderGifts();
 
   // Extra
   renderList('pv-extra', state.extra);
@@ -2072,41 +2153,206 @@ function renderGallery() {
 }
 
 /* ================================================================
-   HISTORIA FLIP CARD
+   INDEXEDDB — almacenamiento local de fotos (Regla 4)
+   DB: "gueka-photos", store: "photos", key: string (ej. "retrato")
 ================================================================ */
-const historiaFlip = document.getElementById('historia-flip');
-if (historiaFlip) {
-  historiaFlip.addEventListener('click', () => {
-    historiaFlip.classList.toggle('flipped');
+const PHOTO_DB_NAME    = 'gueka-photos';
+const PHOTO_DB_VERSION = 1;
+const PHOTO_STORE      = 'photos';
+let photoDB = null;
+
+function openPhotoDB() {
+  return new Promise((resolve, reject) => {
+    if (photoDB) { resolve(photoDB); return; }
+    const req = indexedDB.open(PHOTO_DB_NAME, PHOTO_DB_VERSION);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore(PHOTO_STORE);
+    };
+    req.onsuccess = e => { photoDB = e.target.result; resolve(photoDB); };
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+async function savePhotoLocal(key, file) {
+  const db = await openPhotoDB();
+  return new Promise((resolve, reject) => {
+    const tx    = db.transaction(PHOTO_STORE, 'readwrite');
+    const store = tx.objectStore(PHOTO_STORE);
+    const req   = store.put(file, key);
+    req.onsuccess = () => resolve();
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+async function loadPhotoLocal(key) {
+  const db = await openPhotoDB();
+  return new Promise((resolve) => {
+    const tx    = db.transaction(PHOTO_STORE, 'readonly');
+    const store = tx.objectStore(PHOTO_STORE);
+    const req   = store.get(key);
+    req.onsuccess = e => resolve(e.target.result || null);
+    req.onerror   = () => resolve(null);
+  });
+}
+
+function fileToDataURL(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.readAsDataURL(file);
+  });
+}
+
+/* Aplica foto (dataURL o blob URL) en img + placeholder */
+function applyPhotoToEl(imgId, phId, dataUrl) {
+  const img = document.getElementById(imgId);
+  const ph  = document.getElementById(phId);
+  if (!img || !ph) return;
+  img.src            = dataUrl;
+  img.style.display  = 'block';
+  ph.style.display   = 'none';
+}
+
+/* Carga fotos guardadas al arrancar */
+async function loadSavedPhotos() {
+  const slots = [
+    { key: 'retrato', imgId: 'pv-retrato', phId: 'pv-retrato-ph' },
+    { key: 'fashion', imgId: 'pv-fashion', phId: 'pv-fashion-ph' }
+  ];
+  for (const slot of slots) {
+    const file = await loadPhotoLocal(slot.key);
+    if (file) {
+      const url = await fileToDataURL(file);
+      applyPhotoToEl(slot.imgId, slot.phId, url);
+    }
+  }
+}
+
+/* Registra los inputs de carga de fotos */
+function initPhotoUploads() {
+  document.querySelectorAll('input[data-photo-key]').forEach(input => {
+    input.addEventListener('change', async function() {
+      const file = this.files[0];
+      if (!file) return;
+      const key  = this.dataset.photoKey;
+      // Determina ids por key
+      const imgId = key === 'retrato' ? 'pv-retrato' : 'pv-fashion';
+      const phId  = key === 'retrato' ? 'pv-retrato-ph' : 'pv-fashion-ph';
+      try {
+        await savePhotoLocal(key, file);
+        const url = await fileToDataURL(file);
+        applyPhotoToEl(imgId, phId, url);
+      } catch (err) {
+        console.warn('No se pudo guardar la foto localmente:', err);
+        // Fallback: mostrar de todas formas aunque no se guarde
+        const url = URL.createObjectURL(file);
+        applyPhotoToEl(imgId, phId, url);
+      }
+    });
   });
 }
 
 /* ================================================================
-   SPLASH BUTTON — oculta el splash con fade y escala
+   MESA DE REGALOS — renderGifts() con QR por item (Regla 6)
 ================================================================ */
-document.getElementById('sp-btn').addEventListener('click', () => {
-  const splash = document.getElementById('splash');
-  if (!splash) return;
-  splash.classList.add('splash-hidden');
-  // Tras la transición, remover del flujo para que no bloquee scroll
-  splash.addEventListener('transitionend', () => {
-    splash.style.display = 'none';
-  }, { once: true });
-});
+function renderGifts() {
+  const el = document.getElementById('pv-gifts');
+  if (!el) return;
+  const arr = state.gifts || [];
+  if (!arr.length) { el.innerHTML = ''; return; }
+
+  el.innerHTML = '';
+  el.style.display = 'flex';
+  el.style.flexDirection = 'column';
+  el.style.gap = '12px';
+
+  arr.forEach((item, i) => {
+    const text = item.v || '';
+    const card = document.createElement('div');
+    card.className = 'gift-card';
+
+    const qrId = `gift-qr-${i}`;
+    const boxId = `gift-qr-box-${i}`;
+
+    card.innerHTML = `
+      <div class="gift-card-text">${text}</div>
+      <button class="gift-qr-toggle" data-target="${boxId}" type="button">
+        ▣ Ver QR
+      </button>
+      <div class="gift-qr-box" id="${boxId}">
+        <span class="gift-qr-label">Escanea para acceder</span>
+        <div id="${qrId}"></div>
+      </div>`;
+
+    el.appendChild(card);
+
+    // Botón toggle QR
+    card.querySelector('.gift-qr-toggle').addEventListener('click', function() {
+      const box = document.getElementById(boxId);
+      const isOpen = box.classList.toggle('open');
+      this.textContent = isOpen ? '▣ Cerrar QR' : '▣ Ver QR';
+
+      // Genera QR solo la primera vez que se abre
+      const qrEl = document.getElementById(qrId);
+      if (isOpen && !qrEl.hasChildNodes()) {
+        new QRCode(qrEl, {
+          text: text,
+          width: 148, height: 148,
+          colorDark: '#9d00ff',
+          colorLight: '#050510',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
+    });
+  });
+}
 
 /* ================================================================
-   INIT
+   INIT — todo arranca aquí, cuando el DOM está listo
 ================================================================ */
 window.addEventListener('DOMContentLoaded', () => {
-  // Pre-load default fonts
+  // Fuentes base
   loadFont('cinzel');
   loadFont('cormorant');
   loadFont('sacramento');
   loadFont('mono');
 
+  // Renderizar contenido
   renderPreview();
+
+  // Countdown en vivo
   updateCountdown();
   setInterval(updateCountdown, 1000);
+
+  // Formularios e interacciones
+  initAudioPlayer();
+  initRsvp();
+  initSongSuggest();
+  initPhotoUploads();
+
+  // Carga fotos guardadas localmente (IndexedDB)
+  loadSavedPhotos();
+
+  // Splash — cerrar con fade + escala
+  const spBtn = document.getElementById('sp-btn');
+  if (spBtn) {
+    spBtn.addEventListener('click', () => {
+      const splash = document.getElementById('splash');
+      if (!splash) return;
+      splash.classList.add('splash-hidden');
+      splash.addEventListener('transitionend', () => {
+        splash.style.display = 'none';
+      }, { once: true });
+    });
+  }
+
+  // Historia flip card
+  const historiaFlip = document.getElementById('historia-flip');
+  if (historiaFlip) {
+    historiaFlip.addEventListener('click', () => {
+      historiaFlip.classList.toggle('flipped');
+    });
+  }
 });
 </script>
 </body>
