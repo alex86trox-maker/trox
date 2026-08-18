@@ -33,6 +33,100 @@ a{color:inherit;text-decoration:none}
 select option{background:#1a0a14;color:#f0e6ee}
 
 /* ══════════════════════════════════════════════
+   ELECTRIC BORDER EFFECT (tenue)
+══════════════════════════════════════════════ */
+
+/* Card wrapper — electric glow ring */
+#card-wrapper{
+  position:relative;
+}
+#card-wrapper::before{
+  content:'';
+  position:absolute;inset:-2px;
+  border-radius:4px;
+  border:1.5px solid var(--c-a);
+  opacity:.18;
+  filter:url(#electric-border) blur(.4px);
+  pointer-events:none;
+  z-index:0;
+}
+#card-wrapper::after{
+  content:'';
+  position:absolute;inset:-3px;
+  border-radius:6px;
+  border:1px solid var(--c-c);
+  opacity:.08;
+  filter:url(#electric-border) blur(2px);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* Countdown numbers — electric ring via box-shadow (no ::before conflict) */
+.cd-num{
+  box-shadow:
+    0 4px 24px rgba(232,130,154,.12),
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 0 0 1px rgba(232,130,154,.08);
+  /* Electric flicker via outline trick */
+  outline:1px solid transparent;
+  animation:borderGlow 3s ease-in-out infinite, cdElectric 7s linear infinite;
+}
+@keyframes cdElectric{
+  0%,100%{outline-color:rgba(232,130,154,.0);outline-offset:0px}
+  15%{outline-color:rgba(232,130,154,.12);outline-offset:1px}
+  30%{outline-color:rgba(232,130,154,.0);outline-offset:0px}
+  50%{outline-color:rgba(245,194,206,.1);outline-offset:2px}
+  65%{outline-color:rgba(232,130,154,.0);outline-offset:0px}
+  80%{outline-color:rgba(232,130,154,.09);outline-offset:1px}
+}
+/* Remove conflicting ::before on cd-num (was added in electric block above) */
+/* Padrino cards */
+.padrino-card::after{
+  content:'';
+  position:absolute;inset:0;
+  border-radius:inherit;
+  border:1px solid var(--c-a);
+  opacity:.1;
+  filter:url(#electric-border);
+  pointer-events:none;
+  z-index:1;
+}
+/* Gift cards */
+.gift-card::after{
+  content:'';
+  position:absolute;inset:0;
+  border-radius:inherit;
+  border:1px solid var(--c-c);
+  opacity:.1;
+  filter:url(#electric-border);
+  pointer-events:none;
+  z-index:1;
+}
+/* Audio player */
+#pv-audio-wrap::after{
+  content:'';
+  position:absolute;inset:0;
+  border-radius:inherit;
+  border:1px solid var(--c-a);
+  opacity:.08;
+  filter:url(#electric-border) blur(.5px);
+  pointer-events:none;
+  z-index:1;
+}
+/* Info chips row top border */
+.info-chips{position:relative}
+.info-chips::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:1px;
+  background:var(--c-a);
+  opacity:.12;
+  filter:url(#electric-border) blur(1px);
+  pointer-events:none;
+  z-index:1;
+}
+/* Botones — borde eléctrico al hover ya definido en sección BUTTONS arriba */
+
+/* ══════════════════════════════════════════════
    SCROLL PROGRESS BAR
 ══════════════════════════════════════════════ */
 #scroll-progress{
@@ -85,7 +179,8 @@ select option{background:#1a0a14;color:#f0e6ee}
 /* ══════════════════════════════════════════════
    SECTION SYSTEM
 ══════════════════════════════════════════════ */
-section{position:relative;overflow:hidden;padding:4rem 1.75rem}
+/* overflow:visible en secciones para que las estrellas sparkle no se corten */
+section{position:relative;overflow:visible;padding:4rem 1.75rem}
 .sec-eyebrow{
   font-family:var(--c-mono);font-size:.58rem;letter-spacing:.55em;
   text-transform:uppercase;color:var(--c-a);margin-bottom:.55rem;
@@ -210,19 +305,21 @@ section{position:relative;overflow:hidden;padding:4rem 1.75rem}
   box-shadow:0 0 30px rgba(232,130,154,.18),inset 0 0 30px rgba(232,130,154,.04);
   border-radius:40px;
   transition:all .35s cubic-bezier(.22,1,.36,1);
-  position:relative;overflow:hidden;
+  position:relative;
+  /* overflow:visible para estrellas sparkle */
+  overflow:visible;
 }
-#sp-btn::after{
+#sp-btn::before{
   content:'';position:absolute;inset:0;border-radius:inherit;
   background:radial-gradient(circle at 50% 0%,rgba(232,130,154,.15),transparent 70%);
-  opacity:0;transition:opacity .3s;
+  opacity:0;transition:opacity .3s;pointer-events:none;
 }
 #sp-btn:hover{
   background:rgba(232,130,154,.16);
   box-shadow:0 0 50px rgba(232,130,154,.3),inset 0 0 30px rgba(232,130,154,.08);
   transform:translateY(-2px);
 }
-#sp-btn:hover::after{opacity:1}
+#sp-btn:hover::before{opacity:1}
 #sp-btn:active{transform:translateY(0) scale(.97)}
 .sp-hint{
   margin-top:.9rem;
@@ -604,12 +701,14 @@ section{position:relative;overflow:hidden;padding:4rem 1.75rem}
   border-radius:40px;
   box-shadow:0 0 24px rgba(232,130,154,.12);
   transition:all .3s cubic-bezier(.22,1,.36,1);
-  cursor:pointer;position:relative;overflow:hidden;
+  cursor:pointer;position:relative;
+  /* overflow:visible permite que las estrellas sparkle sean visibles fuera del botón */
+  overflow:visible;
 }
 .btn-primary::before{
-  content:'';position:absolute;inset:0;
+  content:'';position:absolute;inset:0;border-radius:inherit;
   background:radial-gradient(circle at 50% 0%,rgba(232,130,154,.12),transparent 70%);
-  opacity:0;transition:opacity .3s;
+  opacity:0;transition:opacity .3s;pointer-events:none;
 }
 .btn-primary:hover{
   background:rgba(232,130,154,.18);
@@ -618,6 +717,14 @@ section{position:relative;overflow:hidden;padding:4rem 1.75rem}
 }
 .btn-primary:hover::before{opacity:1}
 .btn-primary:active{transform:translateY(0) scale(.97)}
+/* Electric border overlay al hover — z negativo para no tapar sparkles */
+.btn-primary::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  border:1px solid var(--c-a);
+  opacity:0;filter:url(#electric-border);
+  pointer-events:none;transition:opacity .35s;z-index:-1;
+}
+.btn-primary:hover::after{opacity:.22}
 .btn-secondary{
   display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
   padding:.85rem 1.4rem;
@@ -628,6 +735,7 @@ section{position:relative;overflow:hidden;padding:4rem 1.75rem}
   letter-spacing:.18em;text-transform:uppercase;
   border-radius:40px;
   transition:all .25s;cursor:pointer;
+  position:relative;overflow:visible;
 }
 .btn-secondary:hover{border-color:var(--c-a);color:var(--c-a);background:rgba(232,130,154,.05)}
 .btn-secondary:active{transform:scale(.97)}
@@ -781,6 +889,59 @@ section{position:relative;overflow:hidden;padding:4rem 1.75rem}
 }
 
 /* ══════════════════════════════════════════════
+   SPARKLE STARS BUTTON EFFECT
+══════════════════════════════════════════════ */
+/* overflow:visible ya definido en .btn-primary y .btn-secondary arriba */
+
+/* SVG stars — color adapts via palette */
+.btn-star{
+  position:absolute;height:auto;z-index:10;pointer-events:none;
+  filter:drop-shadow(0 0 0 var(--c-c));
+  transition-timing-function:cubic-bezier(0,0.4,0,1.01);
+  transition-property:top,left,filter;
+}
+.btn-star svg path{fill:var(--c-c)}
+.btn-star-1{top:45%;left:45%;width:25px;transition-duration:.9s}
+.btn-star-2{top:45%;left:45%;width:15px;transition-duration:.85s}
+.btn-star-3{top:45%;left:45%;width:5px;transition-duration:.8s}
+.btn-star-4{top:45%;left:45%;width:8px;transition-duration:.75s}
+.btn-star-5{top:45%;left:45%;width:15px;transition-duration:.7s}
+.btn-star-6{top:45%;left:45%;width:5px;transition-duration:.65s;transition-timing-function:cubic-bezier(0.05,0.83,0.43,0.96)}
+
+.btn-primary:hover .btn-star,
+.btn-secondary:hover .btn-star{
+  filter:drop-shadow(0 0 8px var(--c-c)) drop-shadow(0 0 3px #fff);
+  z-index:10;
+}
+.btn-primary:hover .btn-star-1{top:-90%;left:-25%}
+.btn-primary:hover .btn-star-2{top:-30%;left:8%}
+.btn-primary:hover .btn-star-3{top:60%;left:22%}
+.btn-primary:hover .btn-star-4{top:25%;left:85%}
+.btn-primary:hover .btn-star-5{top:20%;left:110%}
+.btn-primary:hover .btn-star-6{top:-5%;left:62%}
+
+.btn-secondary:hover .btn-star-1{top:-80%;left:-20%}
+.btn-secondary:hover .btn-star-2{top:-25%;left:5%}
+.btn-secondary:hover .btn-star-3{top:55%;left:18%}
+.btn-secondary:hover .btn-star-4{top:20%;left:82%}
+.btn-secondary:hover .btn-star-5{top:15%;left:108%}
+.btn-secondary:hover .btn-star-6{top:-10%;left:58%}
+
+/* WhatsApp button — stars in green tones */
+.btn-wa-star svg path{fill:#7fffd4}
+
+/* Star SVG también para el botón del splash */
+#sp-btn .btn-star svg path{fill:#f5c2ce}
+#sp-btn .btn-star{filter:drop-shadow(0 0 0 #f5c2ce)}
+#sp-btn:hover .btn-star{filter:drop-shadow(0 0 8px #f5c2ce) drop-shadow(0 0 3px #fff);z-index:10}
+#sp-btn:hover .btn-star-1{top:-90%;left:-25%}
+#sp-btn:hover .btn-star-2{top:-30%;left:8%}
+#sp-btn:hover .btn-star-3{top:60%;left:22%}
+#sp-btn:hover .btn-star-4{top:25%;left:85%}
+#sp-btn:hover .btn-star-5{top:20%;left:110%}
+#sp-btn:hover .btn-star-6{top:-5%;left:62%}
+
+/* ══════════════════════════════════════════════
    PLAN VISIBILITY
 ══════════════════════════════════════════════ */
 .plan-hidden{display:none!important}
@@ -874,9 +1035,33 @@ section{position:relative;overflow:hidden;padding:4rem 1.75rem}
   <button class="lb-nav" id="lb-next" aria-label="Siguiente" onclick="lbNav(1)">›</button>
 </div>
 
-<!-- ══════════════════════════════════════════════
-     CARD WRAPPER
-══════════════════════════════════════════════ -->
+<!-- SVG Filter: Electric Turbulent Border (hidden) -->
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <defs>
+    <filter id="electric-border" colorInterpolationFilters="sRGB" x="-15%" y="-15%" width="130%" height="130%">
+      <feTurbulence type="turbulence" baseFrequency="0.025" numOctaves="8" result="noise1" seed="3"/>
+      <feOffset in="noise1" dx="0" dy="0" result="offsetNoise1">
+        <animate attributeName="dy" values="600;0" dur="7s" repeatCount="indefinite" calcMode="linear"/>
+      </feOffset>
+      <feTurbulence type="turbulence" baseFrequency="0.025" numOctaves="8" result="noise2" seed="3"/>
+      <feOffset in="noise2" dx="0" dy="0" result="offsetNoise2">
+        <animate attributeName="dy" values="0;-600" dur="7s" repeatCount="indefinite" calcMode="linear"/>
+      </feOffset>
+      <feTurbulence type="turbulence" baseFrequency="0.025" numOctaves="8" result="noise3" seed="5"/>
+      <feOffset in="noise3" dx="0" dy="0" result="offsetNoise3">
+        <animate attributeName="dx" values="400;0" dur="7s" repeatCount="indefinite" calcMode="linear"/>
+      </feOffset>
+      <feTurbulence type="turbulence" baseFrequency="0.025" numOctaves="8" result="noise4" seed="5"/>
+      <feOffset in="noise4" dx="0" dy="0" result="offsetNoise4">
+        <animate attributeName="dx" values="0;-400" dur="7s" repeatCount="indefinite" calcMode="linear"/>
+      </feOffset>
+      <feComposite in="offsetNoise1" in2="offsetNoise2" result="part1"/>
+      <feComposite in="offsetNoise3" in2="offsetNoise4" result="part2"/>
+      <feBlend in="part1" in2="part2" mode="color-dodge" result="combinedNoise"/>
+      <feDisplacementMap in="SourceGraphic" in2="combinedNoise" scale="5" xChannelSelector="R" yChannelSelector="B"/>
+    </filter>
+  </defs>
+</svg>
 <div id="card-wrapper" data-theme="elegante">
 
   <!-- ══ S1: SPLASH ══ -->
@@ -1392,12 +1577,25 @@ let lbIdx = 0;
 ══════════════════════════════════════════════ */
 function renderPreview(){
   const s = state;
-  // Splash
+  // Splash — actualizar solo los nodos de texto, no innerHTML del botón
   setTxt('sp-15', s.age||'15');
   setTxt('sp-name', s.name||'');
   setTxt('sp-date', fmtDate(s.date));
   const spBtn = q('sp-btn');
-  if(spBtn) spBtn.innerHTML = (s.splashBtn||'Abrir invitación');
+  if(spBtn){
+    // Actualizar solo el texto sin borrar los hijos .btn-star ya inyectados
+    const textNodes = Array.from(spBtn.childNodes).filter(n=>n.nodeType===3||n.tagName==='SVG'||n.tagName==='svg');
+    // Si aún no tiene estrellas, actualizar innerHTML completo; si ya las tiene, solo actualizar texto
+    const hasStars = !!spBtn.querySelector('.btn-star-1');
+    if(!hasStars){
+      spBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> ${s.splashBtn||'Abrir invitación'}`;
+    } else {
+      // Actualizar solo el nodo de texto (el primero que no sea .btn-star)
+      Array.from(spBtn.childNodes).forEach(n=>{
+        if(n.nodeType===3) n.textContent = ` ${s.splashBtn||'Abrir invitación'}`;
+      });
+    }
+  }
   const splash = q('splash');
   if(splash) splash.style.display = s.showSplash ? '' : 'none';
 
@@ -2083,10 +2281,34 @@ function showToast(msg){
 }
 
 /* ══════════════════════════════════════════════
+   SPARKLE STARS — inyectar en todos los botones
+══════════════════════════════════════════════ */
+const STAR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 784.11 815.53"
+  style="shape-rendering:geometricPrecision;text-rendering:geometricPrecision;image-rendering:optimizeQuality;fill-rule:evenodd;clip-rule:evenodd">
+  <path d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"/>
+</svg>`;
+
+function injectSparkleStars(){
+  document.querySelectorAll('.btn-primary,.btn-secondary,#sp-btn').forEach(btn => {
+    if(btn.querySelector('.btn-star-1')) return; // ya inyectado
+    // Detectar botón WhatsApp por color verde #25d366 en el atributo style HTML
+    const styleAttr = btn.getAttribute('style') || '';
+    const isWa = styleAttr.includes('#25d366') || styleAttr.includes('25d366');
+    for(let i=1;i<=6;i++){
+      const d = document.createElement('div');
+      d.className = `btn-star btn-star-${i}${isWa?' btn-wa-star':''}`;
+      d.innerHTML = STAR_SVG;
+      btn.appendChild(d);
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════
    BOOT
 ══════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',()=>{
   renderPreview();
+  injectSparkleStars();
   initSplash();
   initAudioPlayer();
   initRsvpForm();
