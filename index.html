@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#120a1c" />
 <title>Mis XV — Catrina · Gueka Ideas</title>
 
 <!-- Tipografías (Fontsource CDN, igual que el editor) -->
@@ -28,244 +29,461 @@
 
 <style>
 /* ============================================================
-   PLANTILLA: "CATRINA" — XV Años
-   Estilo: papel picado, marcos florales, altar de muertos.
+   PLANTILLA "CATRINA" — XV Años · Gueka Ideas
+   Gráficas SVG por sección, papel picado, altar de muertos.
    ============================================================ */
 *,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
 html,body{margin:0;padding:0}
-body{background:#0a0710;display:flex;justify-content:center}
+body{background:#08050d;display:flex;justify-content:center;-webkit-font-smoothing:antialiased;
+  /* Telón de fondo de altar para pantallas grandes; la tarjeta queda centrada */
+  background-image:
+    radial-gradient(40% 30% at 50% 0%, rgba(255,46,136,.14), transparent 70%),
+    radial-gradient(45% 35% at 50% 100%, rgba(255,209,102,.10), transparent 70%)}
 button,[role="button"],a{cursor:pointer}
+img{max-width:100%}
+:focus-visible{outline:2px solid var(--c-b);outline-offset:3px}
 
-/* ---------- Contenedor raíz + variables de tema ---------- */
+/* ---------- Raíz + variables ---------- */
 #card-wrapper{
-  --c-bg:#120a1c; --c-text:#fdf4ff; --c-dim:#c9a9d6; --c-line:rgba(255,214,102,.28);
+  --c-bg:#120a1c; --c-text:#fdf4ff; --c-dim:#c9a9d6; --c-line:rgba(255,214,102,.26);
   --c-a:#ff2e88; --c-b:#ffd166; --c-c:#7bdff2; --c-d:#b892ff; --c-e:#ff8c42;
   --c-head:"Abril Fatface", serif;
   --c-serif:"Cormorant Garamond", serif;
   --c-mono:"JetBrains Mono", monospace;
   --c-script:"Great Vibes", cursive;
+  --card-w:480px;
 
-  position:relative; width:100%; max-width:480px; min-height:100vh;
-  background:var(--c-bg); color:var(--c-text); overflow:hidden;
-  font-family:var(--c-serif);
+  position:relative;width:100%;max-width:var(--card-w);margin:0 auto;min-height:100vh;
+  background:var(--c-bg);color:var(--c-text);overflow-x:hidden;font-family:var(--c-serif);
+  box-shadow:0 0 0 1px var(--c-line),0 0 90px rgba(0,0,0,.7);
 }
 #card-wrapper::before{
-  content:""; position:fixed; inset:0; max-width:480px; pointer-events:none; z-index:0;
+  content:"";position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;
+  width:100%;max-width:var(--card-w);pointer-events:none;z-index:0;
   background:
-    radial-gradient(60% 40% at 12% 8%, color-mix(in oklab, var(--c-a) 26%, transparent), transparent 70%),
-    radial-gradient(55% 45% at 90% 22%, color-mix(in oklab, var(--c-d) 24%, transparent), transparent 72%),
-    radial-gradient(70% 50% at 50% 100%, color-mix(in oklab, var(--c-b) 16%, transparent), transparent 70%);
+    radial-gradient(60% 40% at 12% 6%, color-mix(in oklab,var(--c-a) 26%,transparent),transparent 70%),
+    radial-gradient(55% 45% at 92% 24%, color-mix(in oklab,var(--c-d) 24%,transparent),transparent 72%),
+    radial-gradient(70% 50% at 50% 100%, color-mix(in oklab,var(--c-b) 15%,transparent),transparent 70%);
 }
 #card-wrapper[data-theme="elegante"]{--c-text:#fffaf0;--c-dim:#cbb994}
-#card-wrapper[data-theme="pastel"]{--c-text:#3a2b3f;--c-dim:#7c6a82;--c-line:rgba(0,0,0,.12)}
+#card-wrapper[data-theme="pastel"]{--c-text:#38263d;--c-dim:#7a6880;--c-line:rgba(0,0,0,.12)}
+#particle-canvas{position:fixed;top:0;left:0;right:0;margin:0 auto;
+  width:100%;max-width:var(--card-w);height:100%;pointer-events:none;z-index:4}
 
-#particle-canvas{position:fixed;inset:0;width:100%;height:100%;max-width:480px;pointer-events:none;z-index:3}
+/* ---------- Barra de progreso de lectura ---------- */
+#progress-bar{position:fixed;top:0;left:0;right:0;margin:0 auto;height:3px;max-width:var(--card-w);z-index:18;
+  background:linear-gradient(90deg,var(--c-a),var(--c-b),var(--c-d));
+  transform-origin:left center;transform:scaleX(0);transition:transform .12s linear}
 
 /* ---------- Papel picado ---------- */
 .papel{position:relative;z-index:2;height:26px;display:flex;overflow:hidden}
 .papel i{flex:1;height:100%;background:currentColor;
   clip-path:polygon(0 0,100% 0,100% 62%,50% 100%,0 62%);opacity:.85;
   animation:sway 3.6s ease-in-out infinite}
-.papel i:nth-child(odd){animation-delay:.35s}
+.papel i:nth-child(odd){animation-delay:.4s;opacity:.6}
 @keyframes sway{0%,100%{transform:translateY(0) skewX(0)}50%{transform:translateY(2px) skewX(3deg)}}
 
-/* ---------- Layout ---------- */
+/* ---------- Layout secciones ---------- */
 main{position:relative;z-index:2}
-section{position:relative;padding:52px 22px;border-bottom:1px solid var(--c-line)}
-.eyebrow{font-family:var(--c-mono);font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--c-b);margin:0 0 14px}
-h2.sec-t{font-family:var(--c-head);font-weight:400;font-size:clamp(26px,8vw,36px);line-height:1.05;margin:0 0 18px}
-h2.sec-t em{font-family:var(--c-script);font-style:normal;color:var(--c-a);font-size:1.25em}
-.card-cap{font-size:16.5px;line-height:1.75;color:var(--c-dim);margin:0}
+section{position:relative;padding:56px 22px;border-bottom:1px solid var(--c-line)}
+.sec-art{display:block;width:100%;max-width:150px;margin:0 auto 16px;overflow:visible}
+.sec-art.wide{max-width:100%}
+.sec-head{text-align:center;margin-bottom:24px}
+/* Riel de calaveritas: motivo de catrina presente en todas las secciones */
+.catrina-rail{display:block;width:100%;max-width:210px;margin:0 auto 10px;opacity:.9}
+.catrina-rail use{animation:bob 5s ease-in-out infinite}
+.catrina-rail use:nth-child(2){animation-delay:.8s}
+.catrina-rail use:nth-child(3){animation-delay:1.6s}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.eyebrow{font-family:var(--c-mono);font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--c-b);margin:0 0 10px}
+h2.sec-t{font-family:var(--c-head);font-weight:400;font-size:clamp(26px,8vw,36px);line-height:1.05;margin:0}
+h2.sec-t em{font-family:var(--c-script);font-style:normal;color:var(--c-a);font-size:1.3em;line-height:.8}
+.card-cap{font-size:16.5px;line-height:1.78;color:var(--c-dim);margin:0}
 .card-list{display:flex;flex-direction:column;gap:10px}
-.card-list>div{
-  position:relative;padding:14px 16px 14px 40px;border:1px solid var(--c-line);border-radius:14px;
-  background:color-mix(in oklab, var(--c-text) 5%, transparent);font-size:15px;line-height:1.5
-}
-.card-list>div::before{
-  content:"✿";position:absolute;left:14px;top:13px;color:var(--c-b);font-size:14px
-}
-.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+.card-list>div{position:relative;padding:15px 16px 15px 46px;border:1px solid var(--c-line);border-radius:16px;
+  background:color-mix(in oklab,var(--c-text) 5%,transparent);font-size:15px;line-height:1.5;
+  transition:transform .25s ease,border-color .25s ease}
+.card-list>div:hover{transform:translateX(4px);border-color:color-mix(in oklab,var(--c-a) 55%,transparent)}
+.card-list>div::before{content:"";position:absolute;left:16px;top:50%;transform:translateY(-50%);
+  width:16px;height:16px;background:var(--c-b);
+  clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.card-list.flores>div::before{background:var(--c-e);border-radius:50%;
+  clip-path:polygon(50% 0,65% 25%,92% 15%,82% 43%,100% 62%,70% 68%,60% 100%,40% 100%,30% 68%,0 62%,18% 43%,8% 15%,35% 25%)}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .85s ease,transform .85s cubic-bezier(.2,.7,.2,1)}
 .reveal.in{opacity:1;transform:none}
+.divider-flor{display:flex;align-items:center;gap:12px;margin:26px 0 0;color:var(--c-line)}
+.divider-flor span{flex:1;height:1px;background:currentColor}
 
-/* ---------- Splash ---------- */
-#splash{
-  position:fixed;inset:0;z-index:20;max-width:480px;margin:0 auto;
-  background:var(--c-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:40px 26px;border:0;gap:6px
-}
-#splash::after{
-  content:"";position:absolute;inset:18px;border:1px solid var(--c-line);border-radius:200px 200px 24px 24px;pointer-events:none
-}
-#splash.hide{opacity:0;visibility:hidden;transform:scale(1.06);transition:.7s ease}
-#sp-15{font-family:var(--c-head);font-size:clamp(80px,30vw,150px);line-height:.85;
+/* ---------- 1. Splash ---------- */
+#splash{position:fixed;inset:0;z-index:20;max-width:var(--card-w);margin:0 auto;background:var(--c-bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  padding:36px 26px;border:0;gap:2px}
+#splash::after{content:"";position:absolute;inset:16px;border:1px solid var(--c-line);
+  border-radius:220px 220px 26px 26px;pointer-events:none}
+#splash.hide{opacity:0;visibility:hidden;transform:scale(1.07);transition:.75s ease}
+#sp-15{font-family:var(--c-head);font-size:clamp(78px,29vw,148px);line-height:.85;
   background:linear-gradient(160deg,var(--c-b),var(--c-a) 55%,var(--c-d));
   -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 24px rgba(0,0,0,.5))}
-#sp-name{font-family:var(--c-script);font-size:clamp(34px,12vw,54px);color:var(--c-text);margin-top:6px}
-#sp-date{font-family:var(--c-mono);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--c-b);margin-top:10px}
-#sp-btn{margin-top:30px;font-family:var(--c-mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
-  padding:15px 30px;border-radius:999px;border:1px solid var(--c-b);color:var(--c-bg);
-  background:linear-gradient(120deg,var(--c-b),var(--c-e))}
-.skull{font-size:34px;filter:drop-shadow(0 0 14px color-mix(in oklab,var(--c-a) 60%,transparent));animation:float 4s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+#sp-name{font-family:var(--c-script);font-size:clamp(34px,12vw,54px);margin-top:4px}
+#sp-date{font-family:var(--c-mono);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--c-b);margin-top:12px}
+#sp-btn{margin-top:28px;font-family:var(--c-mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+  padding:16px 32px;border-radius:999px;border:1px solid var(--c-b);color:#1a0f14;
+  background:linear-gradient(120deg,var(--c-b),var(--c-e));box-shadow:0 12px 34px rgba(0,0,0,.4);
+  transition:transform .2s ease}
+#sp-btn:hover{transform:translateY(-2px)}
+.calavera{width:110px;animation:float 4.4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.hint-scroll{position:absolute;bottom:20px;font-family:var(--c-mono);font-size:9px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--c-dim);animation:blink 2.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.35}50%{opacity:1}}
 
-/* ---------- Portada ---------- */
-#pv-retrato-wrap{
-  display:block;width:100%;aspect-ratio:3/4;padding:0;border:none;border-radius:230px 230px 20px 20px;
-  overflow:hidden;position:relative;background:#000;
-  box-shadow:0 0 0 1px var(--c-line),0 0 0 9px color-mix(in oklab,var(--c-a) 18%,transparent),0 30px 60px rgba(0,0,0,.55)
-}
-.cover-img{width:100%;height:100%;object-fit:cover;display:block}
-#pv-retrato-wrap:hover .cover-img{transform:scale(1.04);transition:.9s ease}
-#pv-nombre{font-family:var(--c-script);font-size:clamp(40px,14vw,64px);line-height:1;margin:22px 0 10px;text-align:center}
+/* ---------- 2. Portada ---------- */
+#pv-retrato-wrap{display:block;width:100%;aspect-ratio:3/4;padding:0;border:none;
+  border-radius:230px 230px 22px 22px;overflow:hidden;position:relative;background:#000;
+  box-shadow:0 0 0 1px var(--c-line),0 0 0 9px color-mix(in oklab,var(--c-a) 18%,transparent),0 30px 60px rgba(0,0,0,.55)}
+.cover-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .9s ease}
+#pv-retrato-wrap:hover .cover-img{transform:scale(1.05)}
+.foto-badge{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+  font-family:var(--c-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;backdrop-filter:blur(6px)}
+#pv-nombre{font-family:var(--c-script);font-size:clamp(42px,15vw,66px);line-height:1;margin:22px 0 10px;text-align:center}
+.hashtag{display:block;text-align:center;font-family:var(--c-mono);font-size:11px;letter-spacing:.2em;color:var(--c-c);margin-bottom:14px}
 
-/* ---------- Countdown ---------- */
-#cd{font-family:var(--c-mono);font-size:clamp(26px,10vw,42px);letter-spacing:.06em;text-align:center;
-  color:var(--c-b);padding:22px 10px;border:1px solid var(--c-line);border-radius:18px;
-  background:color-mix(in oklab,var(--c-text) 4%,transparent)}
-.cd-legend{display:flex;justify-content:space-around;font-family:var(--c-mono);font-size:9px;
-  letter-spacing:.22em;color:var(--c-dim);margin-top:10px;text-transform:uppercase}
+/* ---------- 3. Countdown ---------- */
+.cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cd-cell{position:relative;padding:16px 4px 12px;border:1px solid var(--c-line);border-radius:16px;text-align:center;
+  background:color-mix(in oklab,var(--c-text) 4%,transparent);overflow:hidden}
+.cd-cell b{display:block;font-family:var(--c-mono);font-size:clamp(20px,7vw,28px);color:var(--c-b)}
+.cd-cell span{font-family:var(--c-mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--c-dim)}
+.cd-ring{position:absolute;inset:auto 0 0;height:3px;background:var(--c-a);opacity:.7}
+#cd{position:absolute;left:-9999px}
 
-/* ---------- Botones / links ---------- */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;
+/* ---------- Botones ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;width:100%;
   font-family:var(--c-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
-  padding:14px 24px;border-radius:999px;border:1px solid var(--c-b);color:var(--c-b);background:transparent}
-.btn:hover{background:var(--c-b);color:var(--c-bg)}
+  padding:16px 22px;border-radius:999px;border:1px solid var(--c-b);color:var(--c-b);background:transparent;
+  transition:background .25s ease,color .25s ease,transform .2s ease}
+.btn:hover{background:var(--c-b);color:#1a0f14;transform:translateY(-2px)}
 .btn-solid{background:linear-gradient(120deg,var(--c-a),var(--c-d));border-color:transparent;color:#fff}
+.btn-solid:hover{color:#fff;filter:brightness(1.1)}
+.btn svg{width:16px;height:16px;flex:0 0 16px}
 
-/* ---------- Galería ---------- */
+/* ---------- Timeline itinerario ---------- */
+#pv-itin{position:relative;padding-left:6px}
+#pv-itin::before{content:"";position:absolute;left:23px;top:10px;bottom:10px;width:1px;
+  background:linear-gradient(var(--c-a),var(--c-b),var(--c-d))}
+#pv-itin>div{margin-left:22px;padding-left:20px}
+#pv-itin>div::before{left:-8px;width:14px;height:14px;background:var(--c-a);border-radius:50%;
+  clip-path:none;box-shadow:0 0 0 4px var(--c-bg)}
+
+/* ---------- 8. Galería ---------- */
 .gal-prev{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.gal-prev img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px;border:1px solid var(--c-line)}
-.gal-prev img:nth-child(3n+1){border-radius:120px 14px 14px 14px}
+.gal-prev img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:16px;border:1px solid var(--c-line);
+  transition:transform .35s ease,filter .35s ease}
+.gal-prev img:nth-child(3n+1){border-radius:120px 16px 16px 16px}
+.gal-prev img:hover{transform:scale(1.03);filter:saturate(1.2)}
 
-/* ---------- Audio ---------- */
-#pv-audio-wrap{display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid var(--c-line);
-  border-radius:18px;background:color-mix(in oklab,var(--c-text) 5%,transparent);margin-bottom:22px}
+/* ---------- 10. Audio ---------- */
+#pv-audio-wrap{display:flex;flex-direction:column;gap:14px;padding:18px;border:1px solid var(--c-line);
+  border-radius:20px;background:color-mix(in oklab,var(--c-text) 5%,transparent);margin-bottom:22px}
 .audio-row{display:flex;align-items:center;gap:12px}
-#pv-play-btn{width:46px;height:46px;flex:0 0 46px;border-radius:50%;border:none;color:#fff;font-size:15px;
-  background:linear-gradient(120deg,var(--c-a),var(--c-d))}
+#pv-play-btn{width:48px;height:48px;flex:0 0 48px;border-radius:50%;border:none;color:#fff;font-size:15px;
+  background:linear-gradient(120deg,var(--c-a),var(--c-d));box-shadow:0 8px 22px rgba(0,0,0,.35)}
+#pv-play-btn.playing{animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in oklab,var(--c-a) 45%,transparent)}50%{box-shadow:0 0 0 12px transparent}}
 #pv-track-name{font-size:14px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#pv-track-time,#pv-vol{font-family:var(--c-mono);font-size:11px;color:var(--c-dim)}
-input[type=range]{accent-color:var(--c-a);width:100%}
-#pv-vol{width:90px}
+#pv-track-time{font-family:var(--c-mono);font-size:11px;color:var(--c-dim)}
+input[type=range]{accent-color:var(--c-a);width:100%;height:22px}
+#pv-vol{max-width:110px}
+.eq{display:flex;align-items:flex-end;gap:3px;height:22px}
+.eq i{width:3px;background:var(--c-c);border-radius:2px;height:30%;animation:eq 1s ease-in-out infinite}
+.eq i:nth-child(2){animation-delay:.15s}.eq i:nth-child(3){animation-delay:.3s}
+.eq i:nth-child(4){animation-delay:.45s}.eq i:nth-child(5){animation-delay:.6s}
+@keyframes eq{0%,100%{height:25%}50%{height:100%}}
 
 /* ---------- Formularios ---------- */
 label{display:block;font-family:var(--c-mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--c-dim);margin:0 0 6px}
-input,select,textarea{width:100%;padding:13px 14px;border-radius:12px;font-family:var(--c-serif);font-size:15px;
+input,select,textarea{width:100%;padding:14px;border-radius:14px;font-family:var(--c-serif);font-size:15px;
   color:var(--c-text);background:color-mix(in oklab,var(--c-text) 6%,transparent);border:1px solid var(--c-line)}
-input:focus,select,textarea:focus{outline:2px solid color-mix(in oklab,var(--c-a) 60%,transparent)}
-select{color:var(--c-text);background-color:var(--c-bg)}
+select{background-color:var(--c-bg)}
 .field{margin-bottom:14px}
-.rsvp-error-msg{display:none;margin-top:12px;font-size:13px;color:var(--c-a)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rsvp-error-msg{display:none;margin-top:12px;padding:12px 14px;border-radius:12px;font-size:13px;color:#fff;
+  background:color-mix(in oklab,var(--c-a) 30%,transparent);border:1px solid var(--c-a)}
 .rsvp-error-msg.show{display:block}
-.rsvp-note{margin-top:16px;font-size:13px;line-height:1.6;color:var(--c-dim)}
-#rsvp-qr-wrap{display:none;margin-top:18px;padding:18px;text-align:center;border-radius:16px;background:#fff}
+.rsvp-note{margin-top:18px;font-size:13px;line-height:1.7;color:var(--c-dim);
+  padding:14px 16px;border-radius:14px;border:1px dashed var(--c-line)}
+#rsvp-qr-wrap{display:none;margin-top:18px;padding:20px;text-align:center;border-radius:18px;background:#fff;color:#111}
 #rsvp-qr-wrap.show{display:block}
+.qr-cap{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;margin-top:12px;color:#555}
 .ok-msg{display:none;margin-top:12px;font-size:13px;color:var(--c-c)}
 .ok-msg.show{display:block}
 .song-row{display:flex;gap:8px;margin-bottom:8px}
-.song-row button{flex:0 0 44px;border-radius:12px;border:1px solid var(--c-line);background:transparent;color:var(--c-dim)}
+.song-row button{flex:0 0 46px;border-radius:14px;border:1px solid var(--c-line);background:transparent;color:var(--c-dim)}
+.btn-row{display:flex;gap:10px;margin-top:10px}
 
-/* ---------- Cierre ---------- */
+/* ---------- 14. Lugar ---------- */
+.venue-card{padding:20px;border:1px solid var(--c-line);border-radius:20px;text-align:center;
+  background:color-mix(in oklab,var(--c-text) 4%,transparent)}
+.venue-name{font-family:var(--c-head);font-size:24px;margin-bottom:8px}
+
+/* ---------- 17. Cierre ---------- */
 #pv-poem{text-align:center;font-style:italic}
-.splash-name{font-family:var(--c-script);font-size:clamp(34px,12vw,52px);text-align:center;margin-top:20px;color:var(--c-a)}
+.splash-name{font-family:var(--c-script);font-size:clamp(36px,13vw,54px);text-align:center;margin-top:18px;color:var(--c-a)}
+footer{padding:34px 26px 90px;text-align:center}
+.brand-logo{display:block;width:180px;max-width:62%;margin:0 auto 16px;
+  filter:brightness(1.45) drop-shadow(0 4px 18px rgba(0,0,0,.4));mix-blend-mode:screen}
+#card-wrapper[data-theme="pastel"] .brand-logo{filter:none;mix-blend-mode:normal}
+footer .legal{margin:0;font-family:var(--c-serif);font-size:12.5px;line-height:1.8;color:var(--c-dim)}
+footer .legal.copy{margin-top:12px;font-family:var(--c-mono);font-size:8.5px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--c-b);opacity:.8}
+
+/* ---------- Nav flotante ---------- */
+#quick-nav{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:16;display:flex;gap:6px;
+  padding:8px 10px;border-radius:999px;background:rgba(10,6,16,.72);backdrop-filter:blur(12px);
+  border:1px solid var(--c-line);opacity:0;pointer-events:none;transition:opacity .4s ease}
+#quick-nav.show{opacity:1;pointer-events:auto}
+#quick-nav a{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;color:var(--c-dim);
+  text-decoration:none;font-size:15px;transition:background .2s ease,color .2s ease}
+#quick-nav a:hover{background:color-mix(in oklab,var(--c-a) 30%,transparent);color:#fff}
 
 [hidden]{display:none !important}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}.reveal{opacity:1;transform:none}}
 </style>
 </head>
 <body>
 
 <div id="card-wrapper" data-theme="neon">
+  <div id="progress-bar"></div>
   <canvas id="particle-canvas"></canvas>
+
+  <!-- Definiciones SVG reutilizables -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="gA" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="var(--c-a)"/><stop offset="100%" stop-color="var(--c-d)"/>
+      </linearGradient>
+      <linearGradient id="gB" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="var(--c-b)"/><stop offset="100%" stop-color="var(--c-e)"/>
+      </linearGradient>
+      <g id="flor">
+        <g fill="url(#gB)">
+          <circle cx="0" cy="-9" r="6"/><circle cx="9" cy="0" r="6"/>
+          <circle cx="0" cy="9" r="6"/><circle cx="-9" cy="0" r="6"/>
+          <circle cx="6.5" cy="-6.5" r="5"/><circle cx="6.5" cy="6.5" r="5"/>
+          <circle cx="-6.5" cy="6.5" r="5"/><circle cx="-6.5" cy="-6.5" r="5"/>
+        </g>
+        <circle cx="0" cy="0" r="5" fill="var(--c-a)"/>
+      </g>
+      <!-- Calaverita: motivo de catrina que se repite en TODAS las secciones -->
+      <g id="calaverita">
+        <path d="M0-16c8.5 0 14.5 6.2 14.5 14.8 0 5.6-2.3 8.2-2.3 12.5 0 4-4.3 6.6-12.2 6.6s-12.2-2.6-12.2-6.6c0-4.3-2.3-6.9-2.3-12.5C-14.5-9.8-8.5-16 0-16z"
+              fill="none" stroke="var(--c-b)" stroke-width="1.8"/>
+        <circle cx="-5.6" cy="-2.5" r="4.1" fill="var(--c-a)"/>
+        <circle cx="5.6" cy="-2.5" r="4.1" fill="var(--c-a)"/>
+        <path d="M0 3l-2 4h4z" fill="var(--c-b)"/>
+        <path d="M-5 12h10M-2.5 12v3.4M0 12v3.4M2.5 12v3.4" stroke="var(--c-b)" stroke-width="1.3" fill="none"/>
+        <use href="#flor" transform="translate(-11 -14) scale(.42)"/>
+        <use href="#flor" transform="translate(11 -14) scale(.42)"/>
+      </g>
+    </defs>
+  </svg>
 
   <!-- ============ 1. SPLASH / BIENVENIDA ============ -->
   <section id="splash">
-    <div class="skull">💀</div>
+    <!-- Gráfica: calavera catrina -->
+    <svg class="calavera" viewBox="0 0 120 140" aria-hidden="true">
+      <path d="M60 8c26 0 44 19 44 45 0 17-7 25-7 38 0 12-13 20-37 20s-37-8-37-20c0-13-7-21-7-38C16 27 34 8 60 8z"
+            fill="none" stroke="url(#gB)" stroke-width="2.5"/>
+      <circle cx="42" cy="55" r="13" fill="url(#gA)" opacity=".85"/>
+      <circle cx="78" cy="55" r="13" fill="url(#gA)" opacity=".85"/>
+      <circle cx="42" cy="55" r="20" fill="none" stroke="var(--c-b)" stroke-width="1" stroke-dasharray="3 4"/>
+      <circle cx="78" cy="55" r="20" fill="none" stroke="var(--c-b)" stroke-width="1" stroke-dasharray="3 4"/>
+      <path d="M60 70l-6 12h12z" fill="var(--c-b)"/>
+      <path d="M44 98h32M50 98v10M60 98v10M70 98v10" stroke="var(--c-b)" stroke-width="2" fill="none"/>
+      <use href="#flor" x="22" y="20" transform="scale(.8) translate(6 4)"/>
+      <use href="#flor" x="120" y="30" transform="scale(.7)"/>
+    </svg>
     <div id="sp-15">15</div>
     <div id="sp-name">Nombre</div>
     <div id="sp-date">Fecha</div>
     <button id="sp-btn" type="button">Abrir invitación</button>
+    <div class="hint-scroll">Toca para entrar</div>
   </section>
 
   <div class="papel" style="color:var(--c-a)"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
   <main>
     <!-- ============ 2. FOTO PRINCIPAL + NOMBRE ============ -->
-    <section class="reveal">
-      <p class="eyebrow">Mis XV Años</p>
+    <section id="s-portada" class="reveal">
+      <div class="sec-head">
+        <!-- Gráfica: arco floral -->
+        <svg class="sec-art" viewBox="0 0 160 46" aria-hidden="true">
+          <path d="M6 42C30 14 130 14 154 42" fill="none" stroke="var(--c-line)" stroke-width="1.5"/>
+          <use href="#flor" x="80" y="16"/><use href="#flor" x="40" y="26" transform="scale(.72) translate(15 8)"/>
+          <use href="#flor" x="120" y="26" transform="scale(.72) translate(46 8)"/>
+        </svg>
+        <p class="eyebrow">Mis XV Años</p>
+      </div>
       <button id="pv-retrato-wrap" type="button" title="Cambiar foto">
         <img class="cover-img" id="pv-retrato" alt="Retrato" src="" />
+        <span class="foto-badge">Toca para cambiar foto</span>
       </button>
       <h1 id="pv-nombre"></h1>
+      <span class="hashtag" id="pv-hashtag"></span>
       <p id="pv-caption" class="card-cap" style="text-align:center"></p>
     </section>
 
     <!-- ============ 3. CUENTA REGRESIVA ============ -->
-    <section class="reveal">
-      <p class="eyebrow">La cuenta ha comenzado</p>
-      <h2 class="sec-t">Faltan <em>poquito</em></h2>
-      <div id="cd">--:--:--:--</div>
-      <div class="cd-legend"><span>Días</span><span>Horas</span><span>Min</span><span>Seg</span></div>
+    <section id="s-cd" class="reveal">
+      <div class="sec-head">
+        <!-- Gráfica: reloj de arena -->
+        <svg class="sec-art" viewBox="0 0 120 60" aria-hidden="true">
+          <path d="M40 8h40l-20 22 20 22H40l20-22z" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <path d="M46 12h28l-14 15z" fill="url(#gA)"/>
+          <use href="#flor" x="16" y="30" transform="scale(.7) translate(7 13)"/>
+          <use href="#flor" x="104" y="30" transform="scale(.7) translate(45 13)"/>
+        </svg>
+        <p class="eyebrow">La cuenta ha comenzado</p>
+        <h2 class="sec-t">Faltan <em>poquito</em></h2>
+      </div>
+      <div class="cd-grid">
+        <div class="cd-cell"><b id="cd-d">--</b><span>Días</span><i class="cd-ring" style="width:100%"></i></div>
+        <div class="cd-cell"><b id="cd-h">--</b><span>Horas</span><i class="cd-ring" style="width:70%"></i></div>
+        <div class="cd-cell"><b id="cd-m">--</b><span>Min</span><i class="cd-ring" style="width:45%"></i></div>
+        <div class="cd-cell"><b id="cd-s">--</b><span>Seg</span><i class="cd-ring" style="width:25%"></i></div>
+      </div>
+      <div id="cd" aria-live="polite">--:--:--:--</div>
     </section>
 
     <!-- ============ 4. AGENDAR EN CALENDARIO (premium) ============ -->
     <section id="pv-cal-sec" class="reveal" data-plan="premium">
-      <p class="eyebrow">No lo olvides</p>
-      <h2 class="sec-t">Agenda la <em>fecha</em></h2>
-      <a id="pv-cal-btn" class="btn" href="#" target="_blank" rel="noopener">Agregar a mi calendario</a>
+      <div class="sec-head">
+        <!-- Gráfica: calendario -->
+        <svg class="sec-art" viewBox="0 0 120 62" aria-hidden="true">
+          <rect x="30" y="12" width="60" height="42" rx="8" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <path d="M30 24h60" stroke="var(--c-b)" stroke-width="2"/>
+          <path d="M44 6v10M76 6v10" stroke="var(--c-a)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="60" cy="40" r="8" fill="url(#gA)"/>
+          <use href="#flor" x="14" y="44" transform="scale(.6) translate(5 34)"/>
+        </svg>
+        <p class="eyebrow">No lo olvides</p>
+        <h2 class="sec-t">Agenda la <em>fecha</em></h2>
+      </div>
+      <a id="pv-cal-btn" class="btn" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+        Agregar a mi calendario
+      </a>
     </section>
 
     <!-- ============ 5. MI HISTORIA (premium) ============ -->
-    <section class="reveal" data-plan="premium">
-      <p class="eyebrow">Un poco de mí</p>
-      <h2 class="sec-t">Mi <em>historia</em></h2>
+    <section id="s-historia" class="reveal" data-plan="premium">
+      <div class="sec-head">
+        <!-- Gráfica: libro abierto -->
+        <svg class="sec-art" viewBox="0 0 130 56" aria-hidden="true">
+          <path d="M65 14c-10-8-26-8-36-4v34c10-4 26-4 36 4z" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <path d="M65 14c10-8 26-8 36-4v34c-10-4-26-4-36 4z" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <path d="M65 14v34" stroke="var(--c-a)" stroke-width="2"/>
+          <use href="#flor" x="14" y="14" transform="scale(.6) translate(6 8)"/>
+        </svg>
+        <p class="eyebrow">Un poco de mí</p>
+        <h2 class="sec-t">Mi <em>historia</em></h2>
+      </div>
       <img class="cover-img" id="pv-fashion" alt="Foto" src=""
-           style="border-radius:18px;aspect-ratio:4/5;margin-bottom:18px;border:1px solid var(--c-line)" />
+           style="border-radius:20px;aspect-ratio:4/5;margin-bottom:20px;border:1px solid var(--c-line)" />
       <p id="pv-history" class="card-cap"></p>
     </section>
 
     <!-- ============ 6. PROGRAMA / ITINERARIO (premium) ============ -->
-    <section class="reveal" data-plan="premium">
-      <p class="eyebrow">Itinerario</p>
-      <h2 class="sec-t">El <em>programa</em></h2>
+    <section id="s-itin" class="reveal" data-plan="premium">
+      <div class="sec-head">
+        <!-- Gráfica: reloj -->
+        <svg class="sec-art" viewBox="0 0 120 58" aria-hidden="true">
+          <circle cx="60" cy="30" r="22" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <path d="M60 16v14l10 7" stroke="var(--c-a)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <use href="#flor" x="16" y="28" transform="scale(.6) translate(8 30)"/>
+          <use href="#flor" x="104" y="28" transform="scale(.6) translate(60 30)"/>
+        </svg>
+        <p class="eyebrow">Itinerario</p>
+        <h2 class="sec-t">El <em>programa</em></h2>
+      </div>
       <div id="pv-itin" class="card-list"></div>
     </section>
 
     <!-- ============ 7. PADRINOS (deluxe) ============ -->
-    <section class="reveal" data-plan="deluxe">
-      <p class="eyebrow">Con cariño</p>
-      <h2 class="sec-t">Mis <em>padrinos</em></h2>
-      <div id="pv-padr" class="card-list"></div>
+    <section id="s-padr" class="reveal" data-plan="deluxe">
+      <div class="sec-head">
+        <!-- Gráfica: dos corazones entrelazados -->
+        <svg class="sec-art" viewBox="0 0 130 56" aria-hidden="true">
+          <path d="M52 46C36 34 26 28 26 20a10 10 0 0 1 19-4 10 10 0 0 1 19 4c0 8-10 14-26 26z" fill="none" stroke="url(#gA)" stroke-width="2"/>
+          <path d="M84 46C68 34 58 28 58 20a10 10 0 0 1 19-4 10 10 0 0 1 19 4c0 8-10 14-26 26z" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <use href="#flor" x="112" y="18" transform="scale(.6) translate(74 8)"/>
+        </svg>
+        <p class="eyebrow">Con cariño</p>
+        <h2 class="sec-t">Mis <em>padrinos</em></h2>
+      </div>
+      <div id="pv-padr" class="card-list flores"></div>
     </section>
 
     <!-- ============ 8. GALERÍA DE FOTOS ============ -->
-    <section class="reveal">
-      <p class="eyebrow">Recuerdos</p>
-      <h2 class="sec-t">Mi <em>galería</em></h2>
+    <section id="s-gal" class="reveal">
+      <div class="sec-head">
+        <!-- Gráfica: cámara -->
+        <svg class="sec-art" viewBox="0 0 120 58" aria-hidden="true">
+          <rect x="28" y="16" width="64" height="34" rx="8" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <circle cx="60" cy="33" r="11" fill="none" stroke="var(--c-a)" stroke-width="2"/>
+          <circle cx="60" cy="33" r="4" fill="url(#gA)"/>
+          <path d="M48 16l5-6h14l5 6" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <use href="#flor" x="16" y="44" transform="scale(.55) translate(6 46)"/>
+        </svg>
+        <p class="eyebrow">Recuerdos</p>
+        <h2 class="sec-t">Mi <em>galería</em></h2>
+      </div>
       <div id="pv-galeria" class="gal-prev"></div>
     </section>
 
     <!-- ============ 9. COLECTOR DE FOTOS / ÁLBUM (premium) ============ -->
     <section id="pv-album-sec" class="reveal" data-plan="premium">
-      <p class="eyebrow">Álbum compartido</p>
-      <h2 class="sec-t">Súbeme tus <em>fotos</em></h2>
-      <a id="pv-album-btn" class="btn btn-solid" href="#" target="_blank" rel="noopener">Subir fotos al álbum</a>
+      <div class="sec-head">
+        <!-- Gráfica: nube con flecha -->
+        <svg class="sec-art" viewBox="0 0 120 56" aria-hidden="true">
+          <path d="M38 42a12 12 0 0 1 1-24 16 16 0 0 1 30-2 11 11 0 0 1 13 26z" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <path d="M60 46V26m0 0l-7 7m7-7l7 7" stroke="var(--c-a)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </svg>
+        <p class="eyebrow">Álbum compartido</p>
+        <h2 class="sec-t">Súbeme tus <em>fotos</em></h2>
+      </div>
+      <a id="pv-album-btn" class="btn btn-solid" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17V5m0 0l-5 5m5-5l5 5M4 19h16"/></svg>
+        Subir fotos al álbum
+      </a>
     </section>
 
     <!-- ============ 10. MÚSICA (premium) ============ -->
     <section id="pv-music-sec" class="reveal" data-plan="premium">
-      <p class="eyebrow">Ambiente</p>
-      <h2 class="sec-t">La <em>música</em></h2>
+      <div class="sec-head">
+        <!-- Gráfica: notas musicales -->
+        <svg class="sec-art" viewBox="0 0 120 58" aria-hidden="true">
+          <path d="M44 42V14l26-5v28" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <circle cx="38" cy="43" r="7" fill="url(#gA)"/><circle cx="64" cy="39" r="7" fill="url(#gA)"/>
+          <path d="M14 30h10M96 26h10M92 36h14" stroke="var(--c-c)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <p class="eyebrow">Ambiente</p>
+        <h2 class="sec-t">La <em>música</em></h2>
+      </div>
 
       <div id="pv-audio-wrap">
         <div class="audio-row">
-          <button id="pv-play-btn" type="button">▶</button>
+          <button id="pv-play-btn" type="button" aria-label="Reproducir">▶</button>
           <span id="pv-track-name">Sin pista</span>
-          <span id="pv-track-time">0:00 / 0:00</span>
+          <div class="eq" id="eq" hidden><i></i><i></i><i></i><i></i><i></i></div>
         </div>
-        <input id="pv-seek" type="range" min="0" max="100" value="0" />
+        <input id="pv-seek" type="range" min="0" max="100" value="0" aria-label="Avance de la pista" />
         <div class="audio-row">
-          <span style="font-size:13px;color:var(--c-dim)">🔊</span>
-          <input id="pv-vol" type="range" min="0" max="100" value="70" />
+          <span id="pv-track-time">0:00 / 0:00</span>
+          <span style="font-size:13px;color:var(--c-dim);margin-left:auto">🔊</span>
+          <input id="pv-vol" type="range" min="0" max="100" value="70" aria-label="Volumen" />
         </div>
         <audio id="pv-audio-player" hidden></audio>
         <audio id="pv-audio" preload="none"></audio>
@@ -273,91 +491,178 @@ select{color:var(--c-text);background-color:var(--c-bg)}
 
       <div id="pv-songs" class="card-list"></div>
 
-      <div id="pv-song-suggest-wrap" style="margin-top:22px">
+      <div id="pv-song-suggest-wrap" style="margin-top:24px">
         <form id="song-suggest-form">
           <label>Sugiere tus canciones</label>
           <div id="song-inputs"></div>
-          <button id="song-add-btn" type="button" class="btn" style="margin:8px 8px 0 0">+ Otra canción</button>
-          <button type="submit" class="btn btn-solid" style="margin-top:8px">Enviar</button>
+          <div class="btn-row">
+            <button id="song-add-btn" type="button" class="btn">+ Otra</button>
+            <button type="submit" class="btn btn-solid">Enviar</button>
+          </div>
           <p id="song-suggest-ok" class="ok-msg">¡Gracias! Abrimos WhatsApp para enviar tus canciones.</p>
         </form>
       </div>
     </section>
 
     <!-- ============ 11. MESA DE REGALOS (deluxe) ============ -->
-    <section class="reveal" data-plan="deluxe">
-      <p class="eyebrow">Si deseas regalarme algo</p>
-      <h2 class="sec-t">Mesa de <em>regalos</em></h2>
-      <div id="pv-gifts" class="card-list"></div>
+    <section id="s-gifts" class="reveal" data-plan="deluxe">
+      <div class="sec-head">
+        <!-- Gráfica: regalo -->
+        <svg class="sec-art" viewBox="0 0 120 58" aria-hidden="true">
+          <rect x="34" y="24" width="52" height="26" rx="5" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <path d="M30 24h60M60 24v26" stroke="var(--c-a)" stroke-width="2"/>
+          <path d="M60 24c-10-2-16-14-6-16 6-1 6 10 6 16zm0 0c10-2 16-14 6-16-6-1-6 10-6 16z" fill="none" stroke="url(#gB)" stroke-width="2"/>
+        </svg>
+        <p class="eyebrow">Si deseas regalarme algo</p>
+        <h2 class="sec-t">Mesa de <em>regalos</em></h2>
+      </div>
+      <div id="pv-gifts" class="card-list flores"></div>
     </section>
 
     <!-- ============ 12. INFO EXTRA (deluxe) ============ -->
-    <section class="reveal" data-plan="deluxe">
-      <p class="eyebrow">Detalles</p>
-      <h2 class="sec-t">Info <em>extra</em></h2>
+    <section id="s-extra" class="reveal" data-plan="deluxe">
+      <div class="sec-head">
+        <!-- Gráfica: info -->
+        <svg class="sec-art" viewBox="0 0 120 58" aria-hidden="true">
+          <circle cx="60" cy="29" r="20" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <path d="M60 26v14" stroke="var(--c-a)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="60" cy="19" r="2.6" fill="var(--c-a)"/>
+          <use href="#flor" x="18" y="42" transform="scale(.55) translate(10 48)"/>
+        </svg>
+        <p class="eyebrow">Detalles</p>
+        <h2 class="sec-t">Info <em>extra</em></h2>
+      </div>
       <div id="pv-extra" class="card-list"></div>
     </section>
 
     <!-- ============ 13. DRESS CODE ============ -->
-    <section class="reveal">
-      <p class="eyebrow">Etiqueta</p>
-      <h2 class="sec-t">Dress <em>code</em></h2>
+    <section id="s-dress" class="reveal">
+      <div class="sec-head">
+        <!-- Gráfica: vestido + moño -->
+        <svg class="sec-art" viewBox="0 0 130 58" aria-hidden="true">
+          <path d="M52 10h12l6 10-6 6 8 26H44l8-26-6-6z" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <path d="M96 18l14 10-14 10z" fill="none" stroke="url(#gA)" stroke-width="2"/>
+          <path d="M110 18l-14 10 14 10z" fill="none" stroke="url(#gA)" stroke-width="2"/>
+          <use href="#flor" x="20" y="30" transform="scale(.55) translate(14 34)"/>
+        </svg>
+        <p class="eyebrow">Etiqueta</p>
+        <h2 class="sec-t">Dress <em>code</em></h2>
+      </div>
       <div id="pv-dress" class="card-list"></div>
     </section>
 
     <!-- ============ 14. LUGAR DEL EVENTO ============ -->
-    <section class="reveal">
-      <p class="eyebrow">Te espero en</p>
-      <h2 class="sec-t">El <em>lugar</em></h2>
+    <section id="s-lugar" class="reveal">
+      <div class="sec-head">
+        <!-- Gráfica: pin de mapa -->
+        <svg class="sec-art" viewBox="0 0 120 60" aria-hidden="true">
+          <path d="M60 8c9 0 16 7 16 16 0 12-16 26-16 26S44 36 44 24c0-9 7-16 16-16z" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <circle cx="60" cy="24" r="6" fill="url(#gA)"/>
+          <path d="M20 52h80" stroke="var(--c-line)" stroke-width="1.5" stroke-dasharray="4 5"/>
+        </svg>
+        <p class="eyebrow">Te espero en</p>
+        <h2 class="sec-t">El <em>lugar</em></h2>
+      </div>
       <div id="pv-lugar" class="card-cap"></div>
     </section>
 
     <!-- ============ 15. SECCIÓN LIBRE (deluxe) ============ -->
     <section id="pv-custom-sec" class="reveal" data-plan="deluxe">
-      <p class="eyebrow">Además</p>
-      <h2 class="sec-t" id="pv-custom-title"></h2>
+      <div class="sec-head">
+        <!-- Gráfica: veladora del altar -->
+        <svg class="sec-art" viewBox="0 0 120 62" aria-hidden="true">
+          <rect x="48" y="26" width="24" height="30" rx="4" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <path d="M60 24c6-6 2-12 0-16-2 4-6 10 0 16z" fill="url(#gA)"/>
+          <use href="#flor" x="26" y="44" transform="scale(.6) translate(18 44)"/>
+          <use href="#flor" x="94" y="44" transform="scale(.6) translate(90 44)"/>
+        </svg>
+        <p class="eyebrow">Además</p>
+        <h2 class="sec-t" id="pv-custom-title"></h2>
+      </div>
       <p id="pv-custom-text" class="card-cap"></p>
     </section>
 
     <!-- ============ 16. RSVP / CONFIRMACIÓN (premium) ============ -->
-    <section class="reveal" data-plan="premium">
-      <p class="eyebrow">Confirma tu lugar</p>
-      <h2 class="sec-t"><em>RSVP</em></h2>
+    <section id="s-rsvp" class="reveal" data-plan="premium">
+      <div class="sec-head">
+        <!-- Gráfica: sobre con corazón -->
+        <svg class="sec-art" viewBox="0 0 120 58" aria-hidden="true">
+          <rect x="30" y="14" width="60" height="36" rx="6" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <path d="M30 18l30 20 30-20" fill="none" stroke="url(#gB)" stroke-width="2"/>
+          <path d="M60 46c-8-6-13-9-13-14a6 6 0 0 1 13-2 6 6 0 0 1 13 2c0 5-5 8-13 14z" fill="url(#gA)" opacity=".9"/>
+        </svg>
+        <p class="eyebrow">Confirma tu lugar</p>
+        <h2 class="sec-t"><em>RSVP</em></h2>
+      </div>
       <form id="rsvp-form">
         <div class="field">
           <label for="rsvp-nombre">Tu nombre</label>
           <input id="rsvp-nombre" type="text" placeholder="Ana López" required />
         </div>
-        <div class="field">
-          <label for="rsvp-asiste">¿Asistirás?</label>
-          <select id="rsvp-asiste">
-            <option value="si">Sí, asistiré</option>
-            <option value="no">No podré asistir</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="rsvp-acomp">Acompañantes</label>
-          <input id="rsvp-acomp" type="number" min="0" value="0" />
+        <div class="row2">
+          <div class="field">
+            <label for="rsvp-asiste">¿Asistirás?</label>
+            <select id="rsvp-asiste">
+              <option value="si">Sí, asistiré</option>
+              <option value="no">No podré asistir</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="rsvp-acomp">Acompañantes</label>
+            <input id="rsvp-acomp" type="number" min="0" value="0" />
+          </div>
         </div>
         <div class="field">
           <label for="rsvp-msg">Mensaje (opcional)</label>
           <textarea id="rsvp-msg" rows="3" placeholder="¡Nos vemos ahí!"></textarea>
         </div>
-        <button type="submit" class="btn btn-solid">Enviar por WhatsApp</button>
+        <button type="submit" class="btn btn-solid">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-4.2-7.6L21 3l-1.4 4.2A8.9 8.9 0 0 1 21 12z"/></svg>
+          Enviar por WhatsApp
+        </button>
         <p id="rsvp-error" class="rsvp-error-msg"></p>
       </form>
-      <div id="rsvp-qr-wrap"><div id="rsvp-qr-canvas"></div></div>
+      <div id="rsvp-qr-wrap">
+        <div id="rsvp-qr-canvas"></div>
+        <p class="qr-cap">Tu pase de acceso · muéstralo en la entrada</p>
+      </div>
       <p id="pv-rsvp" class="rsvp-note"></p>
     </section>
 
     <!-- ============ 17. CIERRE ============ -->
-    <section class="reveal" style="border-bottom:none">
+    <section id="s-cierre" class="reveal" style="border-bottom:none">
+      <div class="sec-head">
+        <!-- Gráfica: guirnalda de cempasúchil -->
+        <svg class="sec-art wide" viewBox="0 0 300 60" aria-hidden="true">
+          <path d="M10 20C70 56 230 56 290 20" fill="none" stroke="var(--c-line)" stroke-width="1.5"/>
+          <use href="#flor" x="150" y="46"/>
+          <use href="#flor" x="80" y="40" transform="scale(.8) translate(20 8)"/>
+          <use href="#flor" x="220" y="40" transform="scale(.8) translate(55 8)"/>
+          <use href="#flor" x="30" y="24" transform="scale(.6) translate(20 14)"/>
+          <use href="#flor" x="270" y="24" transform="scale(.6) translate(180 14)"/>
+        </svg>
+      </div>
       <p id="pv-poem" class="card-cap"></p>
       <div id="pv-sign" class="splash-name"></div>
     </section>
   </main>
 
   <div class="papel" style="color:var(--c-b);transform:rotate(180deg)"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <footer>
+    <img class="brand-logo" src="https://hercules-cdn.com/file_V4vMq9tjdZG4QMpky1FypKJ9" alt="Gueka Ideas" />
+    <p class="legal">Esta tarjeta digital es propiedad exclusiva de Gueka Ideas<br />Uso permitido únicamente para fines personales.</p>
+    <p class="legal copy">&copy; 2026 Gueka Ideas · Todos los derechos reservados</p>
+  </footer>
+
+  <!-- Navegación rápida flotante -->
+  <nav id="quick-nav" aria-label="Navegación rápida">
+    <a href="#s-portada" title="Inicio">✿</a>
+    <a href="#s-cd" title="Cuenta regresiva">⏳</a>
+    <a href="#s-itin" title="Programa">🕐</a>
+    <a href="#s-gal" title="Galería">📷</a>
+    <a href="#s-lugar" title="Lugar">📍</a>
+    <a href="#s-rsvp" title="Confirmar">✉</a>
+  </nav>
 </div>
 
 <script>
@@ -410,8 +715,8 @@ const state = {
   ],
   extra: [
     { v: 'Estacionamiento con valet sin costo' },
-    { v: 'Evento solo para adultos y adolescentes' },
-    { v: 'Habrá transporte de regreso al centro a la 1:00 am' }
+    { v: 'Evento para adultos y adolescentes' },
+    { v: 'Transporte de regreso al centro a la 1:00 am' }
   ],
   songs: [
     { v: 'Cumbia del olvido — Nicola Cruz' },
@@ -427,15 +732,15 @@ const state = {
   typography: 'abril',
   songSuggestEnabled: true,
   songSuggestWa: '5215512345678',
-  audioKey: '',
-  audioName: 'Cumbia del olvido',
+  audioKey: 'audio/demo-catrina.mp3',
+  audioName: 'Canción demo · Catrina',
   imgKeys: { retrato: '', fashion: '' },
   galKeys: [],
   templateLabel: 'Catrina · XV Años'
 };
 
 /* ==========================================================
-   PALETAS / TIPOGRAFÍAS / PARTÍCULAS
+   PALETAS / TIPOGRAFÍAS
    ========================================================== */
 const PALETTES = {
   neon:      { a:'#ff2e88', b:'#ffd166', c:'#7bdff2', d:'#b892ff', e:'#ff8c42', bg:'#120a1c', theme:'neon' },
@@ -471,8 +776,6 @@ const PLAN_RANK = { classic: 1, premium: 2, deluxe: 3 };
 const GAL_MAX = { classic: 4, premium: 8, deluxe: 12 };
 const wrapper = document.getElementById('card-wrapper');
 const $ = (id) => document.getElementById(id);
-
-/* ---------- Fotos placeholder ---------- */
 const PH = (seed, w = 800, h = 1000) => `https://picsum.photos/seed/${seed}/${w}/${h}`;
 
 /* ==========================================================
@@ -488,6 +791,8 @@ function applyPaletteToCard(name) {
   wrapper.style.setProperty('--c-bg', p.bg);
   wrapper.setAttribute('data-theme', p.theme);
   document.body.style.background = p.theme === 'pastel' ? '#efe9f5' : '#08050d';
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', p.bg);
 }
 
 /* ==========================================================
@@ -510,7 +815,7 @@ function resizeCanvas() {
   canvas.width = wrapper.clientWidth;
   canvas.height = window.innerHeight;
 }
-window.addEventListener('resize', resizeCanvas);
+window.addEventListener('resize', () => { resizeCanvas(); });
 
 function paletteColors() {
   const p = PALETTES[state.palette] || PALETTES.neon;
@@ -652,26 +957,27 @@ function buildCalendarUrl() {
    renderPreview
    ========================================================== */
 function renderPreview() {
-  /* splash */
+  /* 1. splash */
   $('splash').hidden = !state.showSplash;
   $('sp-15').textContent = state.age;
   $('sp-name').textContent = state.name;
   $('sp-date').textContent = formatDate(state.date, state.time);
   $('sp-btn').textContent = state.splashBtn;
 
-  /* portada */
+  /* 2. portada */
   $('pv-retrato').src = state.imgKeys.retrato || PH('catrina-retrato');
   $('pv-nombre').textContent = state.name;
+  $('pv-hashtag').textContent = state.hashtag;
   $('pv-caption').textContent = state.caption;
 
-  /* calendario */
+  /* 4. calendario */
   $('pv-cal-btn').href = buildCalendarUrl();
 
-  /* historia */
+  /* 5. historia */
   $('pv-fashion').src = state.imgKeys.fashion || PH('catrina-fashion');
   $('pv-history').textContent = state.historyText;
 
-  /* listas */
+  /* 6,7,10,11,12,13 listas */
   fillList('pv-itin', state.itinerary);
   fillList('pv-padr', state.padrinos);
   fillList('pv-songs', state.songs);
@@ -679,7 +985,7 @@ function renderPreview() {
   fillList('pv-extra', state.extra);
   fillList('pv-dress', state.dressCode);
 
-  /* galería */
+  /* 8. galería */
   const gal = $('pv-galeria');
   gal.innerHTML = '';
   const max = GAL_MAX[state.plan] || 4;
@@ -688,27 +994,34 @@ function renderPreview() {
   keys.forEach((src, i) => {
     const img = document.createElement('img');
     img.src = src;
+    img.loading = 'lazy';
     img.alt = state.galCaptions[i] || `Foto ${i + 1}`;
     gal.appendChild(img);
   });
 
-  /* álbum */
+  /* 9. álbum */
   $('pv-album-btn').href = state.albumUrl || '#';
 
-  /* música */
+  /* 10. música */
   $('pv-track-name').textContent = state.audioName || 'Sin pista';
-  const audio = $('pv-audio');
-  if (state.audioKey && audio.src !== state.audioKey) audio.src = state.audioKey;
+  const audioEl = $('pv-audio');
+  if (state.audioKey && audioEl.getAttribute('src') !== state.audioKey) {
+    audioEl.setAttribute('src', state.audioKey);
+    audioEl.preload = 'metadata';
+  }
 
-  /* lugar */
+  /* 14. lugar */
   const lugar = $('pv-lugar');
   lugar.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'venue-card';
   const strong = document.createElement('div');
-  strong.style.cssText = 'font-size:20px;color:var(--c-text);margin-bottom:6px';
+  strong.className = 'venue-name';
   strong.textContent = state.venue;
   const addr = document.createElement('div');
+  addr.style.cssText = 'font-size:15px;color:var(--c-dim);line-height:1.6';
   addr.textContent = state.address;
-  lugar.append(strong, addr);
+  card.append(strong, addr);
   if (state.mapUrl && (PLAN_RANK[state.plan] || 1) >= 2) {
     const a = document.createElement('a');
     a.className = 'btn';
@@ -717,14 +1030,15 @@ function renderPreview() {
     a.rel = 'noopener';
     a.textContent = 'Ver mapa';
     a.style.marginTop = '18px';
-    lugar.appendChild(a);
+    card.appendChild(a);
   }
+  lugar.appendChild(card);
 
-  /* sección libre */
+  /* 15. sección libre */
   $('pv-custom-title').innerHTML = state.customTitle;
   $('pv-custom-text').textContent = state.customText;
 
-  /* rsvp nota */
+  /* 16. rsvp nota */
   const notes = [`Aforo total: ${state.rsvpCapacity} invitados.`,
     `Confirma por WhatsApp al +${state.waOrganizer}.`];
   if (state.plan === 'deluxe' && state.rsvpPara) {
@@ -732,7 +1046,7 @@ function renderPreview() {
   }
   $('pv-rsvp').textContent = notes.join(' ');
 
-  /* cierre */
+  /* 17. cierre */
   $('pv-poem').textContent = state.poem;
   $('pv-sign').textContent = state.signature;
 
@@ -740,19 +1054,39 @@ function renderPreview() {
 }
 
 /* ==========================================================
-   COUNTDOWN
+   MOTIVO DE CATRINAS EN TODAS LAS SECCIONES
+   Inyecta un riel de calaveritas en cada encabezado de sección.
+   ========================================================== */
+function decorateSections() {
+  const RAIL = '<svg class="catrina-rail" viewBox="0 0 210 44" aria-hidden="true">' +
+    '<path d="M6 22h198" stroke="var(--c-line)" stroke-width="1"/>' +
+    '<use href="#calaverita" x="0" y="0" transform="translate(60 22) scale(.7)"/>' +
+    '<use href="#calaverita" x="0" y="0" transform="translate(105 22) scale(.95)"/>' +
+    '<use href="#calaverita" x="0" y="0" transform="translate(150 22) scale(.7)"/>' +
+    '<use href="#flor" transform="translate(20 22) scale(.55)"/>' +
+    '<use href="#flor" transform="translate(190 22) scale(.55)"/>' +
+    '</svg>';
+  document.querySelectorAll('.sec-head').forEach((head) => {
+    if (head.querySelector('.catrina-rail')) return;
+    head.insertAdjacentHTML('afterbegin', RAIL);
+  });
+}
+
+/* ==========================================================
+   COUNTDOWN (formato DD:HH:MM:SS en #cd + celdas visuales)
    ========================================================== */
 function tickCountdown() {
   const target = eventDate();
-  const el = $('cd');
-  if (!target) { el.textContent = '--:--:--:--'; return; }
+  if (!target) { $('cd').textContent = '--:--:--:--'; return; }
   let diff = Math.max(0, target.getTime() - Date.now());
   const d = Math.floor(diff / 86400000); diff -= d * 86400000;
   const h = Math.floor(diff / 3600000); diff -= h * 3600000;
   const m = Math.floor(diff / 60000); diff -= m * 60000;
   const s = Math.floor(diff / 1000);
   const p = (n) => String(n).padStart(2, '0');
-  el.textContent = `${p(d)}:${p(h)}:${p(m)}:${p(s)}`;
+  $('cd').textContent = `${p(d)}:${p(h)}:${p(m)}:${p(s)}`;
+  $('cd-d').textContent = p(d); $('cd-h').textContent = p(h);
+  $('cd-m').textContent = p(m); $('cd-s').textContent = p(s);
 }
 setInterval(tickCountdown, 1000);
 
@@ -762,11 +1096,13 @@ setInterval(tickCountdown, 1000);
 $('sp-btn').addEventListener('click', () => {
   const sp = $('splash');
   sp.classList.add('hide');
-  setTimeout(() => { sp.hidden = true; }, 700);
+  setTimeout(() => { sp.hidden = true; }, 750);
+  // El primer gesto del invitado permite iniciar la canción demo de fondo
+  startDemoTrack();
 });
 
 /* ==========================================================
-   FOTO PRINCIPAL (cambiar imagen)
+   FOTO PRINCIPAL
    ========================================================== */
 $('pv-retrato-wrap').addEventListener('click', () => {
   const input = document.createElement('input');
@@ -799,19 +1135,51 @@ const mmss = (s) => {
 };
 
 playBtn.addEventListener('click', async () => {
-  if (!audio.src) { playBtn.textContent = '▶'; return; }
-  if (audio.paused) { await audio.play(); playBtn.textContent = '❚❚'; }
-  else { audio.pause(); playBtn.textContent = '▶'; }
+  if (!audio.getAttribute('src')) { playBtn.textContent = '▶'; return; }
+  if (audio.paused) {
+    try {
+      await audio.play();
+      playBtn.textContent = '❚❚';
+      playBtn.classList.add('playing');
+      $('eq').hidden = false;
+    } catch {
+      playBtn.textContent = '▶';
+      $('pv-track-name').textContent = 'No se pudo reproducir la pista';
+    }
+  } else {
+    audio.pause();
+    playBtn.textContent = '▶';
+    playBtn.classList.remove('playing');
+    $('eq').hidden = true;
+  }
+});
+audio.addEventListener('loadedmetadata', () => {
+  timeEl.textContent = `0:00 / ${mmss(audio.duration)}`;
 });
 audio.addEventListener('timeupdate', () => {
   if (audio.duration) seek.value = String((audio.currentTime / audio.duration) * 100);
   timeEl.textContent = `${mmss(audio.currentTime)} / ${mmss(audio.duration)}`;
 });
-audio.addEventListener('ended', () => { playBtn.textContent = '▶'; });
+audio.addEventListener('ended', () => {
+  playBtn.textContent = '▶';
+  playBtn.classList.remove('playing');
+  $('eq').hidden = true;
+});
 seek.addEventListener('input', () => {
   if (audio.duration) audio.currentTime = (Number(seek.value) / 100) * audio.duration;
 });
 vol.addEventListener('input', () => { audio.volume = Number(vol.value) / 100; });
+
+/* Canción demo de fondo: se activa con el primer gesto del invitado */
+audio.loop = true;
+function startDemoTrack() {
+  if (!audio.getAttribute('src') || !audio.paused) return;
+  audio.play().then(() => {
+    playBtn.textContent = '❚❚';
+    playBtn.classList.add('playing');
+    $('eq').hidden = false;
+  }).catch(() => { /* el navegador puede bloquearlo; el botón sigue disponible */ });
+}
 
 /* ==========================================================
    SUGERENCIA DE CANCIONES
@@ -826,11 +1194,13 @@ function addSongInput() {
   const del = document.createElement('button');
   del.type = 'button';
   del.textContent = '✕';
+  del.setAttribute('aria-label', 'Quitar canción');
   del.addEventListener('click', () => {
     if (songInputs.children.length > 1) row.remove();
   });
   row.append(input, del);
   songInputs.appendChild(row);
+  input.focus();
 }
 $('song-add-btn').addEventListener('click', addSongInput);
 addSongInput();
@@ -862,6 +1232,7 @@ $('rsvp-form').addEventListener('submit', (e) => {
   if (!nombre) {
     err.textContent = 'Por favor escribe tu nombre para confirmar.';
     err.classList.add('show');
+    $('rsvp-nombre').focus();
     return;
   }
   const maxPases = state.plan === 'deluxe' && state.rsvpMaxPases ? state.rsvpMaxPases : state.rsvpCapacity;
@@ -875,8 +1246,8 @@ $('rsvp-form').addEventListener('submit', (e) => {
     `Asistencia: ${asiste ? 'Sí asistiré' : 'No podré asistir'}\n` +
     `Acompañantes: ${acomp}` + (msg ? `\nMensaje: ${msg}` : '');
 
-  if (state.plan === 'deluxe' && state.rsvpPara) {
-    const wrap = $('rsvp-qr-wrap');
+  if (state.plan === 'deluxe' && state.rsvpPara && asiste) {
+    const qrWrap = $('rsvp-qr-wrap');
     const target = $('rsvp-qr-canvas');
     target.innerHTML = '';
     if (window.QRCode) {
@@ -884,7 +1255,8 @@ $('rsvp-form').addEventListener('submit', (e) => {
         text: `PASE|${state.name}|${state.rsvpPara}|${nombre}|${acomp + 1}|${state.date} ${state.time}`,
         width: 180, height: 180, correctLevel: window.QRCode.CorrectLevel.M
       });
-      wrap.classList.add('show');
+      qrWrap.classList.add('show');
+      qrWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
 
@@ -892,12 +1264,22 @@ $('rsvp-form').addEventListener('submit', (e) => {
 });
 
 /* ==========================================================
-   REVEAL AL SCROLL
+   UX: reveal, progreso de lectura, nav flotante
    ========================================================== */
 const io = new IntersectionObserver((entries) => {
   entries.forEach((en) => { if (en.isIntersecting) en.target.classList.add('in'); });
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+const bar = $('progress-bar');
+const nav = $('quick-nav');
+function onScroll() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+  bar.style.transform = `scaleX(${Math.max(0, Math.min(1, pct / 100))})`;
+  nav.classList.toggle('show', window.scrollY > 350);
+}
+window.addEventListener('scroll', onScroll, { passive: true });
 
 /* ==========================================================
    INIT
@@ -906,8 +1288,10 @@ resizeCanvas();
 applyPaletteToCard(state.palette);
 applyFont(state.typography);
 applyParticles(state.particles);
+decorateSections();
 renderPreview();
 tickCountdown();
+onScroll();
 </script>
 </body>
 </html>
