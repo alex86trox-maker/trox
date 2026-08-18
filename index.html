@@ -38,10 +38,21 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(ellipse at 50% 30%, #2d001a 0%, #1a0010 40%, #0d0006 100%);
+      background: #0d0006;
       text-align: center;
-      padding: 2rem;
       transition: opacity 0.8s ease, visibility 0.8s;
+    }
+    .splash-inner {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: radial-gradient(ellipse at 50% 30%, #2d001a 0%, #1a0010 40%, #0d0006 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
     #splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
     .splash-rose {
@@ -878,6 +889,7 @@
 
 <!-- SECCIÓN 0: SPLASH -->
 <div id="splash">
+<div class="splash-inner">
   <!-- Decorative rose SVG -->
   <svg class="splash-rose" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     <!-- Rose petals -->
@@ -922,6 +934,7 @@
   </svg>
 
   <button id="sp-btn">✦ Abrir Invitación ✦</button>
+</div>
 </div>
 
 <!-- ─── CARD WRAPPER ─────────────────────────────────────────── -->
@@ -1384,12 +1397,18 @@ const state = {
     {v:'Viaje o experiencia especial'},
   ],
   galCaptions: [
-    'Mi primera navidad',
-    'Mis 5 años felices',
-    'Vacaciones en familia',
-    'Con mis mejores amigas',
-    'Cumpleaños de 10',
-    'Preparando mis XV',
+    'El gran día llegó',
+    'Con tiara y corazón',
+    'Flores para Isabella',
+    'Vestida de ilusiones',
+    'El vals de mis sueños',
+    'Con mis seres queridos',
+    'Una noche de magia',
+    'La princesa de la noche',
+    'Momentos eternos',
+    'Brindando por la vida',
+    'Sonriendo al futuro',
+    'XV años de amor',
   ],
   typography: 'playfair',
   songSuggestEnabled: true,
@@ -1614,9 +1633,11 @@ function buildCalendarUrl() {
   const [hh, mm] = state.time.split(':');
   const pad = n => String(n).padStart(2, '0');
   const startDt = `${y}${m}${d}T${pad(hh)}${pad(mm)}00`;
-  // End +4 hours
+  // End +4 hours, clamped to 23:59 max to avoid invalid calendar URLs
   let endH = parseInt(hh, 10) + 4;
-  const endDt = `${y}${m}${d}T${pad(endH)}${pad(mm)}00`;
+  let endM = parseInt(mm, 10);
+  if (endH > 23) { endH = 23; endM = 59; }
+  const endDt = `${y}${m}${d}T${pad(endH)}${pad(endM)}00`;
   const title = encodeURIComponent(`XV Años de ${state.name}`);
   const loc = encodeURIComponent(state.address);
   return `https://calendar.google.com/calendar/r/eventedit?text=${title}&dates=${startDt}/${endDt}&location=${loc}&details=`;
@@ -1645,12 +1666,18 @@ const DB_VERSION = 1;
 const PLACEHOLDER_RETRATO  = 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80';
 const PLACEHOLDER_FASHION  = 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80';
 const PLACEHOLDER_GAL = [
-  'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80',
-  'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=600&q=80',
-  'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=600&q=80',
-  'https://images.unsplash.com/photo-1488716820095-cbe80883c496?w=600&q=80',
-  'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80',
-  'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=80',
+  'https://images.unsplash.com/photo-1775871599988-a34324bf58f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800&q=80',
+  'https://images.unsplash.com/photo-1776013113750-9d3f165ff5b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800&q=80',
+  'https://images.unsplash.com/photo-1763625642731-fe68cf5d0d53?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800&q=80',
+  'https://images.unsplash.com/photo-1775871437034-dd26f3afb2bc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800&q=80',
+  'https://images.unsplash.com/photo-1763625643093-65208d7a233f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800&q=80',
+  'https://images.unsplash.com/photo-1763625642832-cf2d13f45b74?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800&q=80',
+  'https://images.unsplash.com/photo-1763625648921-739638b0545f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800&q=80',
+  'https://images.unsplash.com/photo-1775871299393-2cce027efaa9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800&q=80',
+  'https://images.unsplash.com/photo-1763625648548-283c88d75c93?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800&q=80',
+  'https://images.unsplash.com/photo-1763625640687-e518ca2952df?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800&q=80',
+  'https://images.unsplash.com/photo-1776012999163-ac1d889e70f3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800&q=80',
+  'https://images.unsplash.com/photo-1776013246431-c59094c5c5f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800&q=80',
 ];
 
 // Abre (o crea) la base de datos
@@ -1730,7 +1757,12 @@ const GAL_IMGS = [...PLACEHOLDER_GAL];
 let galIdx = 0;
 
 function renderGallery() {
-  const imgs = state.galKeys.length ? state.galKeys : GAL_IMGS;
+  // Límite de fotos según plan: 4 classic / 8 premium / 12 deluxe
+  const planLimits = { classic: 4, premium: 8, deluxe: 12 };
+  const maxPhotos = planLimits[state.plan] || 4;
+
+  const allImgs = GAL_IMGS; // siempre usa GAL_IMGS; loadAllPhotos() ya inyecta los blobs en este array
+  const imgs = allImgs.slice(0, maxPhotos);
   const caps = state.galCaptions;
   const mainImg = document.getElementById('gal-main-img');
   const capTxt = document.getElementById('gal-cap-txt');
@@ -1780,7 +1812,7 @@ function renderPreview() {
   const spDate = document.getElementById('sp-date');
   const spBtn  = document.getElementById('sp-btn');
   if (spName) spName.textContent = state.name;
-  if (sp15)   sp15.textContent = state.age ? 'XV' : 'XV';
+  if (sp15)   sp15.textContent = state.age ? `${state.age}` : 'XV';
   if (spDate) {
     const [y, m, d] = state.date.split('-');
     const mNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -1808,7 +1840,7 @@ function renderPreview() {
   const pvItin = document.getElementById('pv-itin');
   if (pvItin) {
     pvItin.innerHTML = '';
-    state.itinerary.forEach((item, idx) => {
+    state.itinerary.forEach((item) => {
       const li = document.createElement('li');
       li.style.cssText = 'list-style:none;display:flex;align-items:flex-start;gap:0.8rem;padding:0.75rem 0;border-bottom:1px solid rgba(201,168,76,0.08);';
       const parts = item.v.split('—');
@@ -2062,8 +2094,16 @@ function initRsvpForm() {
     const acomp  = document.getElementById('rsvp-acomp').value;
     const msg    = document.getElementById('rsvp-msg').value.trim();
 
-    if (!nombre) { errEl.textContent = 'Por favor ingresa tu nombre.'; return; }
-    if (!asiste) { errEl.textContent = 'Por favor indica si asistirás.'; return; }
+    if (!nombre) {
+      errEl.textContent = 'Por favor ingresa tu nombre.';
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✦ Confirmar por WhatsApp ✦'; }
+      return;
+    }
+    if (!asiste) {
+      errEl.textContent = 'Por favor indica si asistirás.';
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✦ Confirmar por WhatsApp ✦'; }
+      return;
+    }
     errEl.textContent = '';
 
     const asistiStr = asiste === 'si' ? 'Sí asistiré' : asiste === 'no' ? 'No podré asistir' : 'Tal vez asista';
@@ -2082,8 +2122,7 @@ function initRsvpForm() {
 
     const waUrl = `https://wa.me/${state.waOrganizer}?text=${encodeURIComponent(text)}`;
     window.open(waUrl, '_blank');
-    setTimeout(() => { if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✦ Confirmar por WhatsApp ✦'; } }, 3000);
-    // Show success state
+    // Show success state — replaces the card, so no need to restore the button
     const formCard = form.closest('.card');
     if (formCard) {
       formCard.innerHTML = `<div style="text-align:center;padding:2rem 1rem;">
