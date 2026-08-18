@@ -1107,7 +1107,30 @@ section{position:relative;overflow:hidden;padding:2.25rem 1.6rem}
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════
    STATE — objeto central de datos
+   Persisted keys (no data URLs) saved to localStorage for reload resilience
 ══════════════════════════════════════════════════════════════════════════════ */
+const STATE_KEY = 'gueka-15-state-v1';
+const STATE_PERSIST_FIELDS = [
+  'plan','name','age','date','time','hashtag','caption','historyText',
+  'venue','address','mapsUrl','rsvpWa','rsvpPara','waOrganizer',
+  'palette','typography','particles','showSplash','splashBtn','capacity',
+  'galKeys','galCaptions','songs','imgKeys','audioKey','audioName',
+  'itinerary','padrinos','dressCode','extra','gifts',
+  'songSuggestEnabled','songSuggestWa'
+];
+function persistState(){
+  const snap = {};
+  STATE_PERSIST_FIELDS.forEach(k=>{ if(state[k] !== undefined) snap[k] = state[k]; });
+  try{ localStorage.setItem(STATE_KEY, JSON.stringify(snap)); }catch(e){}
+}
+function restoreState(){
+  try{
+    const raw = localStorage.getItem(STATE_KEY);
+    if(!raw) return;
+    const snap = JSON.parse(raw);
+    STATE_PERSIST_FIELDS.forEach(k=>{ if(snap[k] !== undefined) state[k] = snap[k]; });
+  }catch(e){}
+}
 const state = {
   plan: 'deluxe',
   category: '15años',
@@ -1281,13 +1304,16 @@ function triggerPhotoUpload(target){
       if(target === 'retrato'){
         state.imgKeys.retrato = key;
         document.getElementById('pv-retrato').src = dataUrl;
+        persistState();
       } else if(target === 'fashion'){
         state.imgKeys.fashion = key;
         document.getElementById('pv-fashion').src = dataUrl;
+        persistState();
       } else if(target === 'gal'){
         const planMax = {classic:4,premium:8,deluxe:12}[state.plan]||4;
         if(state.galKeys.length < planMax){
           state.galKeys.push(key);
+          persistState();
           renderGallery();
         } else {
           showToast(`Tu plan permite máximo ${planMax} fotos en galería.`, 'error');
@@ -2271,7 +2297,8 @@ function initScrollAnimations(){
    INIT
 ══════════════════════════════════════════════════════════════════════════════ */
 async function init(){
-  // Load fonts
+  // Restore persisted state FIRST (before any render/fonts/etc)
+  restoreState();
   loadFont('montserrat');
   loadFont('sacramento');
   loadFont('bebas_neue_via_link');
