@@ -527,44 +527,71 @@ section{position:relative;overflow:visible;padding:4rem 1.75rem}
 }
 
 /* ══════════════════════════════════════════════
-   GALLERY
+   GALLERY — COVERFLOW 3D
 ══════════════════════════════════════════════ */
-.gal-prev{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.gal-prev{
+  position:relative;
+  width:100%;
+  height:300px;
+  display:flex;align-items:center;justify-content:center;
+  perspective:1200px;
+  overflow:hidden;
+  touch-action:none;
+  cursor:grab;
+  user-select:none;-webkit-user-select:none;
+}
+.gal-prev:active{cursor:grabbing}
 .gal-item{
-  position:relative;overflow:hidden;cursor:pointer;
-  background:rgba(232,130,154,.05);
+  position:absolute;
+  left:50%;top:50%;
+  width:200px;height:265px;
+  border-radius:10px;
+  overflow:hidden;
+  background:rgba(232,130,154,.08);
+  cursor:pointer;
+  will-change:transform,opacity;
+  transform-style:preserve-3d;
+  transition:transform .6s cubic-bezier(.22,1,.36,1),opacity .6s cubic-bezier(.22,1,.36,1);
 }
-.gal-item:first-child{grid-column:1/-1;aspect-ratio:3/2}
-.gal-item:not(:first-child){aspect-ratio:1}
 .gal-item img{
-  width:100%;height:100%;object-fit:cover;
-  display:block;
-  transition:transform .5s cubic-bezier(.22,1,.36,1),filter .3s;
-  filter:saturate(1.05);
+  width:100%;height:100%;object-fit:cover;display:block;
+  pointer-events:none;user-select:none;-webkit-user-select:none;
 }
-.gal-item:hover img{transform:scale(1.07);filter:saturate(1.2)}
 .gal-item-overlay{
   position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(26,10,20,.75) 0%,transparent 55%);
-  opacity:0;transition:opacity .3s;
-  display:flex;align-items:flex-end;
-  padding:.75rem;
+  background:linear-gradient(to top,rgba(26,10,20,.75) 0%,transparent 50%);
+  pointer-events:none;
 }
-.gal-item:hover .gal-item-overlay{opacity:1}
 .gal-caption{
-  font-family:var(--c-serif);font-size:.75rem;
-  font-style:italic;color:rgba(255,255,255,.85);
+  position:absolute;bottom:.75rem;left:.75rem;right:.75rem;
+  font-family:var(--c-mono);font-size:.46rem;letter-spacing:.12em;
+  color:rgba(255,255,255,.85);text-transform:uppercase;
+  pointer-events:none;
+  text-shadow:0 2px 8px rgba(0,0,0,.6);
 }
-.gal-zoom-icon{
-  position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%) scale(.7);
-  width:40px;height:40px;border-radius:50%;
-  background:rgba(26,10,20,.75);border:1px solid rgba(232,130,154,.5);
+/* Dimming overlay per card */
+.gal-dim{
+  position:absolute;inset:0;
+  background:#000;
+  pointer-events:none;
+  border-radius:inherit;
+  transition:opacity .6s cubic-bezier(.22,1,.36,1);
+}
+/* Gallery nav dots */
+.gal-dots{
   display:flex;align-items:center;justify-content:center;
-  font-size:.9rem;color:var(--c-a);
-  opacity:0;transition:opacity .3s,transform .3s;
+  gap:.5rem;margin-top:.85rem;padding:0 1.75rem;
 }
-.gal-item:hover .gal-zoom-icon{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.gal-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(232,130,154,.25);
+  transition:all .3s;cursor:pointer;flex-shrink:0;
+}
+.gal-dot.active{
+  background:var(--c-a);
+  box-shadow:0 0 6px rgba(232,130,154,.6);
+  transform:scale(1.4);
+}
 
 /* ══════════════════════════════════════════════
    AUDIO PLAYER
@@ -624,7 +651,7 @@ section{position:relative;overflow:visible;padding:4rem 1.75rem}
   -webkit-appearance:none;width:11px;height:11px;
   background:var(--c-c);border-radius:50%;cursor:pointer;
 }
-.vol-icon{font-size:.85rem;color:var(--c-dim);opacity:.55;flex-shrink:0}
+.vol-icon{color:var(--c-dim);flex-shrink:0;display:block}
 
 /* ══════════════════════════════════════════════
    RSVP FORM
@@ -1021,7 +1048,11 @@ section{position:relative;overflow:visible;padding:4rem 1.75rem}
 
 <!-- Share FAB -->
 <button id="share-fab" aria-label="Compartir invitación" title="Compartir invitación">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+    <polyline points="16 6 12 2 8 6"/>
+    <line x1="12" y1="2" x2="12" y2="15"/>
+  </svg>
 </button>
 
 <!-- Lightbox -->
@@ -1030,9 +1061,15 @@ section{position:relative;overflow:visible;padding:4rem 1.75rem}
     <img id="lb-img" src="" alt=""/>
     <div id="lb-caption"></div>
   </div>
-  <button class="lb-close" aria-label="Cerrar" onclick="closeLightbox()">✕</button>
-  <button class="lb-nav" id="lb-prev" aria-label="Anterior" onclick="lbNav(-1)">‹</button>
-  <button class="lb-nav" id="lb-next" aria-label="Siguiente" onclick="lbNav(1)">›</button>
+  <button class="lb-close" aria-label="Cerrar" onclick="closeLightbox()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <button class="lb-nav" id="lb-prev" aria-label="Anterior" onclick="lbNav(-1)">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="lb-nav" id="lb-next" aria-label="Siguiente" onclick="lbNav(1)">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
 </div>
 
 <!-- SVG Filter: Electric Turbulent Border (hidden) -->
@@ -1080,7 +1117,11 @@ section{position:relative;overflow:visible;padding:4rem 1.75rem}
       <div id="sp-name">Isabella Valentina</div>
       <div id="sp-date">15 · Noviembre · 2025</div>
       <button id="sp-btn" type="button">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9.5V19a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9.5"/>
+          <path d="M3 9.5 12 4l9 5.5"/>
+          <path d="M9 21V12h6v9"/>
+        </svg>
         Abrir invitación
       </button>
       <p class="sp-hint">Toca en cualquier lugar para entrar</p>
@@ -1155,7 +1196,11 @@ section{position:relative;overflow:visible;padding:4rem 1.75rem}
     <div class="sec-rule"></div>
     <p class="card-cap" style="margin-bottom:1.5rem">Guarda la fecha en tu calendario y no faltes a esta noche tan especial.</p>
     <a id="pv-cal-btn" href="#" target="_blank" rel="noopener" class="btn-primary">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2"/>
+        <path d="M16 2v4M8 2v4M3 10h18"/>
+        <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+      </svg>
       Agregar a Google Calendar
     </a>
   </section>
@@ -1204,9 +1249,10 @@ section{position:relative;overflow:visible;padding:4rem 1.75rem}
       <div class="sec-rule"></div>
     </div>
     <div id="pv-galeria" class="gal-prev"></div>
-    <div style="padding:0 1.75rem;margin-top:1rem;text-align:center">
+    <div id="pv-galeria-dots" class="gal-dots"></div>
+    <div style="padding:0 1.75rem;margin-top:.75rem;text-align:center">
       <p style="font-family:var(--c-mono);font-size:.52rem;letter-spacing:.15em;color:var(--c-dim);opacity:.5">
-        Toca una imagen para ampliarla
+        Arrastra o toca para navegar · Clic para ampliar
       </p>
     </div>
   </section>
@@ -1218,7 +1264,11 @@ section{position:relative;overflow:visible;padding:4rem 1.75rem}
     <div class="sec-rule"></div>
     <p class="card-cap" style="margin-bottom:1.5rem">¿Tienes fotos de la noche? Compártelas en nuestro álbum colaborativo.</p>
     <a id="pv-album-btn" href="#" target="_blank" rel="noopener" class="btn-primary">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
       Compartir mis fotos
     </a>
   </section>
@@ -1232,7 +1282,9 @@ section{position:relative;overflow:visible;padding:4rem 1.75rem}
       <audio id="pv-audio"></audio>
       <div class="audio-top">
         <button id="pv-play-btn" type="button" aria-label="Reproducir / Pausar">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" id="play-icon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" id="play-icon">
+            <path d="M6 4.75a.75.75 0 0 1 1.14-.643l12 7.25a.75.75 0 0 1 0 1.286l-12 7.25A.75.75 0 0 1 6 19.25V4.75z"/>
+          </svg>
         </button>
         <div class="audio-info">
           <div id="pv-track-name">Sin pista cargada</div>
@@ -1241,7 +1293,10 @@ section{position:relative;overflow:visible;padding:4rem 1.75rem}
       </div>
       <div class="audio-controls">
         <input type="range" id="pv-seek" min="0" max="100" value="0" aria-label="Progreso"/>
-        <span class="vol-icon">🔊</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="vol-icon" style="flex-shrink:0;opacity:.5">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        </svg>
         <input type="range" id="pv-vol" min="0" max="1" step="0.05" value="0.7" aria-label="Volumen"/>
       </div>
     </div>
@@ -1257,7 +1312,9 @@ section{position:relative;overflow:visible;padding:4rem 1.75rem}
           + Agregar canción
         </button>
         <button type="submit" class="btn-primary" style="margin-top:.75rem;background:rgba(37,211,102,.1);border-color:#25d366;color:#25d366;box-shadow:0 0 18px rgba(37,211,102,.12)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.533 5.855L.057 23.512a.5.5 0 0 0 .61.641l5.857-1.536A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.9 0-3.682-.497-5.223-1.369l-.374-.214-3.476.912.927-3.382-.232-.389A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2.05 21.949a.5.5 0 0 0 .601.601l4.78-1.388A9.956 9.956 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm-2.29 5.87c.198-.444.62-.37.878.013.356.53.675 1.083.924 1.661.189.437.044.964-.3 1.27l-.397.354a.36.36 0 0 0-.084.432c.334.679.83 1.285 1.42 1.77.3.244.629.45.974.604a.36.36 0 0 0 .427-.093l.34-.399c.306-.359.822-.52 1.265-.34.589.228 1.157.523 1.692.869.4.256.49.77.246 1.177-.536.897-1.46 1.48-2.497 1.394-2.64-.217-5.477-2.898-6.307-5.489-.34-1.066-.044-2.23.42-3.223z"/>
+          </svg>
           Enviar por WhatsApp
         </button>
         <div id="song-suggest-ok" style="display:none;text-align:center;margin-top:.75rem;font-family:var(--c-mono);font-size:.65rem;color:var(--c-a)">
@@ -1332,8 +1389,14 @@ section{position:relative;overflow:visible;padding:4rem 1.75rem}
       <input id="rsvp-nombre" type="text" class="rsvp-field" placeholder="Tu nombre completo" autocomplete="name" required/>
 
       <div class="rsvp-toggle-row">
-        <button type="button" class="rsvp-toggle active" id="rsvp-si">✓ &nbsp;Sí, asistiré</button>
-        <button type="button" class="rsvp-toggle" id="rsvp-no">✗ &nbsp;No podré ir</button>
+        <button type="button" class="rsvp-toggle active" id="rsvp-si">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Sí, asistiré
+        </button>
+        <button type="button" class="rsvp-toggle" id="rsvp-no">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          No podré ir
+        </button>
       </div>
       <select id="rsvp-asiste" class="rsvp-field" style="display:none">
         <option value="si">Sí, asistiré</option>
@@ -1344,10 +1407,8 @@ section{position:relative;overflow:visible;padding:4rem 1.75rem}
       <textarea id="rsvp-msg" class="rsvp-field" rows="3" placeholder="Mensaje opcional para la quinceañera..." style="resize:none"></textarea>
       <!-- WhatsApp RSVP button -->
       <button type="submit" class="btn-primary" style="background:rgba(37,211,102,.12);border-color:#25d366;color:#25d366;box-shadow:0 0 24px rgba(37,211,102,.15)">
-        <!-- WhatsApp icon -->
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.533 5.855L.057 23.512a.5.5 0 0 0 .61.641l5.857-1.536A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.9 0-3.682-.497-5.223-1.369l-.374-.214-3.476.912.927-3.382-.232-.389A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2.05 21.949a.5.5 0 0 0 .601.601l4.78-1.388A9.956 9.956 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm-2.29 5.87c.198-.444.62-.37.878.013.356.53.675 1.083.924 1.661.189.437.044.964-.3 1.27l-.397.354a.36.36 0 0 0-.084.432c.334.679.83 1.285 1.42 1.77.3.244.629.45.974.604a.36.36 0 0 0 .427-.093l.34-.399c.306-.359.822-.52 1.265-.34.589.228 1.157.523 1.692.869.4.256.49.77.246 1.177-.536.897-1.46 1.48-2.497 1.394-2.64-.217-5.477-2.898-6.307-5.489-.34-1.066-.044-2.23.42-3.223z"/>
         </svg>
         Confirmar asistencia por WhatsApp
       </button>
@@ -1588,7 +1649,7 @@ function renderPreview(){
     // Si aún no tiene estrellas, actualizar innerHTML completo; si ya las tiene, solo actualizar texto
     const hasStars = !!spBtn.querySelector('.btn-star-1');
     if(!hasStars){
-      spBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> ${s.splashBtn||'Abrir invitación'}`;
+      spBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5V19a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9.5"/><path d="M3 9.5 12 4l9 5.5"/><path d="M9 21V12h6v9"/></svg> ${s.splashBtn||'Abrir invitación'}`;
     } else {
       // Actualizar solo el nodo de texto (el primero que no sea .btn-star)
       Array.from(spBtn.childNodes).forEach(n=>{
@@ -1684,7 +1745,7 @@ function renderPreview(){
     if(s.address) t+=`<span style="font-family:var(--c-mono);font-size:.7rem;letter-spacing:.06em">${s.address}</span>`;
     if(s.mapUrl && lvl(s.plan)>=1){
       t+=`<div style="margin-top:1.5rem"><a href="${s.mapUrl}" target="_blank" rel="noopener" class="btn-primary">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
         Ver en el mapa</a></div>`;
     }
     lugar.innerHTML = t;
@@ -1796,7 +1857,7 @@ function renderGifts(id, items){
     const copyId = 'copy-'+Math.random().toString(36).slice(2,8);
     d.innerHTML=`<div class="gift-card-text">${txt}</div>
     <button class="copy-btn" id="${copyId}" type="button">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M4 16V4a2 2 0 0 1 2-2h12"/></svg>
       Copiar datos
     </button>`;
     el.appendChild(d);
@@ -1826,7 +1887,7 @@ function renderDressCode(id, items){
   });
 }
 
-/* ── RENDER GALLERY ── */
+/* ── RENDER GALLERY — COVERFLOW 3D ── */
 const IDB_DEFAULTS = [
   'https://images.unsplash.com/photo-1559034750-cdab70a66b8e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800',
   'https://images.unsplash.com/photo-1721069112805-860652356252?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
@@ -1836,53 +1897,188 @@ const IDB_DEFAULTS = [
   'https://images.unsplash.com/photo-1763625642525-7d0a0d5f9cf9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
   'https://images.unsplash.com/photo-1763625638895-c52d46816bc0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
   'https://images.unsplash.com/photo-1654336037958-c698d50700b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
+  'https://images.unsplash.com/photo-1560343776-97e7d202ff0e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
+  'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
+  'https://images.unsplash.com/photo-1516912481808-3406841bd33c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
+  'https://images.unsplash.com/photo-1490645935967-10de6ba17061?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600',
 ];
 
 /** True si la clave es un identificador de IndexedDB (no http/https/data) */
 function isIDBKey(k){ return k && !k.startsWith('http') && !k.startsWith('data:') && !k.startsWith('blob:'); }
 
+/* Coverflow state */
+let cfActive = 0;
+let cfLock = false;
+let cfImages = [];
+let cfCaptions = [];
+
+const CF_SCALE_STEP  = 0.15;   // scale reduction per step from center
+const CF_DEPTH       = 200;    // translateZ per step
+const CF_GAP         = 135;    // translateX per step (px)
+const CF_TILT        = 38;     // rotateY degrees per step
+const CF_SIDE_TILT   = 6;      // rotateZ degrees per step
+const CF_MAX_VISIBLE = 2;      // cards shown each side
+const CF_DIM_STEP    = 0.35;   // dimming per step (0=active, 1=invisible)
+
+function cfApply(){
+  const el = document.getElementById('pv-galeria');
+  if(!el) return;
+  const items = Array.from(el.querySelectorAll('.gal-item'));
+  const n = items.length;
+  items.forEach((card, i) => {
+    let rel = i - cfActive;
+    // Loop correction
+    if(rel > n/2)  rel -= n;
+    if(rel < -n/2) rel += n;
+    const ax = Math.abs(rel);
+    const visible = ax <= CF_MAX_VISIBLE;
+
+    const sc  = Math.max(0.45, 1 - ax * CF_SCALE_STEP);
+    const tx  = rel * CF_GAP;
+    const tz  = -ax * CF_DEPTH;
+    const ry  = -rel * CF_TILT;
+    const rz  = rel * CF_SIDE_TILT;
+    const dimOpacity = Math.min(1, ax * CF_DIM_STEP);
+
+    card.style.transform = `translate(-50%,-50%) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${sc})`;
+    card.style.opacity   = visible ? '1' : '0';
+    card.style.zIndex    = String(100 - ax);
+    card.style.pointerEvents = (visible && ax <= 1) ? 'auto' : 'none';
+
+    const dim = card.querySelector('.gal-dim');
+    if(dim) dim.style.opacity = String(dimOpacity);
+  });
+  // Update dots
+  const dotsEl = document.getElementById('pv-galeria-dots');
+  if(dotsEl){
+    Array.from(dotsEl.querySelectorAll('.gal-dot')).forEach((dot, i) => {
+      dot.classList.toggle('active', i === cfActive);
+    });
+  }
+}
+
+function cfStep(dir){
+  if(cfLock) return;
+  cfLock = true;
+  cfActive = ((cfActive + dir) % cfImages.length + cfImages.length) % cfImages.length;
+  cfApply();
+  setTimeout(()=>{ cfLock = false; }, 650);
+}
+
+function cfInit(el, images, captions){
+  cfActive = 0;
+  cfImages = images;
+  cfCaptions = captions;
+  // Rebuild dot track
+  const dotsEl = document.getElementById('pv-galeria-dots');
+  if(dotsEl){
+    dotsEl.innerHTML = '';
+    images.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'gal-dot' + (i===0?' active':'');
+      dot.onclick = () => {
+        if(cfLock) return;
+        cfLock = true;
+        cfActive = i;
+        cfApply();
+        setTimeout(()=>{ cfLock = false; }, 650);
+      };
+      dotsEl.appendChild(dot);
+    });
+  }
+
+  // Pointer drag/swipe
+  let dragStartX = 0;
+  let dragging = false;
+  const THRESHOLD = 40;
+
+  el.addEventListener('pointerdown', e => {
+    dragging = true;
+    dragStartX = e.clientX;
+    el.setPointerCapture(e.pointerId);
+  });
+  el.addEventListener('pointermove', ()=>{}); // needed for capture to work
+  el.addEventListener('pointerup', e => {
+    if(!dragging) return;
+    dragging = false;
+    el.releasePointerCapture(e.pointerId);
+    const dx = e.clientX - dragStartX;
+    if(Math.abs(dx) > THRESHOLD) cfStep(dx > 0 ? -1 : 1);
+  });
+  el.addEventListener('pointercancel', ()=>{ dragging = false; });
+
+  // Keyboard
+  el.tabIndex = 0;
+  el.addEventListener('keydown', e => {
+    if(e.key === 'ArrowLeft')  { e.preventDefault(); cfStep(-1); }
+    if(e.key === 'ArrowRight') { e.preventDefault(); cfStep(1); }
+  });
+
+  cfApply();
+}
+
 async function renderGallery(keys, captions, plan){
-  const el=q('pv-galeria');if(!el)return;
+  const el=document.getElementById('pv-galeria');if(!el)return;
   el.className='gal-prev';el.innerHTML='';
   const maxP=lvl(plan)>=3?12:lvl(plan)>=2?8:4;
 
-  // Resolver cada clave: si es IDB key → loadURL; si es URL directa → usarla tal cual
   const rawKeys = (keys && keys.length) ? keys.slice(0,maxP) : IDB_DEFAULTS.slice(0,maxP);
-
   const resolved = await Promise.all(rawKeys.map(async k => {
     if(isIDBKey(k)){
       const url = await guekaIDB.loadURL(k);
-      return url || null; // null = foto aún no subida
+      return url || null;
     }
     return k;
   }));
 
+  // Filter out nulls for lightbox
   lbImages = resolved.filter(Boolean);
+  const validCaps = (captions && captions.length) ? captions : rawKeys.map((_,i)=>`Foto ${i+1}`);
 
+  // Build only non-null cards (skip placeholder for coverflow)
+  const finalImages = [];
+  const finalCaps = [];
   resolved.forEach((src, i) => {
-    const cap = captions && captions[i] ? captions[i] : `Foto ${i+1}`;
-    const wrap = document.createElement('div');wrap.className='gal-item';
-
-    if(!src){
-      // Placeholder para fotos pendientes de subir
-      wrap.innerHTML=`<div style="width:100%;height:100%;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;opacity:.3">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        <span style="font-family:var(--c-mono);font-size:.45rem;letter-spacing:.1em">Foto ${i+1}</span>
-      </div>`;
-      el.appendChild(wrap);return;
+    if(src){
+      finalImages.push(src);
+      finalCaps.push(validCaps[i] || `Foto ${i+1}`);
     }
+  });
 
-    const img=document.createElement('img');
-    img.src=src;img.alt=cap;img.loading='lazy';
-    const ov=document.createElement('div');ov.className='gal-item-overlay';
-    ov.innerHTML=`<div class="gal-caption">${cap}</div>`;
-    const zoom=document.createElement('div');zoom.className='gal-zoom-icon';zoom.textContent='⊕';
-    wrap.append(img,ov,zoom);
-    // lbIdx maps to resolved-valid index
-    const lbI = lbImages.indexOf(src);
-    wrap.onclick=()=>openLightbox(lbI>=0?lbI:0);
+  finalImages.forEach((src, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'gal-item';
+
+    const img = document.createElement('img');
+    img.src = src; img.alt = finalCaps[i]; img.loading = 'lazy';
+
+    const ov = document.createElement('div'); ov.className = 'gal-item-overlay';
+    const cap = document.createElement('div'); cap.className = 'gal-caption';
+    cap.textContent = finalCaps[i];
+    ov.appendChild(cap);
+
+    const dim = document.createElement('div'); dim.className = 'gal-dim';
+    dim.style.opacity = '0';
+
+    wrap.append(img, ov, dim);
+    wrap.onclick = () => {
+      const rel = Math.abs(i - cfActive);
+      if(rel === 0){
+        // Active card → open lightbox
+        openLightbox(i);
+      } else {
+        // Side card → go to it
+        if(cfLock) return;
+        cfLock = true;
+        cfActive = i;
+        cfApply();
+        setTimeout(()=>{ cfLock = false; }, 650);
+      }
+    };
     el.appendChild(wrap);
   });
+
+  cfInit(el, finalImages, finalCaps);
 }
 
 /**
