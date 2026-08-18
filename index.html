@@ -88,10 +88,13 @@ section{position:relative;padding:56px 22px;border-bottom:1px solid var(--c-line
 .sec-art{display:block;width:100%;max-width:150px;margin:0 auto 16px;overflow:visible}
 .sec-art.wide{max-width:100%}
 .sec-head{text-align:center;margin-bottom:24px}
-.catrina-rail{display:block;width:100%;max-width:190px;margin:0 auto 10px;opacity:.9}
-.catrina-rail use{animation:bob 5s ease-in-out infinite}
-.catrina-rail use:nth-child(2){animation-delay:.8s}
-.catrina-rail use:nth-child(3){animation-delay:1.6s}
+.flor-rail{display:flex;justify-content:center;align-items:center;gap:14px;margin:0 auto 14px;opacity:.95}
+.flor-rail svg{width:22px;height:22px;overflow:visible;animation:bob 5s ease-in-out infinite}
+.flor-rail svg:nth-child(1){width:16px;height:16px}
+.flor-rail svg:nth-child(5){width:16px;height:16px}
+.flor-rail svg:nth-child(2){animation-delay:.5s}
+.flor-rail svg:nth-child(3){width:26px;height:26px;animation-delay:1s}
+.flor-rail svg:nth-child(4){animation-delay:1.5s}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .eyebrow{font-family:var(--c-mono);font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--c-b);margin:0 0 10px}
 h2.sec-t{font-family:var(--c-head);font-weight:400;font-size:clamp(26px,8vw,36px);line-height:1.05;margin:0}
@@ -794,7 +797,7 @@ const state = {
   signature: 'Valentina',
   palette: 'neon',
   particles: 'ninguna',
-  showSplash: true,
+  showSplash: false,
   splashBtn: 'Abrir invitación',
   itinerary: [
     { v: '18:00 · Misa de acción de gracias' },
@@ -1130,16 +1133,17 @@ function renderPreview() {
 }
 
 function decorateSections() {
-  const RAIL = '<svg class="catrina-rail" viewBox="0 0 210 34" aria-hidden="true">' +
-    '<path d="M6 17h198" stroke="var(--c-line)" stroke-width="1"/>' +
-    '<use href="#flor" transform="translate(30 17) scale(.55)"/>' +
-    '<use href="#flor-c" transform="translate(75 17) scale(.7)"/>' +
-    '<use href="#flor-d" transform="translate(105 17) scale(.85)"/>' +
-    '<use href="#flor-c" transform="translate(135 17) scale(.7)"/>' +
-    '<use href="#flor" transform="translate(180 17) scale(.55)"/>' +
-    '</svg>';
+  const florSvg = (symbolId) =>
+    `<svg viewBox="-11 -11 22 22" aria-hidden="true"><use href="#${symbolId}"/></svg>`;
+  const RAIL = '<div class="flor-rail">' +
+    florSvg('flor') +
+    florSvg('flor-c') +
+    florSvg('flor-d') +
+    florSvg('flor-c') +
+    florSvg('flor') +
+    '</div>';
   document.querySelectorAll('.sec-head').forEach((head) => {
-    if (head.querySelector('.catrina-rail')) return;
+    if (head.querySelector('.flor-rail')) return;
     head.insertAdjacentHTML('afterbegin', RAIL);
   });
 }
