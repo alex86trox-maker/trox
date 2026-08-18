@@ -1031,16 +1031,15 @@ select.rsvp-input option{background:#040d1a;}
 .gueka-footer img.footer-logo{
   display:block;margin:0 auto 16px;
   width:140px;height:auto;
-  opacity:.55;
-  filter:invert(1) brightness(1.8) saturate(0);
-  mix-blend-mode:screen;
+  opacity:.85;
+  filter:brightness(0) invert(1);
 }
 .gueka-footer-text{
   font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:.22em;
-  color:rgba(168,212,245,.18);
+  font-size:9px;letter-spacing:.18em;
+  color:rgba(168,212,245,.55);
   text-transform:uppercase;
-  line-height:1.9;
+  line-height:2.1;
 }
 
 /* ============================================================
@@ -1933,17 +1932,25 @@ function renderPreview(){
   // Padrinos
   buildList('pv-padr', state.padrinos, false);
 
-  // Gallery
+  // Gallery — placeholders solo si IndexedDB no tiene fotos (loadStoredPhotos las sobreescribe)
   const gal = document.getElementById('pv-galeria');
-  if(gal){
+  if(gal && !gal.querySelector('.gal-item')){
+    /* Render placeholder items so the grid has content before IndexedDB resolves */
     gal.innerHTML='';
-    const keys = (state.galKeys && state.galKeys.length) ? state.galKeys : GAL_PLACEHOLDERS;
     const caps = state.galCaptions || [];
-    keys.slice(0,6).forEach((src,i)=>{
+    GAL_PLACEHOLDERS.forEach((src,i)=>{
       const div=document.createElement('div');
-      div.className='gal-item';
+      div.className='gal-item gal-placeholder';
       div.onclick=()=>openLightbox(src);
-      div.innerHTML=`<img src="${src}" alt="${caps[i]||''}"/><div class="gal-item-cap">${caps[i]||''}</div>`;
+      const num=document.createElement('span');
+      num.className='gal-item-num';
+      num.textContent=String(i+1).padStart(2,'0');
+      const img=document.createElement('img');
+      img.src=src; img.alt=caps[i]||''; img.loading='lazy';
+      const cap=document.createElement('div');
+      cap.className='gal-item-cap';
+      cap.textContent=caps[i]||('◆ Foto '+(i+1));
+      div.appendChild(num); div.appendChild(img); div.appendChild(cap);
       gal.appendChild(div);
     });
   }
@@ -2637,8 +2644,9 @@ function loadStoredPhotos() {
     const galKeys = keys.filter(k => String(k).startsWith('gal_'));
     galKeys.sort();
     const gal = document.getElementById('pv-galeria');
-    /* Clear only empty slots; real items stay if already rendered */
+    /* Remove placeholder demo items; keep real user items if any */
     if (gal) {
+      gal.querySelectorAll('.gal-placeholder').forEach(s => s.remove());
       gal.querySelectorAll('.gal-slot-empty').forEach(s => s.remove());
       gal.querySelectorAll('.gal-item').forEach(s => s.remove());
     }
@@ -2664,9 +2672,7 @@ window.addEventListener('resize',()=>{
 document.addEventListener('DOMContentLoaded',()=>{
   renderPreview();
   if(!state.showSplash) closeSplash();
-  loadStoredPhotos();
-  /* Show empty slots immediately before IndexedDB resolves */
-  setTimeout(refreshGalleryUI, 50);
+  loadStoredPhotos(); /* calls refreshGalleryUI when done */
 });
 </script>
 <!-- Scroll to top -->
