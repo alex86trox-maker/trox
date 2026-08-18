@@ -52,8 +52,26 @@ body{background:#040d1a;color:#e0f0ff;font-family:'Space Mono',monospace;min-hei
    ============================================================ */
 #card-wrapper{
   position:relative;z-index:1;
-  max-width:780px;margin:0 auto;
-  padding-bottom:60px;
+  max-width:480px;margin:0 auto;
+  padding-bottom:80px;
+  box-shadow:0 0 80px rgba(168,212,245,.06),0 0 160px rgba(4,13,26,.8);
+}
+
+/* ============================================================
+   READING PROGRESS BAR
+   ============================================================ */
+#read-progress{
+  position:fixed;top:0;left:0;height:2px;width:0%;z-index:10000;
+  background:linear-gradient(90deg,var(--c-a,#a8d4f5),var(--c-b,#d4af6a),var(--c-a,#a8d4f5));
+  background-size:200% 100%;
+  animation:progressShimmer 2s linear infinite;
+  transition:width .1s linear;
+  box-shadow:0 0 8px rgba(168,212,245,.6);
+  pointer-events:none;
+}
+@keyframes progressShimmer{
+  0%{background-position:0% 0%;}
+  100%{background-position:200% 0%;}
 }
 
 /* ============================================================
@@ -232,7 +250,8 @@ body{background:#040d1a;color:#e0f0ff;font-family:'Space Mono',monospace;min-hei
 }
 #pv-retrato-wrap{
   position:relative;display:inline-block;cursor:pointer;
-  margin-bottom:28px;
+  margin-bottom:32px;
+  filter:drop-shadow(0 8px 32px rgba(168,212,245,.18));
 }
 #pv-retrato-wrap::before{
   content:'';position:absolute;inset:-2px;
@@ -245,7 +264,7 @@ body{background:#040d1a;color:#e0f0ff;font-family:'Space Mono',monospace;min-hei
   100%{filter:hue-rotate(360deg);}
 }
 .cover-img{
-  display:block;width:200px;height:200px;object-fit:cover;
+  display:block;width:240px;height:240px;object-fit:cover;
   clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
   animation:scanDown .8s ease-out;
 }
@@ -302,10 +321,11 @@ body{background:#040d1a;color:#e0f0ff;font-family:'Space Mono',monospace;min-hei
    CARD SECTION WRAPPER
    ============================================================ */
 .card-sec{
-  margin:0 16px 32px;
-  padding:32px 28px;
-  background:linear-gradient(135deg,rgba(4,13,26,.8),rgba(7,21,50,.6));
+  margin:0 0 24px;
+  padding:32px 24px;
+  background:linear-gradient(135deg,rgba(4,13,26,.85),rgba(7,21,50,.65));
   border:1px solid var(--c-line);
+  border-left:none;border-right:none;
   position:relative;overflow:hidden;
 }
 .card-sec::before{
@@ -396,7 +416,7 @@ body{background:#040d1a;color:#e0f0ff;font-family:'Space Mono',monospace;min-hei
    ============================================================ */
 .fashion-wrap{
   position:relative;margin-bottom:24px;overflow:hidden;
-  height:320px;
+  height:360px;
 }
 #pv-fashion{
   width:100%;height:100%;object-fit:cover;
@@ -958,14 +978,77 @@ select.rsvp-input option{background:#040d1a;}
    RESPONSIVE
    ============================================================ */
 @media(max-width:540px){
-  .card-sec{margin:0 8px 24px;padding:24px 16px;}
-  #pv-galeria{grid-template-columns:repeat(2,1fr);}
+  .card-sec{padding:28px 18px;}
+  #pv-galeria,.gal-prev{grid-template-columns:repeat(2,1fr);}
   .cd-box{min-width:54px;padding:12px 8px;}
+  .sec-title{font-size:clamp(20px,5vw,28px);}
+  #pv-nombre{font-size:clamp(28px,8vw,48px);}
+  .player-controls{gap:10px;}
 }
+@media(max-width:380px){
+  .cd-box{min-width:46px;padding:10px 6px;}
+  #pv-audio-wrap{padding:20px 14px 14px;}
+}
+
+/* ============================================================
+   SCROLL TO TOP
+   ============================================================ */
+#scroll-top{
+  position:fixed;bottom:28px;right:20px;
+  width:44px;height:44px;
+  background:rgba(10,22,40,.92);
+  border:1px solid rgba(168,212,245,.4);
+  color:var(--c-a,#a8d4f5);
+  font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:9000;
+  opacity:0;transform:translateY(16px);
+  transition:opacity .3s,transform .3s;
+  clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+  pointer-events:none;
+}
+#scroll-top.visible{opacity:1;transform:translateY(0);pointer-events:auto;}
+#scroll-top:hover{background:rgba(168,212,245,.18);box-shadow:0 0 16px rgba(168,212,245,.3);}
+
+/* ============================================================
+   SECTION FADE-IN ON SCROLL
+   ============================================================ */
+.card-sec,.cd-section,.closing-sec{
+  opacity:0;transform:translateY(24px);
+  transition:opacity .55s ease,transform .55s ease;
+}
+.card-sec.visible,.cd-section.visible,.hero-section.visible,.closing-sec.visible{
+  opacity:1;transform:translateY(0);
+}
+/* Hero siempre visible */
+.hero-section{opacity:1 !important;transform:none !important;}
+
+/* ============================================================
+   SECTION NAV DOTS
+   ============================================================ */
+#section-dots{
+  position:fixed;right:10px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:8px;z-index:500;
+  pointer-events:none;
+}
+.s-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(168,212,245,.2);
+  border:1px solid rgba(168,212,245,.3);
+  transition:background .3s,transform .3s;
+  pointer-events:auto;cursor:pointer;
+}
+.s-dot.active{
+  background:var(--c-a,#a8d4f5);
+  box-shadow:0 0 8px rgba(168,212,245,.6);
+  transform:scale(1.4);
+}
+@media(max-width:520px){#section-dots{display:none;}}
 </style>
 </head>
 <body>
 <canvas id="particle-canvas"></canvas>
+<div id="read-progress"></div>
 
 <!-- SPLASH -->
 <section id="splash">
@@ -1801,6 +1884,7 @@ function renderPreview(){
 function closeSplash(){
   const sp = document.getElementById('splash');
   if(sp) sp.classList.add('hidden');
+  setTimeout(() => window.scrollTo({top:0,behavior:'instant'}), 50);
 }
 
 /* ============================================================
@@ -2354,6 +2438,56 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(!state.showSplash) closeSplash();
   loadStoredPhotos();
 });
+</script>
+<!-- Scroll to top -->
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Volver arriba">◆</button>
+
+<!-- Section nav dots -->
+<nav id="section-dots" aria-hidden="true"></nav>
+
+<script>
+/* ============================================================
+   SCROLL UX: progress bar + fade-in reveal + scroll-to-top + nav dots
+   ============================================================ */
+(function initScrollUX(){
+  const sections = Array.from(document.querySelectorAll(
+    '.hero-section,.cd-section,.card-sec,.closing-sec'
+  ));
+
+  /* Build nav dots */
+  const dotsNav = document.getElementById('section-dots');
+  const dots = sections.map((sec, i) => {
+    const d = document.createElement('button');
+    d.className = 's-dot';
+    d.setAttribute('aria-label', 'Ir a sección ' + (i+1));
+    d.addEventListener('click', () => sec.scrollIntoView({behavior:'smooth'}));
+    dotsNav.appendChild(d);
+    return d;
+  });
+
+  /* Reveal + active dot via IntersectionObserver */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+        const idx = sections.indexOf(entry.target);
+        if(idx !== -1) dots.forEach((d,i) => d.classList.toggle('active', i===idx));
+      }
+    });
+  }, {threshold:0.15, rootMargin:'0px 0px -60px 0px'});
+  sections.forEach(s => io.observe(s));
+
+  /* Progress bar + scroll-to-top button */
+  const bar    = document.getElementById('read-progress');
+  const topBtn = document.getElementById('scroll-top');
+  window.addEventListener('scroll', () => {
+    const scrolled = window.scrollY;
+    const total = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = total > 0 ? (scrolled / total) * 100 : 0;
+    if(bar) bar.style.width = pct + '%';
+    if(topBtn) topBtn.classList.toggle('visible', scrolled > 300);
+  }, {passive:true});
+})();
 </script>
 </body>
 </html>
