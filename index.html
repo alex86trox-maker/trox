@@ -107,6 +107,7 @@
     }
     #sp-btn:hover::before { transform: scaleX(1); }
     #sp-btn:hover { color: #1a0010; }
+    #sp-btn:active { transform: scale(0.97); }
     .splash-ornament {
       margin-top: 2rem;
       opacity: 0.4;
@@ -127,7 +128,7 @@
       --c-serif: 'Cormorant Garamond', Georgia, serif;
       --c-mono: 'Courier New', monospace;
       --c-script: 'Sacramento', cursive;
-      max-width: 780px;
+      max-width: 480px;
       margin: 0 auto;
       background: var(--c-bg);
       position: relative;
@@ -167,10 +168,11 @@
     }
     .section-title {
       font-family: var(--c-script);
-      font-size: clamp(2rem, 6vw, 2.8rem);
+      font-size: clamp(1.6rem, 6vw, 2.6rem);
       color: var(--c-b);
-      white-space: nowrap;
+      white-space: normal;
       text-align: center;
+      line-height: 1.2;
     }
     .section-subtitle {
       font-family: var(--c-head);
@@ -289,7 +291,7 @@
     }
     .hero-xv-badge {
       font-family: var(--c-head);
-      font-size: 0.8rem;
+      font-size: 1.2rem;
       letter-spacing: 0.4em;
       text-transform: uppercase;
       color: var(--c-b);
@@ -755,15 +757,34 @@
       color: var(--c-c);
       margin-top: 1.5rem;
     }
-    .watermark {
+    .gueka-footer {
       margin-top: 3rem;
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(201,168,76,0.15);
+    }
+    .gueka-logo {
+      display: block;
+      width: 160px;
+      margin: 0 auto 1rem;
+      opacity: 0.6;
+      filter: brightness(0) invert(1) sepia(1) saturate(0.3) brightness(0.85);
+    }
+    .gueka-legal {
       font-family: var(--c-head);
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      color: rgba(255,255,255,0.15);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.22);
+      margin-bottom: 0.6rem;
+    }
+    .gueka-copy {
+      font-family: var(--c-head);
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      color: rgba(201,168,76,0.3);
       text-transform: uppercase;
     }
-    .watermark a { color: inherit; text-decoration: none; }
 
     /* ─── FILIGREE ORNAMENTS ───────────────────────────────────── */
     .filigree-top, .filigree-bottom {
@@ -797,6 +818,22 @@
     .animate-in {
       animation: fadeInUp 0.7s ease forwards;
     }
+
+    section.visible .section-divider { transition-delay: 0.05s; }
+    section.visible .section-subtitle { transition-delay: 0.1s; }
+    section.visible .card, section.visible .gal-prev, section.visible .two-col { transition-delay: 0.15s; }
+    section.visible .countdown-display { transition-delay: 0.1s; }
+    .section-divider, .section-subtitle, .card, .gal-prev, .two-col, .countdown-display {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    section.visible .section-divider, section.visible .section-subtitle,
+    section.visible .card, section.visible .gal-prev, section.visible .two-col,
+    section.visible .countdown-display {
+      opacity: 1; transform: translateY(0);
+    }
+    /* Hero always visible */
+    #hero-sec .img-frame, #hero-sec .hero-text-overlay { opacity: 1; transform: none; }
 
     /* ─── PADRINOS GRID ────────────────────────────────────────── */
     #pv-padr.card-list {
@@ -889,6 +926,9 @@
 
 <!-- ─── CARD WRAPPER ─────────────────────────────────────────── -->
 <div id="card-wrapper" data-theme="elegante">
+<div id="scroll-bar" style="position:sticky;top:0;z-index:100;height:3px;background:rgba(0,0,0,0.3);">
+  <div id="scroll-fill" style="height:100%;width:0%;background:linear-gradient(to right,#d4748a,#c9a84c);transition:width 0.1s;"></div>
+</div>
 
   <!-- SECCIÓN 1: HERO -->
   <section id="hero-sec">
@@ -1015,8 +1055,8 @@
     <div id="pv-galeria" class="gal-prev">
       <div class="gal-main-wrap">
         <img id="gal-main-img" src="" alt="" />
-        <button class="gal-btn" id="gal-prev-btn" aria-label="Anterior">&#8249;</button>
-        <button class="gal-btn" id="gal-next-btn" aria-label="Siguiente">&#8250;</button>
+        <button class="gal-btn" id="gal-prev-btn" aria-label="Foto anterior" style="width:52px;height:52px;">&#8249;</button>
+        <button class="gal-btn" id="gal-next-btn" aria-label="Foto siguiente" style="width:52px;height:52px;">&#8250;</button>
       </div>
       <p class="gal-caption" id="gal-cap-txt"></p>
       <div class="gal-thumbs" id="gal-thumbs"></div>
@@ -1139,7 +1179,7 @@
     <div class="section-divider">
       <span class="section-title" id="pv-custom-title">Una Palabra de Mamá</span>
     </div>
-    <div class="card" style="max-width:560px;margin:0 auto;">
+    <div class="card" style="max-width:480px;margin:0 auto;">
       <svg style="display:block;margin:0 auto 1rem;opacity:0.5" width="40" height="40" viewBox="0 0 40 40">
         <path d="M8,8 Q8,20 20,20 Q8,20 8,32" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
         <path d="M22,8 Q22,20 32,20 Q22,20 22,32" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
@@ -1156,7 +1196,7 @@
       <span class="section-title">Confirma tu asistencia</span>
     </div>
     <div class="section-subtitle">Tu presencia es nuestro mejor regalo</div>
-    <div class="card" style="max-width:500px;margin:0 auto;">
+    <div class="card" style="max-width:480px;margin:0 auto;">
       <form id="rsvp-form">
         <div class="rsvp-field">
           <label for="rsvp-nombre">Tu nombre completo</label>
@@ -1186,7 +1226,7 @@
           <textarea id="rsvp-msg" rows="3" placeholder="Escribe un deseo para Isabella..."></textarea>
         </div>
         <div id="rsvp-error" class="rsvp-error-msg"></div>
-        <button type="submit" class="rsvp-submit-btn">
+        <button type="submit" class="rsvp-submit-btn" id="rsvp-submit-btn">
           ✦ Confirmar por WhatsApp ✦
         </button>
       </form>
@@ -1259,9 +1299,19 @@
       <path d="M0,15 Q25,5 50,15 Q75,25 100,15 Q125,5 150,15 Q175,25 200,15" fill="none" stroke="#c9a84c" stroke-width="0.8"/>
     </svg>
 
-    <p class="watermark">hecho con ♥ por <a href="https://gueka.mx" target="_blank">Gueka Ideas</a></p>
+    <!-- Gueka Ideas branding -->
+    <div class="gueka-footer">
+      <img src="https://hercules-cdn.com/file_hnWErluK3i3lPXi1ZZ75GgXy" alt="Gueka Ideas" class="gueka-logo"/>
+      <p class="gueka-legal">Esta tarjeta digital es propiedad exclusiva de Gueka Ideas<br/>Uso permitido únicamente para fines personales.</p>
+      <p class="gueka-copy">© 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</p>
+    </div>
   </section>
 
+<button id="back-to-top" aria-label="Volver arriba" title="Volver arriba" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+  style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;width:44px;height:44px;border-radius:50%;
+  background:rgba(26,0,16,0.9);border:1px solid rgba(201,168,76,0.5);color:#c9a84c;font-size:1.2rem;
+  cursor:pointer;display:none;align-items:center;justify-content:center;
+  box-shadow:0 2px 16px rgba(0,0,0,0.5);transition:opacity 0.3s,transform 0.3s;">↑</button>
 </div><!-- /#card-wrapper -->
 
 <script>
@@ -1584,9 +1634,17 @@ function formatDateSpanish(dateStr) {
 }
 
 // ════════════════════════════════════════════════════════════════
-//  GALLERY DATA
+//  INDEXEDDB — fotos almacenadas localmente
+//  Nombre de DB y store deben coincidir con el editor de Gueka Ideas
 // ════════════════════════════════════════════════════════════════
-const GAL_IMGS = [
+const DB_NAME    = 'gueka_media';   // debe coincidir con el editor
+const DB_STORE   = 'fotos';
+const DB_VERSION = 1;
+
+// Placeholders de muestra (solo si no hay foto en IndexedDB)
+const PLACEHOLDER_RETRATO  = 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80';
+const PLACEHOLDER_FASHION  = 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80';
+const PLACEHOLDER_GAL = [
   'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80',
   'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=600&q=80',
   'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=600&q=80',
@@ -1594,6 +1652,81 @@ const GAL_IMGS = [
   'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80',
   'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=80',
 ];
+
+// Abre (o crea) la base de datos
+function openPhotoDB() {
+  return new Promise((resolve, reject) => {
+    if (!window.indexedDB) { resolve(null); return; }
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(DB_STORE)) {
+        db.createObjectStore(DB_STORE);
+      }
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror   = () => resolve(null);  // falla silenciosamente → usa placeholder
+  });
+}
+
+// Obtiene un blob de IndexedDB por clave y devuelve un object URL (o null)
+function getPhotoURL(db, key) {
+  return new Promise(resolve => {
+    if (!db || !key) { resolve(null); return; }
+    try {
+      const tx  = db.transaction(DB_STORE, 'readonly');
+      const req = tx.objectStore(DB_STORE).get(key);
+      req.onsuccess = e => {
+        const blob = e.target.result;
+        resolve(blob ? URL.createObjectURL(blob) : null);
+      };
+      req.onerror = () => resolve(null);
+    } catch(err) { resolve(null); }
+  });
+}
+
+// Carga todas las fotos desde IndexedDB e inyecta en el DOM
+// Si no hay foto guardada, usa el placeholder
+async function loadAllPhotos() {
+  const db = await openPhotoDB();
+
+  // ── Retrato principal
+  const retratoEl = document.getElementById('pv-retrato');
+  if (retratoEl) {
+    const url = await getPhotoURL(db, state.imgKeys.retrato);
+    retratoEl.src = url || PLACEHOLDER_RETRATO;
+    // También splash photo
+    const splashImg = document.querySelector('#splash .splash-photo img');
+    if (splashImg) splashImg.src = url || PLACEHOLDER_RETRATO;
+  }
+
+  // ── Foto fashion / historia
+  const fashionEl = document.getElementById('pv-fashion');
+  if (fashionEl) {
+    const url = await getPhotoURL(db, state.imgKeys.fashion);
+    fashionEl.src = url || PLACEHOLDER_FASHION;
+  }
+
+  // ── Galería
+  const galCount = state.galKeys.length;
+  if (galCount > 0) {
+    const galUrls = await Promise.all(
+      state.galKeys.map(k => getPhotoURL(db, k))
+    );
+    // Reemplaza PLACEHOLDER_GAL con las urls reales donde estén disponibles
+    galUrls.forEach((url, i) => {
+      if (url) GAL_IMGS[i] = url;
+    });
+  }
+
+  // Renderiza la galería con las URLs ya resueltas
+  renderGallery();
+}
+
+// ════════════════════════════════════════════════════════════════
+//  GALLERY DATA
+// ════════════════════════════════════════════════════════════════
+const GAL_IMGS = [...PLACEHOLDER_GAL];
 let galIdx = 0;
 
 function renderGallery() {
@@ -1626,6 +1759,15 @@ function renderGallery() {
 
   document.getElementById('gal-prev-btn').addEventListener('click', () => goTo(galIdx - 1));
   document.getElementById('gal-next-btn').addEventListener('click', () => goTo(galIdx + 1));
+
+  // Touch swipe
+  const mainWrap = mainImg.parentElement;
+  let touchStartX = 0;
+  mainWrap.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  mainWrap.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) goTo(diff > 0 ? galIdx + 1 : galIdx - 1);
+  }, { passive: true });
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -1653,20 +1795,28 @@ function renderPreview() {
   if (pvNombre)  pvNombre.textContent = state.name;
   if (pvCaption) pvCaption.textContent = state.caption;
   if (pvRetrato && state.imgKeys.retrato) pvRetrato.src = state.imgKeys.retrato;
+  // Nota: las fotos se cargan desde IndexedDB en loadAllPhotos()
 
   // ── History
   const pvFashion = document.getElementById('pv-fashion');
   const pvHistory = document.getElementById('pv-history');
   if (pvFashion && state.imgKeys.fashion) pvFashion.src = state.imgKeys.fashion;
+  // Nota: las fotos se cargan desde IndexedDB en loadAllPhotos()
   if (pvHistory) pvHistory.textContent = state.historyText;
 
   // ── Itinerary
   const pvItin = document.getElementById('pv-itin');
   if (pvItin) {
     pvItin.innerHTML = '';
-    state.itinerary.forEach(item => {
+    state.itinerary.forEach((item, idx) => {
       const li = document.createElement('li');
-      li.textContent = item.v;
+      li.style.cssText = 'list-style:none;display:flex;align-items:flex-start;gap:0.8rem;padding:0.75rem 0;border-bottom:1px solid rgba(201,168,76,0.08);';
+      const parts = item.v.split('—');
+      const timeStr = parts.length > 1 ? parts[0].trim() : '';
+      const titleStr = parts.length > 1 ? parts.slice(1).join('—').trim() : item.v;
+      li.innerHTML = timeStr
+        ? `<span style="flex-shrink:0;font-family:var(--c-mono);font-size:0.75rem;color:var(--c-b);min-width:72px;padding-top:0.1rem;">${timeStr}</span><span style="font-family:var(--c-serif);font-size:1rem;color:var(--c-text);">${titleStr}</span>`
+        : `<span style="flex-shrink:0;width:8px;height:8px;border-radius:50%;background:var(--c-a);margin-top:0.4rem;"></span><span style="font-family:var(--c-serif);font-size:1rem;color:var(--c-text);">${item.v}</span>`;
       pvItin.appendChild(li);
     });
   }
@@ -1808,6 +1958,11 @@ function startCountdown() {
       if (cdM) cdM.textContent = '00';
       if (cdS) cdS.textContent = '00';
       if (cdEl) cdEl.textContent = '00:00:00:00';
+      const cdSec = document.getElementById('countdown-sec');
+      if (cdSec) {
+        const sub = cdSec.querySelector('.section-subtitle');
+        if (sub) sub.textContent = '¡La celebración ha comenzado! ✦';
+      }
       return;
     }
 
@@ -1900,6 +2055,8 @@ function initRsvpForm() {
 
   form.addEventListener('submit', e => {
     e.preventDefault();
+    const submitBtn = document.getElementById('rsvp-submit-btn');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Abriendo WhatsApp...'; }
     const nombre = document.getElementById('rsvp-nombre').value.trim();
     const asiste = document.getElementById('rsvp-asiste').value;
     const acomp  = document.getElementById('rsvp-acomp').value;
@@ -1925,6 +2082,19 @@ function initRsvpForm() {
 
     const waUrl = `https://wa.me/${state.waOrganizer}?text=${encodeURIComponent(text)}`;
     window.open(waUrl, '_blank');
+    setTimeout(() => { if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✦ Confirmar por WhatsApp ✦'; } }, 3000);
+    // Show success state
+    const formCard = form.closest('.card');
+    if (formCard) {
+      formCard.innerHTML = `<div style="text-align:center;padding:2rem 1rem;">
+        <div style="font-size:2.5rem;margin-bottom:1rem;">🌹</div>
+        <div style="font-family:var(--c-script);font-size:2rem;color:var(--c-b);margin-bottom:0.5rem;">¡Gracias, ${nombre}!</div>
+        <p style="font-family:var(--c-serif);font-style:italic;color:var(--c-dim);font-size:1rem;line-height:1.7;">
+          Tu confirmación fue enviada por WhatsApp.<br/>Te esperamos con mucha ilusión.
+        </p>
+        <div style="margin-top:1.5rem;font-size:0.6rem;letter-spacing:0.3em;font-family:var(--c-head);color:var(--c-c);text-transform:uppercase;">✦ Nos vemos pronto ✦</div>
+      </div>`;
+    }
   });
 }
 
@@ -2019,7 +2189,7 @@ document.addEventListener('DOMContentLoaded', () => {
   applyPaletteToCard(state.palette);
   applyFont(state.typography);
   renderPreview();
-  renderGallery();
+  loadAllPhotos(); // carga fotos desde IndexedDB → llama renderGallery() al finalizar
   startCountdown();
   initAudioPlayer();
   initRsvpForm();
@@ -2027,6 +2197,32 @@ document.addEventListener('DOMContentLoaded', () => {
   initSplash();
   initIntersectionObserver();
   applyParticles(state.particles);
+
+  // Scroll progress bar
+  const scrollFill = document.getElementById('scroll-fill');
+  const cardWrapper = document.getElementById('card-wrapper');
+  if (scrollFill && cardWrapper) {
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = cardWrapper.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? Math.min((scrollTop / docHeight) * 100, 100) : 0;
+      scrollFill.style.width = pct + '%';
+    }, { passive: true });
+  }
+
+  const btt = document.getElementById('back-to-top');
+  if (btt) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 400) { btt.style.display = 'flex'; }
+      else { btt.style.display = 'none'; }
+    }, { passive: true });
+  }
+
+  // Swatch tooltips
+  document.querySelectorAll('.swatch').forEach(sw => {
+    const name = sw.dataset.name;
+    if (name) sw.setAttribute('title', name);
+  });
 });
 </script>
 </body>
