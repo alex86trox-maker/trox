@@ -590,13 +590,16 @@ section::after{
 
 /* ─── DISCO BALL IMG ─────────────────────────────── */
 .disco-ball-wrap{
-  animation:spin 8s linear infinite;
   display:inline-block;
+  width:56px;height:56px;
+  border-radius:50%;
+  overflow:hidden;
 }
 .disco-ball-wrap img{
   display:block;
   filter:drop-shadow(0 0 12px #ff2d78) drop-shadow(0 0 24px rgba(191,0,255,.6));
 }
+canvas{background:transparent !important;}
 </style>
 </head>
 <body>
@@ -616,12 +619,6 @@ section::after{
   <div style="position:absolute;left:5%;width:90%;height:1px;background:#00f5ff;box-shadow:0 0 6px 2px #00f5ff;animation:laserH2 4.1s ease-in-out infinite;pointer-events:none;z-index:1;"></div>
   <div style="position:absolute;left:20%;width:60%;height:1px;background:#ffd700;box-shadow:0 0 6px 2px #ffd700;animation:laserH 5s ease-in-out infinite 1s;pointer-events:none;z-index:1;"></div>
   <div style="position:absolute;left:0%;width:100%;height:1px;background:#39ff14;box-shadow:0 0 6px 2px #39ff14;animation:laserH2 3.7s ease-in-out infinite .5s;pointer-events:none;z-index:1;"></div>
-  <!-- Disco ball colgante -->
-  <div style="position:absolute;top:0;left:50%;width:2px;height:28px;background:rgba(255,255,255,.3);transform:translateX(-50%);z-index:4;"></div>
-  <div style="position:absolute;top:20px;left:50%;transform:translateX(-50%);z-index:5;animation:spin 8s linear infinite;">
-    <img src="https://hercules-cdn.com/file_opXzYiXuHZ6itThx4g6gdBf4" alt="Disco Ball" width="70" height="70"
-      style="display:block;filter:drop-shadow(0 0 12px #ff2d78) drop-shadow(0 0 24px rgba(191,0,255,.6));"/>
-  </div>
   <!-- Stars -->
   <div id="splash-stars" style="position:absolute;inset:0;pointer-events:none;z-index:0;"></div>
 
@@ -977,11 +974,7 @@ section::after{
 ═══════════════════════════════════════════════════ -->
 <section class="reveal" style="text-align:center;padding-bottom:4rem;background:radial-gradient(ellipse at 50% 70%,rgba(191,0,255,.1) 0%,var(--c-bg) 70%)">
   <!-- Disco ball footer con imagen real -->
-  <div style="margin-bottom:1.5rem;display:flex;justify-content:center">
-    <div class="disco-ball-wrap">
-      <img src="https://hercules-cdn.com/file_opXzYiXuHZ6itThx4g6gdBf4" alt="Disco Ball" width="56" height="56"/>
-    </div>
-  </div>
+  <div style="margin-bottom:1.5rem;display:flex;justify-content:center;height:56px;"></div>
   <p class="card-cap" id="pv-poem" style="max-width:320px;margin:0 auto">"Que esta noche sea el inicio del capítulo más hermoso de tu vida. Con amor, para siempre."</p>
   <div class="laser-div" style="margin:1rem auto;width:80%"></div>
   <span class="splash-name" id="pv-sign">Valentina</span>
@@ -1093,6 +1086,99 @@ const state = {
 ================================================================ */
 const NEON_COLORS = ['#ff2d78','#00f5ff','#bf00ff','#ffd700','#39ff14'];
 const STAR_SHAPES = ['✦','✧','★','✶','◆','⬡','✴'];
+
+/* ================================================================
+   DISCO BALL - CANVAS
+================================================================ */
+function discoBallCanvas(size, canvasId) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  canvas.id = canvasId;
+  canvas.style.cssText = 'display:block;background:transparent !important;';
+  canvas.setAttribute('style', 'display:block;background:transparent;');
+
+  const ctx = canvas.getContext('2d');
+  const cx = size / 2, cy = size / 2, r = size / 2 - 2;
+  const rows = 6, cols = 8;
+  const dw = size * 0.07, dh = size * 0.057;
+  let angle = 0;
+
+  function draw() {
+    // Fondo del canvas = fondo del splash (hace la bola "flotar" sobre él)
+    ctx.clearRect(0, 0, size, size);
+    // Pintar el mismo gradiente de fondo del splash en las esquinas
+    const bgGrad = ctx.createRadialGradient(size*0.5, size*0.3, 0, size*0.5, size*0.5, size);
+    bgGrad.addColorStop(0, '#1a0030');
+    bgGrad.addColorStop(0.5, '#060010');
+    bgGrad.addColorStop(1, '#02000a');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, size, size);
+    // Clip to circle — no white corners ever
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.clip();
+
+    // Dark background inside circle
+    const grad = ctx.createRadialGradient(cx * 0.7, cy * 0.6, 0, cx, cy, r);
+    grad.addColorStop(0, '#1a0030');
+    grad.addColorStop(0.7, '#0d001a');
+    grad.addColorStop(1, '#000010');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
+
+    // Rotating tiles
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+    ctx.translate(-cx, -cy);
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const x = cx - r + 4 + col * ((r * 2 - 8) / cols);
+        const y = cy - r + 5 + row * ((r * 2 - 10) / rows);
+        const c = NEON_COLORS[(row + col) % 5];
+        ctx.shadowColor = c;
+        ctx.shadowBlur = 6;
+        ctx.fillStyle = c;
+        ctx.globalAlpha = 0.85;
+        ctx.beginPath();
+        ctx.moveTo(x, y - dh);
+        ctx.lineTo(x + dw, y);
+        ctx.lineTo(x, y + dh);
+        ctx.lineTo(x - dw, y);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+    ctx.restore();
+
+    // Rim
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+
+    // Specular highlight
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(cx - r * 0.3, cy - r * 0.35, r * 0.12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    angle += 0.008;
+    requestAnimationFrame(draw);
+  }
+  draw();
+  return canvas;
+}
 
 /* ================================================================
    TOAST SYSTEM
@@ -2004,6 +2090,8 @@ function submitSongSuggest(e){
 /* ================================================================
    INIT
 ================================================================ */
+// Disco balls eliminadas
+
 // Neon stars decorations
 const splashStars=document.getElementById('splash-stars');
 if(splashStars)makeNeonStars(splashStars,22);
