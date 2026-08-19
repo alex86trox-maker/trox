@@ -87,11 +87,16 @@ body::before {
     0 8px 0 0 var(--c-bg);
   background: #111;
   overflow: hidden;
+  opacity: 1;
+  transform: translateY(0);
+  transition: none;
+}
+.pixel-window.reveal-ready {
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.5s, transform 0.5s;
 }
-.pixel-window.visible {
+.pixel-window.reveal-ready.visible {
   opacity: 1;
   transform: translateY(0);
 }
@@ -360,7 +365,7 @@ body::before {
   width: 100%; height: 100%;
   object-fit: cover;
   display: block;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 #pv-retrato-wrap {
   width: 160px; height: 160px;
@@ -369,7 +374,6 @@ body::before {
   box-shadow: 0 0 0 4px #000, 0 0 0 8px var(--c-a), 0 0 30px var(--c-a);
   cursor: pointer;
   overflow: hidden;
-  image-rendering: pixelated;
   position: relative;
 }
 #pv-retrato-wrap::after {
@@ -402,23 +406,26 @@ body::before {
 #cd {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 4px;
+  flex-wrap: nowrap;
 }
 .cd-unit {
   text-align: center;
-  min-width: 64px;
+  min-width: 56px;
+  flex: 1;
+  max-width: 72px;
 }
 .cd-num {
   font-family: var(--c-head);
-  font-size: clamp(18px, 7vw, 28px);
+  font-size: clamp(16px, 6vw, 24px);
   color: var(--c-b);
   text-shadow: 2px 2px 0 #000, 0 0 15px var(--c-b);
   background: #111;
   border: 2px solid var(--c-b);
   display: block;
-  padding: 8px 4px;
-  min-width: 60px;
+  padding: 8px 2px;
+  width: 100%;
   text-align: center;
   box-shadow: 0 0 10px var(--c-b);
 }
@@ -432,11 +439,12 @@ body::before {
 }
 .cd-sep {
   font-family: var(--c-head);
-  font-size: 24px;
+  font-size: 20px;
   color: var(--c-a);
   display: flex;
   align-items: center;
-  padding-bottom: 20px;
+  padding-bottom: 18px;
+  flex-shrink: 0;
   animation: pixelBlink 1s step-end infinite;
 }
 
@@ -507,7 +515,7 @@ body::before {
   width: 100%; height: 100%;
   object-fit: cover;
   image-rendering: auto;
-  filter: saturate(1.3) contrast(1.1);
+  filter: saturate(1.2) brightness(1.05);
 }
 .gal-caption {
   position: absolute; bottom: 0; left: 0; right: 0;
@@ -577,22 +585,27 @@ body::before {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  animation: pixelBlink 2s step-end infinite;
 }
+#pv-track-name.playing { animation: none; color: var(--c-d); }
 .audio-controls {
   display: flex; align-items: center; gap: 8px;
   margin-bottom: 8px;
 }
 #pv-play-btn {
   font-family: var(--c-head);
-  font-size: 10px;
+  font-size: 14px;
   color: #000;
   background: var(--c-d);
   border: none;
-  width: 36px; height: 36px;
+  width: 44px; height: 44px;
   cursor: pointer;
-  box-shadow: 3px 3px 0 #006600;
+  box-shadow: 3px 3px 0 #006600, 0 0 12px var(--c-d);
   flex-shrink: 0;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
+#pv-play-btn:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 #006600, 0 0 20px var(--c-d); }
+#pv-play-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #006600; }
 #pv-seek {
   flex: 1;
   -webkit-appearance: none;
@@ -604,9 +617,10 @@ body::before {
 }
 #pv-seek::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 12px; height: 16px;
+  width: 14px; height: 18px;
   background: var(--c-d);
   cursor: pointer;
+  box-shadow: 0 0 6px var(--c-d);
 }
 #pv-track-time {
   font-family: var(--c-head);
@@ -636,6 +650,14 @@ body::before {
   cursor: pointer;
 }
 audio#pv-audio { display: none; }
+.audio-hint {
+  font-family: var(--c-head);
+  font-size: 6px;
+  color: var(--c-dim);
+  text-align: center;
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
 
 /* ══ SONG SUGGEST ══ */
 #pv-song-suggest-wrap {
@@ -853,8 +875,11 @@ select.rsvp-input option { background: #111; }
 
 /* ══ RESPONSIVE ══ */
 @media (max-width: 480px) {
-  .cd-num { font-size: 20px; min-width: 50px; }
+  .cd-num { font-size: 14px; }
+  .cd-sep { font-size: 16px; }
   .gal-item { flex: 0 0 160px; height: 150px; }
+  .win-bar { font-size: 6px; }
+  .gal-upload-slot { font-size: 5px; padding: 5px 7px; }
 }
 
 /* ══ TYPING CURSOR ══ */
@@ -862,6 +887,57 @@ select.rsvp-input option { background: #111; }
 
 /* ══ SECTION PLAN VISIBILITY ══ */
 [data-plan] { display: block; }
+
+/* ══ PHOTO UPLOAD BUTTONS ══ */
+.photo-upload-btn {
+  display: inline-block;
+  font-family: var(--c-head);
+  font-size: 6px;
+  color: #000;
+  background: var(--c-a);
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #600060;
+  letter-spacing: 1px;
+  margin-top: 8px;
+  text-transform: uppercase;
+  transition: transform 0.1s;
+}
+.photo-upload-btn:hover { transform: translate(-1px,-1px); }
+.photo-upload-btn.alt { background: var(--c-b); box-shadow: 2px 2px 0 #006666; }
+.photo-upload-btn.green { background: var(--c-d); box-shadow: 2px 2px 0 #006600; color:#000; }
+input[type="file"].photo-file-input { display: none; }
+.photo-upload-area {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px; margin-top: 6px;
+}
+.photo-stored-badge {
+  font-family: var(--c-head);
+  font-size: 5px;
+  color: var(--c-d);
+  letter-spacing: 1px;
+  display: none;
+}
+.photo-stored-badge.show { display: block; }
+.gal-upload-row {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin: 8px 0;
+}
+.gal-upload-slot {
+  font-family: var(--c-head);
+  font-size: 6px;
+  color: #000;
+  background: #FFFF00;
+  box-shadow: 2px 2px 0 #666600;
+  padding: 7px 10px;
+  cursor: pointer;
+  border: none;
+  letter-spacing: 1px;
+  transition: transform 0.1s;
+}
+.gal-upload-slot:hover { transform: translate(-1px,-1px); }
+.gal-upload-slot.loaded { background: #00FF00; box-shadow: 2px 2px 0 #006600; color: #000; }
 </style>
 </head>
 <body>
@@ -903,6 +979,7 @@ select.rsvp-input option { background: #111; }
     <span class="top-banner-lives">♥ ♥ ♥</span>
   </div>
   <div class="neon-line"></div>
+  <div style="text-align:center; padding:6px 0; font-family:'Press Start 2P',monospace; font-size:7px; color:var(--c-dim); letter-spacing:2px; animation: pixelBlink 1.5s step-end infinite;">▼ SCROLL DOWN ▼</div>
 
   <!-- ══ SECCIÓN 2: FOTO PRINCIPAL + NOMBRE ══ -->
   <section>
@@ -918,7 +995,12 @@ select.rsvp-input option { background: #111; }
       <div class="win-content" style="text-align:center;">
         <div class="score-display">LEVEL 15 · UNLOCKED</div>
         <div id="pv-retrato-wrap" onclick="openLightbox(this.querySelector('img').src)">
-          <img class="cover-img" id="pv-retrato" src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=400&fit=crop&auto=format" alt="Foto XV años">
+          <img class="cover-img" id="pv-retrato" src="https://images.unsplash.com/photo-1776012999163-ac1d889e70f3?w=400&h=400&fit=crop&auto=format" alt="Foto XV años">
+        </div>
+        <div class="photo-upload-area">
+          <button class="photo-upload-btn" onclick="triggerPhotoUpload('retrato')">📷 CAMBIAR FOTO</button>
+          <input type="file" id="upload-retrato" class="photo-file-input" accept="image/*" onchange="handlePhotoUpload('retrato', this)">
+          <span class="photo-stored-badge" id="badge-retrato">✓ GUARDADA LOCALMENTE</span>
         </div>
         <div class="pixel-bar-wrap"><div class="pixel-bar-fill"></div></div>
         <h2 id="pv-nombre" class="pixel-title pixel-title-b"></h2>
@@ -984,7 +1066,12 @@ select.rsvp-input option { background: #111; }
       </div>
       <div class="win-content">
         <div id="pv-fashion-wrap">
-          <img class="cover-img" id="pv-fashion" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=480&h=320&fit=crop&auto=format" alt="Historia" style="height:220px;object-fit:cover;">
+          <img class="cover-img" id="pv-fashion" src="https://images.unsplash.com/photo-1775871600151-c7335246a87f?w=480&h=320&fit=crop&auto=format" alt="Historia" style="height:220px;object-fit:cover;">
+        </div>
+        <div class="photo-upload-area" style="align-items:flex-start;">
+          <button class="photo-upload-btn alt" onclick="triggerPhotoUpload('fashion')">📷 CAMBIAR FOTO</button>
+          <input type="file" id="upload-fashion" class="photo-file-input" accept="image/*" onchange="handlePhotoUpload('fashion', this)">
+          <span class="photo-stored-badge" id="badge-fashion">✓ GUARDADA LOCALMENTE</span>
         </div>
         <div style="margin-top:12px;">
           <p id="pv-history" class="card-cap" style="text-align:left;font-size:19px;"></p>
@@ -1042,9 +1129,11 @@ select.rsvp-input option { background: #111; }
         <div id="pv-galeria" class="gal-prev"></div>
       </div>
       <div class="win-content" style="padding-top:8px;">
+        <div class="gal-upload-row" id="gal-upload-row"></div>
+        <input type="file" id="upload-gal-input" class="photo-file-input" accept="image/*" onchange="handleGalUpload(this)">
         <div class="gal-nav">
           <button class="gal-nav-btn" onclick="galScroll(-1)">◄ PREV</button>
-          <span class="gal-num" id="gal-num">1/4</span>
+          <span class="gal-num" id="gal-num">1/12</span>
           <button class="gal-nav-btn" onclick="galScroll(1)">NEXT ►</button>
         </div>
       </div>
@@ -1093,7 +1182,8 @@ select.rsvp-input option { background: #111; }
               <input type="range" id="pv-vol" min="0" max="1" step="0.05" value="0.7" oninput="setVol(this.value)">
             </div>
           </div>
-          <audio id="pv-audio"></audio>
+          <div class="audio-hint">▲ PRESIONA ▶ PARA REPRODUCIR LA MÚSICA</div>
+          <audio id="pv-audio" preload="metadata"></audio>
         </div>
 
         <div style="margin-top:12px;">
@@ -1272,8 +1362,13 @@ select.rsvp-input option { background: #111; }
         <div style="margin:20px 0;" class="neon-line"></div>
         <div id="pv-sign" class="splash-name typing-cursor"></div>
         <div style="margin-top:16px;" class="icon-row">★ ♥ ◆ ► ◆ ♥ ★</div>
-        <div style="margin-top:12px; font-family:var(--c-head); font-size:6px; color:var(--c-dim);">
-          PIXEL QUEST · XV AÑOS · 2026
+        <div style="margin-top:24px; border-top: 1px solid #222; padding-top:20px;">
+          <img src="https://hercules-cdn.com/file_AbapB05dILYUQnitGn2ks7Vi" alt="Gueka Ideas" style="width:220px; max-width:85%; display:block; margin:0 auto 16px; filter: brightness(0) invert(1); opacity:0.9;">
+          <p style="font-family:'Share Tech Mono',monospace; font-size:11px; color:rgba(255,255,255,0.5); text-align:center; line-height:2; max-width:320px; margin:0 auto;">
+            Esta tarjeta digital es propiedad exclusiva de Gueka Ideas.<br>
+            Uso permitido únicamente para fines personales.<br>
+            <span style="color:rgba(255,255,255,0.35); font-size:10px; letter-spacing:1.5px; display:block; margin-top:4px;">© 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</span>
+          </p>
         </div>
       </div>
     </div>
@@ -1350,23 +1445,32 @@ const state = {
     {v:'Transferencia: 4152 3301 2345 6789'},
     {v:'Efectivo bienvenido ♥'}
   ],
-  galCaptions: ['Childhood Quest','Level 10','Best Friends','Level 15'],
+  galCaptions: ['Sesión Previa','El Vestido','Ramo de Novia','En el Jardín','La Princesa','Bouquet','Tocado Real','Glamour','Tiara & Vals','Fuente de los Sueños','Vestido Rosa','Flores & Amor'],
   typography: 'mono',
   songSuggestEnabled: true,
   songSuggestWa: '573001234567',
   audioKey: '',
-  audioName: 'Música de fondo',
+  audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+  audioName: '♪ Demo Track - SoundHelix',
   imgKeys: { retrato: '', fashion: '' },
   galKeys: [],
   templateLabel: 'PIXEL QUEST'
 };
 
-// ══ GALLERY IMAGES (Unsplash placeholders) ══
+// ══ GALLERY IMAGES — XV Años ══
 const galImages = [
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1488716820095-cbe80883c496?w=400&h=300&fit=crop&auto=format'
+  'https://images.unsplash.com/photo-1763625650105-9bca6b5509ae?w=400&h=300&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1763625642854-9bb2949528c7?w=400&h=300&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1763625642731-fe68cf5d0d53?w=400&h=300&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1763625642932-5691ae173ec4?w=400&h=300&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1763625640936-223ab76af7b6?w=400&h=300&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1763625651080-cf6c7295a9db?w=400&h=300&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1763625638895-c52d46816bc0?w=400&h=300&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1775871437034-dd26f3afb2bc?w=400&h=300&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1776013113750-9d3f165ff5b3?w=400&h=300&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1625755106045-bc7870842718?w=400&h=300&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1663162143055-163b540ed204?w=400&h=300&fit=crop&auto=format',
+  'https://images.unsplash.com/photo-1666590160022-fe5b8bc5ed00?w=400&h=300&fit=crop&auto=format'
 ];
 
 // ══ RENDER PREVIEW ══
@@ -1427,7 +1531,13 @@ function renderPreview() {
   if (albumBtn) albumBtn.href = state.albumUrl;
 
   const trackName = document.getElementById('pv-track-name');
-  if (trackName) trackName.textContent = '♪ ' + state.audioName;
+  if (trackName) trackName.textContent = state.audioName;
+
+  const audio = document.getElementById('pv-audio');
+  if (audio && state.audioUrl) {
+    audio.src = state.audioUrl;
+    audio.volume = 0.7;
+  }
 
   const calBtn = document.getElementById('pv-cal-btn');
   if (calBtn) calBtn.href = buildCalendarUrl();
@@ -1631,14 +1741,16 @@ function animateParticles() {
 
 // ══ CALENDAR URL ══
 function buildCalendarUrl() {
-  const d = state.date.replace(/-/g,'');
-  const t = state.time.replace(':','') + '00';
+  const dateClean = state.date.replace(/-/g,'');
+  const timeClean = state.time.replace(':','') + '00';
   const title = encodeURIComponent('XV Años ' + state.name);
   const loc = encodeURIComponent(state.venue + ', ' + state.address);
-  const start = d + 'T' + t;
-  const endH = String(parseInt(state.time.split(':')[0]) + 4).padStart(2,'0');
-  const end = d + 'T' + endH + '0000';
-  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + title + '&dates=' + start + '/' + end + '&location=' + loc;
+  const details = encodeURIComponent('¡Te invitamos a celebrar los XV años de ' + state.name + '!');
+  const startH = parseInt(state.time.split(':')[0]);
+  const endH = String(Math.min(startH + 4, 23)).padStart(2,'0');
+  const start = dateClean + 'T' + timeClean;
+  const end = dateClean + 'T' + endH + '0000';
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + title + '&dates=' + start + '/' + end + '&location=' + loc + '&details=' + details;
 }
 
 // ══ COUNTDOWN ══
@@ -1661,6 +1773,7 @@ function updateCountdown() {
 }
 
 // ══ GALLERY ══
+let galIdx = 0;
 function buildGallery() {
   const gal = document.getElementById('pv-galeria');
   if (!gal) return;
@@ -1675,7 +1788,7 @@ function buildGallery() {
     img.addEventListener('click', () => openLightbox(src));
     const cap = document.createElement('div');
     cap.className = 'gal-caption';
-    cap.textContent = state.galCaptions[i] || '';
+    cap.textContent = state.galCaptions[i] || ('Foto ' + (i+1));
     const frame = document.createElement('div');
     frame.className = 'gal-frame';
     item.appendChild(img);
@@ -1683,9 +1796,12 @@ function buildGallery() {
     item.appendChild(frame);
     gal.appendChild(item);
   });
+  // Actualizar contador
+  const numEl = document.getElementById('gal-num');
+  if (numEl) numEl.textContent = '1/' + galImages.length;
+  galIdx = 0;
 }
 
-let galIdx = 0;
 function galScroll(dir) {
   const gal = document.getElementById('pv-galeria');
   if (!gal) return;
@@ -1714,13 +1830,27 @@ let isPlaying = false;
 function togglePlay() {
   const audio = document.getElementById('pv-audio');
   const btn = document.getElementById('pv-play-btn');
+  const trackName = document.getElementById('pv-track-name');
+  const hint = document.querySelector('.audio-hint');
   if (!audio) return;
   if (audio.src && audio.src !== window.location.href) {
-    if (isPlaying) { audio.pause(); btn.textContent = '▶'; isPlaying = false; }
-    else { audio.play().catch(function(){}); btn.textContent = '⏸'; isPlaying = true; }
-  } else {
-    btn.textContent = isPlaying ? '▶' : '⏸';
-    isPlaying = !isPlaying;
+    if (isPlaying) {
+      audio.pause();
+      btn.textContent = '▶';
+      if (trackName) trackName.classList.remove('playing');
+      if (hint) hint.textContent = '▲ PRESIONA ▶ PARA REPRODUCIR LA MÚSICA';
+      isPlaying = false;
+    } else {
+      audio.play().then(function() {
+        btn.textContent = '⏸';
+        if (trackName) trackName.classList.add('playing');
+        if (hint) hint.textContent = '♪ REPRODUCIENDO...';
+        isPlaying = true;
+      }).catch(function(e) {
+        console.warn('Audio play error:', e);
+        if (hint) hint.textContent = '⚠ CLICK EN LA TARJETA PRIMERO PARA ACTIVAR AUDIO';
+      });
+    }
   }
 }
 
@@ -1758,10 +1888,10 @@ function initAudioEvents() {
 
 // ══ RSVP ══
 function submitRsvp() {
-  const nombre = document.getElementById('rsvp-nombre').value.trim();
+  const nombre = (document.getElementById('rsvp-nombre').value || '').trim();
   const asiste = document.getElementById('rsvp-asiste').value;
-  const acomp = parseInt(document.getElementById('rsvp-acomp').value) || 0;
-  const msg = document.getElementById('rsvp-msg').value.trim();
+  const acomp = Math.min(parseInt(document.getElementById('rsvp-acomp').value) || 0, state.rsvpMaxPases);
+  const msg = (document.getElementById('rsvp-msg').value || '').trim();
   const errEl = document.getElementById('rsvp-error');
 
   if (!nombre || !asiste) {
@@ -1770,17 +1900,25 @@ function submitRsvp() {
   }
   errEl.classList.remove('show');
 
-  const asistenMsg = asiste === 'si' ? 'SÍ asistiré' : asiste === 'no' ? 'NO podré ir' : 'Quizás asista';
-  let text = '*🎮 RSVP - XV AÑOS ' + state.name.toUpperCase() + '*\n\n';
-  text += '*Nombre:* ' + nombre + '\n';
-  text += '*Asistencia:* ' + asistenMsg + '\n';
-  text += '*Acompañantes:* ' + acomp + '\n';
-  if (msg) text += '*Mensaje:* ' + msg + '\n';
-  text += '\n*Evento:* ' + state.venue + ' · ' + state.date;
+  const asistenMsg = asiste === 'si' ? 'SÍ asistiré ✅' : asiste === 'no' ? 'NO podré ir ❌' : 'Quizás asista 🤔';
+  const d = new Date(state.date + 'T' + state.time);
+  const dateFormatted = d.toLocaleDateString('es-ES', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-  const url = 'https://wa.me/' + state.waOrganizer + '?text=' + encodeURIComponent(text);
+  let text = '🎮 *PIXEL QUEST · XV AÑOS ' + state.name.toUpperCase() + '*\n';
+  text += '━━━━━━━━━━━━━━━━━━━\n';
+  text += '👤 *Nombre:* ' + nombre + '\n';
+  text += '📋 *Asistencia:* ' + asistenMsg + '\n';
+  if (acomp > 0) text += '👥 *Acompañantes:* ' + acomp + '\n';
+  if (msg) text += '💬 *Mensaje:* ' + msg + '\n';
+  text += '━━━━━━━━━━━━━━━━━━━\n';
+  text += '📅 ' + dateFormatted + '\n';
+  text += '📍 ' + state.venue + '\n';
+  text += '🕐 ' + state.time + ' hrs';
 
-  if (state.plan === 'deluxe' && state.rsvpPara) {
+  const waNum = state.waOrganizer.replace(/\D/g,'');
+  const url = 'https://wa.me/' + waNum + '?text=' + encodeURIComponent(text);
+
+  if (state.plan === 'deluxe') {
     generateRsvpQr(nombre, asiste);
   }
 
@@ -1832,11 +1970,15 @@ function removeSongInput(btn) {
 
 function sendSongSuggest() {
   const inputs = document.querySelectorAll('.song-suggest-input');
-  const songs = Array.from(inputs).map(i => i.value.trim()).filter(Boolean);
-  if (!songs.length) return;
+  const songs = Array.from(inputs).map(function(i) { return i.value.trim(); }).filter(Boolean);
+  if (!songs.length) {
+    alert('Escribe al menos una canción');
+    return;
+  }
   let text = '🎵 *Sugerencias de canciones para XV de ' + state.name + '*\n\n';
   songs.forEach(function(s, i) { text += (i+1) + '. ' + s + '\n'; });
-  const url = 'https://wa.me/' + state.songSuggestWa + '?text=' + encodeURIComponent(text);
+  const waNum = state.songSuggestWa.replace(/\D/g,'');
+  const url = 'https://wa.me/' + waNum + '?text=' + encodeURIComponent(text);
   window.open(url, '_blank');
 }
 
@@ -1849,9 +1991,12 @@ function initScrollReveal() {
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0.05, rootMargin: '0px 0px 0px 0px' });
 
-  document.querySelectorAll('.pixel-window').forEach(function(el) { observer.observe(el); });
+  document.querySelectorAll('.pixel-window').forEach(function(el) {
+    el.classList.add('reveal-ready');
+    observer.observe(el);
+  });
 }
 
 // ══ INIT ══
@@ -1859,6 +2004,7 @@ document.addEventListener('DOMContentLoaded', function() {
   renderPreview();
   resizeCanvas();
   initAudioEvents();
+  buildGalUploadRow();
 
   const splash = document.getElementById('splash');
   const mainContent = document.getElementById('main-content');
@@ -1871,6 +2017,7 @@ document.addEventListener('DOMContentLoaded', function() {
     applyParticles(state.particles);
     setInterval(updateCountdown, 1000);
     updateCountdown();
+    loadStoredPhotos();
     return;
   }
 
@@ -1887,13 +2034,188 @@ document.addEventListener('DOMContentLoaded', function() {
           initScrollReveal();
           setInterval(updateCountdown, 1000);
           updateCountdown();
+          loadStoredPhotos();
         }, 500);
       }
     });
   }
+
+  // ── Lightbox: cerrar con ESC y click fuera ──
+  const lb = document.getElementById('lightbox');
+  if (lb) {
+    lb.addEventListener('click', function(e) { if (e.target === lb) closeLightbox(); });
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+  });
 });
 
 window.addEventListener('resize', resizeCanvas);
+
+// ══════════════════════════════════════
+// INDEXEDDB — ALMACENAMIENTO LOCAL DE FOTOS
+// ══════════════════════════════════════
+const DB_NAME = 'PixelQuestXV';
+const DB_VERSION = 1;
+const STORE = 'fotos';
+let db = null;
+
+function openDB() {
+  return new Promise(function(resolve, reject) {
+    if (db) { resolve(db); return; }
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = function(e) {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains(STORE)) {
+        d.createObjectStore(STORE, { keyPath: 'key' });
+      }
+    };
+    req.onsuccess = function(e) { db = e.target.result; resolve(db); };
+    req.onerror = function(e) { reject(e.target.error); };
+  });
+}
+
+function savePhoto(key, dataUrl) {
+  return openDB().then(function(d) {
+    return new Promise(function(resolve, reject) {
+      const tx = d.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).put({ key: key, data: dataUrl });
+      tx.oncomplete = resolve;
+      tx.onerror = function(e) { reject(e.target.error); };
+    });
+  });
+}
+
+function loadPhoto(key) {
+  return openDB().then(function(d) {
+    return new Promise(function(resolve, reject) {
+      const tx = d.transaction(STORE, 'readonly');
+      const req = tx.objectStore(STORE).get(key);
+      req.onsuccess = function(e) { resolve(e.target.result ? e.target.result.data : null); };
+      req.onerror = function(e) { reject(e.target.error); };
+    });
+  });
+}
+
+function deletePhoto(key) {
+  return openDB().then(function(d) {
+    return new Promise(function(resolve, reject) {
+      const tx = d.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).delete(key);
+      tx.oncomplete = resolve;
+      tx.onerror = function(e) { reject(e.target.error); };
+    });
+  });
+}
+
+// ── Trigger upload input ──
+let currentGalSlot = 0;
+function triggerPhotoUpload(key) {
+  const input = document.getElementById('upload-' + key);
+  if (input) input.click();
+}
+
+// ── Handle retrato / fashion upload ──
+function handlePhotoUpload(key, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    // Aplicar a la imagen en pantalla
+    const imgEl = document.getElementById('pv-' + key);
+    if (imgEl) imgEl.src = dataUrl;
+    // Guardar en IndexedDB
+    savePhoto(key, dataUrl).then(function() {
+      const badge = document.getElementById('badge-' + key);
+      if (badge) badge.classList.add('show');
+    }).catch(function(err) {
+      console.warn('Error guardando foto en IndexedDB:', err);
+    });
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+// ── Handle galería upload por slot ──
+function handleGalUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const slot = currentGalSlot;
+  const key = 'gal_' + slot;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    galImages[slot] = dataUrl;
+    buildGallery();
+    // Actualizar botón slot a "cargado"
+    const btn = document.getElementById('gal-slot-' + slot);
+    if (btn) btn.classList.add('loaded');
+    // Guardar en IndexedDB
+    savePhoto(key, dataUrl).then(function() {
+      if (btn) btn.textContent = '✓ FOTO ' + (slot + 1);
+    }).catch(function(err) {
+      console.warn('Error guardando galería en IndexedDB:', err);
+    });
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+// ── Construir botones de slots de galería (máx 12) ──
+function buildGalUploadRow() {
+  const row = document.getElementById('gal-upload-row');
+  if (!row) return;
+  row.innerHTML = '';
+  for (let i = 0; i < 12; i++) {
+    const btn = document.createElement('button');
+    btn.id = 'gal-slot-' + i;
+    btn.className = 'gal-upload-slot';
+    btn.textContent = '📷 ' + (i + 1);
+    btn.addEventListener('click', (function(idx) {
+      return function() {
+        currentGalSlot = idx;
+        document.getElementById('upload-gal-input').click();
+      };
+    })(i));
+    row.appendChild(btn);
+  }
+}
+
+// ── Cargar todas las fotos guardadas al iniciar ──
+function loadStoredPhotos() {
+  // Retrato
+  loadPhoto('retrato').then(function(data) {
+    if (data) {
+      const img = document.getElementById('pv-retrato');
+      if (img) img.src = data;
+      const badge = document.getElementById('badge-retrato');
+      if (badge) badge.classList.add('show');
+    }
+  });
+  // Fashion
+  loadPhoto('fashion').then(function(data) {
+    if (data) {
+      const img = document.getElementById('pv-fashion');
+      if (img) img.src = data;
+      const badge = document.getElementById('badge-fashion');
+      if (badge) badge.classList.add('show');
+    }
+  });
+  // Galería (máx 12)
+  const galPromises = [0,1,2,3,4,5,6,7,8,9,10,11].map(function(i) {
+    return loadPhoto('gal_' + i).then(function(data) {
+      if (data) {
+        galImages[i] = data;
+        const btn = document.getElementById('gal-slot-' + i);
+        if (btn) { btn.classList.add('loaded'); btn.textContent = '✓ FOTO ' + (i + 1); }
+      }
+    });
+  });
+  Promise.all(galPromises).then(function() {
+    buildGallery();
+  });
+}
 </script>
 </body>
 </html>
