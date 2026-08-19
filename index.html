@@ -215,7 +215,26 @@
 
   /* ===== gallery ===== */
   .gal-prev { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 0 auto; }
-  .gal-prev img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; border: 1px solid var(--c-line); }
+  .gal-prev img {
+    width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px;
+    border: 1px solid var(--c-line); cursor: pointer; transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .gal-prev img:hover { transform: scale(1.05); box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+  #gal-lightbox {
+    position: fixed; inset: 0; background: rgba(10,0,18,.92); z-index: 999;
+    display: none; align-items: center; justify-content: center; padding: 24px;
+  }
+  #gal-lightbox.open { display: flex; }
+  #gal-lightbox img { max-width: 100%; max-height: 82vh; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.5); }
+  #gal-lightbox-close {
+    position: absolute; top: 18px; right: 22px; color: var(--c-b); font-size: 30px;
+    line-height: 1; background: none; border: none; cursor: pointer;
+  }
+  #gal-lightbox-nav { position: absolute; top: 50%; left: 0; right: 0; display: flex; justify-content: space-between; transform: translateY(-50%); padding: 0 12px; }
+  #gal-lightbox-nav button {
+    background: rgba(255,255,255,.08); border: 1px solid var(--c-line); color: var(--c-b);
+    font-size: 22px; width: 42px; height: 42px; border-radius: 50%; cursor: pointer;
+  }
 
   /* ===== music player ===== */
   #pv-music-sec .player {
@@ -457,6 +476,15 @@
   </footer>
 </div>
 
+<div id="gal-lightbox">
+  <button id="gal-lightbox-close" type="button" aria-label="Cerrar">&times;</button>
+  <img id="gal-lightbox-img" src="" alt="Foto de galería" />
+  <div id="gal-lightbox-nav">
+    <button id="gal-lightbox-prev" type="button" aria-label="Anterior">&#8249;</button>
+    <button id="gal-lightbox-next" type="button" aria-label="Siguiente">&#8250;</button>
+  </div>
+</div>
+
 <script>
 /* ================== ESTADO ================== */
 const state = {
@@ -485,7 +513,7 @@ const state = {
   signature: 'Con amor, Valentina',
   palette: 'violeta',
   particles: 'estrellas',
-  showSplash: false,
+  showSplash: true,
   splashBtn: 'Abrir invitación',
   itinerary: [
     { v: '19:00 — Recepción de invitados' },
@@ -521,16 +549,16 @@ const state = {
   audioKey: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
   audioName: 'Pista de ejemplo (reemplázala por tu canción)',
   imgKeys: {
-    retrato: 'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?w=600&q=80',
-    fashion: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80',
+    retrato: 'https://images.unsplash.com/photo-1775871436970-cb148e402eaf?w=700&q=80',
+    fashion: 'https://images.unsplash.com/photo-1775871437313-1547980cff96?w=700&q=80',
   },
   galKeys: [
-    'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80',
-    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80',
-    'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&q=80',
-    'https://images.unsplash.com/photo-1512909006721-3d6018887383?w=400&q=80',
-    'https://images.unsplash.com/photo-1470753937643-efeb931202a9?w=400&q=80',
-    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=400&q=80',
+    'https://images.unsplash.com/photo-1775871436970-cb148e402eaf?w=500&q=80',
+    'https://images.unsplash.com/photo-1775871437313-1547980cff96?w=500&q=80',
+    'https://images.unsplash.com/photo-1775871599988-a34324bf58f9?w=500&q=80',
+    'https://images.unsplash.com/photo-1741115560123-8ac060c228f9?w=500&q=80',
+    'https://images.unsplash.com/photo-1693833968509-78c08545a714?w=500&q=80',
+    'https://images.unsplash.com/photo-1721069104514-41c7726fafc9?w=500&q=80',
   ],
 };
 
@@ -763,13 +791,46 @@ function renderGallery() {
   const galMax = GAL_MAX; // la galería siempre respeta el máximo de 12 fotos
   const gal = document.getElementById('pv-galeria');
   gal.innerHTML = '';
-  (state.galKeys || []).slice(0, galMax).forEach((src) => {
+  const photos = (state.galKeys || []).slice(0, galMax);
+  photos.forEach((src, i) => {
     const img = document.createElement('img');
     img.src = src;
     img.alt = 'Foto de galería';
+    img.addEventListener('click', () => openLightbox(photos, i));
     gal.appendChild(img);
   });
 }
+
+/* ================== LIGHTBOX DE GALERÍA ================== */
+let lightboxPhotos = [];
+let lightboxIndex = 0;
+const lightboxEl = document.getElementById('gal-lightbox');
+const lightboxImgEl = document.getElementById('gal-lightbox-img');
+
+function openLightbox(photos, index) {
+  lightboxPhotos = photos;
+  lightboxIndex = index;
+  lightboxImgEl.src = photos[index];
+  lightboxEl.classList.add('open');
+}
+function closeLightbox() {
+  lightboxEl.classList.remove('open');
+}
+function showLightboxDelta(delta) {
+  if (!lightboxPhotos.length) return;
+  lightboxIndex = (lightboxIndex + delta + lightboxPhotos.length) % lightboxPhotos.length;
+  lightboxImgEl.src = lightboxPhotos[lightboxIndex];
+}
+document.getElementById('gal-lightbox-close').addEventListener('click', closeLightbox);
+document.getElementById('gal-lightbox-prev').addEventListener('click', () => showLightboxDelta(-1));
+document.getElementById('gal-lightbox-next').addEventListener('click', () => showLightboxDelta(1));
+lightboxEl.addEventListener('click', (e) => { if (e.target === lightboxEl) closeLightbox(); });
+document.addEventListener('keydown', (e) => {
+  if (!lightboxEl.classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') showLightboxDelta(-1);
+  if (e.key === 'ArrowRight') showLightboxDelta(1);
+});
 
 document.getElementById('pv-gal-add-btn').addEventListener('click', () => {
   const input = document.createElement('input');
@@ -963,9 +1024,6 @@ function maybeRenderQr() {
   const qrWrap = document.getElementById('rsvp-qr-wrap');
   const canvas = document.getElementById('rsvp-qr-canvas');
   const shouldShow = state.plan === 'deluxe' && !!state.rsvpPara;
-  console.log('[debug maybeRenderQr]', { shouldShow, plan: state.plan, rsvpPara: state.rsvpPara, hasQRCode: !!window.QRCode, canvas });
-  qrWrap.setAttribute('data-debug', JSON.stringify({ shouldShow, plan: state.plan, rsvpPara: state.rsvpPara, hasQRCode: !!window.QRCode, canvasExists: !!canvas }));
-  qrWrap.insertAdjacentHTML('afterend', `<p style="color:red;font-size:10px;text-align:center;">DEBUG: ${JSON.stringify({ shouldShow, plan: state.plan, rsvpPara: state.rsvpPara, hasQRCode: !!window.QRCode, canvasExists: !!canvas })}</p>`);
   qrWrap.style.display = shouldShow ? 'flex' : 'none';
   if (!shouldShow) return;
 
