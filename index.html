@@ -263,197 +263,139 @@ section::after{
 /* ─── COVER IMAGE ─────────────────────────────────── */
 .cover-img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
 
-/* ─── GALLERY ─────────────────────────────────────── */
-/* Grid principal */
-.gal-prev{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  grid-auto-rows:100px;
-  gap:.45rem;
-}
-/* Foto hero: primera foto full-ancho, más alta */
-.gal-prev .gal-cell:first-child{
-  grid-column:1/-1;
-  grid-row:span 2;
-}
-/* Celdas */
-.gal-prev .gal-cell{
-  position:relative;border-radius:10px;overflow:hidden;
-  cursor:pointer;
-  background:color-mix(in srgb,var(--c-a) 8%,var(--c-bg));
-}
-/* Imagen */
-.gal-prev .gal-cell img{
-  width:100%;height:100%;object-fit:cover;display:block;
-  transition:transform .4s cubic-bezier(.25,.46,.45,.94),filter .3s;
-  will-change:transform;
-}
-.gal-prev .gal-cell:hover img{transform:scale(1.08);filter:brightness(1.05)}
-
-/* Overlay con degradado */
-.gal-prev .gal-cell .gal-overlay{
-  position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(45,27,34,.75) 0%,rgba(45,27,34,.1) 50%,transparent 100%);
-  opacity:0;transition:opacity .28s;
-  display:flex;align-items:flex-end;justify-content:space-between;
-  padding:.5rem .55rem;
-}
-.gal-prev .gal-cell:hover .gal-overlay{opacity:1}
-.gal-prev .gal-cell:first-child .gal-overlay{padding:.7rem}
-
-/* Número de foto */
-.gal-cell .gal-num{
-  font-family:var(--c-mono);font-size:.48rem;letter-spacing:.2em;
-  color:rgba(255,255,255,.8);font-weight:600;text-transform:uppercase;
-}
-/* Caption en hero */
-.gal-cell:first-child .gal-caption{
-  font-family:var(--c-serif);font-size:.85rem;font-style:italic;
-  color:rgba(255,255,255,.9);text-shadow:0 1px 4px rgba(0,0,0,.4);
-  flex:1;line-height:1.3;
-}
-
-/* Botón eliminar */
-.gal-cell .gal-del{
-  width:22px;height:22px;border-radius:50%;flex-shrink:0;
-  background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.35);
-  color:rgba(255,255,255,.9);font-size:.6rem;
+/* ─── GALLERY 3D CAROUSEL (inline en sección) ─────── */
+.gal-scene{
+  width:100%;
+  height:320px;
+  perspective:900px;
   display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:background .15s,transform .15s;
+  overflow:hidden;
+  touch-action:none;
 }
-.gal-cell .gal-del:hover{background:rgba(220,38,38,.75);transform:scale(1.12)}
+.gal-ring{
+  position:relative;
+  width:200px;height:240px;
+  transform-style:preserve-3d;
+  transition:transform .55s cubic-bezier(.23,1,.32,1);
+}
+/* Cada tarjeta foto */
+.gal-card{
+  position:absolute;
+  width:200px;height:240px;
+  top:0;left:0;
+  border-radius:14px;overflow:hidden;
+  backface-visibility:hidden;
+  box-shadow:0 10px 30px rgba(0,0,0,.45);
+  cursor:pointer;
+  transition:box-shadow .3s;
+  border:2px solid rgba(255,255,255,.12);
+}
+.gal-card img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  pointer-events:none;user-select:none;
+}
+/* Caption superpuesta */
+.gal-card-cap{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:.55rem .7rem;
+  background:linear-gradient(to top,rgba(40,10,25,.85),transparent);
+}
+.gal-card-cap .gc-num{
+  font-family:var(--c-mono);font-size:.42rem;letter-spacing:.25em;
+  color:color-mix(in srgb,var(--c-b) 80%,#fff);opacity:.7;display:block;
+}
+.gal-card-cap .gc-label{
+  font-family:var(--c-serif);font-size:.8rem;font-style:italic;
+  color:rgba(255,255,255,.88);text-shadow:0 1px 3px rgba(0,0,0,.4);
+  line-height:1.25;display:block;
+}
+/* Brillo glow en la carta al frente */
+.gal-card.front{
+  box-shadow:0 16px 48px color-mix(in srgb,var(--c-a) 40%,rgba(0,0,0,.6));
+  border-color:color-mix(in srgb,var(--c-a) 50%,rgba(255,255,255,.2));
+}
+/* Botón eliminar dentro de cada carta */
+.gal-card .gal-del{
+  position:absolute;top:.45rem;right:.45rem;
+  width:22px;height:22px;border-radius:50%;
+  background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.3);
+  color:rgba(255,255,255,.85);font-size:.55rem;
+  display:none;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .15s;z-index:5;
+}
+.gal-card:hover .gal-del{display:flex}
+.gal-card .gal-del:hover{background:rgba(220,38,38,.8)}
 
-/* Borde brillante en la celda hero */
-.gal-prev .gal-cell:first-child::after{
-  content:'';position:absolute;inset:0;
-  border-radius:10px;pointer-events:none;
-  box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--c-a) 35%,transparent);
-  opacity:0;transition:opacity .3s;
+/* Controles prev/next */
+.gal-controls{
+  display:flex;align-items:center;justify-content:center;
+  gap:1.2rem;margin-top:1rem;
 }
-.gal-prev .gal-cell:first-child:hover::after{opacity:1}
-
-/* Badge contador total */
-.gal-count-badge{
-  display:inline-flex;align-items:center;gap:.35rem;
-  font-family:var(--c-mono);font-size:.52rem;letter-spacing:.2em;
-  color:var(--c-c);font-weight:600;text-transform:uppercase;
-  margin-bottom:.65rem;opacity:.8;
+.gal-btn{
+  width:40px;height:40px;border-radius:50%;
+  background:color-mix(in srgb,var(--c-a) 10%,var(--c-bg));
+  border:1.5px solid color-mix(in srgb,var(--c-a) 40%,transparent);
+  color:var(--c-a);font-size:1.2rem;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .22s;
 }
-.gal-count-badge .dot{
+.gal-btn:hover{
+  background:color-mix(in srgb,var(--c-a) 22%,var(--c-bg));
+  transform:scale(1.1);
+  box-shadow:0 0 14px color-mix(in srgb,var(--c-a) 35%,transparent);
+}
+/* Dots */
+.gal-dots{display:flex;gap:.38rem;align-items:center}
+.gal-dot{
   width:5px;height:5px;border-radius:50%;
-  background:var(--c-a);
-  box-shadow:0 0 6px color-mix(in srgb,var(--c-a) 70%,transparent);
+  background:color-mix(in srgb,var(--c-a) 25%,transparent);
+  border:1px solid color-mix(in srgb,var(--c-a) 40%,transparent);
+  transition:all .25s;cursor:pointer;
+}
+.gal-dot.active{
+  background:var(--c-a);width:16px;border-radius:3px;
+  box-shadow:0 0 7px color-mix(in srgb,var(--c-a) 55%,transparent);
 }
 
-/* Gallery empty state */
+/* Contador fotos */
+.gal-counter{
+  font-family:var(--c-mono);font-size:.5rem;letter-spacing:.2em;
+  color:var(--c-dim);opacity:.65;
+}
+
+/* Empty state */
 .gal-empty{
-  grid-column:1/-1;padding:2.5rem 1.5rem;text-align:center;
+  width:100%;padding:2.5rem 1.5rem;text-align:center;
   border:1.5px dashed color-mix(in srgb,var(--c-a) 28%,transparent);
   border-radius:16px;
   color:var(--c-dim);font-family:var(--c-serif);font-size:.95rem;
   font-style:italic;line-height:1.8;
   background:color-mix(in srgb,var(--c-a) 3%,var(--c-bg));
-  transition:border-color .25s;
 }
-.gal-empty:hover{border-color:color-mix(in srgb,var(--c-a) 50%,transparent)}
 .gal-empty .gal-empty-icon{font-size:2.2rem;margin-bottom:.6rem;opacity:.45;display:block}
 
-/* ─── LIGHTBOX 3D CAROUSEL ───────────────────────── */
+/* ─── LIGHTBOX FULLSCREEN (click en carta frontal) ─── */
 #gal-lightbox{
   position:fixed;inset:0;z-index:9999;
-  background:rgba(5,2,10,.96);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  opacity:0;transition:opacity .25s;
-  overflow:hidden;
+  background:rgba(0,0,0,.93);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .22s;
 }
 #gal-lightbox.open{opacity:1}
-/* Perspectiva 3D */
-#gal-lb-stage{
-  width:100%;
-  height:360px;
-  perspective:900px;
-  display:flex;align-items:center;justify-content:center;
+#gal-lb-img{
+  max-width:92vw;max-height:86vh;
+  border-radius:14px;object-fit:contain;
+  box-shadow:0 0 60px color-mix(in srgb,var(--c-a) 30%,rgba(0,0,0,.7));
 }
-#gal-lb-carousel{
-  position:relative;
-  width:260px;height:300px;
-  transform-style:preserve-3d;
-  transition:transform .5s cubic-bezier(.23,1,.32,1);
-}
-/* Cada tarjeta dentro del carrusel 3D */
-.lb-card{
-  position:absolute;
-  width:260px;height:300px;
-  left:0;top:0;
-  transform-style:preserve-3d;
-  cursor:pointer;
-  border-radius:16px;overflow:hidden;
-  backface-visibility:hidden;
-  box-shadow:0 12px 40px rgba(0,0,0,.7);
-  transition:box-shadow .3s;
-}
-.lb-card img{
-  width:100%;height:100%;object-fit:cover;display:block;
-  user-select:none;-webkit-user-drag:none;
-}
-.lb-card-caption{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:.65rem .85rem;
-  background:linear-gradient(to top,rgba(20,0,15,.85),transparent);
-  font-family:var(--c-serif);font-size:.85rem;font-style:italic;
-  color:rgba(255,255,255,.88);
-  text-shadow:0 1px 4px rgba(0,0,0,.5);
-  line-height:1.35;
-}
-/* Caption + número */
-.lb-card-num{
-  font-family:var(--c-mono);font-size:.45rem;letter-spacing:.3em;
-  color:var(--c-b);opacity:.65;display:block;margin-bottom:.15rem;
-}
-
-/* Controles del lightbox */
-#gal-lb-controls{
-  display:flex;align-items:center;gap:1.25rem;margin-top:1.5rem;
-}
-.lb-ctrl-btn{
-  width:42px;height:42px;border-radius:50%;
-  background:rgba(255,255,255,.07);
-  border:1.5px solid color-mix(in srgb,var(--c-a) 45%,transparent);
-  color:var(--c-a);font-size:1.1rem;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:all .2s;
-}
-.lb-ctrl-btn:hover{
-  background:color-mix(in srgb,var(--c-a) 18%,transparent);
-  transform:scale(1.1);
-  box-shadow:0 0 16px color-mix(in srgb,var(--c-a) 40%,transparent);
-}
-/* Dots indicadores */
-#gal-lb-dots{display:flex;gap:.4rem;align-items:center}
-.lb-dot{
-  width:5px;height:5px;border-radius:50%;
-  background:rgba(255,255,255,.2);transition:all .25s;cursor:pointer;
-}
-.lb-dot.active{
-  background:var(--c-a);width:18px;border-radius:3px;
-  box-shadow:0 0 8px color-mix(in srgb,var(--c-a) 60%,transparent);
-}
-/* Cerrar */
 #gal-lb-close{
   position:absolute;top:1rem;right:1rem;
   width:36px;height:36px;border-radius:50%;
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
   color:rgba(255,255,255,.7);font-size:.85rem;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;transition:all .2s;z-index:10;
 }
-#gal-lb-close:hover{background:rgba(229,62,62,.3);color:#fff}
-/* Contador arriba */
-#gal-lb-counter{
-  position:absolute;top:1rem;left:1rem;
-  font-family:var(--c-mono);font-size:.6rem;letter-spacing:.2em;
-  color:rgba(255,255,255,.45);pointer-events:none;
-}
+#gal-lb-close:hover{background:rgba(220,38,38,.4);color:#fff}
 
 /* ─── PHOTO UPLOAD WRAPPER ────────────────────────── */
 .photo-upload-wrap{position:relative;cursor:pointer;}
@@ -613,12 +555,15 @@ section::after{
 
 /* ─── SPLASH ──────────────────────────────────────── */
 #splash{
-  min-height:100vh;
+  position:fixed;
+  inset:0;
+  z-index:8000;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;padding:2rem 1.5rem;
-  position:relative;overflow:hidden;
+  overflow:hidden;
   background:linear-gradient(160deg,#FFF0F5 0%,#FFE4EE 40%,#FADADD 70%,#FFE8F0 100%);
   cursor:pointer;
+  transition:opacity .55s ease, transform .55s ease;
 }
 #splash .splash-bg-circle{position:absolute;border-radius:50%;pointer-events:none;}
 #sp-15{
@@ -956,12 +901,22 @@ section::after{
     <div class="sec-title">Galería</div>
     <div class="ornament-line narrow"></div>
   </div>
-  <!-- Badge contador -->
-  <div id="gal-badge" class="gal-count-badge" style="justify-content:center;margin-bottom:.85rem">
-    <span class="dot"></span>
-    <span id="gal-badge-txt">12 fotos · Toca para explorar</span>
+
+  <!-- Carrusel 3D inline -->
+  <div class="gal-scene" id="gal-scene">
+    <div class="gal-ring" id="gal-ring"></div>
   </div>
-  <div id="pv-galeria" class="gal-prev"></div>
+
+  <!-- Controles -->
+  <div class="gal-controls">
+    <button class="gal-btn" id="gal-prev" aria-label="Anterior">‹</button>
+    <div class="gal-dots" id="gal-dots"></div>
+    <button class="gal-btn" id="gal-next" aria-label="Siguiente">›</button>
+  </div>
+  <div style="text-align:center;margin-top:.5rem">
+    <span class="gal-counter" id="gal-counter"></span>
+  </div>
+
   <div style="text-align:center;margin-top:1.1rem;display:flex;flex-direction:column;align-items:center;gap:.45rem">
     <button id="gal-add-btn" onclick="openGalleryFilePicker()"
       style="display:inline-flex;align-items:center;gap:.45rem;padding:.7rem 1.6rem;border-radius:50px;font-family:var(--c-mono);font-size:.68rem;font-weight:600;letter-spacing:.15em;color:var(--c-a);border:1.5px solid var(--c-a);background:color-mix(in srgb,var(--c-a) 7%,var(--c-bg));cursor:pointer;transition:all .2s;position:relative;overflow:hidden">
@@ -1327,18 +1282,10 @@ section::after{
 
 </div><!-- /#card-wrapper -->
 
-<!-- ═══ LIGHTBOX 3D GALERÍA ═══ -->
-<div id="gal-lightbox" role="dialog" aria-modal="true" aria-label="Galería de fotos" style="display:none">
+<!-- ═══ LIGHTBOX FULLSCREEN ═══ -->
+<div id="gal-lightbox" style="display:none">
   <button id="gal-lb-close" aria-label="Cerrar">✕</button>
-  <div id="gal-lb-counter"></div>
-  <div id="gal-lb-stage">
-    <div id="gal-lb-carousel"></div>
-  </div>
-  <div id="gal-lb-controls">
-    <button class="lb-ctrl-btn" id="lb-prev" aria-label="Anterior">‹</button>
-    <div id="gal-lb-dots"></div>
-    <button class="lb-ctrl-btn" id="lb-next" aria-label="Siguiente">›</button>
-  </div>
+  <img id="gal-lb-img" src="" alt="Foto ampliada"/>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
@@ -1765,88 +1712,196 @@ function renderList(id,arr,type){
   });
 }
 
+/* ================================================================
+   GALERÍA 3D CAROUSEL — igual al referente
+================================================================ */
+let _galState = { imgs:[], captions:[], curIdx:0, theta:0, radius:260 };
+
 function renderGallery(){
-  const el=document.getElementById('pv-galeria');
-  if(!el) return;
-  el.innerHTML='';
-  const MAX=12;
-  const isUserPhotos=state.galKeys.length>0;
-  const imgs=isUserPhotos?state.galKeys:GAL_PLACEHOLDER;
-  const captions=state.galCaptions||[];
-  const total=Math.min(imgs.length,MAX);
+  const MAX = 12;
+  const isUserPhotos = state.galKeys.length > 0;
+  const imgs = isUserPhotos ? state.galKeys : GAL_PLACEHOLDER;
+  const captions = state.galCaptions || [];
+  const total = Math.min(imgs.length, MAX);
 
-  // Actualizar badge
-  const badgeTxt=document.getElementById('gal-badge-txt');
-  if(badgeTxt){
-    if(isUserPhotos) badgeTxt.textContent=`${total} foto${total!==1?'s':''} · Toca para explorar`;
-    else badgeTxt.textContent=`${total} fotos demo · Toca para explorar`;
+  _galState.imgs = imgs.slice(0, total);
+  _galState.captions = captions;
+  _galState.curIdx = 0;
+
+  _buildGalCarousel();
+}
+
+function _buildGalCarousel(){
+  const ring = document.getElementById('gal-ring');
+  const dotsEl = document.getElementById('gal-dots');
+  const counter = document.getElementById('gal-counter');
+  if(!ring) return;
+
+  const imgs = _galState.imgs;
+  const captions = _galState.captions;
+  const total = imgs.length;
+  const isUserPhotos = state.galKeys.length > 0;
+
+  ring.innerHTML = '';
+
+  // Empty state
+  if(total === 0){
+    const scene = document.getElementById('gal-scene');
+    if(scene){
+      scene.innerHTML = '<div class="gal-empty"><span class="gal-empty-icon">📷</span>Aún no hay fotos.<br>Toca <strong>Agregar fotos</strong> para comenzar.</div>';
+    }
+    if(dotsEl) dotsEl.innerHTML = '';
+    if(counter) counter.textContent = '';
+    return;
   }
 
-  if(isUserPhotos&&imgs.length===0){
-    const empty=document.createElement('div');
-    empty.className='gal-empty';
-    empty.innerHTML='<span class="gal-empty-icon">📷</span><div>Aún no hay fotos.<br>Toca <strong>Agregar fotos</strong> para empezar.</div>';
-    el.appendChild(empty); return;
-  }
+  // Recalcular radio según cantidad de fotos
+  // Más fotos → mayor radio para que no se solapen
+  const CARD_W = 200;
+  const minRadius = CARD_W / (2 * Math.tan(Math.PI / total));
+  _galState.radius = Math.max(220, Math.ceil(minRadius * 1.15));
+  const R = _galState.radius;
 
-  imgs.slice(0,total).forEach((src,i)=>{
-    const cell=document.createElement('div');
-    cell.className='gal-cell';
+  // Crear tarjetas
+  imgs.forEach((src, i) => {
+    const card = document.createElement('div');
+    card.className = 'gal-card' + (i === 0 ? ' front' : '');
+    card.dataset.idx = i;
 
-    const img=document.createElement('img');
-    img.src=src; img.alt=captions[i]||`Foto ${i+1}`;
-    img.loading='lazy';
-    cell.appendChild(img);
+    const img = document.createElement('img');
+    img.src = src; img.alt = captions[i] || `Foto ${i+1}`; img.loading = 'lazy';
+    card.appendChild(img);
 
-    // Overlay
-    const overlay=document.createElement('div');
-    overlay.className='gal-overlay';
+    // Caption
+    const cap = document.createElement('div');
+    cap.className = 'gal-card-cap';
+    cap.innerHTML = `<span class="gc-num">FOTO ${i+1} / ${total}</span><span class="gc-label">${captions[i]||''}</span>`;
+    card.appendChild(cap);
 
-    // Caption solo en la celda hero (índice 0) o en todas si son fotos del usuario
-    const capEl=document.createElement('span');
-    capEl.className='gal-caption';
-    capEl.style.cssText='font-family:var(--c-serif);font-size:.78rem;font-style:italic;color:rgba(255,255,255,.9);text-shadow:0 1px 3px rgba(0,0,0,.4);flex:1;line-height:1.3;';
-    capEl.textContent=captions[i]||'';
-    overlay.appendChild(capEl);
-
+    // Botón eliminar (solo fotos del usuario)
     if(isUserPhotos){
-      const delBtn=document.createElement('button');
-      delBtn.className='gal-del'; delBtn.innerHTML='✕'; delBtn.title='Eliminar foto';
-      delBtn.setAttribute('aria-label','Eliminar foto');
-      const dbKey=state.galDbKeys[i];
-      delBtn.addEventListener('click',e=>{
+      const del = document.createElement('button');
+      del.className = 'gal-del'; del.innerHTML = '✕'; del.title = 'Eliminar foto';
+      const dbKey = state.galDbKeys[i];
+      del.addEventListener('click', e => {
         e.stopPropagation();
-        if(confirm('¿Eliminar esta foto?')) deleteGalleryPhoto(dbKey,src);
+        if(confirm('¿Eliminar esta foto?')) deleteGalleryPhoto(dbKey, src);
       });
-      overlay.appendChild(delBtn);
-    } else {
-      // En demo, mostrar número
-      const numEl=document.createElement('span');
-      numEl.className='gal-num';
-      numEl.textContent=`${i+1} / ${total}`;
-      overlay.appendChild(numEl);
+      card.appendChild(del);
     }
 
-    cell.appendChild(overlay);
-    cell.addEventListener('click',()=>openLightbox(imgs.slice(0,total),i,captions));
-    el.appendChild(cell);
+    // Click: si es la carta del frente → lightbox; si no → ir a esa carta
+    card.addEventListener('click', () => {
+      if(parseInt(card.dataset.idx) === _galState.curIdx){
+        _openLightboxSimple(src, captions[i]);
+      } else {
+        _galGoTo(i);
+      }
+    });
+
+    // Posición 3D
+    const angle = (360 / total) * i;
+    card.style.transform = `rotateY(${angle}deg) translateZ(${R}px)`;
+    ring.appendChild(card);
   });
 
-  // Si quedan slots libres (usuario tiene fotos pero menos de 12)
-  if(isUserPhotos&&total<MAX){
-    const remaining=MAX-total;
-    const addCell=document.createElement('div');
-    addCell.className='gal-cell';
-    addCell.style.cssText='display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--c-a) 5%,var(--c-bg));border:1.5px dashed color-mix(in srgb,var(--c-a) 28%,transparent);cursor:pointer;';
-    addCell.innerHTML=`<div style="text-align:center;padding:.5rem"><div style="font-size:1.3rem;opacity:.45">＋</div><div style="font-family:var(--c-mono);font-size:.42rem;letter-spacing:.15em;color:var(--c-dim);margin-top:.25rem;opacity:.65">${remaining} FOTOS<br>DISPONIBLES</div></div>`;
-    addCell.addEventListener('click',openGalleryFilePicker);
-    el.appendChild(addCell);
+  // Dots
+  if(dotsEl){
+    dotsEl.innerHTML = '';
+    const maxDots = Math.min(total, 12);
+    for(let i = 0; i < maxDots; i++){
+      const dot = document.createElement('div');
+      dot.className = 'gal-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => _galGoTo(i));
+      dotsEl.appendChild(dot);
+    }
   }
+
+  // Controles
+  const prevBtn = document.getElementById('gal-prev');
+  const nextBtn = document.getElementById('gal-next');
+  if(prevBtn) prevBtn.onclick = () => _galGoTo(_galState.curIdx - 1);
+  if(nextBtn) nextBtn.onclick = () => _galGoTo(_galState.curIdx + 1);
+
+  // Swipe táctil en la escena
+  const scene = document.getElementById('gal-scene');
+  if(scene){
+    let _tx = 0;
+    scene.addEventListener('touchstart', e => { _tx = e.touches[0].clientX; }, {passive:true});
+    scene.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - _tx;
+      if(Math.abs(dx) > 35) dx < 0 ? _galGoTo(_galState.curIdx+1) : _galGoTo(_galState.curIdx-1);
+    }, {passive:true});
+    // Drag con mouse
+    let _mx = 0, _drag = false;
+    scene.addEventListener('mousedown', e => { _mx = e.clientX; _drag = true; });
+    scene.addEventListener('mouseup', e => {
+      if(!_drag) return; _drag = false;
+      const dx = e.clientX - _mx;
+      if(Math.abs(dx) > 35) dx < 0 ? _galGoTo(_galState.curIdx+1) : _galGoTo(_galState.curIdx-1);
+    });
+  }
+
+  _galUpdateUI();
+}
+
+function _galGoTo(idx){
+  const total = _galState.imgs.length;
+  _galState.curIdx = ((idx % total) + total) % total;
+  _galState.theta = -(360 / total) * _galState.curIdx;
+  _galUpdateUI();
+}
+
+function _galUpdateUI(){
+  const ring = document.getElementById('gal-ring');
+  const dotsEl = document.getElementById('gal-dots');
+  const counter = document.getElementById('gal-counter');
+  const total = _galState.imgs.length;
+  const cur = _galState.curIdx;
+
+  if(ring){
+    ring.style.transform = `rotateY(${_galState.theta}deg)`;
+    // Marcar carta frontal
+    ring.querySelectorAll('.gal-card').forEach((c,i) => {
+      c.classList.toggle('front', i === cur);
+    });
+  }
+  if(dotsEl){
+    dotsEl.querySelectorAll('.gal-dot').forEach((d,i) => d.classList.toggle('active', i === cur));
+  }
+  if(counter) counter.textContent = `${cur+1} / ${total}`;
+}
+
+function _openLightboxSimple(src, caption){
+  const lb = document.getElementById('gal-lightbox');
+  const lbImg = document.getElementById('gal-lb-img');
+  const lbClose = document.getElementById('gal-lb-close');
+  if(!lb || !lbImg) return;
+  lbImg.src = src; lbImg.alt = caption || '';
+  lb.style.display = 'flex';
+  requestAnimationFrame(() => lb.classList.add('open'));
+  document.body.style.overflow = 'hidden';
+  function close(){
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { lb.style.display = 'none'; lbImg.src=''; }, 220);
+    document.removeEventListener('keydown', onKey);
+    lb.removeEventListener('click', onBgClick);
+  }
+  const onKey = e => { if(e.key==='Escape') close(); };
+  const onBgClick = e => { if(e.target === lb) close(); };
+  document.addEventListener('keydown', onKey);
+  lb.addEventListener('click', onBgClick);
+  if(lbClose) lbClose.onclick = close;
+}
+
+/* Función legacy openLightbox — redirige al nuevo sistema */
+function openLightbox(imgs, startIdx, captions){
+  _galGoTo(startIdx);
 }
 
 function renderVenue(){
   const el=document.getElementById('pv-lugar');
-  if(!el) return;
   const level=PLAN_LEVEL[state.plan]||1;
   let html=`
     <div style="font-size:2.5rem;margin-bottom:.5rem">📍</div>
@@ -1879,11 +1934,16 @@ function openCard(e){
   if(e) e.stopPropagation();
   const splash=document.getElementById('splash');
   if(splash){
-    splash.style.transition='opacity .5s ease,transform .5s ease';
-    splash.style.opacity='0'; splash.style.transform='scale(.97)';
-    setTimeout(()=>{splash.style.display='none';},500);
+    splash.style.opacity='0';
+    splash.style.transform='scale(.97)';
+    setTimeout(()=>{
+      splash.style.display='none';
+      document.body.style.overflow='';
+    },560);
   }
 }
+// Bloquear scroll mientras el splash está visible
+document.body.style.overflow='hidden';
 document.getElementById('splash').addEventListener('click',()=>openCard(null));
 
 /* ================================================================
