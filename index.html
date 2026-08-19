@@ -1,1497 +1,833 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXEL QUEST · XV Años Valentina</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&family=VT323:wght@400&family=Montserrat:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;700&family=Raleway:wght@300;400;700&family=Josefin+Sans:wght@300;400;700&family=EB+Garamond:ital,wght@0,400;1,400&family=Abril+Fatface&family=DM+Serif+Display:ital@0;1&family=Alex+Brush&family=Sacramento&family=Great+Vibes&family=Noto+Serif:ital,wght@0,400;1,400&family=Figtree:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mis XV Años - Glamour Púrpura</title>
+
+<!-- Fuentes (Fontsource CDN, igual que el editor) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/montserrat@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/playfair-display@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/cormorant-garamond@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/cinzel@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/marcellus@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/raleway@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/josefin-sans@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/eb-garamond@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/abril-fatface@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/dm-serif-display@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/alex-brush@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/sacramento@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/great-vibes@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/noto-serif@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/figtree@latest/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/jetbrains-mono@latest/index.css">
+
+<!-- QR code lib, igual que el editor -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
 <style>
-/* ══ RESET & BASE ══ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: #0a0a0a;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  font-family: 'Share Tech Mono', monospace;
-  overflow-x: hidden;
-}
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #05000a;
+    font-family: var(--c-serif, 'Cormorant Garamond', serif);
+    color: var(--c-text, #f3e6ff);
+    scroll-behavior: smooth;
+    min-height: 100vh;
+  }
+  a { text-decoration: none; color: inherit; }
 
-/* ══ PIXEL GRID BG ══ */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(0,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,255,255,0.03) 1px, transparent 1px);
-  background-size: 16px 16px;
-  pointer-events: none;
-  z-index: 0;
-}
+  /* Fondo ambiental detrás de la tarjeta, visible en pantallas anchas (tablet/desktop) */
+  body {
+    display: flex;
+    justify-content: center;
+    background:
+      radial-gradient(60% 50% at 50% 0%, rgba(165,61,255,0.25) 0%, transparent 70%),
+      #05000a;
+  }
 
-/* ══ PARTICLE CANVAS ══ */
-#particle-canvas {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-}
+  #particle-canvas {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 1;
+  }
 
-/* ══ CARD WRAPPER ══ */
-#card-wrapper {
-  --c-bg: #0d0d0d;
-  --c-text: #e0e0e0;
-  --c-dim: #888;
-  --c-line: #333;
-  --c-a: #FF00FF;
-  --c-b: #00FFFF;
-  --c-c: #FFFF00;
-  --c-d: #00FF00;
-  --c-e: #FF6600;
-  --c-head: 'Press Start 2P', monospace;
-  --c-serif: 'Share Tech Mono', monospace;
-  --c-mono: 'Share Tech Mono', monospace;
-  --c-script: 'VT323', monospace;
+  /* ===== card-wrapper: paleta / tema ===== */
+  #card-wrapper {
+    --c-bg: #170321;
+    --c-text: #f5e9ff;
+    --c-dim: #cbaee0;
+    --c-line: rgba(230,190,255,0.28);
+    --c-a: #a53dff;
+    --c-b: #d6a4ff;
+    --c-c: #6c1bb0;
+    --c-d: #ffd36e;
+    --c-e: #ff7ad9;
+    --c-head: 'Cinzel', serif;
+    --c-serif: 'Cormorant Garamond', serif;
+    --c-mono: 'JetBrains Mono', monospace;
+    --c-script: 'Great Vibes', cursive;
 
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  background: var(--c-bg);
-  color: var(--c-text);
-  font-family: var(--c-mono);
-  padding-bottom: 40px;
-  min-height: 100vh;
-}
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    background: radial-gradient(120% 140% at 50% 0%, var(--c-c) 0%, var(--c-bg) 55%, #05000a 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    box-shadow: 0 0 80px rgba(0,0,0,0.6);
+  }
 
-/* ══ PIXEL WINDOW FRAME ══ */
-.pixel-window {
-  margin: 20px 16px;
-  border: 3px solid var(--c-a);
-  box-shadow:
-    0 0 0 1px var(--c-bg),
-    -4px 0 0 0 var(--c-a),
-    4px 0 0 0 var(--c-a),
-    0 -4px 0 0 var(--c-a),
-    0 4px 0 0 var(--c-a),
-    -8px 0 0 0 var(--c-bg),
-    8px 0 0 0 var(--c-bg),
-    0 -8px 0 0 var(--c-bg),
-    0 8px 0 0 var(--c-bg);
-  background: #111;
-  overflow: hidden;
-  opacity: 1;
-  transform: translateY(0);
-  transition: none;
-}
-.pixel-window.reveal-ready {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s, transform 0.5s;
-}
-.pixel-window.reveal-ready.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+  section {
+    position: relative;
+    padding: 64px 24px;
+    border-bottom: 1px solid var(--c-line);
+    opacity: 0;
+    transform: translateY(24px);
+    animation: fadeUp 0.9s ease forwards;
+    animation-play-state: paused;
+  }
+  section.in-view { animation-play-state: running; }
 
-.pixel-window-alt { border-color: var(--c-b); box-shadow: 0 0 0 1px var(--c-bg),-4px 0 0 0 var(--c-b),4px 0 0 0 var(--c-b),0 -4px 0 0 var(--c-b),0 4px 0 0 var(--c-b),-8px 0 0 0 var(--c-bg),8px 0 0 0 var(--c-bg),0 -8px 0 0 var(--c-bg),0 8px 0 0 var(--c-bg); }
-.pixel-window-c { border-color: var(--c-c); box-shadow: 0 0 0 1px var(--c-bg),-4px 0 0 0 var(--c-c),4px 0 0 0 var(--c-c),0 -4px 0 0 var(--c-c),0 4px 0 0 var(--c-c),-8px 0 0 0 var(--c-bg),8px 0 0 0 var(--c-bg),0 -8px 0 0 var(--c-bg),0 8px 0 0 var(--c-bg); }
-.pixel-window-d { border-color: var(--c-d); box-shadow: 0 0 0 1px var(--c-bg),-4px 0 0 0 var(--c-d),4px 0 0 0 var(--c-d),0 -4px 0 0 var(--c-d),0 4px 0 0 var(--c-d),-8px 0 0 0 var(--c-bg),8px 0 0 0 var(--c-bg),0 -8px 0 0 var(--c-bg),0 8px 0 0 var(--c-bg); }
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-/* ══ WINDOW TITLE BAR ══ */
-.win-bar {
-  background: var(--c-a);
-  color: #000;
-  font-family: var(--c-head);
-  font-size: 7px;
-  padding: 6px 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.win-bar-alt { background: var(--c-b); }
-.win-bar-c { background: var(--c-c); }
-.win-bar-d { background: var(--c-d); }
-.win-btn-group { display: flex; gap: 4px; }
-.win-btn {
-  width: 10px; height: 10px;
-  border: 2px solid #000;
-  background: #000;
-  display: inline-block;
-  cursor: pointer;
-}
-.win-btn-r { background: #ff4444; }
-.win-btn-y { background: #ffcc00; }
-.win-btn-g { background: #44ff44; }
+  h2.sec-title {
+    font-family: var(--c-head);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 15px;
+    color: var(--c-d);
+    text-align: center;
+    margin: 0 0 28px;
+  }
+  h2.sec-title::before, h2.sec-title::after {
+    content: '✦';
+    color: var(--c-a);
+    margin: 0 10px;
+    font-size: 11px;
+  }
 
-.win-content { padding: 16px; }
+  .card-cap {
+    text-align: center;
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--c-dim);
+    max-width: 380px;
+    margin: 0 auto;
+  }
 
-/* ══ PIXEL TYPOGRAPHY ══ */
-.pixel-title {
-  font-family: var(--c-head);
-  font-size: 14px;
-  line-height: 2;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--c-a);
-  text-shadow:
-    2px 2px 0 #000,
-    0 0 20px var(--c-a),
-    0 0 40px var(--c-a);
-}
-.pixel-title-b { color: var(--c-b); text-shadow: 2px 2px 0 #000, 0 0 20px var(--c-b), 0 0 40px var(--c-b); }
-.pixel-title-c { color: var(--c-c); text-shadow: 2px 2px 0 #000, 0 0 20px var(--c-c), 0 0 40px var(--c-c); }
-.pixel-title-d { color: var(--c-d); text-shadow: 2px 2px 0 #000, 0 0 20px var(--c-d), 0 0 40px var(--c-d); }
+  .card-list { display: flex; flex-direction: column; gap: 14px; max-width: 380px; margin: 0 auto; }
+  .card-list > div {
+    background: rgba(165,61,255,0.08);
+    border: 1px solid var(--c-line);
+    border-radius: 14px;
+    padding: 14px 18px;
+    text-align: center;
+    font-size: 16px;
+    color: var(--c-text);
+  }
 
-.vt-text {
-  font-family: 'VT323', monospace;
-  font-size: 22px;
-  line-height: 1.3;
-}
+  .splash-name {
+    font-family: var(--c-script);
+    font-size: 44px;
+    color: var(--c-d);
+    text-align: center;
+  }
 
-/* ══ BLINK ANIMATION ══ */
-@keyframes pixelBlink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-.blink { animation: pixelBlink 1s step-end infinite; }
+  /* ===== 1. Splash ===== */
+  #splash {
+    position: absolute; inset: 0; z-index: 50;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: radial-gradient(120% 120% at 50% 20%, #6c1bb0 0%, #170321 60%, #05000a 100%);
+    text-align: center;
+    padding: 32px;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+  #splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+  #sp-15 {
+    font-family: var(--c-head);
+    font-size: 96px;
+    color: var(--c-d);
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(255,211,110,0.6);
+  }
+  #splash .sp-sub { font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--c-b); margin-top: 6px; }
+  #sp-name { font-family: var(--c-script); font-size: 40px; margin: 18px 0; color: #fff; }
+  #sp-date { font-size: 14px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--c-dim); margin-bottom: 34px; }
+  #sp-btn {
+    display: inline-block;
+    padding: 14px 38px;
+    border: 1px solid var(--c-a);
+    border-radius: 999px;
+    font-family: var(--c-head);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(135deg, var(--c-a), var(--c-e));
+    cursor: pointer;
+    box-shadow: 0 0 24px rgba(165,61,255,0.55);
+  }
 
-/* ══ GLITCH ══ */
-@keyframes glitch1 {
-  0%,100% { clip-path: inset(0 0 85% 0); transform: translate(-2px,0); }
-  50% { clip-path: inset(30% 0 50% 0); transform: translate(2px,0); }
-}
-@keyframes glitch2 {
-  0%,100% { clip-path: inset(60% 0 10% 0); transform: translate(2px,0); }
-  50% { clip-path: inset(10% 0 70% 0); transform: translate(-2px,0); }
-}
-.glitch-wrap { position: relative; display: inline-block; }
-.glitch-wrap::before, .glitch-wrap::after {
-  content: attr(data-text);
-  position: absolute; top: 0; left: 0;
-  font-family: inherit; font-size: inherit;
-  width: 100%; color: inherit;
-}
-.glitch-wrap::before { color: var(--c-a); animation: glitch1 2.5s infinite step-end; }
-.glitch-wrap::after { color: var(--c-b); animation: glitch2 2.5s infinite step-end; }
+  /* ===== 2. Foto principal ===== */
+  #pv-retrato-wrap {
+    display: block; width: 220px; height: 280px; margin: 0 auto 22px;
+    border-radius: 18px; overflow: hidden; cursor: pointer;
+    border: 2px solid var(--c-a);
+    box-shadow: 0 0 40px rgba(165,61,255,0.4);
+    background: none; padding: 0;
+  }
+  .cover-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #pv-nombre { font-family: var(--c-script); font-size: 46px; text-align: center; color: var(--c-d); margin: 8px 0; }
 
-/* ══ LOADING BAR ══ */
-.pixel-bar-wrap {
-  background: #222;
-  border: 2px solid var(--c-d);
-  height: 14px;
-  position: relative;
-  overflow: hidden;
-  margin: 8px 0;
-}
-.pixel-bar-fill {
-  height: 100%;
-  background: repeating-linear-gradient(90deg, var(--c-d) 0, var(--c-d) 8px, transparent 8px, transparent 12px);
-  animation: loadFill 2s ease-out forwards;
-  width: 0%;
-}
-@keyframes loadFill { to { width: 100%; } }
+  /* ===== 3. Cuenta regresiva ===== */
+  #cd {
+    font-family: var(--c-mono);
+    font-size: 30px;
+    text-align: center;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background: rgba(165,61,255,0.12);
+    border: 1px solid var(--c-line);
+    border-radius: 16px;
+    padding: 18px;
+    max-width: 320px;
+    margin: 0 auto;
+  }
 
-/* ══ SCORE DISPLAY ══ */
-.score-display {
-  font-family: var(--c-head);
-  font-size: 8px;
-  color: var(--c-c);
-  text-align: right;
-  padding: 4px 8px;
-  letter-spacing: 1px;
-}
+  /* ===== calendar / album / music buttons ===== */
+  .pv-link-btn {
+    display: block; text-align: center; margin: 0 auto;
+    max-width: 320px;
+    padding: 14px 20px;
+    border-radius: 999px;
+    border: 1px solid var(--c-a);
+    color: #fff;
+    font-family: var(--c-head);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: rgba(165,61,255,0.15);
+  }
 
-/* ══ SECTION: SPLASH ══ */
-#splash {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: #000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  gap: 0;
-  overflow: hidden;
-}
-#splash::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255,0,255,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,0,255,0.04) 1px, transparent 1px);
-  background-size: 8px 8px;
-}
-.splash-scanlines {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
-  pointer-events: none;
-}
-.splash-corner {
-  position: absolute;
-  font-family: var(--c-head);
-  font-size: 6px;
-  color: var(--c-dim);
-}
-.splash-corner-tl { top: 16px; left: 16px; }
-.splash-corner-tr { top: 16px; right: 16px; }
-.splash-corner-bl { bottom: 16px; left: 16px; }
-.splash-corner-br { bottom: 16px; right: 16px; }
+  /* ===== gallery ===== */
+  .gal-prev { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 0 auto; }
+  .gal-prev img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; border: 1px solid var(--c-line); }
 
-.splash-lives { font-size: 14px; color: var(--c-a); margin-bottom: 8px; letter-spacing: 4px; }
-.splash-score { font-family: var(--c-head); font-size: 7px; color: var(--c-c); margin-bottom: 16px; }
+  /* ===== music player ===== */
+  #pv-music-sec .player {
+    max-width: 340px; margin: 0 auto 24px;
+    background: rgba(165,61,255,0.1);
+    border: 1px solid var(--c-line);
+    border-radius: 18px;
+    padding: 18px;
+  }
+  #pv-play-btn {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--c-a), var(--c-e));
+    color: #fff; border: none; font-size: 18px; cursor: pointer;
+  }
+  .player-row { display: flex; align-items: center; gap: 12px; }
+  #pv-track-name { font-size: 14px; color: var(--c-text); }
+  #pv-track-time { font-size: 12px; color: var(--c-dim); }
+  #pv-seek, #pv-vol { width: 100%; accent-color: var(--c-a); }
 
-#sp-15 {
-  font-family: var(--c-head);
-  font-size: clamp(28px, 10vw, 48px);
-  color: var(--c-a);
-  text-shadow: 4px 4px 0 #800080, 0 0 30px var(--c-a), 0 0 60px var(--c-a);
-  letter-spacing: 4px;
-  text-align: center;
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
+  /* ===== song suggest form ===== */
+  #song-suggest-form input, #rsvp-form input, #rsvp-form select, #rsvp-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--c-line);
+    background: rgba(255,255,255,0.05);
+    color: var(--c-text);
+    font-family: var(--c-serif);
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+  #song-add-btn, #song-suggest-form button[type="submit"], #rsvp-form button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 999px;
+    border: 1px solid var(--c-a);
+    background: linear-gradient(135deg, var(--c-a), var(--c-e));
+    color: #fff;
+    font-family: var(--c-head);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .rsvp-error-msg { color: #ff8fa3; font-size: 13px; text-align: center; margin-top: 10px; }
+  .rsvp-note { text-align: center; font-size: 13px; color: var(--c-dim); margin-top: 14px; }
+  #rsvp-qr-wrap { display: flex; justify-content: center; margin-top: 18px; }
+  #rsvp-qr-canvas.rsvp-note {
+    border: 1px dashed var(--c-line);
+    border-radius: 12px;
+    padding: 16px 20px;
+    max-width: 260px;
+  }
 
-.splash-subtitle {
-  font-family: var(--c-head);
-  font-size: 8px;
-  color: var(--c-b);
-  letter-spacing: 3px;
-  margin-bottom: 4px;
-  text-align: center;
-}
+  /* ===== plan-lock ===== */
+  [data-plan].locked { display: none !important; }
 
-#sp-name {
-  font-family: 'VT323', monospace;
-  font-size: clamp(36px, 12vw, 56px);
-  color: var(--c-c);
-  text-shadow: 3px 3px 0 #806600, 0 0 20px var(--c-c);
-  text-align: center;
-  margin-bottom: 4px;
-  line-height: 1;
-}
-
-#sp-date {
-  font-family: var(--c-head);
-  font-size: 8px;
-  color: var(--c-d);
-  text-align: center;
-  margin-bottom: 24px;
-  letter-spacing: 2px;
-}
-
-.insert-coin {
-  font-family: var(--c-head);
-  font-size: 9px;
-  color: #fff;
-  margin-bottom: 16px;
-  letter-spacing: 2px;
-}
-
-#sp-btn {
-  font-family: var(--c-head);
-  font-size: 10px;
-  color: #000;
-  background: var(--c-d);
-  border: none;
-  padding: 14px 24px;
-  cursor: pointer;
-  box-shadow: 4px 4px 0 #006600, 0 0 20px var(--c-d);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  transition: transform 0.1s, box-shadow 0.1s;
-  position: relative;
-  clip-path: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px));
-}
-#sp-btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 #006600, 0 0 30px var(--c-d); }
-#sp-btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 #006600; }
-
-.splash-pixel-deco {
-  display: flex; gap: 12px; margin-top: 20px;
-  font-size: 16px; color: var(--c-dim);
-}
-
-/* ══ MAIN CONTENT HIDDEN ══ */
-#main-content { display: none; }
-#main-content.active { display: block; }
-
-/* ══ TOP BANNER ══ */
-.top-banner {
-  background: var(--c-a);
-  padding: 8px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.top-banner-title {
-  font-family: var(--c-head);
-  font-size: 7px;
-  color: #000;
-  letter-spacing: 1px;
-}
-.top-banner-lives { font-size: 12px; color: #000; }
-
-/* ══ PIXEL DIVIDER ══ */
-.px-divider {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 16px;
-  font-family: var(--c-head); font-size: 6px; color: var(--c-dim);
-}
-.px-divider::before, .px-divider::after {
-  content: '';
-  flex: 1;
-  height: 2px;
-  background: repeating-linear-gradient(90deg, var(--c-dim) 0, var(--c-dim) 4px, transparent 4px, transparent 8px);
-}
-
-/* ══ COVER IMAGE ══ */
-.cover-img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-  image-rendering: auto;
-}
-#pv-retrato-wrap {
-  width: 160px; height: 160px;
-  margin: 0 auto 12px;
-  border: 4px solid var(--c-a);
-  box-shadow: 0 0 0 4px #000, 0 0 0 8px var(--c-a), 0 0 30px var(--c-a);
-  cursor: pointer;
-  overflow: hidden;
-  position: relative;
-}
-#pv-retrato-wrap::after {
-  content: '◄ CLICK ►';
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: rgba(0,0,0,0.7);
-  font-family: var(--c-head); font-size: 6px; color: var(--c-b);
-  text-align: center; padding: 4px;
-}
-
-#pv-nombre {
-  font-family: var(--c-head);
-  font-size: 11px;
-  color: var(--c-a);
-  text-align: center;
-  text-shadow: 2px 2px 0 #000, 0 0 15px var(--c-a);
-  letter-spacing: 2px;
-  margin-bottom: 8px;
-}
-
-.card-cap {
-  font-family: 'VT323', monospace;
-  font-size: 18px;
-  color: var(--c-text);
-  text-align: center;
-  line-height: 1.4;
-}
-
-/* ══ COUNTDOWN ══ */
-#cd {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 4px;
-  flex-wrap: nowrap;
-}
-.cd-unit {
-  text-align: center;
-  min-width: 56px;
-  flex: 1;
-  max-width: 72px;
-}
-.cd-num {
-  font-family: var(--c-head);
-  font-size: clamp(16px, 6vw, 24px);
-  color: var(--c-b);
-  text-shadow: 2px 2px 0 #000, 0 0 15px var(--c-b);
-  background: #111;
-  border: 2px solid var(--c-b);
-  display: block;
-  padding: 8px 2px;
-  width: 100%;
-  text-align: center;
-  box-shadow: 0 0 10px var(--c-b);
-}
-.cd-label {
-  font-family: var(--c-head);
-  font-size: 6px;
-  color: var(--c-dim);
-  display: block;
-  margin-top: 4px;
-  text-transform: uppercase;
-}
-.cd-sep {
-  font-family: var(--c-head);
-  font-size: 20px;
-  color: var(--c-a);
-  display: flex;
-  align-items: center;
-  padding-bottom: 18px;
-  flex-shrink: 0;
-  animation: pixelBlink 1s step-end infinite;
-}
-
-/* ══ CAL BUTTON ══ */
-#pv-cal-btn {
-  display: block;
-  font-family: var(--c-head);
-  font-size: 8px;
-  color: #000;
-  background: var(--c-c);
-  padding: 12px 16px;
-  text-align: center;
-  text-decoration: none;
-  letter-spacing: 1px;
-  box-shadow: 4px 4px 0 #666600;
-  transition: transform 0.1s;
-}
-#pv-cal-btn:hover { transform: translate(-2px,-2px); }
-
-/* ══ FASHION IMG ══ */
-#pv-fashion-wrap {
-  width: 100%; height: 220px;
-  overflow: hidden; position: relative;
-}
-#pv-fashion { image-rendering: auto; }
-
-/* ══ CARD LIST ══ */
-.card-list { list-style: none; }
-.card-list li {
-  padding: 8px 0;
-  border-bottom: 1px solid #222;
-  font-family: 'VT323', monospace;
-  font-size: 18px;
-  color: var(--c-text);
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-.card-list li::before {
-  content: '►';
-  color: var(--c-a);
-  flex-shrink: 0;
-  font-size: 14px;
-  margin-top: 2px;
-}
-.card-list li:last-child { border-bottom: none; }
-
-/* ══ GALLERY ══ */
-#pv-galeria {
-  display: flex;
-  overflow-x: auto;
-  gap: 0;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  position: relative;
-}
-#pv-galeria::-webkit-scrollbar { display: none; }
-.gal-item {
-  flex: 0 0 200px;
-  height: 180px;
-  scroll-snap-align: start;
-  position: relative;
-  border-right: 4px solid #000;
-  overflow: hidden;
-}
-.gal-item img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  image-rendering: auto;
-  filter: saturate(1.2) brightness(1.05);
-}
-.gal-caption {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: rgba(0,0,0,0.8);
-  font-family: var(--c-head);
-  font-size: 5px;
-  color: var(--c-c);
-  padding: 4px 6px;
-  text-align: center;
-}
-.gal-frame {
-  position: absolute; inset: 0;
-  border: 3px solid transparent;
-  box-shadow: inset 0 0 0 1px rgba(255,0,255,0.3);
-  pointer-events: none;
-}
-.gal-nav {
-  display: flex; justify-content: center; gap: 12px;
-  margin-top: 12px;
-}
-.gal-nav-btn {
-  font-family: var(--c-head);
-  font-size: 10px;
-  color: #000;
-  background: var(--c-a);
-  border: none;
-  padding: 8px 12px;
-  cursor: pointer;
-  box-shadow: 3px 3px 0 #600060;
-}
-.gal-num {
-  font-family: var(--c-head);
-  font-size: 8px;
-  color: var(--c-dim);
-  display: flex; align-items: center;
-}
-
-/* ══ ALBUM BUTTON ══ */
-#pv-album-btn {
-  display: block;
-  font-family: var(--c-head);
-  font-size: 8px;
-  color: #000;
-  background: var(--c-b);
-  padding: 12px;
-  text-align: center;
-  text-decoration: none;
-  box-shadow: 4px 4px 0 #006666;
-  transition: transform 0.1s;
-}
-#pv-album-btn:hover { transform: translate(-2px,-2px); }
-
-/* ══ AUDIO PLAYER ══ */
-#pv-audio-wrap {
-  background: #0a0a0a;
-  border: 2px solid var(--c-d);
-  padding: 12px;
-  box-shadow: 0 0 15px rgba(0,255,0,0.2);
-}
-#pv-track-name {
-  font-family: var(--c-head);
-  font-size: 7px;
-  color: var(--c-d);
-  text-align: center;
-  margin-bottom: 8px;
-  letter-spacing: 1px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  animation: pixelBlink 2s step-end infinite;
-}
-#pv-track-name.playing { animation: none; color: var(--c-d); }
-.audio-controls {
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 8px;
-}
-#pv-play-btn {
-  font-family: var(--c-head);
-  font-size: 14px;
-  color: #000;
-  background: var(--c-d);
-  border: none;
-  width: 44px; height: 44px;
-  cursor: pointer;
-  box-shadow: 3px 3px 0 #006600, 0 0 12px var(--c-d);
-  flex-shrink: 0;
-  transition: transform 0.1s, box-shadow 0.1s;
-}
-#pv-play-btn:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 #006600, 0 0 20px var(--c-d); }
-#pv-play-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #006600; }
-#pv-seek {
-  flex: 1;
-  -webkit-appearance: none;
-  height: 8px;
-  background: #333;
-  outline: none;
-  cursor: pointer;
-  border: 1px solid var(--c-d);
-}
-#pv-seek::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px; height: 18px;
-  background: var(--c-d);
-  cursor: pointer;
-  box-shadow: 0 0 6px var(--c-d);
-}
-#pv-track-time {
-  font-family: var(--c-head);
-  font-size: 7px;
-  color: var(--c-dim);
-  flex-shrink: 0;
-  min-width: 40px;
-  text-align: right;
-}
-.vol-wrap {
-  display: flex; align-items: center; gap: 8px;
-}
-.vol-icon { font-size: 12px; color: var(--c-d); }
-#pv-vol {
-  flex: 1;
-  -webkit-appearance: none;
-  height: 6px;
-  background: #333;
-  outline: none;
-  cursor: pointer;
-  border: 1px solid #444;
-}
-#pv-vol::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 10px; height: 14px;
-  background: var(--c-d);
-  cursor: pointer;
-}
-audio#pv-audio { display: none; }
-.audio-hint {
-  font-family: var(--c-head);
-  font-size: 6px;
-  color: var(--c-dim);
-  text-align: center;
-  margin-top: 6px;
-  letter-spacing: 1px;
-}
-
-/* ══ SONG SUGGEST ══ */
-#pv-song-suggest-wrap {
-  border-top: 1px dashed #333;
-  margin-top: 12px;
-  padding-top: 12px;
-}
-.suggest-title {
-  font-family: var(--c-head);
-  font-size: 7px;
-  color: var(--c-c);
-  margin-bottom: 8px;
-  letter-spacing: 1px;
-}
-#song-inputs { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
-.song-input-row {
-  display: flex; gap: 4px;
-}
-.song-input-row input {
-  flex: 1;
-  background: #0a0a0a;
-  border: 2px solid #333;
-  color: var(--c-text);
-  font-family: var(--c-mono);
-  font-size: 14px;
-  padding: 6px 8px;
-  outline: none;
-}
-.song-input-row input:focus { border-color: var(--c-c); }
-.song-rm-btn {
-  background: #440000;
-  border: 2px solid #880000;
-  color: #ff4444;
-  font-family: var(--c-head);
-  font-size: 8px;
-  cursor: pointer;
-  padding: 0 8px;
-}
-#song-add-btn, #song-suggest-ok {
-  font-family: var(--c-head);
-  font-size: 7px;
-  border: none;
-  padding: 8px 12px;
-  cursor: pointer;
-  letter-spacing: 1px;
-}
-#song-add-btn { background: #333; color: var(--c-c); box-shadow: 2px 2px 0 #000; }
-#song-suggest-ok { background: var(--c-d); color: #000; box-shadow: 3px 3px 0 #006600; }
-.suggest-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-
-/* ══ RSVP ══ */
-#rsvp-form {
-  display: flex; flex-direction: column; gap: 12px;
-}
-.rsvp-field { display: flex; flex-direction: column; gap: 4px; }
-.rsvp-label {
-  font-family: var(--c-head);
-  font-size: 6px;
-  color: var(--c-b);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-.rsvp-input {
-  background: #0a0a0a;
-  border: 2px solid #333;
-  color: var(--c-text);
-  font-family: 'VT323', monospace;
-  font-size: 20px;
-  padding: 8px 10px;
-  outline: none;
-  width: 100%;
-}
-.rsvp-input:focus { border-color: var(--c-b); box-shadow: 0 0 8px rgba(0,255,255,0.3); }
-select.rsvp-input option { background: #111; }
-.rsvp-submit {
-  font-family: var(--c-head);
-  font-size: 9px;
-  color: #000;
-  background: var(--c-b);
-  border: none;
-  padding: 14px;
-  cursor: pointer;
-  box-shadow: 4px 4px 0 #006666;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  transition: transform 0.1s;
-}
-.rsvp-submit:hover { transform: translate(-2px,-2px); }
-.rsvp-error-msg {
-  font-family: var(--c-head);
-  font-size: 7px;
-  color: #ff4444;
-  display: none;
-  padding: 8px;
-  border: 1px solid #ff4444;
-  background: rgba(255,0,0,0.1);
-}
-.rsvp-error-msg.show { display: block; }
-#rsvp-qr-wrap { text-align: center; margin-top: 8px; display: none; }
-#rsvp-qr-wrap.show { display: block; }
-.rsvp-qr-label {
-  font-family: var(--c-head);
-  font-size: 6px;
-  color: var(--c-dim);
-  margin-bottom: 8px;
-  letter-spacing: 1px;
-}
-#rsvp-qr-canvas { display: inline-block; border: 4px solid var(--c-b); }
-.rsvp-note {
-  font-family: 'VT323', monospace;
-  font-size: 16px;
-  color: var(--c-dim);
-  text-align: center;
-}
-
-/* ══ DRESS CODE ══ */
-#pv-dress li::before { content: '◆'; color: var(--c-c); }
-
-/* ══ VENUE ══ */
-#pv-lugar {
-  font-family: 'VT323', monospace;
-  font-size: 20px;
-  line-height: 1.5;
-  color: var(--c-text);
-}
-.venue-name {
-  font-family: var(--c-head);
-  font-size: 10px;
-  color: var(--c-a);
-  margin-bottom: 8px;
-  display: block;
-}
-.venue-address { color: var(--c-dim); font-size: 17px; }
-.venue-map {
-  display: inline-block;
-  margin-top: 12px;
-  font-family: var(--c-head);
-  font-size: 7px;
-  color: #000;
-  background: var(--c-a);
-  padding: 8px 12px;
-  text-decoration: none;
-  box-shadow: 3px 3px 0 #600060;
-  letter-spacing: 1px;
-}
-
-/* ══ CUSTOM SECTION ══ */
-#pv-custom-title {
-  font-family: var(--c-head);
-  font-size: 10px;
-  color: var(--c-e);
-  text-shadow: 2px 2px 0 #000;
-  margin-bottom: 8px;
-}
-
-/* ══ POEM / CLOSE ══ */
-#pv-poem {
-  white-space: pre-line;
-  font-family: 'VT323', monospace;
-  font-size: 22px;
-  line-height: 1.7;
-  color: var(--c-text);
-  text-align: center;
-}
-.splash-name {
-  font-family: var(--c-head);
-  font-size: 10px;
-  color: var(--c-a);
-  text-align: center;
-  text-shadow: 0 0 15px var(--c-a);
-  letter-spacing: 3px;
-}
-
-/* ══ HASHTAG ══ */
-.hashtag-display {
-  font-family: var(--c-head);
-  font-size: 9px;
-  color: var(--c-b);
-  text-align: center;
-  padding: 8px;
-  letter-spacing: 2px;
-}
-
-/* ══ PIXEL ICON ROW ══ */
-.icon-row {
-  display: flex; justify-content: center; gap: 16px;
-  font-size: 18px; padding: 8px 0;
-  color: var(--c-a);
-}
-
-/* ══ EXTRA DECO ══ */
-.neon-line {
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--c-a), var(--c-b), var(--c-c), var(--c-d), transparent);
-  margin: 0;
-  opacity: 0.6;
-}
-
-/* ══ LIGHTBOX ══ */
-#lightbox {
-  display: none;
-  position: fixed; inset: 0; z-index: 10000;
-  background: rgba(0,0,0,0.95);
-  align-items: center; justify-content: center;
-  padding: 20px;
-}
-#lightbox.show { display: flex; }
-#lightbox img { max-width: 100%; max-height: 90vh; border: 3px solid var(--c-a); }
-#lightbox-close {
-  position: absolute; top: 16px; right: 16px;
-  font-family: var(--c-head); font-size: 10px;
-  color: #000; background: var(--c-a);
-  border: none; padding: 8px 12px; cursor: pointer;
-}
-
-/* ══ RESPONSIVE ══ */
-@media (max-width: 480px) {
-  .cd-num { font-size: 14px; }
-  .cd-sep { font-size: 16px; }
-  .gal-item { flex: 0 0 160px; height: 150px; }
-  .win-bar { font-size: 6px; }
-  .gal-upload-slot { font-size: 5px; padding: 5px 7px; }
-}
-
-/* ══ TYPING CURSOR ══ */
-.typing-cursor::after { content: '█'; animation: pixelBlink 0.8s step-end infinite; }
-
-/* ══ SECTION PLAN VISIBILITY ══ */
-[data-plan] { display: block; }
-
-/* ══ PHOTO UPLOAD BUTTONS ══ */
-.photo-upload-btn {
-  display: inline-block;
-  font-family: var(--c-head);
-  font-size: 6px;
-  color: #000;
-  background: var(--c-a);
-  border: none;
-  padding: 6px 10px;
-  cursor: pointer;
-  box-shadow: 2px 2px 0 #600060;
-  letter-spacing: 1px;
-  margin-top: 8px;
-  text-transform: uppercase;
-  transition: transform 0.1s;
-}
-.photo-upload-btn:hover { transform: translate(-1px,-1px); }
-.photo-upload-btn.alt { background: var(--c-b); box-shadow: 2px 2px 0 #006666; }
-.photo-upload-btn.green { background: var(--c-d); box-shadow: 2px 2px 0 #006600; color:#000; }
-input[type="file"].photo-file-input { display: none; }
-.photo-upload-area {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 4px; margin-top: 6px;
-}
-.photo-stored-badge {
-  font-family: var(--c-head);
-  font-size: 5px;
-  color: var(--c-d);
-  letter-spacing: 1px;
-  display: none;
-}
-.photo-stored-badge.show { display: block; }
-.gal-upload-row {
-  display: flex; flex-wrap: wrap; gap: 6px;
-  margin: 8px 0;
-}
-.gal-upload-slot {
-  font-family: var(--c-head);
-  font-size: 6px;
-  color: #000;
-  background: #FFFF00;
-  box-shadow: 2px 2px 0 #666600;
-  padding: 7px 10px;
-  cursor: pointer;
-  border: none;
-  letter-spacing: 1px;
-  transition: transform 0.1s;
-}
-.gal-upload-slot:hover { transform: translate(-1px,-1px); }
-.gal-upload-slot.loaded { background: #00FF00; box-shadow: 2px 2px 0 #006600; color: #000; }
+  footer.card-footer {
+    text-align: center;
+    padding: 40px 24px 28px;
+    letter-spacing: 0.05em;
+  }
+  footer.card-footer img {
+    width: 100%;
+    max-width: 340px;
+    height: auto;
+    display: block;
+    margin: 0 auto 18px;
+    opacity: 0.95;
+  }
+  footer.card-footer .legal-text {
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--c-dim);
+    max-width: 320px;
+    margin: 0 auto;
+  }
 </style>
 </head>
 <body>
 
 <canvas id="particle-canvas"></canvas>
 
-<div id="card-wrapper" data-theme="neon">
+<div id="card-wrapper" data-theme="elegante">
 
-<!-- ══ SECCIÓN 1: SPLASH ══ -->
-<section id="splash">
-  <div class="splash-scanlines"></div>
-  <div class="splash-corner splash-corner-tl">PIXEL QUEST v1.5</div>
-  <div class="splash-corner splash-corner-tr">© 2026</div>
-  <div class="splash-corner splash-corner-bl">CREDITS: 3</div>
-  <div class="splash-corner splash-corner-br">HI-SCORE: 999999</div>
-
-  <div class="splash-lives">♥ ♥ ♥</div>
-  <div class="splash-score">HIGH SCORE · 9 9 9 9 9 9</div>
-
-  <div id="sp-15" class="glitch-wrap" data-text="XV">XV</div>
-  <div class="splash-subtitle">AÑOS</div>
-  <div id="sp-name"></div>
-  <div id="sp-date"></div>
-
-  <div class="insert-coin blink">── INSERT COIN ──</div>
-  <button id="sp-btn"></button>
-
-  <div class="splash-pixel-deco">
-    <span>★</span><span>◆</span><span>►</span><span>◆</span><span>★</span>
-  </div>
-</section>
-
-<!-- ══ MAIN CONTENT ══ -->
-<div id="main-content">
-
-  <!-- Top Banner -->
-  <div class="top-banner">
-    <span class="top-banner-title" id="top-label">PIXEL QUEST</span>
-    <span class="top-banner-lives">♥ ♥ ♥</span>
-  </div>
-  <div class="neon-line"></div>
-  <div style="text-align:center; padding:6px 0; font-family:'Press Start 2P',monospace; font-size:7px; color:var(--c-dim); letter-spacing:2px; animation: pixelBlink 1.5s step-end infinite;">▼ SCROLL DOWN ▼</div>
-
-  <!-- ══ SECCIÓN 2: FOTO PRINCIPAL + NOMBRE ══ -->
-  <section>
-    <div class="pixel-window pixel-window-alt">
-      <div class="win-bar win-bar-alt">
-        <span>PLAYER SELECT</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content" style="text-align:center;">
-        <div class="score-display">LEVEL 15 · UNLOCKED</div>
-        <div id="pv-retrato-wrap" onclick="openLightbox(this.querySelector('img').src)">
-          <img class="cover-img" id="pv-retrato" src="https://images.unsplash.com/photo-1776012999163-ac1d889e70f3?w=400&h=400&fit=crop&auto=format" alt="Foto XV años">
-        </div>
-        <div class="photo-upload-area">
-          <button class="photo-upload-btn" onclick="triggerPhotoUpload('retrato')">📷 CAMBIAR FOTO</button>
-          <input type="file" id="upload-retrato" class="photo-file-input" accept="image/*" onchange="handlePhotoUpload('retrato', this)">
-          <span class="photo-stored-badge" id="badge-retrato">✓ GUARDADA LOCALMENTE</span>
-        </div>
-        <div class="pixel-bar-wrap"><div class="pixel-bar-fill"></div></div>
-        <h2 id="pv-nombre" class="pixel-title pixel-title-b"></h2>
-        <p id="pv-caption" class="card-cap"></p>
-        <div class="hashtag-display" id="ht-display"></div>
-        <div class="icon-row">★ ♥ ◆ ► ◆ ♥ ★</div>
-      </div>
-    </div>
+  <!-- ===== 1. Splash / Bienvenida ===== -->
+  <section id="splash">
+    <div id="sp-15">15</div>
+    <div class="sp-sub">Mis quince años</div>
+    <div id="sp-name">Valentina</div>
+    <div id="sp-date">Sábado 12 de diciembre, 2026</div>
+    <button id="sp-btn" type="button">Abrir invitación</button>
   </section>
 
-  <!-- ══ SECCIÓN 3: CUENTA REGRESIVA ══ -->
+  <!-- ===== 2. Foto principal + nombre ===== -->
   <section>
-    <div class="pixel-window pixel-window-c">
-      <div class="win-bar win-bar-c">
-        <span>TIME REMAINING</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content">
-        <div id="cd">
-          <div class="cd-unit"><span class="cd-num" id="cd-dd">00</span><span class="cd-label">DÍAS</span></div>
-          <div class="cd-sep">:</div>
-          <div class="cd-unit"><span class="cd-num" id="cd-hh">00</span><span class="cd-label">HRS</span></div>
-          <div class="cd-sep">:</div>
-          <div class="cd-unit"><span class="cd-num" id="cd-mm">00</span><span class="cd-label">MIN</span></div>
-          <div class="cd-sep">:</div>
-          <div class="cd-unit"><span class="cd-num" id="cd-ss">00</span><span class="cd-label">SEG</span></div>
-        </div>
-      </div>
-    </div>
+    <button id="pv-retrato-wrap" type="button" aria-label="Cambiar foto">
+      <img id="pv-retrato" class="cover-img" src="https://images.unsplash.com/photo-1520342868574-5fa3804e551c?w=600&q=80" alt="Retrato" />
+    </button>
+    <div id="pv-nombre">Valentina</div>
+    <p id="pv-caption" class="card-cap">Una noche de brillo, magia y color púrpura para celebrar que hoy florezco.</p>
   </section>
 
-  <!-- ══ SECCIÓN 4: CALENDARIO ══ -->
+  <!-- ===== 3. Cuenta regresiva ===== -->
+  <section>
+    <h2 class="sec-title">Falta muy poco</h2>
+    <div id="cd">00:00:00:00</div>
+  </section>
+
+  <!-- ===== 4. Agendar en calendario (premium) ===== -->
   <section id="pv-cal-sec" data-plan="premium">
-    <div class="pixel-window">
-      <div class="win-bar">
-        <span>AGREGAR A CALENDARIO</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content">
-        <a id="pv-cal-btn" href="#" target="_blank">📅 GUARDAR FECHA EN GOOGLE CALENDAR</a>
-      </div>
-    </div>
+    <h2 class="sec-title">Agenda la fecha</h2>
+    <a id="pv-cal-btn" class="pv-link-btn" href="#" target="_blank" rel="noopener">Añadir a Google Calendar</a>
   </section>
 
-  <!-- ══ SECCIÓN 5: MI HISTORIA ══ -->
+  <!-- ===== 5. Mi historia (premium) ===== -->
   <section data-plan="premium">
-    <div class="pixel-window pixel-window-d">
-      <div class="win-bar win-bar-d">
-        <span>PLAYER HISTORY · LORE</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content">
-        <div id="pv-fashion-wrap">
-          <img class="cover-img" id="pv-fashion" src="https://images.unsplash.com/photo-1775871600151-c7335246a87f?w=480&h=320&fit=crop&auto=format" alt="Historia" style="height:220px;object-fit:cover;">
-        </div>
-        <div class="photo-upload-area" style="align-items:flex-start;">
-          <button class="photo-upload-btn alt" onclick="triggerPhotoUpload('fashion')">📷 CAMBIAR FOTO</button>
-          <input type="file" id="upload-fashion" class="photo-file-input" accept="image/*" onchange="handlePhotoUpload('fashion', this)">
-          <span class="photo-stored-badge" id="badge-fashion">✓ GUARDADA LOCALMENTE</span>
-        </div>
-        <div style="margin-top:12px;">
-          <p id="pv-history" class="card-cap" style="text-align:left;font-size:19px;"></p>
-        </div>
-      </div>
-    </div>
+    <h2 class="sec-title">Mi historia</h2>
+    <button id="pv-retrato-wrap-2" type="button" style="all:unset;display:block;width:220px;height:280px;margin:0 auto 22px;border-radius:18px;overflow:hidden;border:2px solid var(--c-a);cursor:pointer;">
+      <img id="pv-fashion" class="cover-img" src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80" alt="Foto secundaria" />
+    </button>
+    <p id="pv-history" class="card-cap">Desde niña soñé con esta noche: luces púrpuras, mi gente favorita y un vestido que me hiciera sentir una reina.</p>
   </section>
 
-  <!-- ══ SECCIÓN 6: ITINERARIO ══ -->
+  <!-- ===== 6. Programa / Itinerario (premium) ===== -->
   <section data-plan="premium">
-    <div class="pixel-window pixel-window-alt">
-      <div class="win-bar win-bar-alt">
-        <span>MISSION SCHEDULE</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content">
-        <ul id="pv-itin" class="card-list"></ul>
-      </div>
-    </div>
+    <h2 class="sec-title">Programa</h2>
+    <div id="pv-itin" class="card-list"></div>
   </section>
 
-  <!-- ══ SECCIÓN 7: PADRINOS ══ -->
+  <!-- ===== 7. Padrinos (deluxe) ===== -->
   <section data-plan="deluxe">
-    <div class="pixel-window">
-      <div class="win-bar">
-        <span>GUILD SPONSORS</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content">
-        <ul id="pv-padr" class="card-list"></ul>
-      </div>
-    </div>
+    <h2 class="sec-title">Padrinos</h2>
+    <div id="pv-padr" class="card-list"></div>
   </section>
 
-  <!-- ══ SECCIÓN 8: GALERÍA ══ -->
+  <!-- ===== 8. Galería de fotos ===== -->
   <section>
-    <div class="pixel-window pixel-window-c" style="margin-bottom:0;">
-      <div class="win-bar win-bar-c">
-        <span>GALLERY · SCREENSHOTS</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div style="overflow:hidden;">
-        <div id="pv-galeria" class="gal-prev"></div>
-      </div>
-      <div class="win-content" style="padding-top:8px;">
-        <div class="gal-upload-row" id="gal-upload-row"></div>
-        <input type="file" id="upload-gal-input" class="photo-file-input" accept="image/*" onchange="handleGalUpload(this)">
-        <div class="gal-nav">
-          <button class="gal-nav-btn" onclick="galScroll(-1)">◄ PREV</button>
-          <span class="gal-num" id="gal-num">1/12</span>
-          <button class="gal-nav-btn" onclick="galScroll(1)">NEXT ►</button>
-        </div>
-      </div>
-    </div>
+    <h2 class="sec-title">Galería</h2>
+    <div id="pv-galeria" class="gal-prev"></div>
+    <button id="pv-gal-add-btn" type="button" class="pv-link-btn" style="margin-top:16px;background:transparent;cursor:pointer;">+ Agregar fotos (máx. 12)</button>
+    <p style="text-align:center;font-size:11px;color:var(--c-dim);margin-top:8px;">Las fotos se guardan solo en este dispositivo (almacenamiento local), no se suben a ningún servidor.</p>
   </section>
 
-  <!-- ══ SECCIÓN 9: ÁLBUM COMPARTIDO ══ -->
+  <!-- ===== 9. Colector de fotos / Álbum compartido (premium) ===== -->
   <section id="pv-album-sec" data-plan="premium">
-    <div class="pixel-window pixel-window-d">
-      <div class="win-bar win-bar-d">
-        <span>PHOTO ALBUM · FULL COLLECTION</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content">
-        <a id="pv-album-btn" href="#" target="_blank">📁 VER ÁLBUM COMPLETO</a>
-      </div>
-    </div>
+    <h2 class="sec-title">Comparte tus fotos</h2>
+    <a id="pv-album-btn" class="pv-link-btn" href="#" target="_blank" rel="noopener">Subir fotos al álbum</a>
   </section>
 
-  <!-- ══ SECCIÓN 10: MÚSICA ══ -->
+  <!-- ===== 10. Música (premium) ===== -->
   <section id="pv-music-sec" data-plan="premium">
-    <div class="pixel-window pixel-window-d">
-      <div class="win-bar win-bar-d">
-        <span>SOUNDTRACK · NOW PLAYING</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
+    <h2 class="sec-title">Música</h2>
+    <div id="pv-audio-wrap" class="player">
+      <div class="player-row">
+        <button id="pv-play-btn" type="button">▶</button>
+        <div style="flex:1;">
+          <div id="pv-track-name">Perfect - Ed Sheeran</div>
+          <input id="pv-seek" type="range" min="0" max="100" value="0" />
+          <div id="pv-track-time">00:00</div>
         </div>
       </div>
-      <div class="win-content">
-        <div id="pv-audio-wrap">
-          <div id="pv-track-name">♪ NO AUDIO LOADED</div>
-          <div id="pv-audio-player">
-            <div class="audio-controls">
-              <button id="pv-play-btn" onclick="togglePlay()">▶</button>
-              <input type="range" id="pv-seek" min="0" max="100" value="0" oninput="seekAudio(this.value)">
-              <span id="pv-track-time">0:00</span>
-            </div>
-            <div class="vol-wrap">
-              <span class="vol-icon">🔊</span>
-              <input type="range" id="pv-vol" min="0" max="1" step="0.05" value="0.7" oninput="setVol(this.value)">
-            </div>
-          </div>
-          <div class="audio-hint">▲ PRESIONA ▶ PARA REPRODUCIR LA MÚSICA</div>
-          <audio id="pv-audio" preload="metadata"></audio>
-        </div>
+      <input id="pv-vol" type="range" min="0" max="1" step="0.01" value="0.7" />
+      <audio id="pv-audio" loop preload="none"></audio>
+      <div id="pv-audio-player"></div>
+    </div>
+    <h3 style="text-align:center;font-family:var(--c-head);font-size:13px;letter-spacing:0.1em;color:var(--c-d);text-transform:uppercase;">Sugerencias del programa</h3>
+    <div id="pv-songs" class="card-list"></div>
 
-        <div style="margin-top:12px;">
-          <div class="score-display" style="text-align:left;color:var(--c-d);">PLAYLIST</div>
-          <ul id="pv-songs" class="card-list"></ul>
+    <div id="pv-song-suggest-wrap" style="max-width:340px;margin:24px auto 0;">
+      <form id="song-suggest-form">
+        <div id="song-inputs">
+          <input type="text" name="song" placeholder="Nombre de la canción" />
         </div>
-
-        <div id="pv-song-suggest-wrap">
-          <div class="suggest-title">★ SUGERIR CANCIÓN</div>
-          <form id="song-suggest-form" onsubmit="return false;">
-            <div id="song-inputs">
-              <div class="song-input-row">
-                <input type="text" placeholder="Canción - Artista" class="song-suggest-input">
-                <button type="button" class="song-rm-btn" onclick="removeSongInput(this)">✕</button>
-              </div>
-            </div>
-            <div class="suggest-btns" style="margin-top:8px;">
-              <button type="button" id="song-add-btn" onclick="addSongInput()">+ AGREGAR</button>
-              <button type="button" id="song-suggest-ok" onclick="sendSongSuggest()">✓ ENVIAR ♪</button>
-            </div>
-          </form>
-        </div>
-      </div>
+        <button id="song-add-btn" type="button">+ Añadir otra canción</button>
+        <button type="submit">Enviar sugerencia</button>
+      </form>
+      <div id="song-suggest-ok" class="rsvp-note" style="display:none;">¡Gracias por tu sugerencia!</div>
     </div>
   </section>
 
-  <!-- ══ SECCIÓN 11: MESA DE REGALOS ══ -->
+  <!-- ===== 11. Mesa de regalos (deluxe) ===== -->
   <section data-plan="deluxe">
-    <div class="pixel-window pixel-window-alt">
-      <div class="win-bar win-bar-alt">
-        <span>GIFT REGISTRY · ITEMS</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content">
-        <ul id="pv-gifts" class="card-list"></ul>
-      </div>
-    </div>
+    <h2 class="sec-title">Mesa de regalos</h2>
+    <div id="pv-gifts" class="card-list"></div>
   </section>
 
-  <!-- ══ SECCIÓN 12: INFO EXTRA ══ -->
+  <!-- ===== 12. Info extra (deluxe) ===== -->
   <section data-plan="deluxe">
-    <div class="pixel-window pixel-window-c">
-      <div class="win-bar win-bar-c">
-        <span>BONUS STAGE · EXTRAS</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content">
-        <ul id="pv-extra" class="card-list"></ul>
-      </div>
-    </div>
+    <h2 class="sec-title">Información extra</h2>
+    <div id="pv-extra" class="card-list"></div>
   </section>
 
-  <!-- ══ SECCIÓN 13: DRESS CODE ══ -->
+  <!-- ===== 13. Dress code ===== -->
   <section>
-    <div class="pixel-window pixel-window-c">
-      <div class="win-bar win-bar-c">
-        <span>CHARACTER SKIN · DRESS CODE</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content">
-        <ul id="pv-dress" class="card-list"></ul>
-      </div>
-    </div>
+    <h2 class="sec-title">Código de vestimenta</h2>
+    <div id="pv-dress" class="card-list"></div>
   </section>
 
-  <!-- ══ SECCIÓN 14: LUGAR ══ -->
+  <!-- ===== 14. Lugar del evento ===== -->
   <section>
-    <div class="pixel-window">
-      <div class="win-bar">
-        <span>MAP LOCATION · VENUE</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content">
-        <div id="pv-lugar">
-          <span class="venue-name" id="venue-name"></span>
-          <span class="venue-address" id="venue-addr"></span>
-        </div>
-      </div>
-    </div>
+    <h2 class="sec-title">Lugar del evento</h2>
+    <p id="pv-lugar" class="card-cap"></p>
   </section>
 
-  <!-- ══ SECCIÓN 15: SECCIÓN LIBRE ══ -->
+  <!-- ===== 15. Sección libre (deluxe) ===== -->
   <section id="pv-custom-sec" data-plan="deluxe">
-    <div class="pixel-window pixel-window-alt">
-      <div class="win-bar win-bar-alt">
-        <span>SECRET MESSAGE</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content" style="text-align:center;">
-        <div id="pv-custom-title" class="pixel-title" style="margin-bottom:12px;font-size:9px;"></div>
-        <p id="pv-custom-text" class="card-cap"></p>
-      </div>
-    </div>
+    <h2 id="pv-custom-title" class="sec-title">Mensaje especial</h2>
+    <p id="pv-custom-text" class="card-cap"></p>
   </section>
 
-  <!-- ══ SECCIÓN 16: RSVP ══ -->
+  <!-- ===== 16. RSVP / Confirmación (premium) ===== -->
   <section data-plan="premium">
-    <div class="pixel-window">
-      <div class="win-bar">
-        <span>RSVP · CONFIRM ATTENDANCE</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content">
-        <form id="rsvp-form" onsubmit="return submitRsvp();">
-          <div class="rsvp-field">
-            <label class="rsvp-label">► NOMBRE DEL JUGADOR</label>
-            <input type="text" id="rsvp-nombre" class="rsvp-input" placeholder="Tu nombre completo">
-          </div>
-          <div class="rsvp-field">
-            <label class="rsvp-label">► ¿CONFIRMAS ASISTENCIA?</label>
-            <select id="rsvp-asiste" class="rsvp-input">
-              <option value="">-- SELECCIONAR --</option>
-              <option value="si">✓ SÍ ASISTIRÉ</option>
-              <option value="no">✗ NO PODRÉ IR</option>
-              <option value="talvez">? QUIZÁS</option>
-            </select>
-          </div>
-          <div class="rsvp-field">
-            <label class="rsvp-label">► ACOMPAÑANTES (MAX <span id="rsvp-max-label">2</span>)</label>
-            <input type="number" id="rsvp-acomp" class="rsvp-input" min="0" max="2" value="0" placeholder="0">
-          </div>
-          <div class="rsvp-field">
-            <label class="rsvp-label">► MENSAJE ESPECIAL</label>
-            <textarea id="rsvp-msg" class="rsvp-input" rows="3" placeholder="Escribe tu mensaje aquí..."></textarea>
-          </div>
-          <div id="rsvp-error" class="rsvp-error-msg">⚠ COMPLETA TODOS LOS CAMPOS REQUERIDOS</div>
-          <button type="submit" class="rsvp-submit">▶ CONFIRMAR ASISTENCIA VÍA WHATSAPP</button>
-          <div id="rsvp-qr-wrap">
-            <div class="rsvp-qr-label">★ TU QR DE CONFIRMACIÓN</div>
-            <canvas id="rsvp-qr-canvas"></canvas>
-          </div>
-        </form>
-        <p id="pv-rsvp" class="rsvp-note" style="margin-top:12px;"></p>
-      </div>
-    </div>
+    <h2 class="sec-title">Confirma tu asistencia</h2>
+    <form id="rsvp-form" style="max-width:340px;margin:0 auto;">
+      <input id="rsvp-nombre" type="text" placeholder="Tu nombre completo" required />
+      <select id="rsvp-asiste">
+        <option value="si">Sí, asistiré</option>
+        <option value="no">No podré asistir</option>
+      </select>
+      <input id="rsvp-acomp" type="number" min="0" placeholder="Número de acompañantes" />
+      <textarea id="rsvp-msg" rows="3" placeholder="Mensaje (opcional)"></textarea>
+      <button type="submit">Confirmar por WhatsApp</button>
+      <div id="rsvp-error" class="rsvp-error-msg" style="display:none;"></div>
+    </form>
+    <div id="rsvp-qr-wrap"><canvas id="rsvp-qr-canvas"></canvas></div>
+    <p id="pv-rsvp" class="rsvp-note"></p>
   </section>
 
-  <!-- ══ SECCIÓN 17: CIERRE ══ -->
+  <!-- ===== 17. Cierre ===== -->
   <section>
-    <div class="pixel-window">
-      <div class="win-bar">
-        <span>GAME OVER · THANKS FOR PLAYING</span>
-        <div class="win-btn-group">
-          <span class="win-btn win-btn-r"></span>
-          <span class="win-btn win-btn-y"></span>
-          <span class="win-btn win-btn-g"></span>
-        </div>
-      </div>
-      <div class="win-content" style="text-align:center;">
-        <div class="icon-row" style="margin-bottom:16px;">★ ♥ ◆ ► ◆ ♥ ★</div>
-        <p id="pv-poem" class="card-cap"></p>
-        <div style="margin:20px 0;" class="neon-line"></div>
-        <div id="pv-sign" class="splash-name typing-cursor"></div>
-        <div style="margin-top:16px;" class="icon-row">★ ♥ ◆ ► ◆ ♥ ★</div>
-        <div style="margin-top:24px; border-top: 1px solid #222; padding-top:20px;">
-          <img src="https://hercules-cdn.com/file_AbapB05dILYUQnitGn2ks7Vi" alt="Gueka Ideas" style="width:220px; max-width:85%; display:block; margin:0 auto 16px; filter: brightness(0) invert(1); opacity:0.9;">
-          <p style="font-family:'Share Tech Mono',monospace; font-size:11px; color:rgba(255,255,255,0.5); text-align:center; line-height:2; max-width:320px; margin:0 auto;">
-            Esta tarjeta digital es propiedad exclusiva de Gueka Ideas.<br>
-            Uso permitido únicamente para fines personales.<br>
-            <span style="color:rgba(255,255,255,0.35); font-size:10px; letter-spacing:1.5px; display:block; margin-top:4px;">© 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</span>
-          </p>
-        </div>
-      </div>
-    </div>
+    <p id="pv-poem" class="card-cap"></p>
+    <div id="pv-sign" class="splash-name"></div>
   </section>
 
-</div><!-- end main-content -->
-
-</div><!-- end card-wrapper -->
-
-<!-- Lightbox -->
-<div id="lightbox">
-  <button id="lightbox-close" onclick="closeLightbox()">✕ CLOSE</button>
-  <img id="lightbox-img" src="" alt="">
+  <footer class="card-footer">
+    <img src="https://hercules-cdn.com/file_pBzUBc1xu00S3Sr45OaxyK7q" alt="Gueka Ideas - Create, Invite, Celebrate" />
+    <p class="legal-text">Esta tarjeta digital es propiedad exclusiva de Gueka Ideas. Uso permitido únicamente para fines personales. © 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</p>
+  </footer>
 </div>
 
 <script>
-// ══ STATE OBJECT ══
+/* ================== ESTADO ================== */
 const state = {
   plan: 'deluxe',
-  category: 'gamer',
-  templateName: 'pixel-quest',
+  category: 'xv-anos',
+  templateName: 'glamour-purpura',
+  templateLabel: 'Glamour Púrpura',
   name: 'Valentina',
   age: '15',
-  date: '2026-09-20',
+  date: '2026-12-12',
   time: '19:00',
-  hashtag: '#ValentinaXV',
-  caption: 'Level Up! Bienvenida a la aventura más épica de tu vida.',
-  historyText: 'Valentina nació soñando con mundos imposibles. Desde pequeña, cada obstáculo fue un boss que derrotó con valentía y alegría. Hoy, a sus 15 años, inicia la mejor misión de todas: vivir su historia.',
-  venue: 'Salón Grand Pixel',
-  address: 'Av. Retro 8-Bit #404, Ciudad',
-  mapUrl: 'https://maps.google.com',
+  hashtag: '#Valen15',
+  caption: 'Una noche de brillo, magia y color púrpura para celebrar que hoy florezco.',
+  historyText: 'Desde niña soñé con esta noche: luces púrpuras, mi gente favorita y un vestido que me hiciera sentir una reina.',
+  venue: 'Salón Jardines de Cristal',
+  address: 'Av. Reforma 123, Ciudad de México',
+  mapUrl: 'https://maps.google.com/?q=Salón+Jardines+de+Cristal',
   customTitle: 'Mensaje especial',
-  customText: 'Esta noche todo es posible. Gracias por ser parte de mi mundo.',
-  waOrganizer: '573001234567',
-  rsvpCapacity: 150,
-  albumUrl: 'https://photos.google.com',
-  rsvpPara: 'Valentina García',
+  customText: 'Gracias por ser parte de esta historia. ¡Nos vemos en la pista de baile!',
+  waOrganizer: '5215555555555',
+  rsvpCapacity: 120,
+  albumUrl: 'https://album.example.com/valen15',
+  rsvpPara: 'Valentina Pérez',
   rsvpMaxPases: 2,
-  poem: 'Quince años de magia,\nde risas y aventuras,\nde mundos inventados\ny noches a lo oscuras.',
-  signature: 'Valentina ♥',
-  palette: 'neon',
+  poem: 'Hoy el tiempo se detiene, hoy la vida me sonríe; quince años de mi historia, hoy comienza mi camino.',
+  signature: 'Con amor, Valentina',
+  palette: 'violeta',
   particles: 'estrellas',
-  showSplash: true,
-  splashBtn: '▶ PRESS START',
+  showSplash: false,
+  splashBtn: 'Abrir invitación',
   itinerary: [
-    {v:'19:00 · Recepción de invitados'},
-    {v:'19:30 · Vals de honor'},
-    {v:'20:00 · Cena gamer'},
-    {v:'21:00 · Baile libre'},
-    {v:'23:00 · Corte de pastel'}
+    { v: '19:00 — Recepción de invitados' },
+    { v: '20:00 — Entrada de la quinceañera' },
+    { v: '20:30 — Vals y baile sorpresa' },
+    { v: '21:30 — Cena' },
+    { v: '22:30 — Fiesta y baile' },
   ],
   padrinos: [
-    {v:'Flores: Familia Rodríguez'},
-    {v:'Música: Tío Carlos'},
-    {v:'Decoración: Tía Sofía'}
+    { v: 'Padrinos de Velación: Juan y María López' },
+    { v: 'Padrinos de Anillo: Carlos y Ana Ruiz' },
   ],
   dressCode: [
-    {v:'Estilo: Casual elegante'},
-    {v:'Colores: Negro y neón'},
-    {v:'Sin: Ropa deportiva'}
+    { v: 'Formal / Etiqueta' },
+    { v: 'Evitar el color púrpura (reservado para la quinceañera)' },
   ],
   extra: [
-    {v:'Habrá zona de videojuegos'},
-    {v:'Photobooth pixel art'},
-    {v:'Shots de colores neón'}
+    { v: 'Evento sin niños después de las 22:00' },
+    { v: 'Estacionamiento disponible en el salón' },
   ],
   songs: [
-    {v:'Blinding Lights - The Weeknd'},
-    {v:'As It Was - Harry Styles'},
-    {v:'Industry Baby - Lil Nas X'}
+    { v: 'Perfect - Ed Sheeran' },
+    { v: 'A Thousand Years - Christina Perri' },
   ],
   gifts: [
-    {v:'Mesa de regalos Liverpool #123456'},
-    {v:'Transferencia: 4152 3301 2345 6789'},
-    {v:'Efectivo bienvenido ♥'}
+    { v: 'Lluvia de sobres' },
+    { v: 'Mesa de regalos: Liverpool #12345678' },
   ],
-  galCaptions: ['Sesión Previa','El Vestido','Ramo de Novia','En el Jardín','La Princesa','Bouquet','Tocado Real','Glamour','Tiara & Vals','Fuente de los Sueños','Vestido Rosa','Flores & Amor'],
-  typography: 'mono',
+  galCaptions: [],
+  typography: 'cinzel',
   songSuggestEnabled: true,
-  songSuggestWa: '573001234567',
-  audioKey: '',
-  audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-  audioName: '♪ Demo Track - SoundHelix',
-  imgKeys: { retrato: '', fashion: '' },
-  galKeys: [],
-  templateLabel: 'PIXEL QUEST'
+  songSuggestWa: '5215555555555',
+  audioKey: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+  audioName: 'Pista de ejemplo (reemplázala por tu canción)',
+  imgKeys: {
+    retrato: 'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?w=600&q=80',
+    fashion: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80',
+  },
+  galKeys: [
+    'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80',
+    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80',
+    'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&q=80',
+    'https://images.unsplash.com/photo-1512909006721-3d6018887383?w=400&q=80',
+    'https://images.unsplash.com/photo-1470753937643-efeb931202a9?w=400&q=80',
+    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=400&q=80',
+  ],
 };
 
-// ══ GALLERY IMAGES — XV Años ══
-const galImages = [
-  'https://images.unsplash.com/photo-1763625650105-9bca6b5509ae?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1763625642854-9bb2949528c7?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1763625642731-fe68cf5d0d53?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1763625642932-5691ae173ec4?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1763625640936-223ab76af7b6?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1763625651080-cf6c7295a9db?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1763625638895-c52d46816bc0?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1775871437034-dd26f3afb2bc?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1776013113750-9d3f165ff5b3?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1625755106045-bc7870842718?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1663162143055-163b540ed204?w=400&h=300&fit=crop&auto=format',
-  'https://images.unsplash.com/photo-1666590160022-fe5b8bc5ed00?w=400&h=300&fit=crop&auto=format'
-];
+/* ================== PALETAS ================== */
+const PALETTES = {
+  neon:     { a:'#ff00e6', b:'#00fff2', c:'#12002b', d:'#fff300', e:'#7d00ff', bg:'#050014', theme:'neon' },
+  violeta:  { a:'#a53dff', b:'#d6a4ff', c:'#6c1bb0', d:'#ffd36e', e:'#ff7ad9', bg:'#170321', theme:'elegante' },
+  dorado:   { a:'#d4af37', b:'#f6e3a1', c:'#5c4419', d:'#fff7dd', e:'#b8860b', bg:'#1a1408', theme:'elegante' },
+  oceano:   { a:'#0ea5c4', b:'#a4e6ff', c:'#003a4d', d:'#ffe9a8', e:'#22d3ee', bg:'#001318', theme:'elegante' },
+  rosas:    { a:'#ff6fa5', b:'#ffd6e6', c:'#7a1f45', d:'#fff0f5', e:'#ff9ecb', bg:'#210313', theme:'pastel' },
+  esmeralda:{ a:'#16a34a', b:'#bbf7d0', c:'#053825', d:'#fef9c3', e:'#34d399', bg:'#02150a', theme:'elegante' },
+  fuego:    { a:'#ff4d1c', b:'#ffb199', c:'#4d0e00', d:'#ffe08a', e:'#ff8c42', bg:'#1a0500', theme:'neon' },
+  pastel:   { a:'#b8a8ff', b:'#ffe1f0', c:'#e8d9ff', d:'#fff3b0', e:'#a3e4d7', bg:'#fbf7ff', theme:'pastel' },
+};
 
-// ══ RENDER PREVIEW ══
+const FONTS = {
+  montserrat: "'Montserrat', sans-serif",
+  playfair: "'Playfair Display', serif",
+  cormorant: "'Cormorant Garamond', serif",
+  cinzel: "'Cinzel', serif",
+  marcellus: "'Marcellus', serif",
+  raleway: "'Raleway', sans-serif",
+  josefin: "'Josefin Sans', sans-serif",
+  ebgaramond: "'EB Garamond', serif",
+  abril: "'Abril Fatface', serif",
+  dmsserif: "'DM Serif Display', serif",
+  alexbrush: "'Alex Brush', cursive",
+  sacramento: "'Sacramento', cursive",
+  greatvibes: "'Great Vibes', cursive",
+  notonserif: "'Noto Serif', serif",
+  figtree: "'Figtree', sans-serif",
+  mono: "'JetBrains Mono', monospace",
+};
+const SCRIPT_FONTS = ['alexbrush', 'sacramento', 'greatvibes'];
+
+/* ================== PLAN LOCK ================== */
+const PLAN_RANK = { classic: 1, premium: 2, deluxe: 3 };
+function applyPlanLocks() {
+  const myRank = PLAN_RANK[state.plan] || 1;
+  document.querySelectorAll('[data-plan]').forEach((el) => {
+    const need = PLAN_RANK[el.getAttribute('data-plan')] || 1;
+    el.classList.toggle('locked', myRank < need);
+  });
+}
+
+/* ================== PALETTE / FONT / PARTICLES ================== */
+function applyPaletteToCard(name) {
+  const p = PALETTES[name] || PALETTES.violeta;
+  const wrap = document.getElementById('card-wrapper');
+  wrap.style.setProperty('--c-a', p.a);
+  wrap.style.setProperty('--c-b', p.b);
+  wrap.style.setProperty('--c-c', p.c);
+  wrap.style.setProperty('--c-d', p.d);
+  wrap.style.setProperty('--c-e', p.e);
+  wrap.style.setProperty('--c-bg', p.bg);
+  wrap.setAttribute('data-theme', p.theme);
+  state.palette = name;
+}
+
+function applyFont(key) {
+  const f = FONTS[key] || FONTS.cinzel;
+  const wrap = document.getElementById('card-wrapper');
+  wrap.style.setProperty('--c-head', f);
+  if (SCRIPT_FONTS.includes(key)) {
+    wrap.style.setProperty('--c-serif', f);
+  }
+  state.typography = key;
+}
+
+let particleAnim = null;
+function applyParticles(type) {
+  state.particles = type;
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  if (particleAnim) cancelAnimationFrame(particleAnim);
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  if (type === 'ninguna') { ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
+
+  const palette = PALETTES[state.palette] || PALETTES.violeta;
+  const colors = [palette.a, palette.b, palette.d, palette.e];
+  const count = type === 'confetti' ? 60 : type === 'nieve' ? 80 : 50;
+  const particles = Array.from({ length: count }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 4 + 2,
+    speed: Math.random() * 1 + 0.4,
+    drift: (Math.random() - 0.5) * 0.6,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    rot: Math.random() * Math.PI * 2,
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach((p) => {
+      p.y += p.speed;
+      p.x += p.drift;
+      if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.fillStyle = p.color;
+      if (type === 'confetti') {
+        ctx.rotate(p.rot += 0.02);
+        ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
+      } else if (type === 'corazones') {
+        ctx.font = `${p.r * 4}px serif`;
+        ctx.fillText('♥', 0, 0);
+      } else if (type === 'estrellas') {
+        ctx.font = `${p.r * 4}px serif`;
+        ctx.fillText('✦', 0, 0);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    });
+    particleAnim = requestAnimationFrame(draw);
+  }
+  draw();
+}
+window.addEventListener('resize', () => {
+  const canvas = document.getElementById('particle-canvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+/* ================== CALENDAR URL ================== */
+function buildCalendarUrl() {
+  const start = new Date(`${state.date}T${state.time}:00`);
+  const end = new Date(start.getTime() + 4 * 60 * 60 * 1000);
+  const fmt = (d) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const text = encodeURIComponent(`Fiesta de XV Años de ${state.name}`);
+  const details = encodeURIComponent(state.caption || '');
+  const location = encodeURIComponent(`${state.venue}, ${state.address}`);
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${fmt(start)}/${fmt(end)}&details=${details}&location=${location}`;
+}
+
+/* ================== INDEXEDDB (almacenamiento local de fotos) ================== */
+/* Todas las fotos (retrato, historia, galería) se guardan como Blob en IndexedDB,
+   directamente en el dispositivo del usuario. Nunca se suben a un servidor externo. */
+const DB_NAME = 'gueka-ideas-photos';
+const DB_STORE = 'photos';
+const GAL_MAX = 12; // máximo absoluto de fotos en galería, sin importar el plan
+
+function openPhotoDb() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function savePhotoBlob(key, blob) {
+  const db = await openPhotoDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    tx.objectStore(DB_STORE).put(blob, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function getPhotoBlob(key) {
+  const db = await openPhotoDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readonly');
+    const req = tx.objectStore(DB_STORE).get(key);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function deletePhotoBlob(key) {
+  const db = await openPhotoDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    tx.objectStore(DB_STORE).delete(key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+/* Carga una foto guardada en IndexedDB (si existe) y la aplica al <img> indicado. */
+async function loadStoredPhoto(key, imgEl) {
+  try {
+    const blob = await getPhotoBlob(key);
+    if (blob) imgEl.src = URL.createObjectURL(blob);
+  } catch {
+    // Si IndexedDB no está disponible, se mantiene la imagen de ejemplo (placeholder).
+  }
+}
+
+/* Guarda un archivo elegido por el usuario en IndexedDB bajo `key` y actualiza el <img>. */
+async function pickAndStorePhoto(key, imgEl) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    await savePhotoBlob(key, file);
+    imgEl.src = URL.createObjectURL(file);
+  };
+  input.click();
+}
+
+/* Carga todas las fotos de galería guardadas localmente (gal-0 .. gal-11) en state.galKeys. */
+async function loadStoredGallery() {
+  const stored = [];
+  for (let i = 0; i < GAL_MAX; i++) {
+    try {
+      const blob = await getPhotoBlob(`gal-${i}`);
+      if (blob) stored[i] = URL.createObjectURL(blob);
+    } catch {
+      break;
+    }
+  }
+  if (stored.some(Boolean)) {
+    state.galKeys = stored.filter(Boolean);
+    renderGallery();
+  }
+}
+
+function renderGallery() {
+  const galMax = GAL_MAX; // la galería siempre respeta el máximo de 12 fotos
+  const gal = document.getElementById('pv-galeria');
+  gal.innerHTML = '';
+  (state.galKeys || []).slice(0, galMax).forEach((src) => {
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = 'Foto de galería';
+    gal.appendChild(img);
+  });
+}
+
+document.getElementById('pv-gal-add-btn').addEventListener('click', () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.multiple = true;
+  input.onchange = async (e) => {
+    const files = Array.from(e.target.files || []);
+    const remaining = GAL_MAX - (state.galKeys || []).length;
+    if (remaining <= 0) return;
+    const toAdd = files.slice(0, remaining);
+    for (let i = 0; i < toAdd.length; i++) {
+      const slot = (state.galKeys || []).length;
+      const key = `gal-${slot}`;
+      await savePhotoBlob(key, toAdd[i]);
+      state.galKeys = state.galKeys || [];
+      state.galKeys.push(URL.createObjectURL(toAdd[i]));
+    }
+    renderGallery();
+  };
+  input.click();
+});
+
+/* ================== RENDER PREVIEW ================== */
+function renderList(id, items) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '';
+  (items || []).forEach((it) => {
+    const div = document.createElement('div');
+    div.textContent = it.v;
+    el.appendChild(div);
+  });
+}
+
 function renderPreview() {
-  const d = new Date(state.date + 'T' + state.time);
-  const opts = { year:'numeric', month:'long', day:'numeric' };
-  const dateStr = d.toLocaleDateString('es-ES', opts).toUpperCase();
-  setText('sp-15', state.age ? state.age : 'XV');
-  setText('sp-name', state.name);
-  setText('sp-date', dateStr);
-  const btn = document.getElementById('sp-btn');
-  if (btn) btn.textContent = state.splashBtn;
+  // Splash
+  document.getElementById('sp-15').textContent = state.age;
+  document.getElementById('sp-name').textContent = state.name;
+  const dateObj = new Date(`${state.date}T${state.time || '00:00'}:00`);
+  const dateFmt = dateObj.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('sp-date').textContent = dateFmt.charAt(0).toUpperCase() + dateFmt.slice(1);
+  document.getElementById('sp-btn').textContent = state.splashBtn;
+  document.getElementById('splash').style.display = state.showSplash ? 'flex' : 'none';
 
-  const topLabel = document.getElementById('top-label');
-  if (topLabel) topLabel.textContent = state.templateLabel;
+  // Foto + nombre
+  document.getElementById('pv-retrato').src = state.imgKeys.retrato;
+  document.getElementById('pv-nombre').textContent = state.name;
+  document.getElementById('pv-caption').textContent = state.caption;
 
-  setText('pv-nombre', state.name);
-  setText('pv-caption', state.caption);
-  setText('ht-display', state.hashtag);
-  setText('pv-history', state.historyText);
+  // Historia
+  document.getElementById('pv-fashion').src = state.imgKeys.fashion;
+  document.getElementById('pv-history').textContent = state.historyText;
 
+  // Calendar
+  document.getElementById('pv-cal-btn').href = buildCalendarUrl();
+
+  // Itinerary / padrinos / dress / extra / gifts / songs
   renderList('pv-itin', state.itinerary);
   renderList('pv-padr', state.padrinos);
   renderList('pv-dress', state.dressCode);
@@ -1499,723 +835,222 @@ function renderPreview() {
   renderList('pv-gifts', state.gifts);
   renderList('pv-songs', state.songs);
 
-  setText('venue-name', state.venue);
-  setText('venue-addr', state.address);
-  const venueEl = document.getElementById('pv-lugar');
-  if (venueEl) {
-    const existing = venueEl.querySelector('a.venue-map');
-    if (existing) existing.remove();
-    if (state.mapUrl) {
-      const a = document.createElement('a');
-      a.href = state.mapUrl; a.target = '_blank';
-      a.className = 'venue-map';
-      a.textContent = '🗺 VER EN MAPA';
-      venueEl.appendChild(a);
-    }
-  }
+  // Gallery (máximo fijo de 12 fotos, guardadas localmente en IndexedDB)
+  renderGallery();
 
-  setText('pv-custom-title', state.customTitle);
-  setText('pv-custom-text', state.customText);
+  // Album
+  const albumOk = !!state.albumUrl && PLAN_RANK[state.plan] >= PLAN_RANK.premium;
+  document.getElementById('pv-album-sec').style.display = albumOk ? '' : 'none';
+  if (albumOk) document.getElementById('pv-album-btn').href = state.albumUrl;
 
-  setText('pv-rsvp', 'Para: ' + state.rsvpPara + ' · Capacidad: ' + state.rsvpCapacity + ' invitados');
-  const maxLabel = document.getElementById('rsvp-max-label');
-  if (maxLabel) maxLabel.textContent = state.rsvpMaxPases;
-  const acompInput = document.getElementById('rsvp-acomp');
-  if (acompInput) acompInput.max = state.rsvpMaxPases;
+  // Music
+  document.getElementById('pv-track-name').textContent = state.audioName;
+  document.getElementById('pv-song-suggest-wrap').style.display = state.songSuggestEnabled ? '' : 'none';
 
-  const poemEl = document.getElementById('pv-poem');
-  if (poemEl) poemEl.textContent = state.poem;
-  setText('pv-sign', state.signature);
+  // Lugar
+  const mapOk = !!state.mapUrl && PLAN_RANK[state.plan] >= PLAN_RANK.premium;
+  document.getElementById('pv-lugar').innerHTML =
+    `${state.venue}<br/>${state.address}` +
+    (mapOk ? `<br/><a href="${state.mapUrl}" target="_blank" rel="noopener" style="color:var(--c-a);text-decoration:underline;">Ver en el mapa</a>` : '');
 
-  const albumBtn = document.getElementById('pv-album-btn');
-  if (albumBtn) albumBtn.href = state.albumUrl;
+  // Custom
+  document.getElementById('pv-custom-title').textContent = state.customTitle;
+  document.getElementById('pv-custom-text').textContent = state.customText;
 
-  const trackName = document.getElementById('pv-track-name');
-  if (trackName) trackName.textContent = state.audioName;
+  // RSVP note
+  document.getElementById('pv-rsvp').textContent =
+    `Cupo limitado a ${state.rsvpCapacity} personas · Confirma por WhatsApp` +
+    (state.rsvpPara ? ` · Pase personalizado para ${state.rsvpPara}` : '');
 
-  const audio = document.getElementById('pv-audio');
-  if (audio && state.audioUrl) {
-    audio.src = state.audioUrl;
-    audio.volume = 0.7;
-  }
+  // Cierre
+  document.getElementById('pv-poem').textContent = state.poem;
+  document.getElementById('pv-sign').textContent = state.signature;
 
-  const calBtn = document.getElementById('pv-cal-btn');
-  if (calBtn) calBtn.href = buildCalendarUrl();
-
-  // Song suggest visibility
-  const suggestWrap = document.getElementById('pv-song-suggest-wrap');
-  if (suggestWrap) suggestWrap.style.display = state.songSuggestEnabled ? '' : 'none';
-
-  buildGallery();
-  applyPaletteToCard(state.palette);
-  applyFont(state.typography);
-  applyParticles(state.particles);
-  showPlanSections(state.plan);
+  applyPlanLocks();
+  maybeRenderQr();
 }
 
-function setText(id, val) {
-  const el = document.getElementById(id);
-  if (el && val !== undefined && val !== null) el.textContent = val;
-}
-
-function renderList(id, arr) {
-  const ul = document.getElementById(id);
-  if (!ul || !arr) return;
-  ul.innerHTML = '';
-  arr.forEach(item => {
-    const li = document.createElement('li');
-    li.textContent = item.v !== undefined ? item.v : item;
-    ul.appendChild(li);
-  });
-}
-
-// ══ SHOW/HIDE BY PLAN ══
-function showPlanSections(plan) {
-  const planLevel = { classic:1, premium:2, deluxe:3 };
-  const level = planLevel[plan] || 3;
-  document.querySelectorAll('[data-plan]').forEach(sec => {
-    const p = sec.getAttribute('data-plan');
-    const required = planLevel[p] || 1;
-    sec.style.display = level >= required ? '' : 'none';
-  });
-}
-
-// ══ APPLY PALETTE ══
-function applyPaletteToCard(name) {
-  const cw = document.getElementById('card-wrapper');
-  if (!cw) return;
-  const palettes = {
-    neon:      { a:'#FF00FF', b:'#00FFFF', c:'#FFFF00', d:'#00FF00', e:'#FF6600', bg:'#0d0d0d', text:'#e0e0e0', dim:'#888', line:'#333' },
-    violeta:   { a:'#9B59B6', b:'#D7BDE2', c:'#E8DAEF', d:'#7D3C98', e:'#C0392B', bg:'#0d0020', text:'#e8e0f0', dim:'#7a6a8a', line:'#2a1a3a' },
-    dorado:    { a:'#F1C40F', b:'#E67E22', c:'#FDEBD0', d:'#D4AC0D', e:'#E74C3C', bg:'#100d00', text:'#f5e6c8', dim:'#9a8a60', line:'#2a2010' },
-    oceano:    { a:'#1ABC9C', b:'#3498DB', c:'#AED6F1', d:'#17A589', e:'#2ECC71', bg:'#00100d', text:'#d0f0ea', dim:'#5a8880', line:'#0a2020' },
-    rosas:     { a:'#E91E8C', b:'#FF6B9D', c:'#FFB3D1', d:'#C2185B', e:'#FF4081', bg:'#120010', text:'#fde8f0', dim:'#8a5070', line:'#2a0018' },
-    esmeralda: { a:'#2ECC71', b:'#1ABC9C', c:'#A9DFBF', d:'#27AE60', e:'#52BE80', bg:'#001008', text:'#d0f5df', dim:'#508860', line:'#0a1f10' },
-    fuego:     { a:'#FF5722', b:'#FF9800', c:'#FFEB3B', d:'#F44336', e:'#FF6D00', bg:'#0d0800', text:'#f5e0c8', dim:'#9a7060', line:'#2a1800' },
-    pastel:    { a:'#F48FB1', b:'#80DEEA', c:'#FFF9C4', d:'#A5D6A7', e:'#CE93D8', bg:'#1a1a2e', text:'#f0f0f5', dim:'#a090b0', line:'#2a2a3e' }
-  };
-  const p = palettes[name] || palettes.neon;
-  cw.style.setProperty('--c-a', p.a);
-  cw.style.setProperty('--c-b', p.b);
-  cw.style.setProperty('--c-c', p.c);
-  cw.style.setProperty('--c-d', p.d);
-  cw.style.setProperty('--c-e', p.e);
-  cw.style.setProperty('--c-bg', p.bg);
-  cw.style.setProperty('--c-text', p.text);
-  cw.style.setProperty('--c-dim', p.dim);
-  cw.style.setProperty('--c-line', p.line);
-  cw.style.background = p.bg;
-}
-
-// ══ APPLY FONT ══
-function applyFont(key) {
-  const fonts = {
-    montserrat:  "'Montserrat', sans-serif",
-    playfair:    "'Playfair Display', serif",
-    cormorant:   "'Cormorant Garamond', serif",
-    cinzel:      "'Cinzel', serif",
-    marcellus:   "'Cinzel', serif",
-    raleway:     "'Raleway', sans-serif",
-    josefin:     "'Josefin Sans', sans-serif",
-    ebgaramond:  "'EB Garamond', serif",
-    abril:       "'Abril Fatface', cursive",
-    dmsserif:    "'DM Serif Display', serif",
-    alexbrush:   "'Alex Brush', cursive",
-    sacramento:  "'Sacramento', cursive",
-    greatvibes:  "'Great Vibes', cursive",
-    notonserif:  "'Noto Serif', serif",
-    figtree:     "'Figtree', sans-serif",
-    mono:        "'Share Tech Mono', monospace"
-  };
-  const cw = document.getElementById('card-wrapper');
-  if (!cw) return;
-  const f = fonts[key] || fonts.mono;
-  cw.style.setProperty('--c-serif', f);
-  cw.style.setProperty('--c-mono', f);
-  cw.style.fontFamily = f;
-}
-
-// ══ PARTICLES ══
-const canvas = document.getElementById('particle-canvas');
-const ctx2d = canvas ? canvas.getContext('2d') : null;
-let particles = [];
-let animFrame = null;
-let particleType = 'estrellas';
-
-function resizeCanvas() {
-  if (!canvas) return;
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-
-function applyParticles(type) {
-  particleType = type;
-  if (animFrame) cancelAnimationFrame(animFrame);
-  particles = [];
-  if (!canvas || !ctx2d) return;
-  resizeCanvas();
-  if (type === 'ninguna') { ctx2d.clearRect(0,0,canvas.width,canvas.height); return; }
-  for (let i = 0; i < 60; i++) spawnParticle();
-  animateParticles();
-}
-
-function spawnParticle() {
-  const cw = document.getElementById('card-wrapper');
-  const cs = getComputedStyle(cw);
-  const colors = [
-    cs.getPropertyValue('--c-a').trim(),
-    cs.getPropertyValue('--c-b').trim(),
-    cs.getPropertyValue('--c-c').trim(),
-    cs.getPropertyValue('--c-d').trim()
-  ];
-  const color = colors[Math.floor(Math.random() * colors.length)];
-  const p = {
-    x: Math.random() * window.innerWidth,
-    y: Math.random() * window.innerHeight,
-    vx: (Math.random() - 0.5) * 0.8,
-    vy: -Math.random() * 1 - 0.2,
-    size: Math.random() * 4 + 2,
-    color,
-    alpha: Math.random() * 0.8 + 0.2,
-    life: 1.0,
-    decay: Math.random() * 0.003 + 0.001,
-    type: particleType,
-    rot: Math.random() * Math.PI * 2,
-    rotSpeed: (Math.random() - 0.5) * 0.05
-  };
-  if (particleType === 'confetti') {
-    p.vy = Math.random() * 2 + 0.5;
-    p.vx = (Math.random() - 0.5) * 2;
-    p.size = Math.random() * 6 + 4;
-    p.decay = Math.random() * 0.002 + 0.001;
-    p.y = -20;
-  }
-  if (particleType === 'nieve') { p.vy = Math.random() * 1.5 + 0.3; p.vx = (Math.random()-0.5)*0.5; p.y = -10; p.color = '#ffffff'; }
-  if (particleType === 'burbujas') { p.vy = -(Math.random()*0.8+0.2); p.size = Math.random()*10+4; p.color = 'rgba(0,255,255,0.3)'; }
-  particles.push(p);
-}
-
-function drawParticle(p) {
-  ctx2d.save();
-  ctx2d.globalAlpha = p.alpha * p.life;
-  ctx2d.fillStyle = p.color;
-  ctx2d.strokeStyle = p.color;
-  ctx2d.translate(p.x, p.y);
-  ctx2d.rotate(p.rot);
-
-  if (p.type === 'estrellas') {
-    ctx2d.font = Math.floor(p.size * 2) + 'px monospace';
-    ctx2d.fillText('★', -p.size/2, p.size/2);
-  } else if (p.type === 'corazones') {
-    ctx2d.font = Math.floor(p.size * 2) + 'px monospace';
-    ctx2d.fillText('♥', -p.size/2, p.size/2);
-  } else if (p.type === 'confetti') {
-    ctx2d.fillRect(-p.size/2, -p.size/4, p.size, p.size/2);
-  } else if (p.type === 'nieve') {
-    ctx2d.beginPath();
-    ctx2d.arc(0, 0, p.size/2, 0, Math.PI*2);
-    ctx2d.fill();
-  } else if (p.type === 'burbujas') {
-    ctx2d.beginPath();
-    ctx2d.arc(0, 0, p.size/2, 0, Math.PI*2);
-    ctx2d.stroke();
-  } else {
-    ctx2d.fillRect(-p.size/2, -p.size/2, p.size, p.size);
-  }
-  ctx2d.restore();
-}
-
-function animateParticles() {
-  if (!ctx2d) return;
-  ctx2d.clearRect(0, 0, canvas.width, canvas.height);
-  particles.forEach(p => {
-    p.x += p.vx; p.y += p.vy;
-    p.rot += p.rotSpeed;
-    p.life -= p.decay;
-    drawParticle(p);
-  });
-  particles = particles.filter(p => p.life > 0 && p.y < window.innerHeight + 50 && p.y > -100);
-  while (particles.length < 60) spawnParticle();
-  animFrame = requestAnimationFrame(animateParticles);
-}
-
-// ══ CALENDAR URL ══
-function buildCalendarUrl() {
-  const dateClean = state.date.replace(/-/g,'');
-  const timeClean = state.time.replace(':','') + '00';
-  const title = encodeURIComponent('XV Años ' + state.name);
-  const loc = encodeURIComponent(state.venue + ', ' + state.address);
-  const details = encodeURIComponent('¡Te invitamos a celebrar los XV años de ' + state.name + '!');
-  const startH = parseInt(state.time.split(':')[0]);
-  const endH = String(Math.min(startH + 4, 23)).padStart(2,'0');
-  const start = dateClean + 'T' + timeClean;
-  const end = dateClean + 'T' + endH + '0000';
-  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + title + '&dates=' + start + '/' + end + '&location=' + loc + '&details=' + details;
-}
-
-// ══ COUNTDOWN ══
-function updateCountdown() {
-  const target = new Date(state.date + 'T' + state.time);
-  const now = new Date();
-  const diff = target - now;
-  if (diff <= 0) {
-    ['cd-dd','cd-hh','cd-mm','cd-ss'].forEach(id => setText(id, '00'));
-    return;
-  }
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff % 86400000) / 3600000);
-  const mins = Math.floor((diff % 3600000) / 60000);
-  const secs = Math.floor((diff % 60000) / 1000);
-  setText('cd-dd', String(days).padStart(2,'0'));
-  setText('cd-hh', String(hours).padStart(2,'0'));
-  setText('cd-mm', String(mins).padStart(2,'0'));
-  setText('cd-ss', String(secs).padStart(2,'0'));
-}
-
-// ══ GALLERY ══
-let galIdx = 0;
-function buildGallery() {
-  const gal = document.getElementById('pv-galeria');
-  if (!gal) return;
-  gal.innerHTML = '';
-  galImages.forEach((src, i) => {
-    const item = document.createElement('div');
-    item.className = 'gal-item';
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = 'Foto ' + (i+1);
-    img.loading = 'lazy';
-    img.addEventListener('click', () => openLightbox(src));
-    const cap = document.createElement('div');
-    cap.className = 'gal-caption';
-    cap.textContent = state.galCaptions[i] || ('Foto ' + (i+1));
-    const frame = document.createElement('div');
-    frame.className = 'gal-frame';
-    item.appendChild(img);
-    item.appendChild(cap);
-    item.appendChild(frame);
-    gal.appendChild(item);
-  });
-  // Actualizar contador
-  const numEl = document.getElementById('gal-num');
-  if (numEl) numEl.textContent = '1/' + galImages.length;
-  galIdx = 0;
-}
-
-function galScroll(dir) {
-  const gal = document.getElementById('pv-galeria');
-  if (!gal) return;
-  galIdx = Math.max(0, Math.min(galImages.length - 1, galIdx + dir));
-  const items = gal.querySelectorAll('.gal-item');
-  if (items[galIdx]) items[galIdx].scrollIntoView({ behavior:'smooth', block:'nearest', inline:'start' });
-  const numEl = document.getElementById('gal-num');
-  if (numEl) numEl.textContent = (galIdx+1) + '/' + galImages.length;
-}
-
-// ══ LIGHTBOX ══
-function openLightbox(src) {
-  const lb = document.getElementById('lightbox');
-  const img = document.getElementById('lightbox-img');
-  if (!lb || !img) return;
-  img.src = src;
-  lb.classList.add('show');
-}
-function closeLightbox() {
-  const lb = document.getElementById('lightbox');
-  if (lb) lb.classList.remove('show');
-}
-
-// ══ AUDIO PLAYER ══
-let isPlaying = false;
-function togglePlay() {
-  const audio = document.getElementById('pv-audio');
-  const btn = document.getElementById('pv-play-btn');
-  const trackName = document.getElementById('pv-track-name');
-  const hint = document.querySelector('.audio-hint');
-  if (!audio) return;
-  if (audio.src && audio.src !== window.location.href) {
-    if (isPlaying) {
-      audio.pause();
-      btn.textContent = '▶';
-      if (trackName) trackName.classList.remove('playing');
-      if (hint) hint.textContent = '▲ PRESIONA ▶ PARA REPRODUCIR LA MÚSICA';
-      isPlaying = false;
-    } else {
-      audio.play().then(function() {
-        btn.textContent = '⏸';
-        if (trackName) trackName.classList.add('playing');
-        if (hint) hint.textContent = '♪ REPRODUCIENDO...';
-        isPlaying = true;
-      }).catch(function(e) {
-        console.warn('Audio play error:', e);
-        if (hint) hint.textContent = '⚠ CLICK EN LA TARJETA PRIMERO PARA ACTIVAR AUDIO';
-      });
-    }
-  }
-}
-
-function seekAudio(val) {
-  const audio = document.getElementById('pv-audio');
-  if (audio && audio.duration) audio.currentTime = (val / 100) * audio.duration;
-}
-
-function setVol(val) {
-  const audio = document.getElementById('pv-audio');
-  if (audio) audio.volume = val;
-}
-
-function formatTime(s) {
-  const m = Math.floor(s / 60);
-  const sec = Math.floor(s % 60);
-  return m + ':' + String(sec).padStart(2,'0');
-}
-
-function initAudioEvents() {
-  const audio = document.getElementById('pv-audio');
-  const seek = document.getElementById('pv-seek');
-  const timeEl = document.getElementById('pv-track-time');
-  if (!audio) return;
-  audio.addEventListener('timeupdate', function() {
-    if (audio.duration && seek) seek.value = (audio.currentTime / audio.duration) * 100;
-    if (timeEl) timeEl.textContent = formatTime(audio.currentTime);
-  });
-  audio.addEventListener('ended', function() {
-    const btn = document.getElementById('pv-play-btn');
-    if (btn) btn.textContent = '▶';
-    isPlaying = false;
-  });
-}
-
-// ══ RSVP ══
-function submitRsvp() {
-  const nombre = (document.getElementById('rsvp-nombre').value || '').trim();
-  const asiste = document.getElementById('rsvp-asiste').value;
-  const acomp = Math.min(parseInt(document.getElementById('rsvp-acomp').value) || 0, state.rsvpMaxPases);
-  const msg = (document.getElementById('rsvp-msg').value || '').trim();
-  const errEl = document.getElementById('rsvp-error');
-
-  if (!nombre || !asiste) {
-    errEl.classList.add('show');
-    return false;
-  }
-  errEl.classList.remove('show');
-
-  const asistenMsg = asiste === 'si' ? 'SÍ asistiré ✅' : asiste === 'no' ? 'NO podré ir ❌' : 'Quizás asista 🤔';
-  const d = new Date(state.date + 'T' + state.time);
-  const dateFormatted = d.toLocaleDateString('es-ES', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-
-  let text = '🎮 *PIXEL QUEST · XV AÑOS ' + state.name.toUpperCase() + '*\n';
-  text += '━━━━━━━━━━━━━━━━━━━\n';
-  text += '👤 *Nombre:* ' + nombre + '\n';
-  text += '📋 *Asistencia:* ' + asistenMsg + '\n';
-  if (acomp > 0) text += '👥 *Acompañantes:* ' + acomp + '\n';
-  if (msg) text += '💬 *Mensaje:* ' + msg + '\n';
-  text += '━━━━━━━━━━━━━━━━━━━\n';
-  text += '📅 ' + dateFormatted + '\n';
-  text += '📍 ' + state.venue + '\n';
-  text += '🕐 ' + state.time + ' hrs';
-
-  const waNum = state.waOrganizer.replace(/\D/g,'');
-  const url = 'https://wa.me/' + waNum + '?text=' + encodeURIComponent(text);
-
-  if (state.plan === 'deluxe') {
-    generateRsvpQr(nombre, asiste);
-  }
-
-  window.open(url, '_blank');
-  return false;
-}
-
-function generateRsvpQr(nombre, asiste) {
-  const qrWrap = document.getElementById('rsvp-qr-wrap');
-  const qrCanvas = document.getElementById('rsvp-qr-canvas');
-  if (!qrWrap || !qrCanvas || typeof QRCode === 'undefined') return;
-  qrCanvas.innerHTML = '';
-  const qrData = 'XV-' + state.name + '-RSVP:' + nombre + ':' + asiste + ':' + state.date;
-  try {
-    new QRCode(qrCanvas, {
-      text: qrData, width: 128, height: 128,
-      colorDark: '#00FFFF', colorLight: '#000000',
-      correctLevel: QRCode.CorrectLevel.M
-    });
-    qrWrap.classList.add('show');
-  } catch(e) { console.warn('QR error', e); }
-}
-
-// ══ SONG SUGGEST ══
-function addSongInput() {
-  const container = document.getElementById('song-inputs');
-  if (!container) return;
-  const row = document.createElement('div');
-  row.className = 'song-input-row';
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.placeholder = 'Canción - Artista';
-  input.className = 'song-suggest-input';
-  const rmBtn = document.createElement('button');
-  rmBtn.type = 'button';
-  rmBtn.className = 'song-rm-btn';
-  rmBtn.textContent = '✕';
-  rmBtn.addEventListener('click', function() { removeSongInput(this); });
-  row.appendChild(input);
-  row.appendChild(rmBtn);
-  container.appendChild(row);
-}
-
-function removeSongInput(btn) {
-  const row = btn.closest('.song-input-row');
-  const container = document.getElementById('song-inputs');
-  if (row && container && container.querySelectorAll('.song-input-row').length > 1) row.remove();
-}
-
-function sendSongSuggest() {
-  const inputs = document.querySelectorAll('.song-suggest-input');
-  const songs = Array.from(inputs).map(function(i) { return i.value.trim(); }).filter(Boolean);
-  if (!songs.length) {
-    alert('Escribe al menos una canción');
-    return;
-  }
-  let text = '🎵 *Sugerencias de canciones para XV de ' + state.name + '*\n\n';
-  songs.forEach(function(s, i) { text += (i+1) + '. ' + s + '\n'; });
-  const waNum = state.songSuggestWa.replace(/\D/g,'');
-  const url = 'https://wa.me/' + waNum + '?text=' + encodeURIComponent(text);
-  window.open(url, '_blank');
-}
-
-// ══ SCROLL REVEAL ══
-function initScrollReveal() {
-  const observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.05, rootMargin: '0px 0px 0px 0px' });
-
-  document.querySelectorAll('.pixel-window').forEach(function(el) {
-    el.classList.add('reveal-ready');
-    observer.observe(el);
-  });
-}
-
-// ══ INIT ══
-document.addEventListener('DOMContentLoaded', function() {
-  renderPreview();
-  resizeCanvas();
-  initAudioEvents();
-  buildGalUploadRow();
-
-  const splash = document.getElementById('splash');
-  const mainContent = document.getElementById('main-content');
-  const spBtn = document.getElementById('sp-btn');
-
-  if (!state.showSplash) {
-    if (splash) splash.style.display = 'none';
-    if (mainContent) mainContent.classList.add('active');
-    initScrollReveal();
-    applyParticles(state.particles);
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
-    loadStoredPhotos();
-    return;
-  }
-
-  applyParticles(state.particles);
-
-  if (spBtn) {
-    spBtn.addEventListener('click', function() {
-      if (splash) {
-        splash.style.transition = 'opacity 0.5s';
-        splash.style.opacity = '0';
-        setTimeout(function() {
-          splash.style.display = 'none';
-          if (mainContent) mainContent.classList.add('active');
-          initScrollReveal();
-          setInterval(updateCountdown, 1000);
-          updateCountdown();
-          loadStoredPhotos();
-        }, 500);
-      }
-    });
-  }
-
-  // ── Lightbox: cerrar con ESC y click fuera ──
-  const lb = document.getElementById('lightbox');
-  if (lb) {
-    lb.addEventListener('click', function(e) { if (e.target === lb) closeLightbox(); });
-  }
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeLightbox();
-  });
+/* ================== PHOTO CHANGE (guardado local en IndexedDB) ================== */
+document.getElementById('pv-retrato-wrap').addEventListener('click', () => {
+  pickAndStorePhoto('retrato', document.getElementById('pv-retrato'));
+});
+document.getElementById('pv-retrato-wrap-2').addEventListener('click', () => {
+  pickAndStorePhoto('fashion', document.getElementById('pv-fashion'));
 });
 
-window.addEventListener('resize', resizeCanvas);
+/* ================== SPLASH OPEN ================== */
+document.getElementById('sp-btn').addEventListener('click', () => {
+  document.getElementById('splash').classList.add('hide');
+});
 
-// ══════════════════════════════════════
-// INDEXEDDB — ALMACENAMIENTO LOCAL DE FOTOS
-// ══════════════════════════════════════
-const DB_NAME = 'PixelQuestXV';
-const DB_VERSION = 1;
-const STORE = 'fotos';
-let db = null;
-
-function openDB() {
-  return new Promise(function(resolve, reject) {
-    if (db) { resolve(db); return; }
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = function(e) {
-      const d = e.target.result;
-      if (!d.objectStoreNames.contains(STORE)) {
-        d.createObjectStore(STORE, { keyPath: 'key' });
-      }
-    };
-    req.onsuccess = function(e) { db = e.target.result; resolve(db); };
-    req.onerror = function(e) { reject(e.target.error); };
-  });
+/* ================== COUNTDOWN ================== */
+function tickCountdown() {
+  const target = new Date(`${state.date}T${state.time || '00:00'}:00`).getTime();
+  const now = Date.now();
+  let diff = Math.max(0, target - now);
+  const dd = Math.floor(diff / (1000 * 60 * 60 * 24));
+  diff -= dd * 1000 * 60 * 60 * 24;
+  const hh = Math.floor(diff / (1000 * 60 * 60));
+  diff -= hh * 1000 * 60 * 60;
+  const mm = Math.floor(diff / (1000 * 60));
+  diff -= mm * 1000 * 60;
+  const ss = Math.floor(diff / 1000);
+  const pad = (n) => String(n).padStart(2, '0');
+  document.getElementById('cd').textContent = `${pad(dd)}:${pad(hh)}:${pad(mm)}:${pad(ss)}`;
 }
+setInterval(tickCountdown, 1000);
 
-function savePhoto(key, dataUrl) {
-  return openDB().then(function(d) {
-    return new Promise(function(resolve, reject) {
-      const tx = d.transaction(STORE, 'readwrite');
-      tx.objectStore(STORE).put({ key: key, data: dataUrl });
-      tx.oncomplete = resolve;
-      tx.onerror = function(e) { reject(e.target.error); };
+/* ================== AUDIO PLAYER ================== */
+const audioEl = document.getElementById('pv-audio');
+const playBtn = document.getElementById('pv-play-btn');
+const seek = document.getElementById('pv-seek');
+const vol = document.getElementById('pv-vol');
+const trackTime = document.getElementById('pv-track-time');
+
+if (state.audioKey) audioEl.src = state.audioKey;
+audioEl.volume = parseFloat(vol.value);
+
+playBtn.addEventListener('click', () => {
+  if (!audioEl.src) return;
+  if (audioEl.paused) {
+    audioEl.play().then(() => { playBtn.textContent = '❚❚'; }).catch(() => {
+      playBtn.textContent = '▶';
     });
-  });
-}
+  } else {
+    audioEl.pause();
+    playBtn.textContent = '▶';
+  }
+});
+audioEl.addEventListener('ended', () => {
+  // El audio ya tiene "loop", pero por seguridad resetea el botón si el navegador no repite.
+  if (audioEl.paused) playBtn.textContent = '▶';
+});
+audioEl.addEventListener('timeupdate', () => {
+  if (!audioEl.duration) return;
+  seek.value = String((audioEl.currentTime / audioEl.duration) * 100);
+  const mm = Math.floor(audioEl.currentTime / 60);
+  const ss = Math.floor(audioEl.currentTime % 60);
+  trackTime.textContent = `${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
+});
+seek.addEventListener('input', () => {
+  if (!audioEl.duration) return;
+  audioEl.currentTime = (parseFloat(seek.value) / 100) * audioEl.duration;
+});
+vol.addEventListener('input', () => { audioEl.volume = parseFloat(vol.value); });
 
-function loadPhoto(key) {
-  return openDB().then(function(d) {
-    return new Promise(function(resolve, reject) {
-      const tx = d.transaction(STORE, 'readonly');
-      const req = tx.objectStore(STORE).get(key);
-      req.onsuccess = function(e) { resolve(e.target.result ? e.target.result.data : null); };
-      req.onerror = function(e) { reject(e.target.error); };
+/* ================== SONG SUGGEST FORM ================== */
+document.getElementById('song-add-btn').addEventListener('click', () => {
+  const wrap = document.getElementById('song-inputs');
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.name = 'song';
+  input.placeholder = 'Otra canción';
+  wrap.appendChild(input);
+});
+
+document.getElementById('song-suggest-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const inputs = Array.from(document.querySelectorAll('#song-inputs input[name="song"]'));
+  const songs = inputs.map((i) => i.value.trim()).filter(Boolean);
+  if (songs.length === 0) return;
+  const text = encodeURIComponent(`¡Hola! Sugiero estas canciones para la fiesta de ${state.name}:\n- ${songs.join('\n- ')}`);
+  window.open(`https://wa.me/${state.songSuggestWa}?text=${text}`, '_blank');
+  document.getElementById('song-suggest-ok').style.display = 'block';
+});
+
+/* ================== RSVP FORM + QR ================== */
+function maybeRenderQr() {
+  const qrWrap = document.getElementById('rsvp-qr-wrap');
+  const canvas = document.getElementById('rsvp-qr-canvas');
+  const shouldShow = state.plan === 'deluxe' && !!state.rsvpPara;
+  console.log('[debug maybeRenderQr]', { shouldShow, plan: state.plan, rsvpPara: state.rsvpPara, hasQRCode: !!window.QRCode, canvas });
+  qrWrap.setAttribute('data-debug', JSON.stringify({ shouldShow, plan: state.plan, rsvpPara: state.rsvpPara, hasQRCode: !!window.QRCode, canvasExists: !!canvas }));
+  qrWrap.insertAdjacentHTML('afterend', `<p style="color:red;font-size:10px;text-align:center;">DEBUG: ${JSON.stringify({ shouldShow, plan: state.plan, rsvpPara: state.rsvpPara, hasQRCode: !!window.QRCode, canvasExists: !!canvas })}</p>`);
+  qrWrap.style.display = shouldShow ? 'flex' : 'none';
+  if (!shouldShow) return;
+
+  if (window.QRCode) {
+    canvas.innerHTML = '';
+    // qrcodejs draws into a div, so we swap to a div fallback
+    const div = document.createElement('div');
+    canvas.replaceWith(div);
+    div.id = 'rsvp-qr-canvas';
+    new QRCode(div, {
+      text: `Pase: ${state.rsvpPara} · Máx. pases: ${state.rsvpMaxPases} · Evento: ${state.name}`,
+      width: 140,
+      height: 140,
     });
-  });
-}
-
-function deletePhoto(key) {
-  return openDB().then(function(d) {
-    return new Promise(function(resolve, reject) {
-      const tx = d.transaction(STORE, 'readwrite');
-      tx.objectStore(STORE).delete(key);
-      tx.oncomplete = resolve;
-      tx.onerror = function(e) { reject(e.target.error); };
-    });
-  });
-}
-
-// ── Trigger upload input ──
-let currentGalSlot = 0;
-function triggerPhotoUpload(key) {
-  const input = document.getElementById('upload-' + key);
-  if (input) input.click();
-}
-
-// ── Handle retrato / fashion upload ──
-function handlePhotoUpload(key, input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    // Aplicar a la imagen en pantalla
-    const imgEl = document.getElementById('pv-' + key);
-    if (imgEl) imgEl.src = dataUrl;
-    // Guardar en IndexedDB
-    savePhoto(key, dataUrl).then(function() {
-      const badge = document.getElementById('badge-' + key);
-      if (badge) badge.classList.add('show');
-    }).catch(function(err) {
-      console.warn('Error guardando foto en IndexedDB:', err);
-    });
-  };
-  reader.readAsDataURL(file);
-  input.value = '';
-}
-
-// ── Handle galería upload por slot ──
-function handleGalUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const slot = currentGalSlot;
-  const key = 'gal_' + slot;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    galImages[slot] = dataUrl;
-    buildGallery();
-    // Actualizar botón slot a "cargado"
-    const btn = document.getElementById('gal-slot-' + slot);
-    if (btn) btn.classList.add('loaded');
-    // Guardar en IndexedDB
-    savePhoto(key, dataUrl).then(function() {
-      if (btn) btn.textContent = '✓ FOTO ' + (slot + 1);
-    }).catch(function(err) {
-      console.warn('Error guardando galería en IndexedDB:', err);
-    });
-  };
-  reader.readAsDataURL(file);
-  input.value = '';
-}
-
-// ── Construir botones de slots de galería (máx 12) ──
-function buildGalUploadRow() {
-  const row = document.getElementById('gal-upload-row');
-  if (!row) return;
-  row.innerHTML = '';
-  for (let i = 0; i < 12; i++) {
-    const btn = document.createElement('button');
-    btn.id = 'gal-slot-' + i;
-    btn.className = 'gal-upload-slot';
-    btn.textContent = '📷 ' + (i + 1);
-    btn.addEventListener('click', (function(idx) {
-      return function() {
-        currentGalSlot = idx;
-        document.getElementById('upload-gal-input').click();
-      };
-    })(i));
-    row.appendChild(btn);
+  } else {
+    // Si la librería de QR no cargó (p.ej. sin conexión a internet), mostramos el pase en texto.
+    canvas.replaceWith(
+      Object.assign(document.createElement('div'), {
+        id: 'rsvp-qr-canvas',
+        className: 'rsvp-note',
+        textContent: `Pase: ${state.rsvpPara} · Máx. ${state.rsvpMaxPases} pases`,
+      })
+    );
   }
 }
 
-// ── Cargar todas las fotos guardadas al iniciar ──
-function loadStoredPhotos() {
-  // Retrato
-  loadPhoto('retrato').then(function(data) {
-    if (data) {
-      const img = document.getElementById('pv-retrato');
-      if (img) img.src = data;
-      const badge = document.getElementById('badge-retrato');
-      if (badge) badge.classList.add('show');
-    }
-  });
-  // Fashion
-  loadPhoto('fashion').then(function(data) {
-    if (data) {
-      const img = document.getElementById('pv-fashion');
-      if (img) img.src = data;
-      const badge = document.getElementById('badge-fashion');
-      if (badge) badge.classList.add('show');
-    }
-  });
-  // Galería (máx 12)
-  const galPromises = [0,1,2,3,4,5,6,7,8,9,10,11].map(function(i) {
-    return loadPhoto('gal_' + i).then(function(data) {
-      if (data) {
-        galImages[i] = data;
-        const btn = document.getElementById('gal-slot-' + i);
-        if (btn) { btn.classList.add('loaded'); btn.textContent = '✓ FOTO ' + (i + 1); }
-      }
-    });
-  });
-  Promise.all(galPromises).then(function() {
-    buildGallery();
-  });
+document.getElementById('rsvp-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const nombre = document.getElementById('rsvp-nombre').value.trim();
+  const asiste = document.getElementById('rsvp-asiste').value;
+  const acomp = parseInt(document.getElementById('rsvp-acomp').value || '0', 10);
+  const msg = document.getElementById('rsvp-msg').value.trim();
+  const errorEl = document.getElementById('rsvp-error');
+  errorEl.style.display = 'none';
+
+  if (!nombre) {
+    errorEl.textContent = 'Por favor escribe tu nombre.';
+    errorEl.style.display = 'block';
+    return;
+  }
+  const totalGuests = 1 + (isNaN(acomp) ? 0 : acomp);
+  if (asiste === 'si' && totalGuests > state.rsvpCapacity) {
+    errorEl.textContent = 'Lo sentimos, se ha alcanzado el aforo máximo del evento.';
+    errorEl.style.display = 'block';
+    return;
+  }
+  const text = encodeURIComponent(
+    `Confirmación de asistencia — Fiesta de XV Años de ${state.name}\n` +
+    `Nombre: ${nombre}\n` +
+    `Asistencia: ${asiste === 'si' ? 'Sí, asistiré' : 'No podré asistir'}\n` +
+    `Acompañantes: ${isNaN(acomp) ? 0 : acomp}\n` +
+    (msg ? `Mensaje: ${msg}\n` : '')
+  );
+  window.open(`https://wa.me/${state.waOrganizer}?text=${text}`, '_blank');
+});
+
+/* ================== SCROLL REVEAL ================== */
+const observer = new IntersectionObserver(
+  (entries) => entries.forEach((en) => { if (en.isIntersecting) en.target.classList.add('in-view'); }),
+  { threshold: 0.15 }
+);
+document.querySelectorAll('section').forEach((s) => observer.observe(s));
+
+/* ================== INIT ================== */
+applyPaletteToCard(state.palette);
+applyFont(state.typography);
+applyParticles(state.particles);
+renderPreview();
+tickCountdown();
+
+// Red de seguridad: si la librería de QR tarda en cargar (o llega después del render inicial),
+// reintenta cuando la página termine de cargar. Si ya cargó, reintenta de inmediato.
+if (document.readyState === 'complete') {
+  maybeRenderQr();
+} else {
+  window.addEventListener('load', maybeRenderQr);
 }
+
+
+// Al cargar, intenta recuperar fotos previamente guardadas por el usuario en este dispositivo (IndexedDB).
+// Si no hay ninguna guardada, se mantienen las fotos de ejemplo (placeholder).
+loadStoredPhoto('retrato', document.getElementById('pv-retrato'));
+loadStoredPhoto('fashion', document.getElementById('pv-fashion'));
+loadStoredGallery();
+
 </script>
 </body>
 </html>
