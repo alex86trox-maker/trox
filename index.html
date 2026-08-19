@@ -147,8 +147,8 @@ section:last-of-type{border-bottom:none}
 /* Wavy section divider */
 section::after{
   content:'';
-  position:absolute;bottom:-1px;left:0;right:0;height:20px;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 20'%3E%3Cpath fill='none' stroke='rgba(255,107,157,0.12)' stroke-width='1.5' d='M0,10 C240,20 480,0 720,10 C960,20 1200,0 1440,10'/%3E%3C/svg%3E") center/cover no-repeat;
+  position:absolute;bottom:-1px;left:0;right:0;height:24px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 24'%3E%3Cpath fill='none' stroke='rgba(255,107,157,0.1)' stroke-width='1' d='M0,12 C60,20 120,4 180,12 C240,20 300,4 360,12 C420,20 450,4 480,12'/%3E%3Cpath fill='none' stroke='rgba(200,101,154,0.07)' stroke-width='.8' d='M0,18 C80,8 160,22 240,14 C320,6 400,20 480,14'/%3E%3Ccircle cx='120' cy='8' r='1.2' fill='rgba(255,107,157,0.2)'/%3E%3Ccircle cx='240' cy='14' r='1.5' fill='rgba(200,101,154,0.25)'/%3E%3Ccircle cx='360' cy='10' r='1.2' fill='rgba(255,107,157,0.2)'/%3E%3C/svg%3E") center/cover no-repeat;
   pointer-events:none;
   z-index:2;
 }
@@ -162,9 +162,25 @@ section::after{
   border-radius:2px;
   margin:1.25rem auto;
   box-shadow:0 0 10px color-mix(in srgb,var(--c-a) 35%,transparent);
+  position:relative;
+}
+.ornament-line::before{
+  content:'◆';
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-size:.45rem;color:var(--c-c);
+  text-shadow:0 0 8px color-mix(in srgb,var(--c-a) 55%,transparent);
+  background:var(--c-bg);padding:0 .35rem;line-height:1;
 }
 .ornament-line.narrow{width:55%}
 .ornament-line.wide{width:92%}
+
+/* SVG divider elegante reutilizable */
+.svg-divider{
+  display:flex;align-items:center;justify-content:center;
+  margin:1.25rem auto;width:70%;
+}
+.svg-divider svg{width:100%;height:auto;overflow:visible;}
 
 /* ─── SECTION LABEL ──────────────────────────────── */
 .sec-label{
@@ -247,42 +263,197 @@ section::after{
 /* ─── COVER IMAGE ─────────────────────────────────── */
 .cover-img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
 
-/* ─── GALLERY GRID ────────────────────────────────── */
+/* ─── GALLERY ─────────────────────────────────────── */
+/* Grid principal */
 .gal-prev{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-auto-rows:100px;
+  gap:.45rem;
 }
-.gal-prev .gal-cell{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:1;cursor:pointer;}
+/* Foto hero: primera foto full-ancho, más alta */
+.gal-prev .gal-cell:first-child{
+  grid-column:1/-1;
+  grid-row:span 2;
+}
+/* Celdas */
+.gal-prev .gal-cell{
+  position:relative;border-radius:10px;overflow:hidden;
+  cursor:pointer;
+  background:color-mix(in srgb,var(--c-a) 8%,var(--c-bg));
+}
+/* Imagen */
 .gal-prev .gal-cell img{
   width:100%;height:100%;object-fit:cover;display:block;
-  transition:transform .35s ease;
-  box-shadow:0 4px 14px color-mix(in srgb,var(--c-a) 18%,transparent);
+  transition:transform .4s cubic-bezier(.25,.46,.45,.94),filter .3s;
+  will-change:transform;
 }
-.gal-prev .gal-cell:hover img{transform:scale(1.06)}
+.gal-prev .gal-cell:hover img{transform:scale(1.08);filter:brightness(1.05)}
+
+/* Overlay con degradado */
 .gal-prev .gal-cell .gal-overlay{
   position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(45,27,34,.7) 0%,transparent 55%);
-  opacity:0;transition:opacity .25s;
-  display:flex;align-items:flex-end;justify-content:space-between;padding:.55rem;
+  background:linear-gradient(to top,rgba(45,27,34,.75) 0%,rgba(45,27,34,.1) 50%,transparent 100%);
+  opacity:0;transition:opacity .28s;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:.5rem .55rem;
 }
 .gal-prev .gal-cell:hover .gal-overlay{opacity:1}
-.gal-cell .gal-del{
-  width:24px;height:24px;border-radius:50%;
-  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.4);
-  color:#fff;font-size:.7rem;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:background .15s;
+.gal-prev .gal-cell:first-child .gal-overlay{padding:.7rem}
+
+/* Número de foto */
+.gal-cell .gal-num{
+  font-family:var(--c-mono);font-size:.48rem;letter-spacing:.2em;
+  color:rgba(255,255,255,.8);font-weight:600;text-transform:uppercase;
 }
-.gal-cell .gal-del:hover{background:rgba(229,62,62,.7)}
+/* Caption en hero */
+.gal-cell:first-child .gal-caption{
+  font-family:var(--c-serif);font-size:.85rem;font-style:italic;
+  color:rgba(255,255,255,.9);text-shadow:0 1px 4px rgba(0,0,0,.4);
+  flex:1;line-height:1.3;
+}
+
+/* Botón eliminar */
+.gal-cell .gal-del{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;
+  background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.35);
+  color:rgba(255,255,255,.9);font-size:.6rem;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .15s,transform .15s;
+}
+.gal-cell .gal-del:hover{background:rgba(220,38,38,.75);transform:scale(1.12)}
+
+/* Borde brillante en la celda hero */
+.gal-prev .gal-cell:first-child::after{
+  content:'';position:absolute;inset:0;
+  border-radius:10px;pointer-events:none;
+  box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--c-a) 35%,transparent);
+  opacity:0;transition:opacity .3s;
+}
+.gal-prev .gal-cell:first-child:hover::after{opacity:1}
+
+/* Badge contador total */
+.gal-count-badge{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-family:var(--c-mono);font-size:.52rem;letter-spacing:.2em;
+  color:var(--c-c);font-weight:600;text-transform:uppercase;
+  margin-bottom:.65rem;opacity:.8;
+}
+.gal-count-badge .dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--c-a);
+  box-shadow:0 0 6px color-mix(in srgb,var(--c-a) 70%,transparent);
+}
 
 /* Gallery empty state */
 .gal-empty{
-  grid-column:1/-1;padding:2.5rem;text-align:center;
-  border:2px dashed color-mix(in srgb,var(--c-a) 30%,transparent);
+  grid-column:1/-1;padding:2.5rem 1.5rem;text-align:center;
+  border:1.5px dashed color-mix(in srgb,var(--c-a) 28%,transparent);
   border-radius:16px;
   color:var(--c-dim);font-family:var(--c-serif);font-size:.95rem;
-  font-style:italic;line-height:1.7;
+  font-style:italic;line-height:1.8;
+  background:color-mix(in srgb,var(--c-a) 3%,var(--c-bg));
+  transition:border-color .25s;
 }
-.gal-empty .gal-empty-icon{font-size:2rem;margin-bottom:.5rem;opacity:.5}
+.gal-empty:hover{border-color:color-mix(in srgb,var(--c-a) 50%,transparent)}
+.gal-empty .gal-empty-icon{font-size:2.2rem;margin-bottom:.6rem;opacity:.45;display:block}
+
+/* ─── LIGHTBOX 3D CAROUSEL ───────────────────────── */
+#gal-lightbox{
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(5,2,10,.96);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .25s;
+  overflow:hidden;
+}
+#gal-lightbox.open{opacity:1}
+/* Perspectiva 3D */
+#gal-lb-stage{
+  width:100%;
+  height:360px;
+  perspective:900px;
+  display:flex;align-items:center;justify-content:center;
+}
+#gal-lb-carousel{
+  position:relative;
+  width:260px;height:300px;
+  transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.23,1,.32,1);
+}
+/* Cada tarjeta dentro del carrusel 3D */
+.lb-card{
+  position:absolute;
+  width:260px;height:300px;
+  left:0;top:0;
+  transform-style:preserve-3d;
+  cursor:pointer;
+  border-radius:16px;overflow:hidden;
+  backface-visibility:hidden;
+  box-shadow:0 12px 40px rgba(0,0,0,.7);
+  transition:box-shadow .3s;
+}
+.lb-card img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  user-select:none;-webkit-user-drag:none;
+}
+.lb-card-caption{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:.65rem .85rem;
+  background:linear-gradient(to top,rgba(20,0,15,.85),transparent);
+  font-family:var(--c-serif);font-size:.85rem;font-style:italic;
+  color:rgba(255,255,255,.88);
+  text-shadow:0 1px 4px rgba(0,0,0,.5);
+  line-height:1.35;
+}
+/* Caption + número */
+.lb-card-num{
+  font-family:var(--c-mono);font-size:.45rem;letter-spacing:.3em;
+  color:var(--c-b);opacity:.65;display:block;margin-bottom:.15rem;
+}
+
+/* Controles del lightbox */
+#gal-lb-controls{
+  display:flex;align-items:center;gap:1.25rem;margin-top:1.5rem;
+}
+.lb-ctrl-btn{
+  width:42px;height:42px;border-radius:50%;
+  background:rgba(255,255,255,.07);
+  border:1.5px solid color-mix(in srgb,var(--c-a) 45%,transparent);
+  color:var(--c-a);font-size:1.1rem;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;
+}
+.lb-ctrl-btn:hover{
+  background:color-mix(in srgb,var(--c-a) 18%,transparent);
+  transform:scale(1.1);
+  box-shadow:0 0 16px color-mix(in srgb,var(--c-a) 40%,transparent);
+}
+/* Dots indicadores */
+#gal-lb-dots{display:flex;gap:.4rem;align-items:center}
+.lb-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(255,255,255,.2);transition:all .25s;cursor:pointer;
+}
+.lb-dot.active{
+  background:var(--c-a);width:18px;border-radius:3px;
+  box-shadow:0 0 8px color-mix(in srgb,var(--c-a) 60%,transparent);
+}
+/* Cerrar */
+#gal-lb-close{
+  position:absolute;top:1rem;right:1rem;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+  color:rgba(255,255,255,.7);font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;z-index:10;
+}
+#gal-lb-close:hover{background:rgba(229,62,62,.3);color:#fff}
+/* Contador arriba */
+#gal-lb-counter{
+  position:absolute;top:1rem;left:1rem;
+  font-family:var(--c-mono);font-size:.6rem;letter-spacing:.2em;
+  color:rgba(255,255,255,.45);pointer-events:none;
+}
 
 /* ─── PHOTO UPLOAD WRAPPER ────────────────────────── */
 .photo-upload-wrap{position:relative;cursor:pointer;}
@@ -596,14 +767,67 @@ section::after{
   <div class="splash-bg-circle" style="width:350px;height:350px;background:radial-gradient(circle,var(--c-d),transparent);opacity:.55;top:-80px;left:-80px;"></div>
   <div class="splash-bg-circle" style="width:250px;height:250px;background:radial-gradient(circle,var(--c-b),transparent);opacity:.35;bottom:-60px;right:-60px;"></div>
   <div class="float" style="margin-bottom:1rem">
-    <svg width="90" height="55" viewBox="0 0 90 55" fill="none">
-      <path d="M10 48 L10 28 L28 8 L45 30 L62 8 L80 28 L80 48 Z" stroke="var(--c-a)" stroke-width="1.5" fill="color-mix(in srgb,var(--c-a) 12%,transparent)" stroke-linejoin="round"/>
-      <circle cx="10" cy="28" r="4" fill="var(--c-a)" opacity=".8"/>
-      <circle cx="45" cy="30" r="5" fill="var(--c-c)" opacity=".9"/>
-      <circle cx="80" cy="28" r="4" fill="var(--c-a)" opacity=".8"/>
-      <circle cx="28" cy="8" r="3" fill="var(--c-e)" opacity=".7"/>
-      <circle cx="62" cy="8" r="3" fill="var(--c-e)" opacity=".7"/>
-      <rect x="5" y="44" width="80" height="7" rx="3.5" fill="var(--c-a)" opacity=".2"/>
+    <!-- Corona / Tiara elegante -->
+    <svg width="110" height="68" viewBox="0 0 110 68" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Corona">
+      <defs>
+        <linearGradient id="sp-grad" x1="0" y1="0" x2="110" y2="68" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="var(--c-a)"/>
+          <stop offset="45%" stop-color="var(--c-c)"/>
+          <stop offset="100%" stop-color="var(--c-e)"/>
+        </linearGradient>
+        <linearGradient id="sp-band" x1="0" y1="0" x2="110" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="var(--c-e)" stop-opacity="0"/>
+          <stop offset="25%" stop-color="var(--c-a)"/>
+          <stop offset="75%" stop-color="var(--c-a)"/>
+          <stop offset="100%" stop-color="var(--c-e)" stop-opacity="0"/>
+        </linearGradient>
+        <filter id="sp-glow">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Cuerpo relleno de la corona -->
+      <path d="M8 55 L8 33 C8 33 19 14 28 22 L38 33 L55 5 L72 33 L82 22 C91 14 102 33 102 33 L102 55 Z"
+        fill="url(#sp-grad)" opacity=".1"/>
+      <!-- Contorno principal de la corona -->
+      <path d="M8 55 L8 33 C8 33 19 14 28 22 L38 33 L55 5 L72 33 L82 22 C91 14 102 33 102 33 L102 55"
+        stroke="url(#sp-grad)" stroke-width="1.8" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+
+      <!-- Base band -->
+      <rect x="6" y="54" width="98" height="9" rx="4.5" fill="url(#sp-band)" opacity=".22"/>
+      <rect x="6" y="54" width="98" height="4" rx="2" fill="url(#sp-band)" opacity=".35"/>
+
+      <!-- Filigrana interna — línea fina de detalle -->
+      <path d="M18 55 L18 36 L28 25 L38 36 L55 12 L72 36 L82 25 L92 36 L92 55"
+        stroke="url(#sp-grad)" stroke-width=".6" fill="none" opacity=".35"
+        stroke-linejoin="round" stroke-linecap="round"/>
+
+      <!-- Punta central — gema grande -->
+      <circle cx="55" cy="5" r="5" fill="var(--c-c)" opacity=".9" filter="url(#sp-glow)"/>
+      <circle cx="55" cy="5" r="3" fill="var(--c-a)" opacity=".7"/>
+      <circle cx="55" cy="5" r="1.4" fill="white" opacity=".75"/>
+
+      <!-- Puntas laterales — gemas -->
+      <circle cx="28" cy="22" r="3.5" fill="var(--c-a)" opacity=".85"/>
+      <circle cx="28" cy="22" r="1.4" fill="white" opacity=".6"/>
+      <circle cx="82" cy="22" r="3.5" fill="var(--c-a)" opacity=".85"/>
+      <circle cx="82" cy="22" r="1.4" fill="white" opacity=".6"/>
+
+      <!-- Vértices del cuerpo -->
+      <circle cx="8"  cy="33" r="2.5" fill="var(--c-e)" opacity=".75"/>
+      <circle cx="102" cy="33" r="2.5" fill="var(--c-e)" opacity=".75"/>
+      <circle cx="38" cy="33" r="2.5" fill="var(--c-b)" opacity=".8"/>
+      <circle cx="72" cy="33" r="2.5" fill="var(--c-b)" opacity=".8"/>
+
+      <!-- Fila de perlas en la base -->
+      <circle cx="19"  cy="58" r="2.2" fill="var(--c-a)" opacity=".6"/>
+      <circle cx="33"  cy="58" r="2"   fill="var(--c-b)" opacity=".5"/>
+      <circle cx="47"  cy="58" r="2.2" fill="var(--c-c)" opacity=".65"/>
+      <circle cx="55"  cy="58" r="2.8" fill="var(--c-a)" opacity=".75"/>
+      <circle cx="63"  cy="58" r="2.2" fill="var(--c-c)" opacity=".65"/>
+      <circle cx="77"  cy="58" r="2"   fill="var(--c-b)" opacity=".5"/>
+      <circle cx="91"  cy="58" r="2.2" fill="var(--c-a)" opacity=".6"/>
     </svg>
   </div>
   <div class="fade-up">
@@ -727,18 +951,23 @@ section::after{
      SECCIÓN 8 · GALERÍA DE FOTOS
 ═══════════════════════════════════════════════════ -->
 <section class="reveal">
-  <div style="text-align:center;margin-bottom:1.75rem">
+  <div style="text-align:center;margin-bottom:1.25rem">
     <div class="sec-label">📸 Momentos para recordar</div>
     <div class="sec-title">Galería</div>
     <div class="ornament-line narrow"></div>
   </div>
+  <!-- Badge contador -->
+  <div id="gal-badge" class="gal-count-badge" style="justify-content:center;margin-bottom:.85rem">
+    <span class="dot"></span>
+    <span id="gal-badge-txt">12 fotos · Toca para explorar</span>
+  </div>
   <div id="pv-galeria" class="gal-prev"></div>
-  <div style="text-align:center;margin-top:1.25rem">
+  <div style="text-align:center;margin-top:1.1rem;display:flex;flex-direction:column;align-items:center;gap:.45rem">
     <button id="gal-add-btn" onclick="openGalleryFilePicker()"
-      style="display:inline-flex;align-items:center;gap:.45rem;padding:.7rem 1.5rem;border-radius:50px;font-family:var(--c-mono);font-size:.68rem;font-weight:600;letter-spacing:.15em;color:var(--c-a);border:1.5px solid var(--c-a);background:color-mix(in srgb,var(--c-a) 7%,var(--c-bg));cursor:pointer;transition:all .2s;position:relative;overflow:hidden">
+      style="display:inline-flex;align-items:center;gap:.45rem;padding:.7rem 1.6rem;border-radius:50px;font-family:var(--c-mono);font-size:.68rem;font-weight:600;letter-spacing:.15em;color:var(--c-a);border:1.5px solid var(--c-a);background:color-mix(in srgb,var(--c-a) 7%,var(--c-bg));cursor:pointer;transition:all .2s;position:relative;overflow:hidden">
       ＋ &nbsp;Agregar fotos
     </button>
-    <p style="margin-top:.55rem;font-family:var(--c-mono);font-size:.5rem;letter-spacing:.2em;color:var(--c-dim);opacity:.6">TUS FOTOS SE GUARDAN EN ESTE DISPOSITIVO</p>
+    <p style="font-family:var(--c-mono);font-size:.48rem;letter-spacing:.2em;color:var(--c-dim);opacity:.55">TUS FOTOS SE GUARDAN EN ESTE DISPOSITIVO · MÁX. 12</p>
   </div>
 </section>
 
@@ -954,9 +1183,80 @@ section::after{
 ═══════════════════════════════════════════════════ -->
 <section class="reveal" style="text-align:center;padding-bottom:4rem;background:linear-gradient(to bottom,var(--c-bg),color-mix(in srgb,var(--c-d) 25%,var(--c-bg)))">
   <div style="margin-bottom:1.25rem">
-    <svg width="70" height="40" viewBox="0 0 70 40" fill="none">
-      <path d="M5 35 Q20 5 35 20 Q50 35 65 5" stroke="var(--c-a)" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".55"/>
-      <circle cx="35" cy="20" r="3" fill="var(--c-a)" opacity=".65"/>
+    <!-- Ornamento floral de cierre -->
+    <svg width="140" height="52" viewBox="0 0 140 52" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ornamento">
+      <defs>
+        <linearGradient id="cl-grad" x1="0" y1="0" x2="140" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stop-color="var(--c-a)" stop-opacity="0"/>
+          <stop offset="25%"  stop-color="var(--c-a)"/>
+          <stop offset="50%"  stop-color="var(--c-c)"/>
+          <stop offset="75%"  stop-color="var(--c-a)"/>
+          <stop offset="100%" stop-color="var(--c-a)" stop-opacity="0"/>
+        </linearGradient>
+        <filter id="cl-glow">
+          <feGaussianBlur stdDeviation="1.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Rama izquierda -->
+      <path d="M10 26 Q28 12 48 24" stroke="url(#cl-grad)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".7"/>
+      <path d="M18 26 Q22 16 30 20" stroke="var(--c-b)" stroke-width=".8" fill="none" stroke-linecap="round" opacity=".55"/>
+      <path d="M28 24 Q30 14 36 18" stroke="var(--c-b)" stroke-width=".8" fill="none" stroke-linecap="round" opacity=".45"/>
+
+      <!-- Rama derecha (espejo) -->
+      <path d="M130 26 Q112 12 92 24" stroke="url(#cl-grad)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".7"/>
+      <path d="M122 26 Q118 16 110 20" stroke="var(--c-b)" stroke-width=".8" fill="none" stroke-linecap="round" opacity=".55"/>
+      <path d="M112 24 Q110 14 104 18" stroke="var(--c-b)" stroke-width=".8" fill="none" stroke-linecap="round" opacity=".45"/>
+
+      <!-- Línea central -->
+      <line x1="50" y1="26" x2="90" y2="26" stroke="url(#cl-grad)" stroke-width="1" opacity=".5"/>
+
+      <!-- Flor central compuesta -->
+      <circle cx="70" cy="26" r="8" fill="var(--c-a)" opacity=".08"/>
+      <!-- Pétalos -->
+      <ellipse cx="70" cy="18" rx="3"   ry="5"   fill="var(--c-a)" opacity=".35" transform="rotate(0   70 26)"/>
+      <ellipse cx="70" cy="18" rx="2.8" ry="4.8" fill="var(--c-a)" opacity=".35" transform="rotate(45  70 26)"/>
+      <ellipse cx="70" cy="18" rx="2.8" ry="4.8" fill="var(--c-a)" opacity=".35" transform="rotate(90  70 26)"/>
+      <ellipse cx="70" cy="18" rx="2.8" ry="4.8" fill="var(--c-a)" opacity=".35" transform="rotate(135 70 26)"/>
+      <ellipse cx="70" cy="18" rx="2.8" ry="4.8" fill="var(--c-c)" opacity=".3"  transform="rotate(180 70 26)"/>
+      <ellipse cx="70" cy="18" rx="2.8" ry="4.8" fill="var(--c-c)" opacity=".3"  transform="rotate(225 70 26)"/>
+      <ellipse cx="70" cy="18" rx="2.8" ry="4.8" fill="var(--c-c)" opacity=".3"  transform="rotate(270 70 26)"/>
+      <ellipse cx="70" cy="18" rx="2.8" ry="4.8" fill="var(--c-c)" opacity=".3"  transform="rotate(315 70 26)"/>
+      <!-- Centro de la flor -->
+      <circle cx="70" cy="26" r="4.5" fill="var(--c-c)" opacity=".65" filter="url(#cl-glow)"/>
+      <circle cx="70" cy="26" r="2.5" fill="var(--c-a)" opacity=".85"/>
+      <circle cx="70" cy="26" r="1"   fill="white"      opacity=".8"/>
+
+      <!-- Mini flores laterales izquierda -->
+      <circle cx="52" cy="24" r="3.2" fill="var(--c-a)" opacity=".09"/>
+      <circle cx="52" cy="20" r="1.8" fill="var(--c-b)" opacity=".4" transform="rotate(0   52 24)"/>
+      <circle cx="52" cy="20" r="1.6" fill="var(--c-b)" opacity=".35" transform="rotate(72  52 24)"/>
+      <circle cx="52" cy="20" r="1.6" fill="var(--c-b)" opacity=".35" transform="rotate(144 52 24)"/>
+      <circle cx="52" cy="20" r="1.6" fill="var(--c-b)" opacity=".35" transform="rotate(216 52 24)"/>
+      <circle cx="52" cy="20" r="1.6" fill="var(--c-b)" opacity=".35" transform="rotate(288 52 24)"/>
+      <circle cx="52" cy="24" r="1.5" fill="var(--c-c)" opacity=".7"/>
+      <circle cx="52" cy="24" r=".7"  fill="white" opacity=".7"/>
+
+      <!-- Mini flores laterales derecha -->
+      <circle cx="88" cy="24" r="3.2" fill="var(--c-a)" opacity=".09"/>
+      <circle cx="88" cy="20" r="1.8" fill="var(--c-b)" opacity=".4"  transform="rotate(0   88 24)"/>
+      <circle cx="88" cy="20" r="1.6" fill="var(--c-b)" opacity=".35" transform="rotate(72  88 24)"/>
+      <circle cx="88" cy="20" r="1.6" fill="var(--c-b)" opacity=".35" transform="rotate(144 88 24)"/>
+      <circle cx="88" cy="20" r="1.6" fill="var(--c-b)" opacity=".35" transform="rotate(216 88 24)"/>
+      <circle cx="88" cy="20" r="1.6" fill="var(--c-b)" opacity=".35" transform="rotate(288 88 24)"/>
+      <circle cx="88" cy="24" r="1.5" fill="var(--c-c)" opacity=".7"/>
+      <circle cx="88" cy="24" r=".7"  fill="white" opacity=".7"/>
+
+      <!-- Hojitas decorativas -->
+      <path d="M40 26 Q36 20 32 24" stroke="var(--c-a)" stroke-width="1" fill="none" stroke-linecap="round" opacity=".45"/>
+      <path d="M100 26 Q104 20 108 24" stroke="var(--c-a)" stroke-width="1" fill="none" stroke-linecap="round" opacity=".45"/>
+
+      <!-- Puntos brillantes al vuelo -->
+      <circle cx="22"  cy="32" r="1.5" fill="var(--c-a)" opacity=".4"/>
+      <circle cx="118" cy="32" r="1.5" fill="var(--c-a)" opacity=".4"/>
+      <circle cx="14"  cy="22" r="1"   fill="var(--c-b)" opacity=".35"/>
+      <circle cx="126" cy="22" r="1"   fill="var(--c-b)" opacity=".35"/>
     </svg>
   </div>
   <p class="card-cap" id="pv-poem">"Que esta noche sea el inicio del capítulo más hermoso de tu vida. Con amor, para siempre."</p>
@@ -1026,6 +1326,20 @@ section::after{
 </footer>
 
 </div><!-- /#card-wrapper -->
+
+<!-- ═══ LIGHTBOX 3D GALERÍA ═══ -->
+<div id="gal-lightbox" role="dialog" aria-modal="true" aria-label="Galería de fotos" style="display:none">
+  <button id="gal-lb-close" aria-label="Cerrar">✕</button>
+  <div id="gal-lb-counter"></div>
+  <div id="gal-lb-stage">
+    <div id="gal-lb-carousel"></div>
+  </div>
+  <div id="gal-lb-controls">
+    <button class="lb-ctrl-btn" id="lb-prev" aria-label="Anterior">‹</button>
+    <div id="gal-lb-dots"></div>
+    <button class="lb-ctrl-btn" id="lb-next" aria-label="Siguiente">›</button>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
@@ -1250,12 +1564,20 @@ function bindFashionClick(){
 }
 
 function openGalleryFilePicker(){
+  const MAX=12;
+  if(state.galDbKeys.length>=MAX){
+    showToast(`⚠ Máximo ${MAX} fotos alcanzado. Elimina alguna para agregar más.`);
+    return;
+  }
   createHiddenInput(true,async files=>{
     if(!files||!files.length) return;
+    const available=MAX-state.galDbKeys.length;
+    const toAdd=Math.min(files.length, available);
+    if(files.length>available) showToast(`⚠ Solo se agregarán ${available} fotos (límite: ${MAX})`);
     const btn=document.getElementById('gal-add-btn');
     if(btn){ btn.disabled=true; btn.textContent='Guardando...'; }
     let nextIdx=state.galDbKeys.length;
-    for(let i=0;i<files.length;i++){
+    for(let i=0;i<toAdd;i++){
       const key=`gal_${nextIdx+i}`;
       await dbSave(key, files[i]);
       const url=URL.createObjectURL(files[i]);
@@ -1264,7 +1586,7 @@ function openGalleryFilePicker(){
     }
     renderGallery();
     if(btn){ btn.disabled=false; btn.textContent='＋ Agregar fotos'; }
-    showToast(`📸 ${files.length} foto${files.length>1?'s':''} agregada${files.length>1?'s':''} a la galería`);
+    showToast(`📸 ${toAdd} foto${toAdd>1?'s':''} agregada${toAdd>1?'s':''}`);
   });
 }
 
@@ -1447,45 +1769,79 @@ function renderGallery(){
   const el=document.getElementById('pv-galeria');
   if(!el) return;
   el.innerHTML='';
-  const maxPhotos={classic:4,premium:8,deluxe:12};
-  const limit=maxPhotos[state.plan]||4;
+  const MAX=12;
   const isUserPhotos=state.galKeys.length>0;
   const imgs=isUserPhotos?state.galKeys:GAL_PLACEHOLDER;
   const captions=state.galCaptions||[];
+  const total=Math.min(imgs.length,MAX);
+
+  // Actualizar badge
+  const badgeTxt=document.getElementById('gal-badge-txt');
+  if(badgeTxt){
+    if(isUserPhotos) badgeTxt.textContent=`${total} foto${total!==1?'s':''} · Toca para explorar`;
+    else badgeTxt.textContent=`${total} fotos demo · Toca para explorar`;
+  }
 
   if(isUserPhotos&&imgs.length===0){
     const empty=document.createElement('div');
     empty.className='gal-empty';
-    empty.innerHTML='<div class="gal-empty-icon">📷</div><div>Aún no hay fotos en la galería.<br>Toca "Agregar fotos" para empezar.</div>';
+    empty.innerHTML='<span class="gal-empty-icon">📷</span><div>Aún no hay fotos.<br>Toca <strong>Agregar fotos</strong> para empezar.</div>';
     el.appendChild(empty); return;
   }
 
-  imgs.slice(0,limit).forEach((src,i)=>{
+  imgs.slice(0,total).forEach((src,i)=>{
     const cell=document.createElement('div');
     cell.className='gal-cell';
+
     const img=document.createElement('img');
     img.src=src; img.alt=captions[i]||`Foto ${i+1}`;
     img.loading='lazy';
     cell.appendChild(img);
 
+    // Overlay
     const overlay=document.createElement('div');
     overlay.className='gal-overlay';
 
+    // Caption solo en la celda hero (índice 0) o en todas si son fotos del usuario
+    const capEl=document.createElement('span');
+    capEl.className='gal-caption';
+    capEl.style.cssText='font-family:var(--c-serif);font-size:.78rem;font-style:italic;color:rgba(255,255,255,.9);text-shadow:0 1px 3px rgba(0,0,0,.4);flex:1;line-height:1.3;';
+    capEl.textContent=captions[i]||'';
+    overlay.appendChild(capEl);
+
     if(isUserPhotos){
-      const cap=document.createElement('span');
-      cap.style.cssText='font-family:var(--c-serif);font-size:.75rem;color:#fff;font-style:italic;text-shadow:0 1px 3px rgba(0,0,0,.4)';
-      cap.textContent=captions[i]||'';
-      overlay.appendChild(cap);
       const delBtn=document.createElement('button');
-      delBtn.className='gal-del'; delBtn.innerHTML='✕'; delBtn.title='Eliminar';
+      delBtn.className='gal-del'; delBtn.innerHTML='✕'; delBtn.title='Eliminar foto';
+      delBtn.setAttribute('aria-label','Eliminar foto');
       const dbKey=state.galDbKeys[i];
-      delBtn.addEventListener('click',e=>{e.stopPropagation();deleteGalleryPhoto(dbKey,src);});
+      delBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        if(confirm('¿Eliminar esta foto?')) deleteGalleryPhoto(dbKey,src);
+      });
       overlay.appendChild(delBtn);
+    } else {
+      // En demo, mostrar número
+      const numEl=document.createElement('span');
+      numEl.className='gal-num';
+      numEl.textContent=`${i+1} / ${total}`;
+      overlay.appendChild(numEl);
     }
+
     cell.appendChild(overlay);
-    cell.addEventListener('click',()=>openLightbox(imgs,i,captions));
+    cell.addEventListener('click',()=>openLightbox(imgs.slice(0,total),i,captions));
     el.appendChild(cell);
   });
+
+  // Si quedan slots libres (usuario tiene fotos pero menos de 12)
+  if(isUserPhotos&&total<MAX){
+    const remaining=MAX-total;
+    const addCell=document.createElement('div');
+    addCell.className='gal-cell';
+    addCell.style.cssText='display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--c-a) 5%,var(--c-bg));border:1.5px dashed color-mix(in srgb,var(--c-a) 28%,transparent);cursor:pointer;';
+    addCell.innerHTML=`<div style="text-align:center;padding:.5rem"><div style="font-size:1.3rem;opacity:.45">＋</div><div style="font-family:var(--c-mono);font-size:.42rem;letter-spacing:.15em;color:var(--c-dim);margin-top:.25rem;opacity:.65">${remaining} FOTOS<br>DISPONIBLES</div></div>`;
+    addCell.addEventListener('click',openGalleryFilePicker);
+    el.appendChild(addCell);
+  }
 }
 
 function renderVenue(){
@@ -1921,7 +2277,11 @@ function submitRsvpFinal(){
       form.innerHTML=`
         <div style="text-align:center;padding:1.5rem 1rem">
           <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--c-a),var(--c-c));display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;box-shadow:0 6px 24px color-mix(in srgb,var(--c-a) 40%,transparent);animation:successBounce .5s ease">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="15" cy="15" r="13" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+              <path d="M8 15.5 L12.5 20.5 L22 10" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8.5 15.5 L13 20 L21.5 10.5" stroke="rgba(255,255,255,0.4)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </div>
           <p style="font-family:var(--c-head);font-size:2.4rem;color:var(--c-e);line-height:1.1;margin-bottom:.65rem">¡Gracias, ${escHtml(_rsvpNombre)}!</p>
           <div style="height:2px;background:linear-gradient(90deg,transparent,var(--c-a),var(--c-c),transparent);margin:.75rem 0"></div>
@@ -1964,43 +2324,107 @@ function submitSongSuggest(e){
 }
 
 /* ================================================================
-   LIGHTBOX GALERÍA
+   LIGHTBOX 3D GALERÍA
 ================================================================ */
-function openLightbox(imgs,idx,captions){
-  let cur=idx;
-  const pal=PALETTES[state.palette]||PALETTES.rosas;
-  const overlay=document.createElement('div');
-  overlay.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.95);display:flex;align-items:center;justify-content:center;padding:1rem;cursor:zoom-out';
+function openLightbox(imgs,startIdx,captions){
+  const lb=document.getElementById('gal-lightbox');
+  const lbCarousel=document.getElementById('gal-lb-carousel');
+  const lbDots=document.getElementById('gal-lb-dots');
+  const lbCounter=document.getElementById('gal-lb-counter');
+  const lbPrev=document.getElementById('lb-prev');
+  const lbNext=document.getElementById('lb-next');
+  const lbClose=document.getElementById('gal-lb-close');
+  if(!lb||!lbCarousel) return;
 
-  const render=()=>{
-    overlay.innerHTML=`
-      <div style="max-width:460px;width:100%;position:relative" onclick="event.stopPropagation()">
-        <img src="${imgs[cur]}" style="width:100%;border-radius:14px;max-height:72vh;object-fit:contain;box-shadow:0 0 40px color-mix(in srgb,${pal.a} 35%,transparent);display:block"/>
-        <p style="text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:rgba(255,255,255,.75);margin-top:.65rem">${(captions||[])[cur]||''}</p>
-        <div style="display:flex;justify-content:center;gap:.4rem;margin-top:.65rem">
-          ${imgs.map((_,i)=>`<div style="width:${i===cur?20:5}px;height:3px;border-radius:2px;background:${i===cur?pal.a:'rgba(255,255,255,.2)'};transition:all .2s"></div>`).join('')}
-        </div>
-        <button onclick="window._lbClose()" style="position:absolute;top:-10px;right:-10px;width:30px;height:30px;border-radius:50%;background:rgba(10,0,8,.9);border:1px solid ${pal.a};color:${pal.a};font-size:.85rem;display:flex;align-items:center;justify-content:center;cursor:pointer">✕</button>
-        ${cur>0?`<button onclick="window._lbMove(-1)" style="position:absolute;top:50%;left:-18px;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(10,0,8,.85);border:1px solid ${pal.a};color:${pal.a};font-size:1.2rem;display:flex;align-items:center;justify-content:center;cursor:pointer">‹</button>`:''}
-        ${cur<imgs.length-1?`<button onclick="window._lbMove(1)" style="position:absolute;top:50%;right:-18px;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(10,0,8,.85);border:1px solid ${pal.a};color:${pal.a};font-size:1.2rem;display:flex;align-items:center;justify-content:center;cursor:pointer">›</button>`:''}
-      </div>`;
-  };
-  window._lbClose=()=>{overlay.style.opacity='0';setTimeout(()=>document.body.removeChild(overlay),200);};
-  window._lbMove=dir=>{cur=Math.max(0,Math.min(imgs.length-1,cur+dir));render();};
-  overlay.addEventListener('click',window._lbClose);
-  overlay.style.opacity='0';overlay.style.transition='opacity .2s';
-  document.body.appendChild(overlay);
-  requestAnimationFrame(()=>{overlay.style.opacity='1';});
+  const total=imgs.length;
+  const RADIUS=Math.max(240, Math.round(total*45));
+  let theta=0;
+  let curIdx=startIdx;
 
-  // Swipe support
-  let touchStartX=0;
-  overlay.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;},{passive:true});
-  overlay.addEventListener('touchend',e=>{
-    const dx=e.changedTouches[0].clientX-touchStartX;
-    if(Math.abs(dx)>40){window._lbMove(dx<0?1:-1);e.stopPropagation();}
+  // Construir tarjetas
+  lbCarousel.innerHTML='';
+  imgs.forEach((src,i)=>{
+    const card=document.createElement('div');
+    card.className='lb-card';
+    const img=document.createElement('img');
+    img.src=src; img.alt=(captions||[])[i]||`Foto ${i+1}`;
+    img.loading='lazy';
+    card.appendChild(img);
+    const cap=document.createElement('div');
+    cap.className='lb-card-caption';
+    cap.innerHTML=`<span class="lb-card-num">FOTO ${i+1} / ${total}</span>${(captions||[])[i]||''}`;
+    card.appendChild(cap);
+    // Posición 3D
+    const angle=(360/total)*i;
+    card.style.transform=`rotateY(${angle}deg) translateZ(${RADIUS}px)`;
+    lbCarousel.appendChild(card);
   });
 
-  render();
+  // Construir dots (max 12)
+  lbDots.innerHTML='';
+  imgs.forEach((_,i)=>{
+    const dot=document.createElement('div');
+    dot.className='lb-dot'+(i===startIdx?' active':'');
+    dot.addEventListener('click',()=>goTo(i));
+    lbDots.appendChild(dot);
+  });
+
+  function rotateTo(idx){
+    curIdx=((idx%total)+total)%total;
+    theta=-(360/total)*curIdx;
+    lbCarousel.style.transform=`rotateY(${theta}deg)`;
+    // Actualizar dots
+    lbDots.querySelectorAll('.lb-dot').forEach((d,i)=>d.classList.toggle('active',i===curIdx));
+    if(lbCounter) lbCounter.textContent=`${curIdx+1} / ${total}`;
+  }
+
+  function goTo(idx){ rotateTo(idx); }
+  function next(){ rotateTo(curIdx+1); }
+  function prev(){ rotateTo(curIdx-1); }
+
+  rotateTo(startIdx);
+
+  // Controles
+  lbNext.onclick=next;
+  lbPrev.onclick=prev;
+  lbClose.onclick=closeLb;
+
+  // Teclado
+  function onKey(e){
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') next();
+    else if(e.key==='ArrowLeft'||e.key==='ArrowUp') prev();
+    else if(e.key==='Escape') closeLb();
+  }
+  document.addEventListener('keydown',onKey);
+
+  // Swipe táctil
+  let tx=0;
+  lb.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true,once:false});
+  lb.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>35){ if(dx<0) next(); else prev(); }
+  },{passive:true});
+
+  // Drag con mouse
+  let mx=0,dragging=false;
+  lb.addEventListener('mousedown',e=>{mx=e.clientX;dragging=true;});
+  lb.addEventListener('mouseup',e=>{
+    if(!dragging) return; dragging=false;
+    const dx=e.clientX-mx;
+    if(Math.abs(dx)>35){ if(dx<0) next(); else prev(); }
+  });
+
+  // Mostrar
+  lb.style.display='flex';
+  requestAnimationFrame(()=>lb.classList.add('open'));
+  document.body.style.overflow='hidden';
+
+  function closeLb(){
+    lb.classList.remove('open');
+    document.removeEventListener('keydown',onKey);
+    document.body.style.overflow='';
+    setTimeout(()=>{lb.style.display='none';},250);
+  }
 }
 
 /* ================================================================
