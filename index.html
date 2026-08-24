@@ -9,6 +9,14 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background:#111; }
+  html { scroll-behavior: smooth; }
+  ::selection { background: #ffb703; color: #1b0f08; }
+
+  :focus-visible {
+    outline: 2px solid #ffb703;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 
   #card-wrapper {
     --c-bg: #1b0f08;
@@ -47,9 +55,33 @@
   section {
     position: relative;
     z-index: 2;
-    padding: 56px 24px;
-    border-bottom: 1px dashed var(--c-line);
+    padding: 64px 24px 56px;
+    border-bottom: none;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .7s ease, transform .7s ease;
+    background-image:
+      radial-gradient(rgba(214,40,40,.10) 3px, transparent 3.5px),
+      radial-gradient(rgba(47,158,68,.08) 1.5px, transparent 2px);
+    background-size: 64px 64px, 34px 34px;
+    background-position: 0 0, 17px 17px;
   }
+  section.in-view { opacity: 1; transform: translateY(0); }
+
+  /* borde tipo orilla de pizza (masa festoneada) entre secciones */
+  section::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 22px;
+    background: radial-gradient(circle at 50% 0%, transparent 0 9px, var(--c-bg) 9.5px);
+    background-size: 28px 22px;
+    background-repeat: repeat-x;
+    background-position: bottom;
+    opacity: .9;
+    pointer-events: none;
+  }
+  section:last-of-type::after { display: none; }
 
   .sec-title {
     font-family: var(--c-head);
@@ -58,6 +90,29 @@
     text-align: center;
     margin-bottom: 20px;
     text-shadow: 0 0 12px rgba(255,183,3,.4);
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+  .sec-title::before, .sec-title::after {
+    content: '🍕';
+    font-size: .8rem;
+    opacity: .55;
+    vertical-align: middle;
+    margin: 0 8px;
+    filter: drop-shadow(0 0 4px rgba(255,183,3,.4));
+  }
+  .sec-sub {
+    display: block;
+    text-align: center;
+    font-family: var(--c-mono);
+    font-size: .68rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--c-dim);
+    margin-top: -12px;
+    margin-bottom: 18px;
+    opacity: .75;
   }
 
   /* pizza slice divider */
@@ -78,22 +133,30 @@
     padding: 24px;
   }
   #splash.hide { opacity: 0; transform: scale(1.05); pointer-events: none; }
-  #splash .emoji { font-size: 3.2rem; margin-bottom: 8px; animation: spin 6s linear infinite; }
+  #splash .emoji { font-size: 3.2rem; margin-bottom: 8px; animation: spin 6s linear infinite, bob 2.4s ease-in-out infinite; }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes bob { 0%,100% { translate: 0 0; } 50% { translate: 0 -6px; } }
   #sp-15 {
     font-family: var(--c-head);
     font-size: 5.5rem;
     color: var(--c-b);
     line-height: 1;
     text-shadow: 0 0 24px rgba(255,183,3,.6);
+    animation: fadeUp .8s ease both;
   }
   #sp-name {
     font-family: var(--c-script);
     font-size: 2.4rem;
     color: var(--c-e);
     margin-top: 8px;
+    animation: fadeUp .8s ease .1s both;
   }
-  #sp-date { color: var(--c-dim); margin-top: 10px; letter-spacing: .1em; text-transform: uppercase; font-family: var(--c-mono); font-size: .8rem; }
+  #sp-date {
+    color: var(--c-dim); margin-top: 10px; letter-spacing: .1em; text-transform: uppercase;
+    font-family: var(--c-mono); font-size: .8rem;
+    animation: fadeUp .8s ease .2s both;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
   #sp-btn {
     margin-top: 32px;
     background: linear-gradient(135deg, var(--c-a), var(--c-d));
@@ -105,6 +168,31 @@
     font-size: 1rem;
     cursor: pointer;
     box-shadow: 0 6px 20px rgba(214,40,40,.5);
+    animation: fadeUp .8s ease .3s both, pulse 2.2s ease-in-out 1.2s infinite;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  #sp-btn:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 10px 26px rgba(214,40,40,.6); }
+  #sp-btn:active { transform: translateY(0) scale(.97); }
+  @keyframes pulse { 0%,100% { box-shadow: 0 6px 20px rgba(214,40,40,.5); } 50% { box-shadow: 0 6px 28px rgba(255,183,3,.65); } }
+  .splash-hint {
+    margin-top: 14px;
+    font-family: var(--c-mono);
+    font-size: .65rem;
+    letter-spacing: .08em;
+    color: var(--c-dim);
+    opacity: .7;
+    animation: fadeUp .8s ease .4s both;
+  }
+
+  /* Scroll progress bar */
+  #scroll-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--c-a), var(--c-b));
+    z-index: 60;
+    transition: width .1s linear;
   }
 
   /* ===== SECTION 2: FOTO PRINCIPAL ===== */
@@ -114,49 +202,168 @@
     margin: 0 auto 20px; border: 6px solid var(--c-b);
     box-shadow: 0 0 0 3px var(--c-a), 0 10px 30px rgba(0,0,0,.5);
     background: #333; cursor: pointer; padding: 0;
+    position: relative;
+    transition: transform .25s ease, box-shadow .25s ease;
   }
+  #pv-retrato-wrap:hover { transform: scale(1.03); box-shadow: 0 0 0 3px var(--c-a), 0 14px 36px rgba(0,0,0,.6); }
+  #pv-retrato-wrap:active { transform: scale(.98); }
+  #pv-retrato-wrap::after {
+    content: '✎ Cambiar foto';
+    position: absolute; inset: auto 0 0 0;
+    background: rgba(20,10,5,.72);
+    color: var(--c-e);
+    font-family: var(--c-mono);
+    font-size: .62rem;
+    letter-spacing: .05em;
+    padding: 8px 0;
+    opacity: 0;
+    transition: opacity .2s ease;
+  }
+  #pv-retrato-wrap:hover::after, #pv-retrato-wrap:focus-visible::after { opacity: 1; }
   .cover-img { width: 100%; height: 100%; object-fit: cover; display: block; }
   #pv-nombre { font-family: var(--c-head); font-size: 2.4rem; color: var(--c-e); }
   .card-cap { font-size: 1.05rem; color: var(--c-dim); line-height: 1.6; text-align:center; margin-top: 10px; }
 
   /* ===== SECTION 3: COUNTDOWN ===== */
   #cd-sec { text-align: center; }
-  #cd { font-family: var(--c-mono); font-size: 1.6rem; letter-spacing: .05em; color: var(--c-b); }
-
-  /* generic list */
-  .card-list { display: flex; flex-direction: column; gap: 10px; }
-  .card-list > div {
+  #cd {
+    font-family: var(--c-mono); font-size: 1.7rem; letter-spacing: .08em; color: var(--c-b);
+    display: inline-flex; gap: 6px;
+  }
+  #cd .cd-unit {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
     background: rgba(255,183,3,.08);
     border: 1px solid var(--c-line);
-    border-radius: 12px;
-    padding: 12px 16px;
+    border-radius: 10px;
+    padding: 8px 12px;
+    min-width: 58px;
+  }
+  #cd .cd-unit b { font-size: 1.5rem; line-height: 1; }
+  #cd .cd-unit small { font-family: var(--c-mono); font-size: .55rem; color: var(--c-dim); text-transform: uppercase; letter-spacing: .08em; }
+
+  /* generic list - estilo "porción de pizza" */
+  .card-list { display: flex; flex-direction: column; gap: 12px; }
+  .card-list > div {
+    position: relative;
+    background:
+      radial-gradient(circle at 88% 30%, rgba(214,40,40,.35) 0 5px, transparent 5.5px),
+      radial-gradient(circle at 78% 70%, rgba(214,40,40,.3) 0 4px, transparent 4.5px),
+      linear-gradient(90deg, rgba(255,183,3,.14), rgba(255,183,3,.05));
+    border: 1px solid var(--c-line);
+    border-left: 4px solid var(--c-b);
+    border-radius: 4px 14px 14px 4px;
+    padding: 12px 18px;
     font-family: var(--c-mono);
     font-size: .9rem;
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .card-list > div:hover { border-color: var(--c-b); transform: translateX(3px); }
+
+  /* rebanadas triangulares para itinerario / programa */
+  #pv-itin > div, #pv-padr > div {
+    padding-left: 34px;
+  }
+  #pv-itin > div::before, #pv-padr > div::before {
+    content: '';
+    position: absolute;
+    left: 12px; top: 50%;
+    width: 0; height: 0;
+    transform: translateY(-50%);
+    border-style: solid;
+    border-width: 6px 0 6px 9px;
+    border-color: transparent transparent transparent var(--c-a);
   }
 
   a.btn, button.btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     background: linear-gradient(135deg, var(--c-c), var(--c-a));
     color: #fff; text-decoration: none;
     padding: 12px 22px; border-radius: 999px; font-family: var(--c-head);
     font-size: .95rem; border: none; cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+    box-shadow: 0 4px 14px rgba(0,0,0,.3);
   }
+  a.btn:hover, button.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.4); }
+  a.btn:active, button.btn:active { transform: translateY(0) scale(.97); }
+  button.btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
   .center { text-align: center; }
 
   .gal-prev { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
-  .gal-prev img { width: 100%; height: 130px; object-fit: cover; border-radius: 10px; border: 2px solid var(--c-line); }
+  .gal-prev img {
+    width: 100%; height: 130px; object-fit: cover; border-radius: 10px; border: 2px solid var(--c-line);
+    cursor: pointer; transition: transform .25s ease, border-color .25s ease;
+  }
+  .gal-prev img:hover { transform: scale(1.03); border-color: var(--c-b); }
 
-  /* music */
-  #pv-audio-wrap { display:flex; align-items:center; gap:12px; background: rgba(0,0,0,.3); padding: 14px; border-radius: 14px; }
-  #pv-play-btn { width: 44px; height:44px; border-radius:50%; background: var(--c-a); border:none; color:#fff; font-size:1.1rem; cursor:pointer; }
+  /* music - reproductor con forma de pizza */
+  #pv-audio-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    background: rgba(0,0,0,.3); padding: 22px 18px; border-radius: 22px;
+  }
+  #pv-pizza-disc {
+    position: relative;
+    width: 130px; height: 130px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #pv-play-btn {
+    width: 130px; height: 130px; border-radius: 50%;
+    border: none; cursor: pointer;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink: 0;
+    padding: 0;
+    background:
+      radial-gradient(circle at 50% 50%, #3b1c0c 0 8%, transparent 8.5%),
+      radial-gradient(circle at 30% 32%, #d62828 0 6%, transparent 6.5%),
+      radial-gradient(circle at 68% 28%, #d62828 0 5.5%, transparent 6%),
+      radial-gradient(circle at 74% 62%, #d62828 0 6%, transparent 6.5%),
+      radial-gradient(circle at 38% 70%, #d62828 0 5%, transparent 5.5%),
+      radial-gradient(circle at 58% 52%, #d62828 0 5%, transparent 5.5%),
+      radial-gradient(circle at 20% 52%, #d62828 0 4.5%, transparent 5%),
+      conic-gradient(from 0deg, #ffb703, #ffd166, #ffb703 92%, #e8940f 100%);
+    box-shadow:
+      0 0 0 8px #e8b74a,
+      0 0 0 11px #7a4a1e,
+      0 8px 24px rgba(0,0,0,.5);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  #pv-play-btn::after {
+    content: '▶';
+    color: #fff8e7;
+    font-size: 1.6rem;
+    text-shadow: 0 2px 6px rgba(0,0,0,.5);
+    background: rgba(20,10,5,.55);
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #pv-play-btn.playing::after { content: '⏸'; }
+  #pv-play-btn:hover { transform: scale(1.05); }
+  #pv-play-btn:active { transform: scale(.96); }
+  #pv-play-btn.playing { animation: pizzaSpin 6s linear infinite; }
+  @keyframes pizzaSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  #pv-audio-info { width: 100%; text-align: center; }
   #pv-track-name { font-family: var(--c-mono); font-size: .85rem; }
-  #pv-track-time { font-size: .75rem; color: var(--c-dim); }
-  #pv-seek { width: 100%; }
-  #pv-vol { width: 60px; }
+  #pv-track-time { font-size: .75rem; color: var(--c-dim); margin-top: 4px; }
+  #pv-seek { width: 100%; accent-color: var(--c-a); cursor: pointer; margin-top: 10px; }
+  .pv-vol-row { display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; margin-top: 4px; }
+  .pv-vol-row span { font-size: .8rem; opacity: .8; }
+  #pv-vol { width: 100px; accent-color: var(--c-b); cursor: pointer; }
 
   input, select, textarea {
     width: 100%; background: rgba(255,255,255,.05); border: 1px solid var(--c-line);
-    color: var(--c-text); padding: 10px 12px; border-radius: 8px; font-family: var(--c-serif); font-size: .95rem; margin-bottom: 10px;
+    color: var(--c-text); padding: 11px 13px; border-radius: 8px; font-family: var(--c-serif); font-size: .95rem; margin-bottom: 10px;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  input:hover, select:hover, textarea:hover { border-color: var(--c-dim); }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--c-b); background: rgba(255,255,255,.08);
+    box-shadow: 0 0 0 3px rgba(255,183,3,.2);
+  }
+  input.field-error, select.field-error, textarea.field-error {
+    border-color: var(--c-d); box-shadow: 0 0 0 3px rgba(214,40,40,.2);
   }
   label { font-size: .8rem; color: var(--c-dim); display:block; margin-bottom: 4px; }
 
@@ -208,11 +415,79 @@
   [data-plan] { position: relative; }
 
   #rsvp-qr-wrap { text-align: center; margin-top: 16px; }
+
+  /* Toast de feedback */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(20,10,5,.92);
+    border: 1px solid var(--c-line);
+    color: var(--c-e);
+    font-family: var(--c-mono);
+    font-size: .82rem;
+    padding: 12px 20px;
+    border-radius: 999px;
+    z-index: 70;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease, transform .3s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,.5);
+    max-width: 88%;
+    text-align: center;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Lightbox de galería */
+  #lightbox {
+    position: fixed; inset: 0; z-index: 80;
+    background: rgba(10,5,2,.92);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s ease;
+    padding: 24px;
+  }
+  #lightbox.show { opacity: 1; pointer-events: auto; }
+  #lightbox img { max-width: 100%; max-height: 80vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+  #lightbox-close {
+    position: absolute; top: 20px; right: 20px;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255,255,255,.1); border: 1px solid var(--c-line); color: var(--c-e);
+    font-size: 1.2rem; cursor: pointer;
+  }
+
+  /* Botón volver arriba */
+  #back-to-top {
+    position: fixed;
+    bottom: 24px;
+    right: 20px;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--c-a), var(--c-d));
+    color: #fff;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    z-index: 45;
+    box-shadow: 0 6px 18px rgba(0,0,0,.4);
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+  }
+  #back-to-top.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  #back-to-top:hover { transform: translateY(-2px) scale(1.06); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  }
 </style>
 </head>
 <body>
 <div id="card-wrapper" data-theme="neon">
 
+  <div id="scroll-progress"></div>
   <canvas id="particle-canvas"></canvas>
 
   <!-- Marca de agua Gueka Ideas -->
@@ -228,6 +503,7 @@
     <div id="sp-name">Nombre</div>
     <div id="sp-date">Fecha</div>
     <button id="sp-btn" type="button">Abrir invitación</button>
+    <span class="splash-hint">Toca para comenzar</span>
   </section>
 
   <!-- 2. FOTO PRINCIPAL + NOMBRE -->
@@ -242,7 +518,12 @@
   <!-- 3. CUENTA REGRESIVA -->
   <section id="cd-sec">
     <div class="sec-title">🍕 Faltan solo...</div>
-    <div id="cd">00:00:00:00</div>
+    <div id="cd" role="timer" aria-live="polite">
+      <div class="cd-unit"><b id="cd-d">00</b><small>días</small></div>
+      <div class="cd-unit"><b id="cd-h">00</b><small>hrs</small></div>
+      <div class="cd-unit"><b id="cd-m">00</b><small>min</small></div>
+      <div class="cd-unit"><b id="cd-s">00</b><small>seg</small></div>
+    </div>
   </section>
 
   <!-- 4. AGENDAR EN CALENDARIO -->
@@ -292,13 +573,17 @@
   <section id="pv-music-sec" data-plan="premium">
     <div class="sec-title">🎶 Música</div>
     <div id="pv-audio-wrap">
-      <button id="pv-play-btn" type="button">▶</button>
-      <div style="flex:1;">
+      <button id="pv-play-btn" type="button" aria-label="Reproducir música"></button>
+      <div id="pv-audio-info">
         <div id="pv-track-name">—</div>
-        <input id="pv-seek" type="range" min="0" max="100" value="0" />
+        <input id="pv-seek" type="range" min="0" max="100" value="0" aria-label="Progreso de la canción" />
         <div id="pv-track-time">0:00 / 0:00</div>
+        <div class="pv-vol-row">
+          <span>🔈</span>
+          <input id="pv-vol" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volumen" />
+          <span>🔊</span>
+        </div>
       </div>
-      <input id="pv-vol" type="range" min="0" max="1" step="0.01" value="0.8" />
       <audio id="pv-audio" preload="auto"></audio>
     </div>
     <div class="slice-divider">🍕🍕🍕</div>
@@ -393,6 +678,18 @@
 
 </div>
 
+<!-- Lightbox de galería -->
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Vista de foto">
+  <button id="lightbox-close" type="button" aria-label="Cerrar">✕</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
+<!-- Toast de feedback -->
+<div id="toast" role="status" aria-live="polite"></div>
+
+<!-- Botón volver arriba -->
+<button id="back-to-top" type="button" aria-label="Volver arriba">↑</button>
+
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
 (function () {
@@ -423,7 +720,7 @@
     poem: 'Gracias por acompañarme en esta noche inolvidable, que quedará para siempre en mi corazón.',
     signature: 'Valentina',
     palette: 'fuego',
-    particles: 'confetti',
+    particles: 'ninguna',
     showSplash: true,
     splashBtn: 'Abrir invitación',
     itinerary: [
@@ -458,6 +755,7 @@
     songSuggestWa: '5215555555555',
     audioKey: 'demo',
     audioName: 'Pista de fondo — Fiesta',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
     imgKeys: { retrato: 'retrato', fashion: 'fashion' },
     galKeys: ['g1', 'g2', 'g3', 'g4'],
     templateLabel: 'Pizza Party XV',
@@ -609,6 +907,7 @@
 
     // music
     el('pv-track-name').textContent = state.audioName;
+    if (state.audioUrl) el('pv-audio').src = state.audioUrl;
     el('pv-song-suggest-wrap').style.display = state.songSuggestEnabled ? '' : 'none';
 
     applyPlanGating();
@@ -722,10 +1021,89 @@
       const mm = String(Math.floor(diff / 60000)).padStart(2, '0');
       diff %= 60000;
       const ss = String(Math.floor(diff / 1000)).padStart(2, '0');
-      el('cd').textContent = `${dd}:${hh}:${mm}:${ss}`;
+      el('cd-d').textContent = dd;
+      el('cd-h').textContent = hh;
+      el('cd-m').textContent = mm;
+      el('cd-s').textContent = ss;
     }
     tick();
     setInterval(tick, 1000);
+  }
+
+  /* ============ SCROLL REVEAL ============ */
+  function initScrollReveal() {
+    const sections = document.querySelectorAll('section');
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('in-view');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
+      sections.forEach((s) => observer.observe(s));
+    } else {
+      sections.forEach((s) => s.classList.add('in-view'));
+    }
+  }
+
+  /* ============ SCROLL PROGRESS + BACK TO TOP ============ */
+  function initScrollChrome() {
+    const bar = el('scroll-progress');
+    const backBtn = el('back-to-top');
+    function onScroll() {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      bar.style.width = `${pct}%`;
+      backBtn.classList.toggle('show', window.scrollY > 480);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    backBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  /* ============ TOAST ============ */
+  let toastTimer = null;
+  function showToast(message) {
+    const toast = el('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+  }
+
+  /* ============ LIGHTBOX GALERÍA ============ */
+  function initLightbox() {
+    const lightbox = el('lightbox');
+    const lightboxImg = el('lightbox-img');
+    const closeBtn = el('lightbox-close');
+
+    function open(src, alt) {
+      lightboxImg.src = src;
+      lightboxImg.alt = alt || '';
+      lightbox.classList.add('show');
+    }
+    function close() {
+      lightbox.classList.remove('show');
+    }
+
+    el('pv-galeria').addEventListener('click', (e) => {
+      const img = e.target.closest('img');
+      if (img) open(img.src, img.alt);
+    });
+    closeBtn.addEventListener('click', close);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+    });
   }
 
   /* ============ SPLASH ============ */
@@ -741,7 +1119,7 @@
   function initPhotoPickers() {
     el('pv-retrato-wrap').addEventListener('click', () => {
       // En el editor real esto abre un selector de imagen; aquí solo es un placeholder visual
-      console.log('Cambiar foto de retrato');
+      showToast('En el editor real aquí podrás subir tu foto 📸');
     });
   }
 
@@ -761,13 +1139,16 @@
     }
 
     playBtn.addEventListener('click', () => {
-      if (!audio.src) return;
+      if (!audio.src) {
+        showToast('No hay pista de audio configurada todavía 🎵');
+        return;
+      }
       if (audio.paused) {
-        audio.play();
-        playBtn.textContent = '⏸';
+        audio.play().catch(() => showToast('No se pudo reproducir el audio 🎵'));
+        playBtn.classList.add('playing');
       } else {
         audio.pause();
-        playBtn.textContent = '▶';
+        playBtn.classList.remove('playing');
       }
     });
 
@@ -776,6 +1157,10 @@
         seek.value = (audio.currentTime / audio.duration) * 100;
         trackTime.textContent = `${fmtTime(audio.currentTime)} / ${fmtTime(audio.duration)}`;
       }
+    });
+
+    audio.addEventListener('ended', () => {
+      playBtn.classList.remove('playing');
     });
 
     seek.addEventListener('input', () => {
@@ -799,6 +1184,7 @@
       input.type = 'text';
       input.placeholder = 'Otra canción';
       inputsWrap.appendChild(input);
+      input.focus();
     });
 
     form.addEventListener('submit', (e) => {
@@ -806,11 +1192,15 @@
       const values = Array.from(inputsWrap.querySelectorAll('input'))
         .map((i) => i.value.trim())
         .filter(Boolean);
-      if (values.length === 0) return;
+      if (values.length === 0) {
+        showToast('Escribe al menos una canción antes de enviar 🎶');
+        return;
+      }
       const text = encodeURIComponent(
         `🍕 Sugerencias de música para ${state.name}:\n` + values.map((v) => `- ${v}`).join('\n')
       );
       window.open(`https://wa.me/${state.songSuggestWa}?text=${text}`, '_blank');
+      showToast('¡Gracias por tu sugerencia! Abrimos WhatsApp para enviarla 🎉');
     });
   }
 
@@ -821,18 +1211,26 @@
     const form = el('rsvp-form');
     if (!form) return;
     const errorBox = el('rsvp-error');
+    const nombreInput = el('rsvp-nombre');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.textContent : '';
+
+    nombreInput.addEventListener('input', () => nombreInput.classList.remove('field-error'));
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       errorBox.textContent = '';
+      nombreInput.classList.remove('field-error');
 
-      const nombre = el('rsvp-nombre').value.trim();
+      const nombre = nombreInput.value.trim();
       const asiste = el('rsvp-asiste').value;
       const acomp = parseInt(el('rsvp-acomp').value || '0', 10);
       const msg = el('rsvp-msg').value.trim();
 
       if (!nombre) {
         errorBox.textContent = 'Por favor ingresa tu nombre.';
+        nombreInput.classList.add('field-error');
+        nombreInput.focus();
         return;
       }
       if (asiste === 'si') {
@@ -852,11 +1250,25 @@
       if (asiste === 'si') lines.push(`Acompañantes: ${acomp}`);
       if (msg) lines.push(`Mensaje: ${msg}`);
 
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Enviando...';
+      }
+
       window.open(`https://wa.me/${state.waOrganizer}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
 
       if (state.plan === 'deluxe' && state.rsvpPara && asiste === 'si') {
         renderQr(nombre);
       }
+
+      showToast(asiste === 'si' ? '¡Confirmación enviada! Te esperamos 🍕' : 'Gracias por avisarnos');
+
+      setTimeout(() => {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalBtnText;
+        }
+      }, 1200);
     });
   }
 
@@ -883,6 +1295,9 @@
     applyFont(state.typography);
     applyParticles(state.particles);
     startCountdown();
+    initScrollReveal();
+    initScrollChrome();
+    initLightbox();
     initSplash();
     initPhotoPickers();
     initAudioPlayer();
