@@ -782,7 +782,7 @@ section[data-plan].plan-visible{display:block;}
 
 <!-- AUDIO ELEMENT — fuera del main para que no desaparezca al ocultar secciones -->
 <audio id="pv-audio" preload="metadata"
-  src="https://www.bensound.com/bensound-music/bensound-romantic.mp3"></audio>
+  src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 
 </div><!-- /#card-wrapper -->
 
@@ -857,8 +857,8 @@ var state = {
   songSuggestEnabled: true,
   songSuggestWa: '5491112345678',
   audioKey: '',
-  audioUrl: 'https://www.bensound.com/bensound-music/bensound-romantic.mp3',
-  audioName: 'Romantic — Bensound',
+  audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+  audioName: 'Romantic Piano — Demo',
   imgKeys: {retrato: '', fashion: ''},
   galKeys: [],
 };
@@ -995,7 +995,17 @@ function tryAutoplay() {
   var initialSrc = a.getAttribute('src') || a.src;
   if (initialSrc) a.setAttribute('data-loaded-src', initialSrc);
 
-  a.addEventListener('play',    function() { syncAudioUI(true); });
+  a.addEventListener('play',    function() {
+    syncAudioUI(true);
+    /* Limpiar mensaje de error si hubiera */
+    var tn = document.getElementById('pv-track-name');
+    if (tn && tn.getAttribute('data-orig') !== null) {
+      tn.textContent = tn.getAttribute('data-orig');
+      tn.removeAttribute('data-orig');
+      tn.style.color = '';
+      tn.style.fontSize = '';
+    }
+  });
   a.addEventListener('playing', function() { syncAudioUI(true); });
   a.addEventListener('pause',   function() { if (!a.ended) syncAudioUI(false); });
   a.addEventListener('ended',   function() {
@@ -1016,7 +1026,16 @@ function tryAutoplay() {
     var dur = document.getElementById('pv-track-dur');
     if (dur) dur.textContent = fmtTime(a.duration);
   });
-  a.addEventListener('error', function() { syncAudioUI(false); });
+  a.addEventListener('error', function() {
+    syncAudioUI(false);
+    var trackName = document.getElementById('pv-track-name');
+    if (trackName && trackName.getAttribute('data-orig') === null) {
+      trackName.setAttribute('data-orig', trackName.textContent);
+      trackName.textContent = 'No se pudo cargar el audio';
+      trackName.style.color = 'rgba(240,100,100,.8)';
+      trackName.style.fontSize = '13px';
+    }
+  });
 })();   /* ← IIFE cerrada correctamente */
 
 /* ══════════════════════════════════════════════════════════════
