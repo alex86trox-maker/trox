@@ -1133,14 +1133,16 @@ function renderPreview() {
     if (btn) btn.href = S.albumUrl;
   }
 
-  /* Music */
+  /* Music — solo asignar src si cambió (reasignar dispara pause y rompe el toggle) */
   setText('pv-track-name', S.audioName || 'Nuestra canción');
   const audioEl = document.getElementById('pv-audio');
   if (audioEl) {
-    if (S.audioKey) {
-      audioEl.src = 'https://hercules-cdn.com/' + S.audioKey;
-    } else if (S.audioUrl) {
-      audioEl.src = S.audioUrl;
+    const newSrc = S.audioKey
+      ? 'https://hercules-cdn.com/' + S.audioKey
+      : (S.audioUrl || '');
+    if (newSrc && audioEl.getAttribute('data-loaded-src') !== newSrc) {
+      audioEl.src = newSrc;
+      audioEl.setAttribute('data-loaded-src', newSrc);
     }
   }
   renderSongsList();
@@ -1459,7 +1461,9 @@ function fmtTime(s) {
     if (dur) dur.textContent = fmtTime(a.duration);
   });
   a.addEventListener('error', () => setAudioPlaying(false));
-})();
+
+  /* Marcar el src inicial que ya viene hardcodeado en el HTML */
+  if (a.src) a.setAttribute('data-loaded-src', a.getAttribute('src') || a.src);
 
 /* ─── RSVP ─── */
 let rsvpDone = false;
