@@ -683,6 +683,9 @@ a,button{-webkit-tap-highlight-color:transparent}
 /* Nav active section indicator */
 .nav-links a.nav-active{color:var(--rose-mid)}
 
+/* Urgency bar - hide short version on desktop */
+.urgency-short{display:none}
+
 /* Urgency bar dismiss - flex layout only, position is set in the main rule */
 .urgency-bar{display:flex;align-items:center;justify-content:center;gap:12px;padding-right:40px}
 .urgency-dismiss{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(232,221,213,.5);cursor:pointer;font-size:.9rem;padding:4px;line-height:1}
@@ -725,8 +728,26 @@ a,button{-webkit-tap-highlight-color:transparent}
 
 /* --- Hero: fix nav overlap & urgency bar --- */
 @media(max-width:640px){
-  .urgency-bar{font-size:.6rem;letter-spacing:.1em;padding:7px 36px 7px 12px;text-align:left;line-height:1.5}
-  #nav{position:sticky!important;top:0!important}
+  .urgency-bar{
+    font-size:.6rem;
+    letter-spacing:.08em;
+    padding:7px 30px 7px 8px;
+    text-align:center;
+    justify-content:center;
+    gap:5px;
+    white-space:nowrap;
+    overflow:hidden;
+    position:sticky!important;
+    top:0!important;
+    z-index:1001!important;
+  }
+  .urgency-full{display:none!important}
+  .urgency-short{display:inline!important}
+  .urgency-dismiss{right:6px}
+  #nav{
+    position:fixed!important;
+    top:34px!important; /* height of urgency bar on mobile */
+  }
   .hero{min-height:100svh}
   .hero-content{padding-top:clamp(60px,16vw,100px);padding-left:20px;padding-right:20px;padding-bottom:100px}
   .hero-title{font-size:clamp(2rem,9vw,2.8rem);line-height:1.08}
@@ -1007,7 +1028,8 @@ a,button{-webkit-tap-highlight-color:transparent}
 </div>
 
 <div class="urgency-bar" role="note">
-  Cupos <strong>limitados</strong> disponibles en Fontibon, Bogota &mdash;
+  <span class="urgency-full">Cupos <strong>limitados</strong> disponibles en Fontibon, Bogota &mdash;</span>
+  <span class="urgency-short"><strong>Cupos limitados</strong> &mdash;</span>
   <a href="https://wa.me/573115653678?text=Hola%2C%20quiero%20postularme%20como%20modelo%20webcam%20en%20Velvett%20Agency" target="_blank" rel="noopener noreferrer" title="Postulate ahora por WhatsApp">Postulate ahora</a>
   <button class="urgency-dismiss" id="urgencyDismiss" aria-label="Cerrar barra">&#x2715;</button>
 </div>
@@ -1858,9 +1880,19 @@ function setNavTop(){
   var ub = document.querySelector('.urgency-bar');
   var n = document.getElementById('nav');
   if(!n) return;
-  var h = (ub && ub.style.display !== 'none') ? ub.offsetHeight : 0;
-  n.style.top = h + 'px';
-  document.body.style.paddingTop = (h > 0 ? h + 'px' : '0');
+  var isMobile = window.innerWidth <= 640;
+  if(isMobile){
+    // On mobile: urgency-bar is sticky at top:0, nav is fixed at top:34px (urgency-bar height)
+    // The CSS handles this — clear any JS inline overrides
+    n.style.top = '';
+    n.style.position = '';
+    document.body.style.paddingTop = '';
+  } else {
+    // On desktop: both are fixed, nav sits below urgency bar
+    var h = (ub && ub.style.display !== 'none') ? ub.offsetHeight : 0;
+    n.style.top = h + 'px';
+    document.body.style.paddingTop = (h > 0 ? h + 'px' : '0');
+  }
 }
 setNavTop();
 window.addEventListener('resize', setNavTop);
