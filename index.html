@@ -883,12 +883,17 @@ a,button{-webkit-tap-highlight-color:transparent}
   #sp-toast{bottom:88px;max-width:calc(100vw - 40px)}
 }
 
-/* Fix: Cookie banner on mobile - must sit above mob-bar (z-index 999) */
+/* Fix: Cookie banner on mobile - float above mob-bar at bottom */
 @media(max-width:640px){
   #cookieBanner{
-    z-index:1001;
-    bottom:74px;
+    top:auto;
+    bottom:calc(74px + env(safe-area-inset-bottom, 0px));
+    z-index:1002;
+    border-top:1px solid rgba(185,128,143,.25);
+    border-bottom:none;
     border-radius:4px 4px 0 0;
+    transform:translateY(150%);
+    transition:transform .5s ease;
   }
 }
 
@@ -2100,8 +2105,13 @@ if(!localStorage.getItem('cookies')){
   var b = document.getElementById('cookieBanner');
   if(b){
     setTimeout(function(){ b.style.transform = 'translateY(0)'; }, 2200);
-    document.getElementById('cookieAccept').onclick = function(){ localStorage.setItem('cookies','accepted'); b.style.transform='translateY(100%)'; };
-    document.getElementById('cookieReject').onclick = function(){ localStorage.setItem('cookies','rejected'); b.style.transform='translateY(100%)'; };
+    function dismissCookie(choice){
+      localStorage.setItem('cookies', choice);
+      // On mobile the banner comes from the top, so dismiss upward; on desktop dismiss downward
+      b.style.transform = 'translateY(150%)';
+    }
+    document.getElementById('cookieAccept').onclick = function(){ dismissCookie('accepted'); };
+    document.getElementById('cookieReject').onclick = function(){ dismissCookie('rejected'); };
   }
 }
 
