@@ -679,8 +679,7 @@ audio{display:none}
         <span class="gold-shimmer" style="font-family:'Playfair Display',serif;font-size:3rem;letter-spacing:.06em;display:block;font-weight:700;">Nuestra Música</span>
       </div>
 
-      <!-- Audio element — uses a reliable CORS-friendly public domain track -->
-      <audio id="pv-audio" preload="metadata" crossorigin="anonymous"></audio>
+      <!-- No audio element needed — Web Audio API generates the melody -->
 
       <div class="player-wrap">
         <div class="player-disc" id="player-disc"></div>
@@ -1107,147 +1106,228 @@ function buildSongs(){
 }
 
 // ═══════════════════════════════════════
-// MUSIC PLAYER — robust implementation
+// MUSIC PLAYER — Web Audio API synthesizer
+// No external files, no CORS, works on all browsers including Safari/iOS
 // ═══════════════════════════════════════
-var playerState = {
-  playing: false,
-  trackIdx: 0,
-  ready: false
-};
 
-function initPlayer(){
-  var audio   = document.getElementById('pv-audio');
-  var playBtn = document.getElementById('pv-play');
-  var iPlay   = document.getElementById('icon-play');
-  var iPause  = document.getElementById('icon-pause');
-  var disc    = document.getElementById('player-disc');
-  var eq      = document.getElementById('player-eq');
-  var fill    = document.getElementById('player-prog-fill');
-  var progBg  = document.getElementById('player-prog-bg');
-  var timeCur = document.getElementById('pv-cur');
-  var timeDur = document.getElementById('pv-dur');
-  var volSlider = document.getElementById('pv-vol');
-  var statusEl  = document.getElementById('player-status');
-  var trackName = document.getElementById('pv-track-name');
-  var trackArtist = document.getElementById('pv-track-artist');
+var WAP = (function(){
+  // "Canon in D" simplified melody — frequencies (Hz) + durations (beats)
+  var MELODY = [
+    // bar 1
+    [493.88,1],[440.00,1],[392.00,1],[349.23,1],[329.63,1],[293.66,1],[261.63,1],[293.66,1],
+    // bar 2
+    [329.63,1],[349.23,1],[392.00,1],[440.00,1],[493.88,1],[440.00,1],[392.00,1],[349.23,1],
+    // bar 3
+    [329.63,0.5],[349.23,0.5],[392.00,1],[440.00,1],[493.88,1],[523.25,1],[587.33,1],[659.25,1],
+    // bar 4
+    [587.33,1],[523.25,1],[493.88,1],[440.00,1],[392.00,1],[349.23,1],[329.63,1],[261.63,1],
+    // bar 5 — repeat with variation
+    [329.63,1],[392.00,1],[440.00,1],[493.88,1],[523.25,1],[587.33,1],[659.25,1],[587.33,1],
+    // bar 6
+    [523.25,1],[493.88,1],[440.00,1],[392.00,1],[349.23,1],[392.00,1],[440.00,1],[493.88,1],
+    // bar 7
+    [523.25,0.5],[493.88,0.5],[440.00,1],[392.00,1],[349.23,1],[329.63,1],[293.66,1],[261.63,1],
+    // bar 8 — ending phrase
+    [293.66,1],[329.63,1],[349.23,1],[392.00,1],[440.00,2],[392.00,1],[349.23,1],
+    [329.63,4]
+  ];
+
+  // Bass line (root notes of Canon chord progression: D A Bm F#m G D G A)
+  var BASS = [293.66,220.00,246.94,185.00,196.00,146.83,196.00,220.00];
+
+  var BPM        = 72;
+  var BEAT_S     = 60 / BPM;
+  var TOTAL_BEATS= MELODY.reduce(function(a,n){return a+n[1];},0);
+  var DURATION_S = TOTAL_BEATS * BEAT_S;
+
+  var ctx        = null;
+  var gainNode   = null;
+  var startTime  = 0;
+  var pauseAt    = 0;        // seconds into track when paused
+  var isPlaying  = false;
+  var loopTimer  = null;
+  var noteNodes  = [];       // active oscillators so we can stop them
+  var rafId      = null;
+
+  // ── UI refs (set in init) ──
+  var playBtn, iPlay, iPause, disc, eq, fill, progBg, timeCur, timeDur, volSlider, statusEl;
 
   function fmt(t){
     if(isNaN(t)||t<0)return'0:00';
-    var m=Math.floor(t/60), s=Math.floor(t%60);
+    var m=Math.floor(t/60),s=Math.floor(t%60);
     return m+':'+(s<10?'0':'')+s;
   }
 
   function setPlayUI(on){
-    iPlay.style.display  = on ? 'none' : '';
-    iPause.style.display = on ? '' : 'none';
-    disc.classList.toggle('spinning', on);
-    eq.classList.toggle('active', on);
-    playerState.playing = on;
+    iPlay.style.display  = on?'none':'';
+    iPause.style.display = on?'':'none';
+    disc.classList.toggle('spinning',on);
+    eq.classList.toggle('active',on);
+    isPlaying = on;
   }
 
-  function showStatus(msg, isError){
+  function showStatus(msg,err){
     statusEl.textContent = msg;
-    statusEl.className   = isError ? 'player-error' : 'player-loading';
-    statusEl.style.display = msg ? 'block' : 'none';
+    statusEl.className   = err?'player-error':'player-loading';
+    statusEl.style.display = msg?'block':'none';
   }
 
-  function loadTrack(idx){
-    var t = CFG.tracks[idx];
-    if(!t) return;
-    playerState.trackIdx = idx;
-    playerState.ready    = false;
-    trackName.textContent   = t.name;
-    trackArtist.textContent = t.artist;
-    fill.style.width = '0%';
-    timeCur.textContent = '0:00';
-    timeDur.textContent = '0:00';
-    showStatus('Cargando...', false);
-    audio.src = t.src;
-    audio.load();
+  function ensureCtx(){
+    if(!ctx){
+      ctx      = new (window.AudioContext||window.webkitAudioContext)();
+      gainNode = ctx.createGain();
+      gainNode.gain.value = parseFloat(volSlider.value);
+      gainNode.connect(ctx.destination);
+    }
+    if(ctx.state==='suspended') ctx.resume();
   }
 
-  // ── Events ──────────────────────────
-  audio.addEventListener('canplay', function(){
-    playerState.ready = true;
-    showStatus('', false);
-    if(playerState.playing){
-      audio.play().catch(function(e){ showStatus('No se pudo reproducir: '+e.message, true); setPlayUI(false); });
-    }
-  });
+  // Schedule one note: freq=0 means rest
+  function scheduleNote(freq, startSec, durSec, vol){
+    if(freq<=0||!ctx) return;
+    var osc  = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    // Soft attack/release envelope
+    gain.gain.setValueAtTime(0, startSec);
+    gain.gain.linearRampToValueAtTime(vol, startSec + 0.04);
+    gain.gain.setValueAtTime(vol, startSec + durSec * 0.75);
+    gain.gain.linearRampToValueAtTime(0, startSec + durSec - 0.02);
+    osc.connect(gain);
+    gain.connect(gainNode);
+    osc.start(startSec);
+    osc.stop(startSec + durSec);
+    noteNodes.push(osc);
+  }
 
-  audio.addEventListener('loadedmetadata', function(){
-    timeDur.textContent = fmt(audio.duration);
-  });
-
-  audio.addEventListener('timeupdate', function(){
-    if(!audio.duration) return;
-    fill.style.width = (audio.currentTime/audio.duration*100)+'%';
-    timeCur.textContent = fmt(audio.currentTime);
-  });
-
-  audio.addEventListener('ended', function(){
-    setPlayUI(false);
-    fill.style.width = '0%';
-  });
-
-  audio.addEventListener('error', function(){
-    var codes = {1:'abortado',2:'red',3:'decode',4:'fuente no soportada'};
-    var code  = audio.error ? (codes[audio.error.code]||audio.error.code) : 'desconocido';
-    showStatus('Error al cargar el audio ('+code+'). Prueba otro navegador.', true);
-    setPlayUI(false);
-  });
-
-  audio.addEventListener('waiting', function(){ showStatus('Cargando...', false); });
-  audio.addEventListener('playing', function(){ showStatus('', false); });
-
-  // ── Play / Pause button ──────────────
-  playBtn.addEventListener('click', function(){
-    if(!audio.src || audio.src === window.location.href){
-      // First press: load the track
-      loadTrack(playerState.trackIdx);
-      playerState.playing = true;
-      return;
-    }
-    if(audio.paused){
-      if(playerState.ready){
-        audio.play().then(function(){
-          setPlayUI(true);
-        }).catch(function(e){
-          showStatus('Necesitas interactuar con la página primero.', true);
-          setPlayUI(false);
-        });
-      } else {
-        playerState.playing = true;
-        audio.load();
+  // Schedule the full melody starting at ctx.currentTime offset
+  function scheduleSong(fromBeat){
+    if(!ctx) return;
+    var t       = ctx.currentTime + 0.05;   // small scheduling buffer
+    startTime   = t - fromBeat * BEAT_S;
+    var cursor  = 0;
+    for(var i=0;i<MELODY.length;i++){
+      var freq = MELODY[i][0];
+      var beats= MELODY[i][1];
+      var dur  = beats * BEAT_S;
+      var noteStart = t + (cursor - fromBeat) * BEAT_S;
+      if(noteStart + dur > ctx.currentTime){
+        scheduleNote(freq, Math.max(noteStart, ctx.currentTime), dur * 0.88, 0.35);
       }
-      setPlayUI(true);
-    } else {
-      audio.pause();
-      setPlayUI(false);
+      cursor += beats;
     }
-  });
+    // Bass — one note per bar (8 beats each)
+    var bassCursor = 0;
+    for(var b=0;b<BASS.length;b++){
+      var barStart = t + (bassCursor - fromBeat) * BEAT_S;
+      var barDur   = 8 * BEAT_S;
+      if(barStart + barDur > ctx.currentTime){
+        scheduleNote(BASS[b]/2, Math.max(barStart, ctx.currentTime), barDur * 0.6, 0.18);
+      }
+      bassCursor += 8;
+    }
+  }
 
-  // ── Seek bar ────────────────────────
-  progBg.addEventListener('click', function(e){
-    if(!audio.duration) return;
-    var r = progBg.getBoundingClientRect();
-    audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
-  });
+  function stopAllNodes(){
+    for(var i=0;i<noteNodes.length;i++){
+      try{ noteNodes[i].stop(0); }catch(e){}
+    }
+    noteNodes = [];
+  }
 
-  // ── Volume ──────────────────────────
-  audio.volume = parseFloat(volSlider.value);
-  volSlider.addEventListener('input', function(){
-    audio.volume = parseFloat(this.value);
-  });
+  function currentBeat(){
+    if(!ctx||!isPlaying) return pauseAt / BEAT_S;
+    return (ctx.currentTime - startTime) / BEAT_S;
+  }
 
-  // ── Rewind / Forward ────────────────
-  document.getElementById('btn-rew').addEventListener('click', function(){
-    audio.currentTime = Math.max(0, audio.currentTime - 10);
-  });
-  document.getElementById('btn-fwd').addEventListener('click', function(){
-    if(audio.duration) audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
-  });
-}
+  function updateProgress(){
+    if(!isPlaying){ rafId=null; return; }
+    var elapsed = ctx.currentTime - startTime;
+    if(elapsed >= DURATION_S){
+      // End of track — loop
+      pauseAt = 0;
+      stopAllNodes();
+      scheduleSong(0);
+    }
+    var pct = Math.min(elapsed / DURATION_S, 1);
+    fill.style.width = (pct*100)+'%';
+    timeCur.textContent = fmt(elapsed);
+    rafId = requestAnimationFrame(updateProgress);
+  }
+
+  function play(){
+    ensureCtx();
+    showStatus('','');
+    var fromBeat = pauseAt / BEAT_S;
+    stopAllNodes();
+    scheduleSong(fromBeat);
+    setPlayUI(true);
+    rafId = requestAnimationFrame(updateProgress);
+  }
+
+  function pause(){
+    if(!ctx) return;
+    pauseAt = ctx.currentTime - startTime;
+    if(pauseAt<0) pauseAt=0;
+    stopAllNodes();
+    if(rafId){ cancelAnimationFrame(rafId); rafId=null; }
+    setPlayUI(false);
+  }
+
+  function seek(pct){
+    var wasPlaying = isPlaying;
+    if(isPlaying) pause();
+    pauseAt = pct * DURATION_S;
+    fill.style.width = (pct*100)+'%';
+    timeCur.textContent = fmt(pauseAt);
+    if(wasPlaying) play();
+  }
+
+  function init(){
+    playBtn   = document.getElementById('pv-play');
+    iPlay     = document.getElementById('icon-play');
+    iPause    = document.getElementById('icon-pause');
+    disc      = document.getElementById('player-disc');
+    eq        = document.getElementById('player-eq');
+    fill      = document.getElementById('player-prog-fill');
+    progBg    = document.getElementById('player-prog-bg');
+    timeCur   = document.getElementById('pv-cur');
+    timeDur   = document.getElementById('pv-dur');
+    volSlider = document.getElementById('pv-vol');
+    statusEl  = document.getElementById('player-status');
+
+    timeDur.textContent = fmt(DURATION_S);
+
+    playBtn.addEventListener('click',function(){
+      if(isPlaying) pause(); else play();
+    });
+
+    progBg.addEventListener('click',function(e){
+      var r=progBg.getBoundingClientRect();
+      seek((e.clientX-r.left)/r.width);
+    });
+
+    volSlider.addEventListener('input',function(){
+      if(gainNode) gainNode.gain.value = parseFloat(this.value);
+    });
+
+    document.getElementById('btn-rew').addEventListener('click',function(){
+      var t = Math.max(0, (isPlaying ? ctx.currentTime - startTime : pauseAt) - 10);
+      seek(t / DURATION_S);
+    });
+    document.getElementById('btn-fwd').addEventListener('click',function(){
+      var t = Math.min(DURATION_S, (isPlaying ? ctx.currentTime - startTime : pauseAt) + 10);
+      seek(t / DURATION_S);
+    });
+
+    showStatus('Presiona ▶ para escuchar', false);
+  }
+
+  return { init: init };
+})();
+
+function initPlayer(){ WAP.init(); }
 
 // ═══════════════════════════════════════
 // SONG SUGGEST
