@@ -679,7 +679,7 @@ audio{display:none}
         <span class="gold-shimmer" style="font-family:'Playfair Display',serif;font-size:3rem;letter-spacing:.06em;display:block;font-weight:700;">Nuestra Música</span>
       </div>
 
-      <!-- No audio element needed — Web Audio API generates the melody -->
+      <audio id="pv-audio" style="display:none"></audio>
 
       <div class="player-wrap">
         <div class="player-disc" id="player-disc"></div>
@@ -890,8 +890,8 @@ const CFG = {
 // SPLASH
 // ═══════════════════════════════════════
 function openInvitation() {
-  const splash = document.getElementById('splash');
-  const inv    = document.getElementById('invitation');
+  var splash = document.getElementById('splash');
+  var inv    = document.getElementById('invitation');
   splash.classList.add('closing');
   setTimeout(function() {
     splash.style.display = 'none';
@@ -1106,228 +1106,272 @@ function buildSongs(){
 }
 
 // ═══════════════════════════════════════
-// MUSIC PLAYER — Web Audio API synthesizer
-// No external files, no CORS, works on all browsers including Safari/iOS
+// MUSIC PLAYER — WAV blob synthesizer
+// Genera un WAV en memoria (sin archivos externos) y lo reproduce
+// con el elemento <audio> estándar. Funciona en todos los navegadores.
 // ═══════════════════════════════════════
+function initPlayer() {
 
-var WAP = (function(){
-  // "Canon in D" simplified melody — frequencies (Hz) + durations (beats)
+  // ── Canon in D — [freq Hz, beats] ──────────────────────────────
   var MELODY = [
-    // bar 1
-    [493.88,1],[440.00,1],[392.00,1],[349.23,1],[329.63,1],[293.66,1],[261.63,1],[293.66,1],
-    // bar 2
-    [329.63,1],[349.23,1],[392.00,1],[440.00,1],[493.88,1],[440.00,1],[392.00,1],[349.23,1],
-    // bar 3
-    [329.63,0.5],[349.23,0.5],[392.00,1],[440.00,1],[493.88,1],[523.25,1],[587.33,1],[659.25,1],
-    // bar 4
-    [587.33,1],[523.25,1],[493.88,1],[440.00,1],[392.00,1],[349.23,1],[329.63,1],[261.63,1],
-    // bar 5 — repeat with variation
-    [329.63,1],[392.00,1],[440.00,1],[493.88,1],[523.25,1],[587.33,1],[659.25,1],[587.33,1],
-    // bar 6
-    [523.25,1],[493.88,1],[440.00,1],[392.00,1],[349.23,1],[392.00,1],[440.00,1],[493.88,1],
-    // bar 7
-    [523.25,0.5],[493.88,0.5],[440.00,1],[392.00,1],[349.23,1],[329.63,1],[293.66,1],[261.63,1],
-    // bar 8 — ending phrase
-    [293.66,1],[329.63,1],[349.23,1],[392.00,1],[440.00,2],[392.00,1],[349.23,1],
-    [329.63,4]
+    [523.25,1],[493.88,1],[440.00,1],[392.00,1],[349.23,1],[329.63,1],[293.66,1],[261.63,1],
+    [293.66,1],[261.63,1],[293.66,1],[349.23,1],[392.00,1],[440.00,1],[349.23,1],[392.00,1],
+    [440.00,1],[349.23,1],[392.00,1],[440.00,1],[493.88,1],[440.00,1],[392.00,1],[349.23,1],
+    [329.63,1],[349.23,1],[392.00,1],[329.63,1],[261.63,1],[293.66,1],[329.63,1],[261.63,1],
+    [293.66,1],[349.23,1],[392.00,1],[440.00,1],[493.88,1],[523.25,1],[587.33,1],[659.25,1],
+    [587.33,1],[523.25,1],[493.88,1],[440.00,1],[392.00,1],[440.00,1],[493.88,1],[440.00,1],
+    [392.00,1],[349.23,1],[392.00,1],[440.00,1],[493.88,1],[523.25,1],[587.33,2],[523.25,2],
+    [493.88,1],[440.00,1],[392.00,1],[349.23,1],[329.63,1],[293.66,1],[261.63,4]
   ];
+  var BASS = [293.66,220.00,246.94,185.00,196.00,293.66,196.00,220.00];
 
-  // Bass line (root notes of Canon chord progression: D A Bm F#m G D G A)
-  var BASS = [293.66,220.00,246.94,185.00,196.00,146.83,196.00,220.00];
+  var BPM = 66;
+  var SR  = 22050;   // sample rate — 22 kHz is enough for this
+  var SPB = 60 / BPM; // seconds per beat
 
-  var BPM        = 72;
-  var BEAT_S     = 60 / BPM;
-  var TOTAL_BEATS= MELODY.reduce(function(a,n){return a+n[1];},0);
-  var DURATION_S = TOTAL_BEATS * BEAT_S;
+  // ── Build PCM samples ──────────────────────────────────────────
+  function buildWav() {
+    // compute total samples
+    var totalBeats = 0;
+    for (var i = 0; i < MELODY.length; i++) totalBeats += MELODY[i][1];
+    var totalSec = totalBeats * SPB + 0.5; // 0.5s tail
+    var nSamples = Math.ceil(totalSec * SR);
+    var pcm = new Float32Array(nSamples); // mono, -1..1
 
-  var ctx        = null;
-  var gainNode   = null;
-  var startTime  = 0;
-  var pauseAt    = 0;        // seconds into track when paused
-  var isPlaying  = false;
-  var loopTimer  = null;
-  var noteNodes  = [];       // active oscillators so we can stop them
-  var rafId      = null;
-
-  // ── UI refs (set in init) ──
-  var playBtn, iPlay, iPause, disc, eq, fill, progBg, timeCur, timeDur, volSlider, statusEl;
-
-  function fmt(t){
-    if(isNaN(t)||t<0)return'0:00';
-    var m=Math.floor(t/60),s=Math.floor(t%60);
-    return m+':'+(s<10?'0':'')+s;
-  }
-
-  function setPlayUI(on){
-    iPlay.style.display  = on?'none':'';
-    iPause.style.display = on?'':'none';
-    disc.classList.toggle('spinning',on);
-    eq.classList.toggle('active',on);
-    isPlaying = on;
-  }
-
-  function showStatus(msg,err){
-    statusEl.textContent = msg;
-    statusEl.className   = err?'player-error':'player-loading';
-    statusEl.style.display = msg?'block':'none';
-  }
-
-  function ensureCtx(){
-    if(!ctx){
-      ctx      = new (window.AudioContext||window.webkitAudioContext)();
-      gainNode = ctx.createGain();
-      gainNode.gain.value = parseFloat(volSlider.value);
-      gainNode.connect(ctx.destination);
-    }
-    if(ctx.state==='suspended') ctx.resume();
-  }
-
-  // Schedule one note: freq=0 means rest
-  function scheduleNote(freq, startSec, durSec, vol){
-    if(freq<=0||!ctx) return;
-    var osc  = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    // Soft attack/release envelope
-    gain.gain.setValueAtTime(0, startSec);
-    gain.gain.linearRampToValueAtTime(vol, startSec + 0.04);
-    gain.gain.setValueAtTime(vol, startSec + durSec * 0.75);
-    gain.gain.linearRampToValueAtTime(0, startSec + durSec - 0.02);
-    osc.connect(gain);
-    gain.connect(gainNode);
-    osc.start(startSec);
-    osc.stop(startSec + durSec);
-    noteNodes.push(osc);
-  }
-
-  // Schedule the full melody starting at ctx.currentTime offset
-  function scheduleSong(fromBeat){
-    if(!ctx) return;
-    var t       = ctx.currentTime + 0.05;   // small scheduling buffer
-    startTime   = t - fromBeat * BEAT_S;
-    var cursor  = 0;
-    for(var i=0;i<MELODY.length;i++){
-      var freq = MELODY[i][0];
-      var beats= MELODY[i][1];
-      var dur  = beats * BEAT_S;
-      var noteStart = t + (cursor - fromBeat) * BEAT_S;
-      if(noteStart + dur > ctx.currentTime){
-        scheduleNote(freq, Math.max(noteStart, ctx.currentTime), dur * 0.88, 0.35);
+    // helper: add a sine tone at offset (samples)
+    function addSine(freq, startSample, durationSamples, amp) {
+      var atk = Math.min(Math.floor(SR * 0.04), Math.floor(durationSamples * 0.1));
+      var rel = Math.min(Math.floor(SR * 0.06), Math.floor(durationSamples * 0.12));
+      for (var j = 0; j < durationSamples; j++) {
+        var idx = startSample + j;
+        if (idx >= nSamples) break;
+        var env = 1.0;
+        if (j < atk) env = j / atk;
+        else if (j > durationSamples - rel) env = (durationSamples - j) / rel;
+        pcm[idx] += amp * env * Math.sin(2 * Math.PI * freq * j / SR);
       }
-      cursor += beats;
     }
-    // Bass — one note per bar (8 beats each)
+
+    // melody
+    var cursor = 0;
+    for (var m = 0; m < MELODY.length; m++) {
+      var freq  = MELODY[m][0];
+      var beats = MELODY[m][1];
+      var dur   = beats * SPB;
+      var startS = Math.floor(cursor * SR);
+      var durS   = Math.floor(dur * 0.84 * SR);
+      addSine(freq, startS, durS, 0.30);
+      cursor += dur;
+    }
+
+    // bass — 8-beat blocks, triangle-ish (add harmonics)
     var bassCursor = 0;
-    for(var b=0;b<BASS.length;b++){
-      var barStart = t + (bassCursor - fromBeat) * BEAT_S;
-      var barDur   = 8 * BEAT_S;
-      if(barStart + barDur > ctx.currentTime){
-        scheduleNote(BASS[b]/2, Math.max(barStart, ctx.currentTime), barDur * 0.6, 0.18);
+    for (var b = 0; b < BASS.length; b++) {
+      var bFreq  = BASS[b] / 2;
+      var bDur   = 8 * SPB * 0.65;
+      var bStart = Math.floor(bassCursor * SR);
+      var bDurS  = Math.floor(bDur * SR);
+      addSine(bFreq,       bStart, bDurS, 0.14);
+      addSine(bFreq * 3,   bStart, bDurS, 0.04);
+      bassCursor += 8 * SPB;
+    }
+
+    // normalize to avoid clipping
+    var peak = 0;
+    for (var s = 0; s < pcm.length; s++) {
+      var abs = pcm[s] < 0 ? -pcm[s] : pcm[s];
+      if (abs > peak) peak = abs;
+    }
+    if (peak > 0.9) {
+      var scale = 0.9 / peak;
+      for (var s2 = 0; s2 < pcm.length; s2++) pcm[s2] *= scale;
+    }
+
+    // encode as 16-bit WAV
+    var dataLen = nSamples * 2; // 16-bit mono
+    var buf = new ArrayBuffer(44 + dataLen);
+    var view = new DataView(buf);
+    function str4(o, s) { for (var i=0;i<4;i++) view.setUint8(o+i, s.charCodeAt(i)); }
+    str4(0,  'RIFF');  view.setUint32(4,  36 + dataLen, true);
+    str4(8,  'WAVE'); str4(12, 'fmt ');
+    view.setUint32(16, 16, true);          // subchunk size
+    view.setUint16(20, 1,  true);          // PCM
+    view.setUint16(22, 1,  true);          // mono
+    view.setUint32(24, SR, true);          // sample rate
+    view.setUint32(28, SR * 2, true);      // byte rate
+    view.setUint16(32, 2,  true);          // block align
+    view.setUint16(34, 16, true);          // bits per sample
+    str4(36, 'data'); view.setUint32(40, dataLen, true);
+    var offset = 44;
+    for (var k = 0; k < nSamples; k++) {
+      var val = Math.max(-1, Math.min(1, pcm[k]));
+      view.setInt16(offset, val < 0 ? val * 32768 : val * 32767, true);
+      offset += 2;
+    }
+    return buf;
+  }
+
+  // ── UI refs ──────────────────────────────────────────────────
+  var audio    = document.getElementById('pv-audio');
+  var btnPlay  = document.getElementById('pv-play');
+  var iPlay    = document.getElementById('icon-play');
+  var iPause   = document.getElementById('icon-pause');
+  var disc     = document.getElementById('player-disc');
+  var eq       = document.getElementById('player-eq');
+  var fill     = document.getElementById('player-prog-fill');
+  var progBg   = document.getElementById('player-prog-bg');
+  var timeCur  = document.getElementById('pv-cur');
+  var timeDur  = document.getElementById('pv-dur');
+  var volSldr  = document.getElementById('pv-vol');
+  var statusEl = document.getElementById('player-status');
+
+  // ── State ────────────────────────────────────────────────────
+  var blobReady  = false;  // WAV blob assigned and canplay fired
+  var preparing  = false;  // buildWav in progress (prevents double-build)
+  var pendingCbs = [];     // callbacks waiting for blob to be ready
+
+  // ── Helpers ──────────────────────────────────────────────────
+  function setStatus(msg, err) {
+    statusEl.textContent   = msg || '';
+    statusEl.className     = err ? 'player-error' : 'player-loading';
+    statusEl.style.display = msg ? 'block' : 'none';
+  }
+
+  function fmt(t) {
+    t = t > 0 ? t : 0;
+    var m = Math.floor(t / 60), s = Math.floor(t % 60);
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function setPlayUI(on) {
+    iPlay.style.display  = on ? 'none' : '';
+    iPause.style.display = on ? ''     : 'none';
+    disc.classList.toggle('spinning', on);
+    eq.classList.toggle('active', on);
+  }
+
+  function updateBar() {
+    if (!audio.duration || isNaN(audio.duration)) return;
+    fill.style.width    = (audio.currentTime / audio.duration * 100) + '%';
+    timeCur.textContent = fmt(audio.currentTime);
+  }
+
+  function safePlay() {
+    var p = audio.play();
+    if (p && p.catch) p.catch(function(err) {
+      setStatus('No se pudo reproducir: ' + err.message, true);
+    });
+  }
+
+  // prepare: builds WAV once, queues multiple callbacks safely,
+  // fires them all only after canplay (audio is seekable).
+  function prepare(cb) {
+    if (blobReady) { cb(); return; }
+    pendingCbs.push(cb);
+    if (preparing) return;   // already building — cb is queued, will fire
+    preparing = true;
+    setStatus('Preparando audio…', false);
+    setTimeout(function() {
+      try {
+        var buf  = buildWav();
+        var blob = new Blob([buf], { type: 'audio/wav' });
+        var url  = URL.createObjectURL(blob);
+
+        function onCanPlay() {
+          audio.removeEventListener('canplay', onCanPlay);
+          blobReady = true;
+          preparing = false;
+          setStatus('', false);
+          var cbs = pendingCbs.splice(0);
+          for (var i = 0; i < cbs.length; i++) cbs[i]();
+        }
+        audio.addEventListener('canplay', onCanPlay);
+        audio.src = url;
+        audio.load();
+      } catch (err) {
+        preparing  = false;
+        pendingCbs = [];
+        setStatus('Error al generar audio: ' + err.message, true);
       }
-      bassCursor += 8;
-    }
+    }, 20);
   }
 
-  function stopAllNodes(){
-    for(var i=0;i<noteNodes.length;i++){
-      try{ noteNodes[i].stop(0); }catch(e){}
-    }
-    noteNodes = [];
-  }
+  // ── Audio events ──────────────────────────────────────────────
+  audio.addEventListener('timeupdate', updateBar);
 
-  function currentBeat(){
-    if(!ctx||!isPlaying) return pauseAt / BEAT_S;
-    return (ctx.currentTime - startTime) / BEAT_S;
-  }
+  audio.addEventListener('loadedmetadata', function() {
+    if (!isNaN(audio.duration)) timeDur.textContent = fmt(audio.duration);
+  });
 
-  function updateProgress(){
-    if(!isPlaying){ rafId=null; return; }
-    var elapsed = ctx.currentTime - startTime;
-    if(elapsed >= DURATION_S){
-      // End of track — loop
-      pauseAt = 0;
-      stopAllNodes();
-      scheduleSong(0);
-    }
-    var pct = Math.min(elapsed / DURATION_S, 1);
-    fill.style.width = (pct*100)+'%';
-    timeCur.textContent = fmt(elapsed);
-    rafId = requestAnimationFrame(updateProgress);
-  }
+  audio.addEventListener('ended', function() {
+    // loop: restart from beginning
+    audio.currentTime = 0;
+    safePlay();
+  });
 
-  function play(){
-    ensureCtx();
-    showStatus('','');
-    var fromBeat = pauseAt / BEAT_S;
-    stopAllNodes();
-    scheduleSong(fromBeat);
-    setPlayUI(true);
-    rafId = requestAnimationFrame(updateProgress);
-  }
-
-  function pause(){
-    if(!ctx) return;
-    pauseAt = ctx.currentTime - startTime;
-    if(pauseAt<0) pauseAt=0;
-    stopAllNodes();
-    if(rafId){ cancelAnimationFrame(rafId); rafId=null; }
+  audio.addEventListener('playing', function() { setStatus('', false); setPlayUI(true); });
+  audio.addEventListener('pause',   function() { setPlayUI(false); });
+  audio.addEventListener('error',   function() {
+    var msg = (audio.error && audio.error.message) ? audio.error.message : 'Error de audio';
+    setStatus(msg, true);
     setPlayUI(false);
-  }
+  });
 
-  function seek(pct){
-    var wasPlaying = isPlaying;
-    if(isPlaying) pause();
-    pauseAt = pct * DURATION_S;
-    fill.style.width = (pct*100)+'%';
-    timeCur.textContent = fmt(pauseAt);
-    if(wasPlaying) play();
-  }
+  // ── Play / Pause ─────────────────────────────────────────────
+  btnPlay.addEventListener('click', function() {
+    if (!audio.paused) {
+      audio.pause();
+    } else {
+      prepare(safePlay);
+    }
+  });
 
-  function init(){
-    playBtn   = document.getElementById('pv-play');
-    iPlay     = document.getElementById('icon-play');
-    iPause    = document.getElementById('icon-pause');
-    disc      = document.getElementById('player-disc');
-    eq        = document.getElementById('player-eq');
-    fill      = document.getElementById('player-prog-fill');
-    progBg    = document.getElementById('player-prog-bg');
-    timeCur   = document.getElementById('pv-cur');
-    timeDur   = document.getElementById('pv-dur');
-    volSlider = document.getElementById('pv-vol');
-    statusEl  = document.getElementById('player-status');
-
-    timeDur.textContent = fmt(DURATION_S);
-
-    playBtn.addEventListener('click',function(){
-      if(isPlaying) pause(); else play();
+  // ── Seek bar ─────────────────────────────────────────────────
+  progBg.addEventListener('click', function(ev) {
+    var rect    = progBg.getBoundingClientRect();
+    var frac    = Math.max(0, Math.min(1, (ev.clientX - rect.left) / rect.width));
+    var wasPlaying = !audio.paused;
+    prepare(function() {
+      audio.currentTime = frac * audio.duration;
+      updateBar();
+      if (wasPlaying) safePlay();  // keep playing if it was playing
     });
+  });
 
-    progBg.addEventListener('click',function(e){
-      var r=progBg.getBoundingClientRect();
-      seek((e.clientX-r.left)/r.width);
+  // ── Volume ───────────────────────────────────────────────────
+  audio.volume = parseFloat(volSldr.value);
+  volSldr.addEventListener('input', function() {
+    audio.volume = parseFloat(this.value);
+  });
+
+  // ── Rewind −10s ──────────────────────────────────────────────
+  document.getElementById('btn-rew').addEventListener('click', function() {
+    var wasPlaying = !audio.paused;
+    prepare(function() {
+      audio.currentTime = Math.max(0, audio.currentTime - 10);
+      updateBar();
+      if (wasPlaying) safePlay();
     });
+  });
 
-    volSlider.addEventListener('input',function(){
-      if(gainNode) gainNode.gain.value = parseFloat(this.value);
+  // ── Forward +10s ─────────────────────────────────────────────
+  document.getElementById('btn-fwd').addEventListener('click', function() {
+    var wasPlaying = !audio.paused;
+    prepare(function() {
+      audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+      updateBar();
+      if (wasPlaying) safePlay();
     });
+  });
 
-    document.getElementById('btn-rew').addEventListener('click',function(){
-      var t = Math.max(0, (isPlaying ? ctx.currentTime - startTime : pauseAt) - 10);
-      seek(t / DURATION_S);
-    });
-    document.getElementById('btn-fwd').addEventListener('click',function(){
-      var t = Math.min(DURATION_S, (isPlaying ? ctx.currentTime - startTime : pauseAt) + 10);
-      seek(t / DURATION_S);
-    });
-
-    showStatus('Presiona ▶ para escuchar', false);
-  }
-
-  return { init: init };
-})();
-
-function initPlayer(){ WAP.init(); }
+  // ── Init UI (show duration immediately from melody data) ──────
+  var totalBeats = 0;
+  for (var ti = 0; ti < MELODY.length; ti++) totalBeats += MELODY[ti][1];
+  timeDur.textContent = fmt(totalBeats * SPB);
+  fill.style.width    = '0%';
+  timeCur.textContent = '0:00';
+  setStatus('Presiona ▶ para escuchar', false);
+}
 
 // ═══════════════════════════════════════
 // SONG SUGGEST
