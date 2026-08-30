@@ -152,22 +152,90 @@
     #lightbox-img{width:100%;border:1px solid rgba(212,175,98,.4);border-radius:10px;max-height:72vh;object-fit:contain;display:block;}
 
     /* ══════ AUDIO PLAYER ══════ */
-    #pv-audio-wrap{
+    .player-card{
       background:linear-gradient(135deg,#100c1e,#060410);
-      border:1px solid rgba(212,175,98,.2);border-radius:14px;
-      padding:1.5rem;margin-bottom:1rem;
-      box-shadow:0 8px 40px rgba(0,0,0,.5),0 0 0 1px rgba(212,175,98,.06);
+      border:1px solid rgba(212,175,98,.22);border-radius:16px;
+      padding:1.4rem 1.3rem 1.2rem;
+      box-shadow:0 8px 40px rgba(0,0,0,.55),0 0 0 1px rgba(212,175,98,.06);
     }
-    .audio-ctrl-btn{
-      width:46px;height:46px;border-radius:50%;
-      background:linear-gradient(135deg,#7a5c10,#d4af62);
-      border:none;color:#020309;font-size:1.1rem;
+    .player-track-name{
+      font-family:'Cormorant Garamond',serif;font-style:italic;
+      font-size:1.1rem;color:var(--c-c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      margin-bottom:3px;
+    }
+    .player-track-artist{font-size:.4rem;letter-spacing:.32em;color:var(--c-dim);font-weight:600;}
+    .player-time{font-size:.44rem;color:var(--c-dim);font-variant-numeric:tabular-nums;}
+
+    /* Seek bar */
+    .seek-bar{
+      position:relative;height:5px;border-radius:3px;
+      background:rgba(212,175,98,.12);cursor:pointer;
+      user-select:none;-webkit-user-select:none;
+    }
+    .seek-fill{
+      height:100%;width:0%;border-radius:3px;
+      background:linear-gradient(90deg,var(--c-b),var(--c-a),var(--c-c));
+      pointer-events:none;
+    }
+    .seek-thumb{
+      position:absolute;top:50%;left:0%;
+      transform:translate(-50%,-50%);
+      width:14px;height:14px;border-radius:50%;
+      background:var(--c-a);
+      box-shadow:0 0 10px rgba(212,175,98,.6);
+      pointer-events:none;transition:left .1s linear;
+    }
+
+    /* Controles */
+    .player-controls{
+      display:flex;align-items:center;justify-content:center;gap:.9rem;
+    }
+    .player-btn-main{
+      width:56px;height:56px;border-radius:50%;
+      background:linear-gradient(135deg,#7a5c10,#d4af62,#efe0a8,#d4af62,#7a5c10);
+      border:none;color:#020309;
       display:flex;align-items:center;justify-content:center;
-      box-shadow:0 4px 20px rgba(212,175,98,.3);
-      flex-shrink:0;
+      box-shadow:0 4px 22px rgba(212,175,98,.4);
+      transition:transform .12s,box-shadow .12s;
+      cursor:pointer;flex-shrink:0;
     }
-    .audio-range{-webkit-appearance:none;appearance:none;height:3px;border-radius:2px;background:rgba(212,175,98,.15);outline:none;cursor:pointer;flex:1;}
-    .audio-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:var(--c-a);cursor:pointer;box-shadow:0 0 8px rgba(212,175,98,.4);}
+    .player-btn-main:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(212,175,98,.55);}
+    .player-btn-main:active{transform:scale(.95);}
+    .player-btn-mid{
+      width:40px;height:40px;border-radius:50%;
+      background:rgba(212,175,98,.09);border:1px solid rgba(212,175,98,.22);
+      color:var(--c-a);
+      display:flex;align-items:center;justify-content:center;
+      transition:background .18s;cursor:pointer;flex-shrink:0;
+    }
+    .player-btn-mid:hover{background:rgba(212,175,98,.18);}
+    .player-btn-sm{
+      width:34px;height:34px;border-radius:50%;
+      background:transparent;border:1px solid rgba(212,175,98,.15);
+      color:rgba(212,175,98,.4);
+      display:flex;align-items:center;justify-content:center;
+      transition:all .18s;cursor:pointer;flex-shrink:0;
+    }
+    .player-btn-sm:hover{background:rgba(212,175,98,.1);color:var(--c-a);}
+    .player-btn-sm.active{
+      background:rgba(212,175,98,.18);border-color:rgba(212,175,98,.5);
+      color:var(--c-a);
+    }
+    .audio-range{
+      -webkit-appearance:none;appearance:none;height:3px;border-radius:2px;
+      background:rgba(212,175,98,.18);outline:none;cursor:pointer;flex:1;
+    }
+    .audio-range::-webkit-slider-thumb{
+      -webkit-appearance:none;appearance:none;
+      width:14px;height:14px;border-radius:50%;
+      background:var(--c-a);cursor:pointer;
+      box-shadow:0 0 8px rgba(212,175,98,.4);
+    }
+    /* Playlist item activo */
+    .playlist-item.active{
+      border-left-color:var(--c-a) !important;
+      background:linear-gradient(135deg,rgba(212,175,98,.1),rgba(212,175,98,.04));
+    }
 
     /* ══════ RSVP ══════ */
     .rsvp-input{display:block;width:100%;padding:.95rem 1.1rem;background:#0a0814;border:1px solid rgba(212,175,98,.18);color:var(--c-text);font-size:.76rem;border-radius:8px;outline:none;}
@@ -484,46 +552,61 @@
 
     <!-- ── REPRODUCTOR ── -->
     <div id="pv-audio-wrap" class="reveal">
-      <audio id="pv-audio" preload="auto" crossorigin="anonymous"></audio>
+      <audio id="pv-audio" preload="metadata"></audio>
 
-      <!-- Tarjeta del reproductor -->
-      <div style="background:linear-gradient(135deg,#100c1e,#060410);border:1px solid rgba(212,175,98,.22);border-radius:16px;padding:1.5rem 1.4rem 1.3rem;box-shadow:0 8px 40px rgba(0,0,0,.55),0 0 0 1px rgba(212,175,98,.06);">
+      <!-- Tarjeta reproductor -->
+      <div class="player-card">
 
-        <!-- Título de pista + artista -->
-        <div style="text-align:center;margin-bottom:1.1rem;">
-          <div id="pv-track-name" style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-style:italic;color:var(--c-c);line-height:1.3;margin-bottom:.2rem;">Canon in D</div>
-          <div id="pv-track-artist" style="font-size:.42rem;letter-spacing:.38em;color:var(--c-dim);font-weight:600;">JOHANN PACHELBEL (DEMO)</div>
-        </div>
-
-        <!-- Barra de progreso + tiempos -->
-        <div style="margin-bottom:1rem;">
-          <div style="position:relative;height:4px;border-radius:2px;background:rgba(212,175,98,.12);cursor:pointer;margin-bottom:.5rem;" id="seek-track" onclick="seekByClick(event,this)">
-            <div id="seek-fill" style="height:100%;width:0%;background:linear-gradient(90deg,var(--c-b),var(--c-a),var(--c-c));border-radius:2px;pointer-events:none;transition:width .15s linear;"></div>
-            <div id="seek-thumb" style="position:absolute;top:50%;right:calc(100% - 0%);transform:translate(50%,-50%);width:13px;height:13px;border-radius:50%;background:var(--c-a);box-shadow:0 0 8px rgba(212,175,98,.5);pointer-events:none;transition:right .15s linear;"></div>
+        <!-- Disco animado + info de pista -->
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;">
+          <div id="player-disc" style="width:52px;height:52px;border-radius:50%;background:conic-gradient(from 0deg,#b8943a,#efe0a8,#d4af62,#7a5c10,#b8943a);flex-shrink:0;box-shadow:0 0 18px rgba(212,175,98,.3);transition:transform .1s linear;position:relative;overflow:hidden;">
+            <div style="position:absolute;inset:30%;border-radius:50%;background:#08060f;"></div>
           </div>
-          <div style="display:flex;justify-content:space-between;">
-            <span id="pv-track-time" style="font-size:.42rem;color:var(--c-dim);">0:00</span>
-            <span id="pv-track-dur"  style="font-size:.42rem;color:var(--c-dim);">0:00</span>
+          <div style="flex:1;min-width:0;">
+            <div id="pv-track-name" class="player-track-name">Canon in D</div>
+            <div id="pv-track-artist" class="player-track-artist">JOHANN PACHELBEL</div>
           </div>
         </div>
 
-        <!-- Controles principales -->
-        <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.1rem;">
-          <!-- Anterior -->
-          <button onclick="playerPrev()" title="Anterior" style="width:38px;height:38px;border-radius:50%;background:rgba(212,175,98,.08);border:1px solid rgba(212,175,98,.2);color:var(--c-a);font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background .2s;">⏮</button>
-          <!-- Play/Pause -->
-          <button id="pv-play-btn" onclick="togglePlay()" title="Play / Pausa" style="width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#7a5c10,#d4af62,#efe0a8,#d4af62,#7a5c10);border:none;color:#020309;font-size:1.3rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(212,175,98,.35);transition:transform .15s;">▶</button>
-          <!-- Siguiente -->
-          <button onclick="playerNext()" title="Siguiente" style="width:38px;height:38px;border-radius:50%;background:rgba(212,175,98,.08);border:1px solid rgba(212,175,98,.2);color:var(--c-a);font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background .2s;">⏭</button>
-          <!-- Repetir -->
-          <button id="pv-repeat-btn" onclick="toggleRepeat()" title="Repetir" style="width:34px;height:34px;border-radius:50%;background:transparent;border:1px solid rgba(212,175,98,.15);color:rgba(212,175,98,.35);font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:all .2s;">🔁</button>
+        <!-- Barra de progreso -->
+        <div style="margin-bottom:1.1rem;">
+          <div id="seek-track" class="seek-bar" onmousedown="seekStart(event,this)" ontouchstart="seekStart(event,this)">
+            <div id="seek-fill" class="seek-fill"></div>
+            <div id="seek-thumb" class="seek-thumb"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:5px;">
+            <span id="pv-track-time" class="player-time">0:00</span>
+            <span id="pv-track-dur"  class="player-time">--:--</span>
+          </div>
         </div>
 
-        <!-- Volumen -->
-        <div style="display:flex;align-items:center;gap:.6rem;">
-          <button id="pv-mute-btn" onclick="toggleMute()" title="Silenciar" style="background:none;border:none;font-size:1rem;color:var(--c-a);flex-shrink:0;">🔈</button>
+        <!-- Botones de control -->
+        <div class="player-controls">
+          <button class="player-btn-sm" id="pv-repeat-btn" onclick="toggleRepeat()" title="Repetir">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          </button>
+          <button class="player-btn-mid" onclick="playerPrev()" title="Anterior">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+          </button>
+          <button class="player-btn-main" id="pv-play-btn" onclick="togglePlay()" title="Play / Pausa">
+            <svg id="icon-play"  width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="icon-pause" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <button class="player-btn-mid" onclick="playerNext()" title="Siguiente">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2.5-6 5.5 3.5L8.5 12zM16 6h2v12h-2z"/></svg>
+          </button>
+          <button class="player-btn-sm" id="pv-mute-btn" onclick="toggleMute()" title="Silenciar/Activar sonido">
+            <svg id="icon-vol"  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            <svg id="icon-mute" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+          </button>
+        </div>
+
+        <!-- Barra de volumen -->
+        <div style="display:flex;align-items:center;gap:.75rem;margin-top:.85rem;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(212,175,98,.4)" stroke-width="2.2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg>
           <input type="range" id="pv-vol" class="audio-range" style="flex:1;" min="0" max="100" value="80" oninput="setVolume(this.value)"/>
-          <span id="pv-vol-pct" style="font-size:.4rem;color:var(--c-dim);width:26px;text-align:right;flex-shrink:0;">80%</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(212,175,98,.4)" stroke-width="2.2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          <span id="pv-vol-pct" style="font-size:.45rem;color:var(--c-dim);min-width:28px;text-align:right;">80%</span>
         </div>
       </div>
     </div>
@@ -788,7 +871,7 @@ const state = {
   poem: '"Y así, con el corazón lleno de gratitud, cerramos esta invitación esperando verte pronto en el momento más especial de nuestras vidas."',
   signature: 'Sofía & Andrés',
   palette: 'dorado',
-  particles: 'corazones',
+ particles: 'ninguna',
   showSplash: true,
   splashBtn: '✦ ABRIR INVITACIÓN',
   itinerary: [
@@ -1478,92 +1561,87 @@ function closeLightbox() {
 }
 
 /* ═══════════════════════════════════════════════════
-   AUDIO PLAYER — completamente funcional
-   Canción demo: fragmento libre de derechos via CDN
+   AUDIO PLAYER — reconstruido desde cero
    ═══════════════════════════════════════════════════ */
 
-/* Playlist: el editor inyecta state.songs; usamos la demo como fallback.
-   Fuentes: Internet Archive — dominio público, CORS abierto */
+/* Pistas demo: Wikimedia Commons — dominio público, CORS abierto garantizado */
 const DEMO_TRACKS = [
   {
     title: 'Canon in D',
-    artist: 'Johann Pachelbel (demo)',
-    src: 'https://ia800304.us.archive.org/33/items/CanoninD_596/CanoninD.mp3'
+    artist: 'Pachelbel',
+    src: 'https://upload.wikimedia.org/wikipedia/commons/b/b8/Johann_Pachelbel_-_Canon_in_D_major.ogg'
   },
   {
     title: 'Clair de Lune',
-    artist: 'Claude Debussy (demo)',
-    src: 'https://ia801404.us.archive.org/21/items/ClairDeLune_975/ClairDeLune.mp3'
+    artist: 'Debussy',
+    src: 'https://upload.wikimedia.org/wikipedia/commons/6/6e/Debussy_-_Clair_de_lune.ogg'
   },
   {
-    title: 'Air on the G String',
-    artist: 'J.S. Bach (demo)',
-    src: 'https://ia800506.us.archive.org/8/items/AirOnTheGString_201405/AirOnGString2.mp3'
+    title: 'Gymnopédie No.1',
+    artist: 'Satie',
+    src: 'https://upload.wikimedia.org/wikipedia/commons/e/e1/Satie_-_3_Gymnop%C3%A9dies_-_1._Lent_et_douloureux.ogg'
   },
 ];
 
-let playerIdx      = 0;
-let playerRepeat   = false;
-let playerMuted    = false;
-let playerVolume   = 0.8;
-let playerTracks   = [];       /* se llena en initPlayer() */
-let playerSeeking  = false;
-let playerInited   = false;    /* bandera — evita doble bind de eventos */
+let playerIdx     = 0;
+let playerRepeat  = false;
+let playerMuted   = false;
+let playerVolume  = 0.8;
+let playerTracks  = [];
+let playerInited  = false;
+let discAngle     = 0;
+let discRAF       = null;
 
-/* Construye la lista de pistas combinando state.songs + demo */
-function buildPlayerTracks() {
-  const fromState = (state.songs || []).map((s, i) => {
-    const raw   = typeof s === 'string' ? s : (s.v || '');
-    const parts = raw.split('—').map(p => p.trim());
-    return {
-      title:  parts[1] || raw,
-      artist: parts[0] || '',
-      src:    DEMO_TRACKS[i % DEMO_TRACKS.length].src,   /* audio libre */
-    };
-  });
-  playerTracks = fromState.length ? fromState : DEMO_TRACKS;
-}
-
+/* ── Init ── */
 function initPlayer() {
   buildPlayerTracks();
-  loadTrack(0, false);
   renderPlaylist();
+  loadTrack(0, false);
   if (!playerInited) {
     bindPlayerEvents();
     playerInited = true;
   }
 }
 
-/* ── Cargar pista por índice ── */
+function buildPlayerTracks() {
+  const fromState = (state.songs || []).map((s, i) => {
+    const raw   = typeof s === 'string' ? s : (s.v || '');
+    const parts = raw.split('—').map(p => p.trim());
+    return { title: parts[1] || raw, artist: parts[0] || '', src: DEMO_TRACKS[i % DEMO_TRACKS.length].src };
+  });
+  playerTracks = fromState.length ? fromState : DEMO_TRACKS;
+}
+
+/* ── Cargar pista ── */
 function loadTrack(idx, autoplay) {
   const audio = document.getElementById('pv-audio');
   if (!audio || !playerTracks.length) return;
   playerIdx = ((idx % playerTracks.length) + playerTracks.length) % playerTracks.length;
   const t = playerTracks[playerIdx];
 
-  audio.src   = t.src;
+  audio.pause();
+  audio.removeAttribute('src');
+  audio.load();
+  audio.src = t.src;
   audio.volume = playerVolume;
   audio.muted  = playerMuted;
-  audio.load();
 
-  /* Actualizar UI nombre */
+  /* UI */
   const nameEl   = document.getElementById('pv-track-name');
   const artistEl = document.getElementById('pv-track-artist');
   if (nameEl)   nameEl.textContent   = t.title;
   if (artistEl) artistEl.textContent = t.artist.toUpperCase();
-
-  /* Reset barra */
-  updateSeekUI(0, 0);
-  updateDuration(0);
+  setSeekUI(0);
+  const durEl = document.getElementById('pv-track-dur');
+  if (durEl) durEl.textContent = '--:--';
+  setPlayBtn(false);
+  stopDisc();
+  highlightPlaylistItem(playerIdx);
 
   if (autoplay) {
-    audio.play().then(() => setPlayBtn(true)).catch(() => {});
-  } else {
-    setPlayBtn(false);
+    audio.load();
+    audio.play().then(() => { setPlayBtn(true); spinDisc(); }).catch(() => {});
   }
-
-  /* Resaltar en playlist */
-  highlightPlaylistItem(playerIdx);
 }
 
 /* ── Play / Pause ── */
@@ -1574,39 +1652,36 @@ function togglePlay() {
     if (!audio.src || audio.src === window.location.href) {
       loadTrack(playerIdx, true);
     } else {
-      audio.play().then(() => setPlayBtn(true)).catch(() => {});
+      audio.play().then(() => { setPlayBtn(true); spinDisc(); }).catch(() => {});
     }
   } else {
     audio.pause();
     setPlayBtn(false);
+    stopDisc();
   }
 }
 
-/* ── Anterior / Siguiente ── */
+/* ── Prev / Next ── */
 function playerPrev() {
   const audio = document.getElementById('pv-audio');
-  /* Si llevamos más de 3s, reiniciar pista; si no, ir a la anterior */
+  const wasPlaying = audio && !audio.paused;
   if (audio && audio.currentTime > 3) {
     audio.currentTime = 0;
   } else {
-    loadTrack(playerIdx - 1, !document.getElementById('pv-audio')?.paused);
+    loadTrack(playerIdx - 1, wasPlaying);
   }
 }
-
 function playerNext() {
-  const wasPlaying = !document.getElementById('pv-audio')?.paused;
+  const audio = document.getElementById('pv-audio');
+  const wasPlaying = audio && !audio.paused;
   loadTrack(playerIdx + 1, wasPlaying);
 }
 
-/* ── Repetir ── */
+/* ── Repeat ── */
 function toggleRepeat() {
   playerRepeat = !playerRepeat;
   const btn = document.getElementById('pv-repeat-btn');
-  if (btn) {
-    btn.style.color      = playerRepeat ? 'var(--c-a)'              : 'rgba(212,175,98,.35)';
-    btn.style.background = playerRepeat ? 'rgba(212,175,98,.15)'    : 'transparent';
-    btn.style.borderColor= playerRepeat ? 'rgba(212,175,98,.5)'     : 'rgba(212,175,98,.15)';
-  }
+  if (btn) btn.classList.toggle('active', playerRepeat);
   const audio = document.getElementById('pv-audio');
   if (audio) audio.loop = playerRepeat;
 }
@@ -1615,101 +1690,149 @@ function toggleRepeat() {
 function toggleMute() {
   const audio = document.getElementById('pv-audio');
   if (!audio) return;
-  playerMuted  = !playerMuted;
-  audio.muted  = playerMuted;
-  const btn = document.getElementById('pv-mute-btn');
-  if (btn) btn.textContent = playerMuted ? '🔇' : (playerVolume > 0.5 ? '🔊' : '🔈');
+  playerMuted = !playerMuted;
+  audio.muted = playerMuted;
+  const volIcon  = document.getElementById('icon-vol');
+  const muteIcon = document.getElementById('icon-mute');
+  if (volIcon)  volIcon.style.display  = playerMuted ? 'none' : '';
+  if (muteIcon) muteIcon.style.display = playerMuted ? ''     : 'none';
 }
 
-/* ── Volumen ── */
+/* ── Volume ── */
 function setVolume(val) {
-  const audio = document.getElementById('pv-audio');
   playerVolume = val / 100;
-  if (audio) { audio.volume = playerVolume; if (playerMuted && playerVolume > 0) { playerMuted = false; audio.muted = false; } }
+  const audio = document.getElementById('pv-audio');
+  if (audio) {
+    audio.volume = playerVolume;
+    if (playerMuted && playerVolume > 0) {
+      playerMuted = false;
+      audio.muted = false;
+      const volIcon  = document.getElementById('icon-vol');
+      const muteIcon = document.getElementById('icon-mute');
+      if (volIcon)  volIcon.style.display  = '';
+      if (muteIcon) muteIcon.style.display = 'none';
+    }
+  }
   const pct = document.getElementById('pv-vol-pct');
-  if (pct) pct.textContent = `${Math.round(val)}%`;
-  const btn = document.getElementById('pv-mute-btn');
-  if (btn) btn.textContent = playerMuted ? '🔇' : (playerVolume > 0.5 ? '🔊' : '🔈');
+  if (pct) pct.textContent = Math.round(val) + '%';
 }
 
-/* ── Seek click en barra ── */
+/* ── Seek: click en la barra ── */
 function seekByClick(e, bar) {
   const audio = document.getElementById('pv-audio');
   if (!audio || !audio.duration) return;
   const rect = bar.getBoundingClientRect();
   const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
   audio.currentTime = pct * audio.duration;
-  updateSeekUI(pct * 100, audio.duration);
+  setSeekUI(pct * 100);
 }
 
-/* ── Compatibilidad: seekAudio (input range) ── */
+/* Seek con mousedown/touchstart para arrastre */
+function seekStart(e, bar) {
+  e.preventDefault();
+  const audio = document.getElementById('pv-audio');
+
+  function getPos(ev) {
+    const clientX = ev.touches ? ev.touches[0].clientX : ev.clientX;
+    const rect = bar.getBoundingClientRect();
+    return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  }
+
+  function onMove(ev) {
+    const pct = getPos(ev);
+    setSeekUI(pct * 100);
+    if (audio && audio.duration) audio.currentTime = pct * audio.duration;
+  }
+
+  function onUp() {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onUp);
+  }
+
+  onMove(e);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onUp);
+}
+
+/* Compat. legacy */
 function seekAudio(val) {
   const audio = document.getElementById('pv-audio');
   if (!audio || !audio.duration) return;
   audio.currentTime = (val / 100) * audio.duration;
 }
 
-/* ── Helpers UI ── */
+/* ── UI helpers ── */
 function setPlayBtn(playing) {
+  const playIcon  = document.getElementById('icon-play');
+  const pauseIcon = document.getElementById('icon-pause');
+  if (playIcon)  playIcon.style.display  = playing ? 'none' : '';
+  if (pauseIcon) pauseIcon.style.display = playing ? ''     : 'none';
   const btn = document.getElementById('pv-play-btn');
-  if (btn) {
-    btn.textContent = playing ? '⏸' : '▶';
-    btn.style.transform = playing ? 'scale(1.06)' : 'scale(1)';
-  }
+  if (btn) btn.style.transform = playing ? 'scale(1.06)' : 'scale(1)';
 }
 
-function updateSeekUI(pct, dur) {
+function setSeekUI(pct) {
+  const p = Math.max(0, Math.min(100, pct));
   const fill  = document.getElementById('seek-fill');
   const thumb = document.getElementById('seek-thumb');
-  const p = Math.max(0, Math.min(100, pct));
-  if (fill)  fill.style.width  = `${p}%`;
-  if (thumb) thumb.style.right = `calc(${100-p}% - 6.5px)`;
-  /* legacy range */
-  const seekRange = document.getElementById('pv-seek');
-  if (seekRange) seekRange.value = p;
+  if (fill)  fill.style.width = p + '%';
+  if (thumb) thumb.style.left = p + '%';
 }
 
-function updateTimeDisplay(cur, dur) {
-  const fmt = s => { const m = Math.floor(s/60); return `${m}:${String(Math.floor(s%60)).padStart(2,'0')}`; };
-  const curEl = document.getElementById('pv-track-time');
-  if (curEl) curEl.textContent = fmt(cur);
+function fmtTime(s) {
+  if (!s || isNaN(s) || s < 0) return '0:00';
+  const m = Math.floor(s / 60);
+  return m + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 }
 
-function updateDuration(dur) {
-  const fmt = s => { if (!s || isNaN(s)) return '0:00'; const m = Math.floor(s/60); return `${m}:${String(Math.floor(s%60)).padStart(2,'0')}`; };
-  const durEl = document.getElementById('pv-track-dur');
-  if (durEl) durEl.textContent = fmt(dur);
+/* ── Disco giratorio ── */
+function spinDisc() {
+  stopDisc();
+  const disc = document.getElementById('player-disc');
+  if (!disc) return;
+  let last = null;
+  function step(ts) {
+    if (last !== null) discAngle += (ts - last) * 0.06; /* ~1 vuelta cada 6s */
+    last = ts;
+    disc.style.transform = `rotate(${discAngle}deg)`;
+    discRAF = requestAnimationFrame(step);
+  }
+  discRAF = requestAnimationFrame(step);
+}
+function stopDisc() {
+  if (discRAF) { cancelAnimationFrame(discRAF); discRAF = null; }
 }
 
-function highlightPlaylistItem(idx) {
-  document.querySelectorAll('.playlist-item').forEach((el, i) => {
-    const isActive = i === idx;
-    el.style.borderLeftColor = isActive ? 'var(--c-a)' : 'var(--c-b)';
-    el.style.background      = isActive ? 'linear-gradient(135deg,rgba(212,175,98,.12),rgba(212,175,98,.06))' : '';
-    const num = el.querySelector('.playlist-num');
-    if (num) num.textContent = isActive ? '♪' : String(i + 1);
-  });
-}
-
-/* ── Renderizar playlist visual ── */
+/* ── Playlist UI ── */
 function renderPlaylist() {
   const container = document.getElementById('pv-playlist-list');
   if (!container) return;
   container.innerHTML = playerTracks.map((t, i) => `
-    <div class="list-item playlist-item" onclick="loadTrack(${i},true)"
+    <div class="list-item playlist-item${i === playerIdx ? ' active' : ''}"
+         onclick="loadTrack(${i}, true)"
          style="cursor:pointer;padding:.85rem 1.1rem;transition:background .2s,border-left-color .2s;">
-      <div class="playlist-num" style="flex-shrink:0;width:18px;text-align:center;font-size:.55rem;color:var(--c-dim);font-weight:700;">${i+1}</div>
+      <div style="flex-shrink:0;width:20px;text-align:center;font-size:.52rem;color:var(--c-dim);font-weight:700;" class="pl-num">${i === playerIdx ? '♪' : (i + 1)}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-family:'Cormorant Garamond',serif;font-size:.95rem;color:var(--c-c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(t.title)}</div>
         <div style="font-size:.38rem;letter-spacing:.22em;color:var(--c-dim);margin-top:2px;">${escHtml(t.artist.toUpperCase())}</div>
       </div>
-      <div style="flex-shrink:0;font-size:.9rem;color:rgba(212,175,98,.3);">▶</div>
-    </div>
-  `).join('');
-  highlightPlaylistItem(playerIdx);
+      <div style="flex-shrink:0;font-size:.8rem;color:rgba(212,175,98,.25);">▶</div>
+    </div>`).join('');
 }
 
-/* ── Eventos del elemento <audio> ── */
+function highlightPlaylistItem(idx) {
+  document.querySelectorAll('.playlist-item').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+    const num = el.querySelector('.pl-num');
+    if (num) num.textContent = i === idx ? '♪' : String(i + 1);
+  });
+}
+
+/* ── Event listeners del <audio> ── */
 function bindPlayerEvents() {
   const audio = document.getElementById('pv-audio');
   if (!audio) return;
@@ -1717,36 +1840,36 @@ function bindPlayerEvents() {
   audio.addEventListener('timeupdate', () => {
     if (!audio.duration || isNaN(audio.duration)) return;
     const pct = (audio.currentTime / audio.duration) * 100;
-    updateSeekUI(pct, audio.duration);
-    updateTimeDisplay(audio.currentTime, audio.duration);
+    setSeekUI(pct);
+    const timeEl = document.getElementById('pv-track-time');
+    if (timeEl) timeEl.textContent = fmtTime(audio.currentTime);
   });
 
   audio.addEventListener('loadedmetadata', () => {
-    updateDuration(audio.duration);
+    const durEl = document.getElementById('pv-track-dur');
+    if (durEl) durEl.textContent = fmtTime(audio.duration);
   });
 
-  audio.addEventListener('play',  () => setPlayBtn(true));
-  audio.addEventListener('pause', () => setPlayBtn(false));
+  audio.addEventListener('play',  () => { setPlayBtn(true);  spinDisc(); });
+  audio.addEventListener('pause', () => { setPlayBtn(false); stopDisc(); });
 
   audio.addEventListener('ended', () => {
+    stopDisc();
     if (playerRepeat) {
-      audio.currentTime = 0; audio.play();
+      audio.currentTime = 0;
+      audio.play().then(() => spinDisc()).catch(() => {});
     } else {
       const next = playerIdx + 1;
       if (next < playerTracks.length) loadTrack(next, true);
-      else { setPlayBtn(false); updateSeekUI(0, 0); }
+      else { setPlayBtn(false); setSeekUI(0); }
     }
   });
 
   audio.addEventListener('error', () => {
-    /* Si falla la fuente, saltar a la siguiente */
     const next = playerIdx + 1;
     if (next < playerTracks.length) loadTrack(next, false);
   });
 }
-
-/* ── Compatibilidad: seekAudio para input range legacy ── */
-/* ya declarado arriba */
 
 /* ═══════════════════════════════════════════════════
    RSVP
