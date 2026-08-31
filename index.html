@@ -1251,7 +1251,7 @@ const state = {
   templateName:'azulejo-mediterraneo',
   templateLabel:'Azulejo Mediterráneo',
   name:'Isabella & Marco',age:'2025',
-  date:'2025-06-14',time:'17:00',
+  date:'2026-11-21',time:'17:00',
   hashtag:'#IsabellaYMarco2025',
   caption:'Dos almas que se encontraron a orillas del mar, donde los azulejos cuentan historias de amor eterno.',
   historyText:'Nos conocimos en las calles empedradas de Lisboa, entre el aroma del café y el suave sonido del fado. Desde entonces, cada día ha sido un mosaico de momentos preciosos que hemos construido juntos, azulejo por azulejo.',
@@ -1413,7 +1413,18 @@ function buildCalendarUrl(){
 function startCountdown(){
   function tick(){
     if (!state.date||!state.time) return;
-    let diff=Math.max(0,new Date(state.date+'T'+state.time+':00').getTime()-Date.now());
+    const target=new Date(state.date+'T'+state.time+':00').getTime();
+    const now=Date.now();
+    let diff=target-now;
+    if(diff<=0){
+      // Date has passed — show celebration message
+      [['d','00'],['h','00'],['m','00'],['s','00']].forEach(([k,v])=>{
+        const el=document.getElementById('cd-'+k);if(el)el.textContent=v;
+      });
+      const cdWrap=document.getElementById('cd-wrap-section');
+      if(cdWrap){cdWrap.querySelector('.section-title-sub') && (cdWrap.querySelector('.section-title-sub').textContent='¡Ya estamos casados!');}
+      return;
+    }
     const dd=String(Math.floor(diff/86400000)).padStart(2,'0');diff%=86400000;
     const hh=String(Math.floor(diff/3600000)).padStart(2,'0');diff%=3600000;
     const mm=String(Math.floor(diff/60000)).padStart(2,'0');diff%=60000;
