@@ -25,7 +25,7 @@ body{
 #app{
   width:100%;
   max-width:480px;
-  overflow-x:clip;
+  overflow-x:hidden;
   position:relative;
   background:#FDF6EC;
   box-shadow:0 0 80px rgba(0,0,0,.3);
@@ -52,13 +52,14 @@ body{
 /* ─── SPLASH ─── */
 #splash{
   position:fixed;
-  top:0; left:50%; transform:translateX(-50%);
+  top:0; left:50%;
+  translate: -50% 0;          /* usa translate separado para no interferir con la transición */
   width:100%; max-width:480px;
   height:100vh; z-index:9999;
   background:#1A1208;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   overflow:hidden;
-  transition:opacity .6s,transform .6s;
+  transition:opacity .6s ease;
 }
 #splash.hidden{opacity:0;pointer-events:none;}
 
@@ -357,7 +358,7 @@ section{
   gap:1rem;
   margin-top:1.5rem;
 }
-@media(min-width:480px){#pv-galeria{grid-template-columns:repeat(4,1fr);}}
+@media(min-width:400px){#pv-galeria{grid-template-columns:repeat(4,1fr);}}
 .gal-card{
   background:#fff;
   padding:6px 6px 24px;
@@ -368,7 +369,17 @@ section{
 .gal-card:nth-child(odd){transform:rotate(-1.5deg);}
 .gal-card:nth-child(even){transform:rotate(1.8deg);}
 .gal-card:hover{transform:rotate(0) scale(1.05);}
-.gal-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block;}
+.gal-img-wrap{position:relative;overflow:hidden;}
+.gal-img-wrap img{width:100%;aspect-ratio:1;object-fit:cover;display:block;transition:filter .2s;}
+.gal-change-hint{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.45);
+  color:#fff;font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.05em;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .2s;
+}
+.gal-card:hover .gal-change-hint{opacity:1;}
+.gal-card:hover .gal-img-wrap img{filter:brightness(.75);}
 .gal-cap{
   font-family:'Dancing Script',cursive;
   font-size:.85rem;color:#777;
@@ -650,13 +661,18 @@ input[type=range]{width:100%;accent-color:var(--a);margin:.3rem 0;}
   color:var(--b);
 }
 
-/* ─── SCROLL ANIMATIONS ─── */
-.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease;}
-.reveal.visible{opacity:1;transform:none;}
-.reveal-left{opacity:0;transform:translateX(-28px);transition:opacity .65s ease,transform .65s ease;}
-.reveal-left.visible{opacity:1;transform:none;}
-.reveal-right{opacity:0;transform:translateX(28px);transition:opacity .65s ease,transform .65s ease;}
-.reveal-right.visible{opacity:1;transform:none;}
+/* ─── REVEAL ON SCROLL ─── */
+.reveal,.reveal-left,.reveal-right{
+  opacity:0;
+  transform:translateY(28px);
+  transition:opacity .65s ease,transform .65s ease;
+}
+.reveal-left{transform:translateX(-28px);}
+.reveal-right{transform:translateX(28px);}
+.reveal.visible,.reveal-left.visible,.reveal-right.visible{
+  opacity:1;transform:none;
+}
+
 
 /* ─── UTILITIES ─── */
 .mt1{margin-top:1rem;}.mt2{margin-top:2rem;}
@@ -1322,7 +1338,7 @@ const state = {
     {v: 'El Palacio de Hierro: Mesa #7342'},
     {v: 'Efectivo: CLABE 012345678901234567'}
   ],
-  galCaptions: ['Nos comprometimos', 'Viajando juntos', 'Nuestra familia', 'El gran día se acerca'],
+  galCaptions: ['Nos comprometimos', 'Viajando juntos', 'Nuestra familia', 'El gran día se acerca', 'Con amor', 'Preparativos', 'Nuestra historia', 'Para siempre'],
   typography: 'playfair',
   songSuggestEnabled: true,
   songSuggestWa: '5215512345678',
@@ -1370,7 +1386,11 @@ const GAL_IMGS = [
   'https://images.unsplash.com/photo-1606216794079-73f887e26673?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400',
   'https://images.unsplash.com/photo-1510279770292-4b34de9f5c23?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400',
   'https://images.unsplash.com/photo-1504439468489-c8920d796a29?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400',
-  'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'
+  'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400',
+  'https://images.unsplash.com/photo-1519741497674-611481863552?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400',
+  'https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400',
+  'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400',
+  'https://images.unsplash.com/photo-1537633552985-df8429e8048b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'
 ];
 
 /* ─── RENDER PREVIEW ─── */
@@ -1391,11 +1411,10 @@ function renderPreview() {
   const splash = document.getElementById('splash');
   if (splash) {
     if (!state.showSplash) {
-      splash.classList.add('hidden');
+      splash.style.display = 'none';
       document.body.style.overflow = '';
-    } else {
-      document.body.style.overflow = 'hidden';
     }
+    /* Never set overflow:hidden on body — splash is position:fixed */
   }
 
   /* Hero */
@@ -1558,18 +1577,19 @@ function renderGallery() {
   GAL_IMGS.forEach((src, i) => {
     const card = document.createElement('div');
     card.className = 'gal-card';
-    // id="gal-img-{i}" permite que changeGalPhoto(i) encuentre la imagen
-    // onclick en la imagen: clic normal abre picker; si quieres lightbox usa botón separado
+    card.title = 'Toca para cambiar esta foto';
+    card.onclick = () => changeGalPhoto(i);
     card.innerHTML = `
-      <img id="gal-img-${i}" src="${src}" alt="${captions[i] || ''}" loading="lazy"
-           style="cursor:pointer;" title="Toca para cambiar esta foto"
-           onclick="changeGalPhoto(${i})"/>
+      <div class="gal-img-wrap">
+        <img id="gal-img-${i}" src="${src}" alt="${captions[i] || 'Foto ' + (i+1)}" loading="lazy"/>
+        <div class="gal-change-hint">&#128247; Cambiar</div>
+      </div>
       <div class="gal-cap">${captions[i] || ''}</div>
     `;
     gal.appendChild(card);
   });
-  /* Restaurar fotos desde IDB después de renderizar */
-  loadAllPhotosFromIDB().catch(() => {});
+  /* Cargar fotos guardadas en IDB DESPUÉS de que el DOM esté listo */
+  setTimeout(() => loadAllPhotosFromIDB().catch(() => {}), 0);
 }
 
 /* ─── PALETTE ─── */
@@ -1751,6 +1771,10 @@ function openInvitation() {
   splash.classList.add('hidden');
   setTimeout(() => { splash.style.display = 'none'; }, 700);
   document.body.style.overflow = '';
+  /* Marcar visibles todos los elementos reveal al abrir la invitación */
+  document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => {
+    el.classList.add('visible');
+  });
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2019,13 +2043,12 @@ async function loadAllPhotosFromIDB() {
     const img = document.getElementById('pv-fashion');
     if (img) img.src = fashion;
   }
-  /* Galería (hasta 12 slots) */
-  const galEl = document.getElementById('pv-galeria');
-  if (galEl) {
-    const imgs = galEl.querySelectorAll('img');
-    for (let i = 0; i < imgs.length; i++) {
-      const stored = await loadPhotoIDB(`gal_${i}`).catch(() => null);
-      if (stored) imgs[i].src = stored;
+  /* Galería — usar id gal-img-{i} directamente, más confiable */
+  for (let i = 0; i < GAL_IMGS.length; i++) {
+    const stored = await loadPhotoIDB(`gal_${i}`).catch(() => null);
+    if (stored) {
+      const img = document.getElementById(`gal-img-${i}`);
+      if (img) img.src = stored;
     }
   }
 }
@@ -2158,6 +2181,7 @@ function openLightbox(src) {
 /* ─── SCROLL ANIMATIONS ─── */
 function initReveal() {
   const els = document.querySelectorAll('.reveal,.reveal-left,.reveal-right');
+  if (!els.length) return;
   const obs = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting) {
@@ -2165,7 +2189,7 @@ function initReveal() {
         obs.unobserve(e.target);
       }
     });
-  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0.08, rootMargin: '0px 0px 0px 0px' });
   els.forEach(el => obs.observe(el));
 }
 
@@ -2173,9 +2197,18 @@ function initReveal() {
 document.addEventListener('DOMContentLoaded', () => {
   renderPreview();
   applyParticles(state.particles || 'confetti');
-  initReveal();
 
-  /* Cargar fotos guardadas en IndexedDB */
+  /* Si hay splash, hacer todos los reveals visibles de inicio
+     para que al abrirse el contenido ya esté listo */
+  if (state.showSplash) {
+    document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => {
+      el.classList.add('visible');
+    });
+  } else {
+    initReveal();
+  }
+
+  /* Fotos IDB: renderGallery() ya las carga; aquí solo retrato y fashion */
   loadAllPhotosFromIDB().catch(err => console.warn('IDB load error:', err));
 
   /* Enlazar clics en lista de canciones */
