@@ -12,7 +12,24 @@
 /* ─── RESET & BASE ─── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
-body{font-family:'Lato',sans-serif;background:#FDF6EC;color:#1A1208;overflow-x:hidden;}
+body{
+  font-family:'Lato',sans-serif;
+  background:#c8c2ba;
+  color:#1A1208;
+  overflow-x:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-height:100vh;
+}
+#app{
+  width:100%;
+  max-width:480px;
+  overflow:hidden;
+  position:relative;
+  background:#FDF6EC;
+  box-shadow:0 0 80px rgba(0,0,0,.3);
+}
 
 /* ─── CSS VARIABLES ─── */
 :root{
@@ -34,11 +51,12 @@ body{font-family:'Lato',sans-serif;background:#FDF6EC;color:#1A1208;overflow-x:h
 
 /* ─── SPLASH ─── */
 #splash{
-  position:fixed;inset:0;z-index:9999;
+  position:absolute;inset:0;z-index:9999;
   background:#1A1208;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   overflow:hidden;
   transition:opacity .6s,transform .6s;
+  min-height:100vh;
 }
 #splash.hidden{opacity:0;pointer-events:none;transform:scale(1.04);}
 
@@ -153,7 +171,7 @@ section{
 .header-combo{margin-bottom:2rem;text-align:center;}
 
 /* ─── CONTAINER ─── */
-.container{max-width:680px;margin:0 auto;}
+.container{max-width:100%;margin:0 auto;padding:0 1.25rem;}
 
 /* ─── POLAROID ─── */
 .polaroid-wrap{
@@ -365,26 +383,76 @@ section{
 .music-section .sec-title{color:#FDF6EC;}
 
 #pv-audio-wrap{
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.12);
-  padding:1.25rem;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:14px;
+  padding:1.5rem 1.25rem 1rem;
   margin:1.5rem 0;
 }
-.audio-controls{display:flex;align-items:center;gap:1rem;margin-bottom:.75rem;}
-#pv-play-btn{
-  width:44px;height:44px;border-radius:50%;
-  background:var(--a);color:#fff;border:none;cursor:pointer;
-  font-size:1.2rem;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-  transition:transform .15s;
-}
-#pv-play-btn:hover{transform:scale(1.1);}
-.audio-meta{flex:1;min-width:0;}
+.audio-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;gap:.5rem;}
 #pv-track-name{
-  font-family:'Space Mono',monospace;font-size:.75rem;
-  color:#FDF6EC;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-family:'Playfair Display',serif;font-size:.95rem;font-style:italic;
+  color:#FDF6EC;flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
 }
-#pv-track-time{font-family:'Space Mono',monospace;font-size:.65rem;color:#aaa;margin-top:.2rem;}
+#pv-track-time{font-family:'Space Mono',monospace;font-size:.62rem;color:rgba(253,246,236,.5);flex-shrink:0;white-space:nowrap;margin-top:.2rem;}
+.seek-wrap{position:relative;margin-bottom:1rem;}
+#pv-seek{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:4px;border-radius:4px;outline:none;cursor:pointer;
+  background:rgba(255,255,255,.15);
+  background-image:linear-gradient(var(--a,#FF4D3D),var(--a,#FF4D3D));
+  background-size:0% 100%;background-repeat:no-repeat;transition:background-size .1s;
+}
+#pv-seek::-webkit-slider-thumb{
+  -webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+  background:var(--a,#FF4D3D);cursor:pointer;box-shadow:0 0 6px rgba(0,0,0,.4);transition:transform .15s;
+}
+#pv-seek::-webkit-slider-thumb:hover{transform:scale(1.3);}
+.audio-controls{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1rem;}
+.audio-side-btn{
+  width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.08);color:#FDF6EC;cursor:pointer;font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;
+}
+.audio-side-btn:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.4);}
+#pv-play-btn{
+  width:52px;height:52px;border-radius:50%;
+  background:var(--a,#FF4D3D);color:#fff;border:none;cursor:pointer;
+  font-size:1.3rem;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;box-shadow:0 4px 18px rgba(0,0,0,.4);transition:transform .15s,box-shadow .15s;
+}
+#pv-play-btn:hover{transform:scale(1.08);box-shadow:0 6px 24px rgba(0,0,0,.5);}
+#pv-play-btn:active{transform:scale(.96);}
+.vol-row{display:flex;align-items:center;gap:.75rem;margin-top:.25rem;}
+.vol-icon{font-size:.9rem;flex-shrink:0;color:rgba(253,246,236,.6);}
+#pv-vol{
+  -webkit-appearance:none;appearance:none;
+  flex:1;height:3px;border-radius:3px;outline:none;cursor:pointer;
+  background:rgba(255,255,255,.15);
+  background-image:linear-gradient(var(--b,#FFB800),var(--b,#FFB800));
+  background-size:70% 100%;background-repeat:no-repeat;transition:background-size .1s;
+}
+#pv-vol::-webkit-slider-thumb{
+  -webkit-appearance:none;width:12px;height:12px;border-radius:50%;
+  background:var(--b,#FFB800);cursor:pointer;
+}
+.audio-load-btn{
+  display:flex;align-items:center;gap:.5rem;margin-top:1rem;padding:.55rem 1rem;
+  background:rgba(255,255,255,.07);border:1px dashed rgba(255,255,255,.25);border-radius:8px;
+  color:rgba(253,246,236,.65);font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.06em;
+  cursor:pointer;width:100%;justify-content:center;transition:all .2s;
+}
+.audio-load-btn:hover{background:rgba(255,255,255,.12);color:#FDF6EC;border-style:solid;}
+.song-item{
+  display:flex;align-items:center;gap:.75rem;padding:.65rem .75rem;border-radius:8px;
+  cursor:pointer;transition:background .2s;list-style:none;
+}
+.song-item:hover{background:rgba(255,255,255,.08);}
+.song-item.active{background:rgba(255,255,255,.12);}
+.song-item.active .song-num{color:var(--a,#FF4D3D);}
+.song-num{font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(253,246,236,.4);width:22px;flex-shrink:0;}
+.song-play-icon{font-size:.75rem;margin-left:auto;opacity:0;transition:opacity .2s;}
+.song-item:hover .song-play-icon,.song-item.active .song-play-icon{opacity:1;}
 input[type=range]{width:100%;accent-color:var(--a);margin:.3rem 0;}
 
 .songs-list{margin-top:1.5rem;}
@@ -645,13 +713,18 @@ input[type=range]{width:100%;accent-color:var(--a);margin:.3rem 0;}
 </head>
 <body>
 
-<!-- PARTICLE CANVAS -->
+<!-- PARTICLE CANVAS — full viewport, detrás de todo -->
 <canvas id="particle-canvas"></canvas>
 
 <!-- LIGHTBOX -->
 <div id="lightbox" onclick="this.classList.remove('open')">
   <img id="lb-img" src="" alt=""/>
 </div>
+
+<!-- ═══════════════════════════════════════
+     APP WRAPPER — 480px centrado
+════════════════════════════════════════ -->
+<div id="app">
 
 <!-- ═══════════════════════════════════════════
      SECTION 1 · SPLASH
@@ -902,18 +975,35 @@ input[type=range]{width:100%;accent-color:var(--a);margin:.3rem 0;}
 
     <div id="pv-audio-wrap" class="reveal">
       <audio id="pv-audio"></audio>
-      <div class="audio-controls">
-        <button id="pv-play-btn" onclick="togglePlay()">▶</button>
-        <div class="audio-meta">
-          <div id="pv-track-name">Música de fondo</div>
-          <div id="pv-track-time">0:00 / 0:00</div>
-        </div>
+
+      <!-- Track info -->
+      <div class="audio-header">
+        <div id="pv-track-name">Sin audio cargado</div>
+        <div id="pv-track-time">0:00 / 0:00</div>
       </div>
-      <input type="range" id="pv-seek" min="0" max="100" value="0" oninput="seekAudio(this.value)" style="width:100%;"/>
-      <input type="range" id="pv-vol" min="0" max="1" step="0.05" value="0.7" oninput="setVolume(this.value)" style="width:100%;"/>
-      <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:.55rem;color:#888;margin-top:.25rem;">
-        <span>Progreso</span><span>Volumen</span>
+
+      <!-- Seek bar -->
+      <div class="seek-wrap">
+        <input type="range" id="pv-seek" min="0" max="100" value="0" step="0.1"/>
       </div>
+
+      <!-- Controls: prev · play/pause · next -->
+      <div id="pv-audio-player" class="audio-controls">
+        <button class="audio-side-btn" id="pv-prev-btn" onclick="audioPrev()" title="Anterior">&#9664;&#9664;</button>
+        <button id="pv-play-btn" onclick="togglePlay()" title="Play / Pause">&#9654;</button>
+        <button class="audio-side-btn" id="pv-next-btn" onclick="audioNext()" title="Siguiente">&#9654;&#9654;</button>
+      </div>
+
+      <!-- Volume -->
+      <div class="vol-row">
+        <span class="vol-icon" id="vol-icon">&#128266;</span>
+        <input type="range" id="pv-vol" min="0" max="1" step="0.02" value="0.7"/>
+      </div>
+
+      <!-- Load local audio file -->
+      <button class="audio-load-btn" onclick="loadLocalAudio()">
+        &#128192; Cargar archivo de música desde tu dispositivo
+      </button>
     </div>
 
     <ul id="pv-songs" class="card-list songs-list reveal"></ul>
@@ -1141,12 +1231,24 @@ es la primera línea de nuestro más grande mensaje.
       <div class="tape tape-blue"  style="display:inline-block;width:50px;height:12px;transform:rotate(-2deg);margin:0 4px;"></div>
     </div>
 
-    <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(253,246,236,.3);margin-top:2.5rem;letter-spacing:.1em;" class="reveal">
-      Boda Ecléctica · Mix &amp; Match · 17 · 10 · 2026
-    </p>
+    <!-- BRAND FOOTER -->
+    <div class="reveal" style="margin-top:3.5rem;padding-top:2.5rem;border-top:1px solid rgba(253,246,236,.12);">
+      <img
+        src="https://hercules-cdn.com/file_JRl0wwCItoea8lP3NpYB1iOV"
+        alt="Gueka Ideas"
+        style="display:block;margin:0 auto 1.5rem;width:260px;max-width:80%;filter:brightness(0) invert(1);opacity:0.9;"
+      />
+      <p style="font-family:'Space Mono',monospace;font-size:.62rem;color:rgba(253,246,236,.55);line-height:2;letter-spacing:.06em;max-width:380px;margin:0 auto;">
+        Esta tarjeta digital es propiedad exclusiva de Gueka Ideas<br>
+        Uso permitido únicamente para fines personales.<br>
+        <span style="color:rgba(253,246,236,.35);">© 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</span>
+      </p>
+    </div>
   </div>
   <div class="tape tape-sage" style="position:absolute;bottom:40px;left:-10px;transform:rotate(40deg);width:100px;"></div>
 </section>
+
+</div><!-- /#app -->
 
 <!-- ═══════════════════════════════════════════
      JAVASCRIPT
@@ -1454,12 +1556,18 @@ function renderGallery() {
   GAL_IMGS.forEach((src, i) => {
     const card = document.createElement('div');
     card.className = 'gal-card';
+    // id="gal-img-{i}" permite que changeGalPhoto(i) encuentre la imagen
+    // onclick en la imagen: clic normal abre picker; si quieres lightbox usa botón separado
     card.innerHTML = `
-      <img src="${src}" alt="${captions[i] || ''}" loading="lazy" onclick="openLightbox('${src}')"/>
+      <img id="gal-img-${i}" src="${src}" alt="${captions[i] || ''}" loading="lazy"
+           style="cursor:pointer;" title="Toca para cambiar esta foto"
+           onclick="changeGalPhoto(${i})"/>
       <div class="gal-cap">${captions[i] || ''}</div>
     `;
     gal.appendChild(card);
   });
+  /* Restaurar fotos desde IDB después de renderizar */
+  loadAllPhotosFromIDB().catch(() => {});
 }
 
 /* ─── PALETTE ─── */
@@ -1641,53 +1749,189 @@ function openInvitation() {
   document.body.style.overflow = '';
 }
 
-/* ─── AUDIO PLAYER ─── */
-const audioEl = document.getElementById('pv-audio');
-let isPlaying = false;
+/* ══════════════════════════════════════════════════════════════
+   AUDIO PLAYER — reproductor completo
+   ══════════════════════════════════════════════════════════════ */
+const audioEl   = document.getElementById('pv-audio');
+const seekEl    = document.getElementById('pv-seek');
+const volEl     = document.getElementById('pv-vol');
+const playBtn   = document.getElementById('pv-play-btn');
+const trackName = document.getElementById('pv-track-name');
+const trackTime = document.getElementById('pv-track-time');
+const volIcon   = document.getElementById('vol-icon');
 
+let isPlaying     = false;
+let audioPlaylist = [];   // { name, url } — URLs de blob o remote
+let currentTrack  = 0;
+
+/* ── Helpers ── */
+function fmtTime(s) {
+  if (!isFinite(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  return `${m}:${String(Math.floor(s % 60)).padStart(2,'0')}`;
+}
+
+function setPlayIcon(playing) {
+  if (playBtn) playBtn.innerHTML = playing ? '&#9646;&#9646;' : '&#9654;';
+}
+
+function updateSeekFill() {
+  if (!seekEl) return;
+  const pct = audioEl.duration ? (audioEl.currentTime / audioEl.duration) * 100 : 0;
+  seekEl.style.backgroundSize = `${pct}% 100%`;
+  seekEl.value = pct;
+}
+
+function updateVolFill() {
+  if (!volEl) return;
+  volEl.style.backgroundSize = `${volEl.value * 100}% 100%`;
+  if (volIcon) {
+    const v = parseFloat(volEl.value);
+    volIcon.innerHTML = v === 0 ? '&#128263;' : v < 0.4 ? '&#128264;' : '&#128266;';
+  }
+}
+
+function loadTrack(index, autoplay) {
+  if (!audioPlaylist.length) return;
+  currentTrack = Math.max(0, Math.min(index, audioPlaylist.length - 1));
+  const t = audioPlaylist[currentTrack];
+  audioEl.src = t.url;
+  audioEl.load();
+  if (trackName) trackName.textContent = t.name;
+  if (trackTime) trackTime.textContent = '0:00 / 0:00';
+  updateSeekFill();
+  /* Highlight active song in list */
+  document.querySelectorAll('#pv-songs .song-item').forEach((li, i) => {
+    li.classList.toggle('active', i === currentTrack);
+  });
+  if (autoplay) {
+    audioEl.play().then(() => { isPlaying = true; setPlayIcon(true); }).catch(() => {});
+  }
+}
+
+/* ── Public controls ── */
 function togglePlay() {
-  if (!audioEl.src || audioEl.src === window.location.href) {
-    const btn = document.getElementById('pv-play-btn');
-    if (btn) btn.textContent = '▶';
+  if (!audioPlaylist.length) {
+    /* No hay audio: sugerir cargar uno */
+    const wrap = document.getElementById('pv-audio-wrap');
+    if (wrap) {
+      const hint = wrap.querySelector('.audio-load-btn');
+      if (hint) { hint.style.borderColor = 'var(--a)'; hint.style.color = '#FDF6EC'; }
+    }
     return;
   }
   if (isPlaying) {
     audioEl.pause();
     isPlaying = false;
-    document.getElementById('pv-play-btn').textContent = '▶';
+    setPlayIcon(false);
   } else {
-    audioEl.play().catch(() => {});
-    isPlaying = true;
-    document.getElementById('pv-play-btn').textContent = '⏸';
+    audioEl.play().then(() => { isPlaying = true; setPlayIcon(true); }).catch(() => {});
   }
 }
 
+function audioPrev() {
+  if (!audioPlaylist.length) return;
+  if (audioEl.currentTime > 3) {
+    /* Si avanzó más de 3 s, reinicia la canción actual */
+    audioEl.currentTime = 0;
+    if (!isPlaying) { audioEl.play().then(() => { isPlaying = true; setPlayIcon(true); }).catch(() => {}); }
+    return;
+  }
+  loadTrack(currentTrack > 0 ? currentTrack - 1 : audioPlaylist.length - 1, isPlaying);
+}
+
+function audioNext() {
+  if (!audioPlaylist.length) return;
+  loadTrack(currentTrack < audioPlaylist.length - 1 ? currentTrack + 1 : 0, isPlaying);
+}
+
 function seekAudio(val) {
-  if (audioEl.duration) audioEl.currentTime = (val / 100) * audioEl.duration;
+  if (audioEl.duration) {
+    audioEl.currentTime = (val / 100) * audioEl.duration;
+    updateSeekFill();
+  }
 }
 
 function setVolume(val) {
   audioEl.volume = parseFloat(val);
+  audioEl.muted  = parseFloat(val) === 0;
+  updateVolFill();
 }
 
-function formatTime(s) {
-  const m = Math.floor(s / 60);
-  const sec = Math.floor(s % 60);
-  return `${m}:${String(sec).padStart(2, '0')}`;
+/* Cargar archivo local desde el dispositivo */
+function loadLocalAudio() {
+  const input = document.createElement('input');
+  input.type = 'multiple';
+  input.type = 'file';
+  input.accept = 'audio/*';
+  input.multiple = true;
+  input.onchange = () => {
+    const files = Array.from(input.files);
+    if (!files.length) return;
+    /* Revocar URLs anteriores para liberar memoria */
+    audioPlaylist.forEach(t => { if (t.url.startsWith('blob:')) URL.revokeObjectURL(t.url); });
+    audioPlaylist = files.map(f => ({ name: f.name.replace(/\.[^.]+$/, ''), url: URL.createObjectURL(f) }));
+    loadTrack(0, true);
+    /* Re-render song list con las canciones cargadas */
+    const songsEl = document.getElementById('pv-songs');
+    if (songsEl) {
+      songsEl.innerHTML = '';
+      audioPlaylist.forEach((t, i) => {
+        const li = document.createElement('li');
+        li.className = 'song-item' + (i === 0 ? ' active' : '');
+        li.innerHTML = `<span class="song-num">${String(i+1).padStart(2,'0')}</span>
+          <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t.name}</span>
+          <span class="song-play-icon">&#9654;</span>`;
+        li.onclick = () => loadTrack(i, true);
+        songsEl.appendChild(li);
+      });
+    }
+  };
+  input.click();
 }
 
+/* ── Event listeners ── */
 audioEl.addEventListener('timeupdate', () => {
-  const seek = document.getElementById('pv-seek');
-  const time = document.getElementById('pv-track-time');
-  if (seek && audioEl.duration) seek.value = (audioEl.currentTime / audioEl.duration) * 100;
-  if (time) time.textContent = `${formatTime(audioEl.currentTime)} / ${formatTime(audioEl.duration || 0)}`;
+  updateSeekFill();
+  if (trackTime) trackTime.textContent = `${fmtTime(audioEl.currentTime)} / ${fmtTime(audioEl.duration)}`;
 });
 
 audioEl.addEventListener('ended', () => {
-  isPlaying = false;
-  const btn = document.getElementById('pv-play-btn');
-  if (btn) btn.textContent = '▶';
+  /* Avanza automáticamente a la siguiente canción */
+  if (currentTrack < audioPlaylist.length - 1) {
+    loadTrack(currentTrack + 1, true);
+  } else {
+    isPlaying = false;
+    setPlayIcon(false);
+    updateSeekFill();
+  }
 });
+
+audioEl.addEventListener('play',  () => { isPlaying = true;  setPlayIcon(true);  });
+audioEl.addEventListener('pause', () => { isPlaying = false; setPlayIcon(false); });
+
+/* Seek bar input */
+if (seekEl) {
+  seekEl.addEventListener('input', () => seekAudio(seekEl.value));
+}
+
+/* Volume slider input */
+if (volEl) {
+  volEl.addEventListener('input', () => setVolume(volEl.value));
+  updateVolFill();
+}
+
+/* Clic en canción de la lista de state.songs */
+function bindSongListClicks() {
+  document.querySelectorAll('#pv-songs .song-item').forEach((li, i) => {
+    li.style.cursor = 'pointer';
+    li.onclick = () => {
+      if (audioPlaylist.length) {
+        loadTrack(i % audioPlaylist.length, true);
+      }
+    };
+  });
+}
 
 /* ─── SONG SUGGEST ─── */
 function addSongInput() {
@@ -1712,43 +1956,188 @@ function submitSongSuggest(e) {
   if (ok) ok.style.display = 'block';
 }
 
-/* ─── RSVP ─── */
+/* ══════════════════════════════════════════════════════════════
+   INDEXEDDB — almacenamiento local de fotos
+   Las imágenes se guardan en el navegador del usuario (sin subir
+   a ningún servidor). La DB se llama "GuekaIdeasDB".
+   ══════════════════════════════════════════════════════════════ */
+const IDB_NAME    = 'GuekaIdeasDB';
+const IDB_STORE   = 'photos';
+const IDB_VERSION = 1;
+let   idb         = null;
+
+function openIDB() {
+  return new Promise((resolve, reject) => {
+    if (idb) { resolve(idb); return; }
+    const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(IDB_STORE)) {
+        db.createObjectStore(IDB_STORE); // key = slot name (retrato / fashion / gal_0…)
+      }
+    };
+    req.onsuccess = e => { idb = e.target.result; resolve(idb); };
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+async function savePhotoIDB(key, dataUrl) {
+  const db = await openIDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(IDB_STORE, 'readwrite');
+    const st  = tx.objectStore(IDB_STORE);
+    st.put(dataUrl, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror    = e  => reject(e.target.error);
+  });
+}
+
+async function loadPhotoIDB(key) {
+  const db = await openIDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(IDB_STORE, 'readonly');
+    const req = tx.objectStore(IDB_STORE).get(key);
+    req.onsuccess = e => resolve(e.target.result || null);
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+async function loadAllPhotosFromIDB() {
+  /* Retrato */
+  const retrato = await loadPhotoIDB('retrato').catch(() => null);
+  if (retrato) {
+    const img = document.getElementById('pv-retrato');
+    if (img) img.src = retrato;
+  }
+  /* Fashion */
+  const fashion = await loadPhotoIDB('fashion').catch(() => null);
+  if (fashion) {
+    const img = document.getElementById('pv-fashion');
+    if (img) img.src = fashion;
+  }
+  /* Galería (hasta 12 slots) */
+  const galEl = document.getElementById('pv-galeria');
+  if (galEl) {
+    const imgs = galEl.querySelectorAll('img');
+    for (let i = 0; i < imgs.length; i++) {
+      const stored = await loadPhotoIDB(`gal_${i}`).catch(() => null);
+      if (stored) imgs[i].src = stored;
+    }
+  }
+}
+
+/* Abre el selector de archivo y guarda en IDB + actualiza el DOM */
+function pickPhoto(slot, imgId) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async e => {
+      const dataUrl = e.target.result;
+      /* Actualizar DOM inmediatamente */
+      const imgEl = document.getElementById(imgId);
+      if (imgEl) imgEl.src = dataUrl;
+      /* Persistir en IndexedDB */
+      try {
+        await savePhotoIDB(slot, dataUrl);
+      } catch (err) {
+        console.warn('IndexedDB write error:', err);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+/* Wrapper: clic en #pv-retrato-wrap abre picker para foto principal */
+function changeRetratoPhoto() { pickPhoto('retrato', 'pv-retrato'); }
+/* Wrapper: clic en #pv-fashion abre picker para foto historia */
+function changeFashionPhoto() { pickPhoto('fashion', 'pv-fashion'); }
+/* Wrapper: clic en imagen de galería */
+function changeGalPhoto(index) { pickPhoto(`gal_${index}`, `gal-img-${index}`); }
+
+/* ══════════════════════════════════════════════════════════════
+   RSVP — confirmación vía WhatsApp
+   ══════════════════════════════════════════════════════════════ */
 let rsvpQr = null;
 
 function submitRsvp(e) {
   e.preventDefault();
-  const nombre = document.getElementById('rsvp-nombre').value.trim();
-  const asiste = document.getElementById('rsvp-asiste').value;
-  const acomp = document.getElementById('rsvp-acomp').value;
-  const msg = document.getElementById('rsvp-msg').value.trim();
-  const errEl = document.getElementById('rsvp-error');
 
-  if (!nombre || !asiste) {
+  const nombre = document.getElementById('rsvp-nombre')?.value.trim() ?? '';
+  const asiste = document.getElementById('rsvp-asiste')?.value        ?? '';
+  const acomp  = parseInt(document.getElementById('rsvp-acomp')?.value ?? '0', 10);
+  const msg    = document.getElementById('rsvp-msg')?.value.trim()    ?? '';
+  const errEl  = document.getElementById('rsvp-error');
+
+  /* Validaciones */
+  if (!nombre) {
+    errEl.textContent = '* Por favor ingresa tu nombre completo.';
     errEl.style.display = 'block';
-    errEl.textContent = '* Por favor completa tu nombre y confirmación de asistencia.';
+    return;
+  }
+  if (!asiste) {
+    errEl.textContent = '* Indica si asistirás o no.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (asiste === 'si' && (acomp + 1) > state.rsvpCapacity) {
+    errEl.textContent = `* Lo sentimos, el aforo máximo es ${state.rsvpCapacity} personas.`;
+    errEl.style.display = 'block';
     return;
   }
   errEl.style.display = 'none';
 
-  const asisText = asiste === 'si' ? '✅ SÍ asistiré' : '❌ No podré asistir';
-  const acompText = parseInt(acomp) > 0 ? `con +${acomp} acompañante(s)` : 'solo/a';
-  const msgText = msg ? `\n\nMensaje: ${msg}` : '';
+  /* Construir mensaje de WhatsApp */
+  const asisEmoji = asiste === 'si' ? '✅' : '❌';
+  const asisLabel = asiste === 'si' ? 'SÍ asistiré con mucho gusto' : 'Lamentablemente no podré asistir';
+  const acompLine = asiste === 'si' && acomp > 0
+    ? `👥 Acompañantes: +${acomp} persona${acomp > 1 ? 's' : ''}\n`
+    : '';
+  const msgLine   = msg ? `\n💬 Mensaje: ${msg}\n` : '';
+  const fecha     = formatDate(state.date);
+  const hora      = state.time || '';
 
-  const waMsg = `Hola! Confirmo mi asistencia a la boda de ${state.name}:\n\n👤 Nombre: ${nombre}\n${asisText} ${acompText}${msgText}\n\n${state.hashtag}`;
-  const waUrl = `https://wa.me/${state.waOrganizer}?text=${encodeURIComponent(waMsg)}`;
+  const waMsg =
+`Hola 👋 Confirmo mi asistencia a la boda de ${state.name}:
+
+${asisEmoji} ${nombre}
+📋 ${asisLabel}
+${acompLine}📅 ${fecha} · ${hora}
+📍 ${state.venue}
+${msgLine}
+${state.hashtag}`.trim();
+
+  /* Limpiar el número (solo dígitos) */
+  const numero  = state.waOrganizer.replace(/\D/g, '');
+  const waUrl   = `https://wa.me/${numero}?text=${encodeURIComponent(waMsg)}`;
   window.open(waUrl, '_blank');
 
-  /* QR */
-  const qrWrap = document.getElementById('rsvp-qr-wrap');
+  /* Generar QR de pase si plan es deluxe y hay rsvpPara */
+  const qrWrap   = document.getElementById('rsvp-qr-wrap');
   const qrCanvas = document.getElementById('rsvp-qr-canvas');
-  if (qrWrap && qrCanvas && typeof QRCode !== 'undefined') {
+  if (qrWrap && qrCanvas && state.plan === 'deluxe' && state.rsvpPara && typeof QRCode !== 'undefined') {
     qrWrap.style.display = 'block';
     qrCanvas.innerHTML = '';
     rsvpQr = new QRCode(qrCanvas, {
-      text: waMsg,
-      width: 160, height: 160,
+      text: `PASE · ${state.rsvpPara}\nInvitado: ${nombre}\nFecha: ${fecha}\n${state.hashtag}`,
+      width: 180, height: 180,
       colorDark: '#1A1208', colorLight: '#ffffff'
     });
+  }
+
+  /* Feedback visual: deshabilitar botón brevemente */
+  const btn = e.target.querySelector('button[type="submit"]');
+  if (btn) {
+    btn.textContent = '✓ Abriendo WhatsApp…';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = 'Confirmar por WhatsApp';
+      btn.disabled = false;
+    }, 3500);
   }
 }
 
@@ -1781,6 +2170,35 @@ document.addEventListener('DOMContentLoaded', () => {
   renderPreview();
   applyParticles(state.particles || 'confetti');
   initReveal();
+
+  /* Cargar fotos guardadas en IndexedDB */
+  loadAllPhotosFromIDB().catch(err => console.warn('IDB load error:', err));
+
+  /* Enlazar clics en lista de canciones */
+  setTimeout(bindSongListClicks, 400);
+
+  /* Conectar pickers de foto vía clic */
+  const retratoWrap = document.getElementById('pv-retrato-wrap');
+  if (retratoWrap) {
+    retratoWrap.style.cursor = 'pointer';
+    retratoWrap.title = 'Toca para cambiar la foto';
+    retratoWrap.addEventListener('click', e => {
+      /* No abrir picker si el clic fue para el lightbox */
+      if (e.target.tagName !== 'IMG') return;
+      e.stopPropagation();
+      changeRetratoPhoto();
+    });
+  }
+
+  const fashionImg = document.getElementById('pv-fashion');
+  if (fashionImg) {
+    fashionImg.style.cursor = 'pointer';
+    fashionImg.title = 'Toca para cambiar la foto';
+    fashionImg.addEventListener('click', e => {
+      e.stopPropagation();
+      changeFashionPhoto();
+    });
+  }
 
   /* Re-observe after render */
   setTimeout(initReveal, 300);
