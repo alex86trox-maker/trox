@@ -1,958 +1,811 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Máquina de Garras</title>
-    <style>
-      *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-      @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-      body {
-        font-family: 'Courier New', monospace;
-        background: #0a0015;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        background-image:
-          radial-gradient(ellipse at 15% 50%, rgba(139, 40, 220, 0.18) 0%, transparent 55%),
-          radial-gradient(ellipse at 85% 20%, rgba(0, 190, 230, 0.12) 0%, transparent 50%),
-          radial-gradient(ellipse at 50% 90%, rgba(255, 60, 130, 0.1) 0%, transparent 50%);
-      }
-
-      /* ── Arcade cabinet shell ── */
-      .arcade {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        filter: drop-shadow(0 0 40px rgba(160, 60, 255, 0.4));
-      }
-
-      .cabinet-top {
-        background: linear-gradient(160deg, #1e0640 0%, #0c1a40 100%);
-        border: 2px solid #7c3aed;
-        border-bottom: none;
-        border-radius: 16px 16px 0 0;
-        padding: 14px 20px 10px;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-      }
-
-      .cabinet-title {
-        color: #e879f9;
-        font-size: 11px;
-        font-weight: 900;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        text-shadow: 0 0 12px #e879f9, 0 0 30px #c026d3;
-        white-space: nowrap;
-      }
-
-      .cabinet-title span {
-        color: #ffd700;
-        text-shadow: 0 0 12px #ffd700;
-      }
-
-      .hud {
-        display: flex;
-        gap: 12px;
-      }
-
-      .hud-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background: rgba(0,0,0,0.6);
-        border: 1px solid #7c3aed;
-        border-radius: 6px;
-        padding: 4px 10px;
-        min-width: 48px;
-      }
-
-      .hud-label {
-        color: #7c3aed;
-        font-size: 6px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-      }
-
-      .hud-value {
-        color: #ffd700;
-        font-size: 18px;
-        font-weight: bold;
-        line-height: 1.2;
-        text-shadow: 0 0 10px #ffd700;
-        text-align: center;
-      }
-
-      /* ── Machine body ── */
-      .machine-shell {
-        background: linear-gradient(180deg, #140428 0%, #0a1530 100%);
-        border: 2px solid #7c3aed;
-        border-top: none;
-        border-bottom: none;
-        padding: 12px 16px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 6px;
-        width: 100%;
-      }
-
-      .collection-label {
-        color: #7c3aed;
-        font-size: 7px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        align-self: flex-start;
-      }
-
-      /* ── Control panel ── */
-      .cabinet-controls {
-        background: linear-gradient(160deg, #1e0640 0%, #0c1a40 100%);
-        border: 2px solid #7c3aed;
-        border-top: 1px solid #3b1a6e;
-        border-radius: 0 0 16px 16px;
-        padding: 16px 20px 18px;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .game-hint {
-        color: #a78bfa;
-        font-size: 8px;
-        letter-spacing: 1px;
-        text-align: center;
-        opacity: 0.8;
-      }
-
-      .control-row {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-      }
-
-      .game-btn {
-        font-family: 'Courier New', monospace;
-        font-size: 11px;
-        font-weight: bold;
-        letter-spacing: 2px;
-        padding: 10px 18px;
-        border-radius: 8px;
-        border: 2px solid transparent;
-        cursor: not-allowed;
-        transition: transform 0.08s, box-shadow 0.15s, background 0.15s;
-        text-transform: uppercase;
-        user-select: none;
-        -webkit-user-select: none;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .game-btn::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: rgba(255,255,255,0.05);
-        opacity: 0;
-        transition: opacity 0.15s;
-      }
-
-      .game-btn:active::before { opacity: 1; }
-
-      .game-btn.active {
-        cursor: pointer;
-        animation: btn-glow 1.2s ease-in-out infinite;
-      }
-
-      .game-btn.active:active {
-        transform: scale(0.94);
-      }
-
-      .btn-move {
-        background: #0d1f4e;
-        border-color: #2563eb;
-        color: #93c5fd;
-      }
-
-      .btn-move.active {
-        background: #1e3a8a;
-        border-color: #60a5fa;
-        color: #bfdbfe;
-        box-shadow: 0 0 16px #2563eb, inset 0 0 8px rgba(37,99,235,0.3);
-      }
-
-      .btn-drop {
-        background: #3b0a2a;
-        border-color: #be185d;
-        color: #f9a8d4;
-      }
-
-      .btn-drop.active {
-        background: #831843;
-        border-color: #ec4899;
-        color: #fce7f3;
-        box-shadow: 0 0 16px #be185d, inset 0 0 8px rgba(190,24,93,0.3);
-      }
-
-      @keyframes btn-glow {
-        0%, 100% { box-shadow: 0 0 10px currentColor; }
-        50% { box-shadow: 0 0 24px currentColor, 0 0 40px currentColor; }
-      }
-
-      .kbd-hint {
-        color: #4b5280;
-        font-size: 7px;
-        letter-spacing: 1px;
-        text-align: center;
-      }
-
-      /* ── Win banner ── */
-      .win-banner {
-        display: none;
-        position: fixed;
-        inset: 0;
-        z-index: 200;
-        background: rgba(0,0,0,0.75);
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        gap: 12px;
-      }
-      .win-banner.show { display: flex; }
-
-      .win-card {
-        background: #0a0015;
-        border: 3px solid #ffd700;
-        border-radius: 16px;
-        padding: 28px 48px;
-        text-align: center;
-        animation: win-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        box-shadow: 0 0 60px rgba(255,215,0,0.4);
-      }
-
-      @keyframes win-pop {
-        0% { transform: scale(0.5); opacity: 0; }
-        100% { transform: scale(1); opacity: 1; }
-      }
-
-      .win-emoji { font-size: 40px; margin-bottom: 8px; }
-      .win-title {
-        color: #ffd700;
-        font-size: 18px;
-        font-weight: bold;
-        letter-spacing: 4px;
-        text-shadow: 0 0 20px #ffd700;
-        text-transform: uppercase;
-      }
-      .win-sub { color: #a78bfa; font-size: 10px; letter-spacing: 2px; margin-top: 6px; }
-
-      .win-close {
-        background: #ffd700;
-        color: #000;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 24px;
-        font-family: 'Courier New', monospace;
-        font-size: 11px;
-        font-weight: bold;
-        letter-spacing: 2px;
-        cursor: pointer;
-        margin-top: 10px;
-        text-transform: uppercase;
-        transition: transform 0.1s;
-      }
-      .win-close:hover { transform: scale(1.05); }
-
-      /* ── Scanlines overlay ── */
-      .scanlines {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        z-index: 300;
-        background: repeating-linear-gradient(
-          to bottom,
-          transparent 0px,
-          transparent 2px,
-          rgba(0,0,0,0.08) 2px,
-          rgba(0,0,0,0.08) 4px
-        );
-      }
-
-      /* ─────────────────────────────────────────────────
-         ORIGINAL MACHINE CSS (preserved + themed)
-      ───────────────────────────────────────────────── */
-
-      .pix, .pix::before, .pix::after {
-        width: calc(var(--w) * var(--m));
-        height: calc(var(--h) * var(--m));
-        image-rendering: pixelated;
-        background-size: calc(var(--w) * var(--m)) calc(var(--h) * var(--m));
-      }
-      .pix::before, .pix::after { position: absolute; content: ""; }
-
-      body {
-        --brown: #57280f;
-        --blue: #33a5da;
-        --dark-blue: #3a94b7;
-        --machine-color: #32c2db;
-        --machine-width: 160px;
-        --m: 2;
-      }
-
-      .collection-box {
-        --h: 32px;
-        width: calc(var(--m) * var(--machine-width));
-        display: flex;
-        align-items: flex-end;
-        justify-content: flex-start;
-        min-height: calc(var(--m) * var(--h));
-        flex-wrap: nowrap;
-        overflow: hidden;
-        background: rgba(0,0,0,0.3);
-        border: 1px solid #3b1a6e;
-        border-radius: 6px;
-      }
-
-      .collection-box .toy-wrapper {
-        position: relative;
-        width: calc(100% / 6);
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        flex-shrink: 0;
-      }
-      .collection-box .toy-wrapper .toy::after { top: auto; bottom: 0; }
-
-      .toy-wrapper.squeeze-in {
-        width: 0;
-        animation: squeeze-in forwards 0.4s 1.4s;
-      }
-      @keyframes squeeze-in {
-        0% { width: 0; }
-        100% { width: calc(100% / 6); }
-      }
-      @keyframes show-toy-2 {
-        0% { opacity: 0; transform: translateY(-100vh); }
-        100% { opacity: 1; transform: translateY(0); }
-      }
-      .toy-wrapper .toy {
-        opacity: 0;
-        transform: translateY(-100vh);
-        animation: show-toy-2 0.8s forwards 1s;
-      }
-
-      .claw-machine {
-        display: flex;
-        flex-direction: column;
-        border: 2px solid var(--brown);
-        overflow: hidden;
-        position: relative;
-        border-radius: 4px;
-        box-shadow: 0 0 20px rgba(50, 194, 219, 0.2), inset 0 0 30px rgba(0,0,0,0.4);
-      }
-
-      .claw-machine.show-overlay::after {
-        content: "";
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        left: 0; top: 0;
-        background-color: var(--machine-color);
-        opacity: 0.55;
-        z-index: 6;
-        pointer-events: none;
-      }
-
-      .box {
-        position: relative;
-        background-color: #5ab8d4;
-        --w: var(--machine-width);
-        --h: 180px;
-        height: calc(var(--h) * var(--m));
-        background-image:
-          radial-gradient(ellipse at 30% 60%, rgba(100,220,255,0.2) 0%, transparent 60%),
-          radial-gradient(ellipse at 70% 30%, rgba(255,255,255,0.1) 0%, transparent 50%);
-      }
-      .box::before {
-        background-color: var(--brown);
-        top: calc(70px * var(--m));
-        width: 100%; height: calc(var(--m) * 8px);
-        z-index: 5;
-      }
-      .box::after {
-        background-color: var(--machine-color);
-        top: calc(70px * var(--m)); right: 0;
-        width: calc(var(--m) * 8px); height: calc(var(--m) * 170px);
-        z-index: 2;
-      }
-
-      .machine-top, .machine-bottom { position: absolute; width: 100%; --h: 70px; height: calc(var(--h) * var(--m)); }
-      .machine-top { top: 0; display: flex; align-items: center; z-index: 1; }
-      .machine-top::after {
-        content: ""; top: 0; left: 0; width: 100%; height: 100%;
-        background-color: #70f7f372; z-index: 1;
-      }
-      .machine-bottom { bottom: 0; background-color: #c8eef5; }
-
-      .collection-point {
-        position: absolute; bottom: 0;
-        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAMCAYAAABm+U3GAAAAAXNSR0IArs4c6QAAADBJREFUOE9jtJqy/T8DFcGxHE9GkHGM1DYYZCjIcJoYTDMXjxqMkrZGIw8eHEMvKADnSiE1EAXSagAAAABJRU5ErkJggg==);
-        --w: 44px; --h: 24px; z-index: 0;
-      }
-
-      .rail { top: 0; left: 0; transition: 0.3s; border: solid var(--blue); }
-      .rail.hori { --h: 5px; width: 100%; background-color: #fff; border-width: 2px 0; z-index: 1; }
-      .rail.vert { position: absolute; --h: 70px; --w: 5px; background-color: #fff; border-width: 0 2px; }
-
-      .arm-joint { position: absolute; top: 0; left: 0; --w: 5px; --h: 5px; transition: 0.3s; z-index: -1; }
-      .arm-joint::after {
-        position: absolute; border: solid var(--blue) 2px; background-color: #fff;
-        --w: 10px; --h: 10px;
-        top: calc(var(--m) * var(--h) * -0.25); left: calc(var(--m) * var(--w) * -0.25);
-      }
-
-      .arm::after {
-        position: absolute; --w: 13px; --h: 7px;
-        bottom: calc(var(--m) * -1px); left: calc(var(--m) * -3px);
-        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAHCAYAAADTcMcaAAAAAXNSR0IArs4c6QAAAElJREFUKFNjZGBgYDBeeus/iCYGnI1WY2QEaTgTpUqMerAak2W3GVA0RWgKMKy4/gHDAGRx6miCWQEyGQbQbcawiRiPgTWRE3oA5mIzfZr3jVYAAAAASUVORK5CYII=);
-      }
-      .arm.missed::after {
-        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAHCAYAAADTcMcaAAAAAXNSR0IArs4c6QAAAENJREFUKFNjZGBgYDBeeus/iCYGnI1WY2QEaTgTpUqMerAak2W3GSjTFKEpADZpxfUPGLYiy+G0CaYImyHkO4+c0AMAWBctfQPWfVQAAAAASUVORK5CYII=);
-      }
-
-      .control {
-        position: relative; --h: 60px; width: 100%;
-        text-align: right; background-color: var(--dark-blue);
-        display: none; /* hidden — replaced by .cabinet-controls */
-      }
-
-      .cover { position: absolute; background-color: var(--machine-color); z-index: 4; }
-      .top { top: 0; width: 100%; height: calc(var(--m) * 16px); }
-      .bottom { bottom: 0; width: 100%; height: calc(var(--m) * 8px); background-color: var(--brown); }
-      .left { bottom: 0; left: 0; height: calc(var(--m) * 170px); width: calc(var(--m) * 8px); }
-      .right { top: 0; right: 0; height: 100%; width: calc(var(--m) * 116px); }
-
-      .instruction {
-        position: absolute; --w: 51px; --h: 12px;
-        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAMCAYAAADPjYVSAAAAAXNSR0IArs4c6QAAAPRJREFUSEvdVkESwkAIs0d9hv9/k8/Qow4d6aSZBKjjRfdSdltYIBC63B735+m9rufLkvuQ4/joHnVCRjsp531hG89w7+S0r3xdnc8X1RONOGfynL/lO1A/A8akOZ/4Xk7GhoQy6pBx2fwkmKOJZMQQ/Q0ZFzVHP0VIlUlVVlw+GKR6p/wYBTNFzSGjLu6SMk3iDhl04NfllbH+ZZUEUDWbqn9XjkgkWBaqlJh0eHQopkwwLDU7eu0a1fWHs9eRQqeHNF4OSYfMNFvVkHSzZ0oMqP9VZBytcy9O6JptTZGJ72SZqdrvJjT3Au6VgxVds+70t+cFkvdjifIP/BkAAAAASUVORK5CYII=);
-        top: calc(var(--m) * 34px); right: calc(var(--m) * 11px);
-      }
-
-      .arm {
-        position: absolute; --w: 7px; --h: 28px;
-        background-color: #fff; box-shadow: 0 0 0 2px var(--blue);
-        transition: 0.3s; margin-top: calc(var(--m) * -1px); margin-left: calc(var(--m) * -1px);
-      }
-
-      .claws { position: absolute; --w: 3px; --h: 10px; bottom: calc(var(--m) * -5px); left: calc(var(--m) * 2.5px); }
-      .claws::before, .claws::after { top: 0; --w: 10px; --h: 16px; transition: 0.2s; }
-      .claws::before {
-        left: calc(var(--m) * -10px);
-        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAQCAYAAAAvf+5AAAAAAXNSR0IArs4c6QAAAGRJREFUKFNjZMADwjX4/6+88ZERpARMYAMgRSuuf2CI0BRgACnGqhCmCGYASDGGQmyKMEzEpQjFjfgUwRUSUgRWSIwi0hSCVBNjKjx4CClGCUeiggcWC0QFOD7FlCUKZJNhyQwAi8VlK14hrsQAAAAASUVORK5CYII=);
-        --close-angle: 45deg; transform-origin: top right;
-      }
-      .claws::after {
-        left: calc(var(--m) * 2.5px);
-        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAQCAYAAAAvf+5AAAAAAXNSR0IArs4c6QAAAFxJREFUKFNjZICCcA3+/ytvfGSE8dFpsARI0YrrHxgiNAUYcClmhCmCmYBLMYqJ+BTD3UTIZBTH41OM4UtcirEGBzbF5CskymqiPENU8BBSBIoI8qIQb6IgNpkBAEPjZSuK8jVuAAAAAElFTkSuQmCC);
-        --close-angle: -45deg; transform-origin: top left;
-      }
-      .arm.open .claws::before, .arm.open .claws::after { rotate: var(--close-angle); }
-
-      .arm-joint::before {
-        --w: 20px; --h: 16px;
-        transform: scale(var(--scale)); margin-left: -15px; margin-top: var(--shadow-pos);
-        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAAAXNSR0IArs4c6QAAAF5JREFUOE9jZMABXmQc+49LDiQuMcOKEZs8iiAhQ3BZgGw43EByDYNZAjMUbCClhiEbSn0DqeU6mCsZRw3El5aJkqN+GA7+dAgLGEqTD0rWo9RQrIUDehQScjGu4gsAxKQ3Ke4v44gAAAAASUVORK5CYII=);
-        z-index: -1; opacity: 0.5;
-      }
-
-      /* Hidden original button (logic preserved, visually replaced) */
-      button.hori-btn, button.vert-btn {
-        display: none;
-      }
-
-      .toy {
-        position: absolute; transition: transform 1s, left 0.3s, top 0.3s;
-        --m: 2; --w: 20px; --h: 27px;
-        transform: rotate(var(--rotate-angle)); pointer-events: none;
-      }
-      .toy::after { content: ""; }
-
-      .toy.bear::after { --w: 24px; --h: 30px; top: calc(var(--m) * -2px); left: calc(var(--m) * -2px); background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAeCAYAAAA2Lt7lAAAAAXNSR0IArs4c6QAAATNJREFUSEvtVssNwjAMbcUZwQLcYQfWQLAAU7FAEWuwA9xZAMQZgRzpRY7rOEkbTtALtLHfc54/ctuwZ7ucvfF6vD5afpb6H/P1IGTwOtw8zmS/aHJJLF9HoBmkItbOtQADAoqanu5yH4Lf7FZz50dEUCCQaCiwjIaIIK+/QS1wkIHk+wSU4NrR81u0GgGSlUscs6fvP0awOT+dvKf1NKjMYokGdZni5HKAUWEllAzlufaNcxT3AWQASKrCAoKcW5TI1hsVcK7RdByccH0OMAXpF1O1JGrNnwaeazQ+x0tBLXsK1CRAvaP+JVjqPEmgNZUkiZFD6iyJZOeCxAL3BChRnqSxeUCRuCRzsBoJl9vIn6CXrlESIXlWY5oEqCgNgDvGikFbN9UFly+y0EDuqTk25PsBag8IsJphwl4AAAAASUVORK5CYII=); }
-      .toy.bear.grabbed::after { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAeCAYAAAA2Lt7lAAAAAXNSR0IArs4c6QAAAUNJREFUSEvllr0NAjEMhe9EjWABetiBNRAswFQsAGINdoCeBUDUCORIL3KM48RHqLiGn8T+bD87l75jz3o+eeHn4XLv+Vrpe842OqENz901+hltZ10txLINAG1DKWJtXQswAVDU9OzPtyH+u81iGuwIhAokJRrqWEZDIJQ3ZtDKOWCA/B5AAreOnmfRawBKzwvVbOg/FUAReCC5vSagFmIF4s5gdXqE8h6X46Qz3Rl4ysMFlbqFDHBUWKLmBCzZ0LBVAaAHr0upy5JBq8nCczh9HBUwbjF03Dn5jSXCKUifOFU9UWv2QQP5LvA6tfZToCYA/Y7+l85K60WANlQSkoOj1FUlkpMLiOU8AtCiXKRvdUCTxEHjbcpf3ENA8jaS3H1adNSfAyCepZNZInSU5oAb5rTSrpvqBZdfZNFJ8p5as4ds30LPDrDvwGtOAAAAAElFTkSuQmCC); }
-      .toy-wrapper .toy.bear::after { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAeCAYAAAA2Lt7lAAAAAXNSR0IArs4c6QAAATVJREFUSEvtVsutwkAMTMQZQQPvDj3QBoIGqOo1AKINeoA7DYA4I9CsNCuv5f2FhQvkkpC1ZxyPbdx34lrNJg/+3J2uvTzLPcd8PQgM7v9njzPa/HWlJClfR2AZ5CK2zq0AAwJEjWt7vAzB79bzqfMDETMQpGgosI6GREyv/4JW4CQjyfsJIHDr6OVX9BYBxSiljtnj/ZcRLA83l979YhxUZnWKBnWZ4eQ04KhICQpD6zz2HpjVfcA0yEBzQaGbPzMqGFWLppNzCLheA05B3DlVa8XmuKa/S5H+L6gFTdmDKEnAemf9a7DceZbAaipNEiNnqotSpDuXJClwT8BGkyK/qkMgsgRrIbjeRoLd50dAYeXCVpUiiicXLF0QSQ1YURaAdIxpZa2b5oIrF1lGqPfUEhv4PgFUUwiwSYZ9UgAAAABJRU5ErkJggg==); }
-
-      .toy.bunny { --w: 20px; --h: 29px; }
-      .toy.bunny::after { --w: 24px; --h: 32px; top: calc(var(--m) * -2px); left: calc(var(--m) * -2px); background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAAXNSR0IArs4c6QAAAN1JREFUSEvtVtsNgzAMTCYoY9CJ2hHpRDBGO0Grq2TkOg4+KlAfSv4wjs+cH1xO5pz6w93aLtMtWxueGd+Xi7gwjNci1vnYJQvC+s4AtQuCpkHW+DYAr/ZJ09ko2o4iRAK3ON6saKSiBlFfu2kGRgHJewTXw/kZAJZrnalXG8Rxv6ABrC4yKLO979ls51Zr4LW41EXeRcMmg/lcdnvMwjxoktGWIH+8KpjOiBafjlF00W8CWIXG9PcSTXpeINYoZRfxXvubwf5dAMwatzq2UM2MqGV8hLa3ZTkj3QHyACJNPMzl3sUuAAAAAElFTkSuQmCC); }
-      .toy.bunny.grabbed::after { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAAXNSR0IArs4c6QAAAOxJREFUSEvtVsENwjAMTCaAMWAiGBEmgjFgAqpDcmUcp76UVAWpfbVR7LMv5/RyMs/psHvZtev9me0avpm9H4EIuNweRa7zcZ8sCLt3BKgFCJoGadm7AXhnnzSdG0X9KEImcIvHmxWNVJxBpGu3zGBRQPISyfVwrgPAch1RhzxuB60Atf1dAJBEVKXfRXVdOqhRVe3ABtjKpDpmHmgVCc8CHiUfKZJfHxMQqcabZvo2nZMcMW+AJaZ5navCU0sLNVZdhUz/E8A6tG/lqucFZo1ydi3nYF3gbwEw1/hkB1NDx3hTzyTPtuWMdUfBA5gROcxJDOyoAAAAAElFTkSuQmCC); }
-      .toy-wrapper .toy.bunny::after { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAAXNSR0IArs4c6QAAAOZJREFUSEvtVtsNgzAMTCZox6ATtSO2E5Ux2gmorpKRcZz4QCC1CL7Asn3J+cHlZJ5rdxqs7dG/s7Xhm/GdBCLg/nwVuW6Xc7IgrO8IUAsQNA0yx/cA8GqfNJ0HRetRhEzgFo83KxqpqEHU1+4xA6OA5C2S6+HcKQBbTE2FV3zkKSiCUbpEv9dq2vJ3AZZ0TAucKrJ3E/Z2FIAeMjltNGwS8112W8zCOGhyojVBdrwqmM6I2tjOxaSL/hPAKjSmv1s0yR6DD8Qapewi3mt/M9h/C4BZ41bHFqqZEbWMj9C2WJYz0h0gH33VNsxxz+QWAAAAAElFTkSuQmCC); }
-
-      .toy.golem::after { --w: 26px; --h: 30px; top: calc(var(--m) * -1px); left: calc(var(--m) * -3px); background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAeCAYAAAAy2w7YAAAAAXNSR0IArs4c6QAAAQpJREFUSEtjZEAC4Rr8/5H5K298ZKSWPNwgkCVFtRXI5jL0NXcwwCyjVB7FooXbVqFYFO8VhmIRJfJgi0CuRTcEZiPIMhCgRB4UKoz4LEHxHgUckGNHiEWE4gVXKOLShzPoRi0ilBUGZ6qDxRt6QsCVkZHV0ddHhIogCgoEsFZYeYm3UKWWJSBzMOob9KqCXMuQqxi4RbAKj5iIJcViWAIiWHpfPH4ObK6+pRHcfGLFSEp1xBqKTd3gtIiU+MCnFpxhYfkIX3VNroUoiQG9OUWtlIfcsMGaj0aeRcTWvhQFHaEGJXreQW5So5R1sBSIq7wj1ESGWYRezmEkBphC9MY+TJxQox+XOpA4AFO+HuQ4QuSjAAAAAElFTkSuQmCC); }
-      .toy.golem.grabbed::after { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAeCAYAAAAy2w7YAAAAAXNSR0IArs4c6QAAARhJREFUSEtjZEAC4Rr8/5H5K298ZKSWPNwgkCVFtRXI5jL0NXcwwCyjVB7FooXbVqFYFO8VhmIRJfJgi0CuRTcEZiPIMhCgRB4UKoz4LEHxHgUckGNHLSIrALEGHSzyYSbiSgToNuLTN7AWkRU2BDSRlOpAirFlWGKCliSLQI6mJP7ol48IFUGUxhmsvMRbqFLLEpA5GPUNelVBrmXIVQzcIliFR0wKIsViWOIhWHpfPH4ObK6+pRHcfGLFkB1EMHkTayg2dYPTIlLiA59acNDB8hG+6ppcC1ESA3pzilopD7lhgzUfjTyLCDW/kJtpyC1djCIIX9ARalCi5x2cFsFSIK7yjlATGWYRejmHkRhgCtEb+zBxQo1+XOpA4gCEWBjkRLE8iwAAAABJRU5ErkJggg==); }
-      .toy-wrapper .toy.golem::after { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAeCAYAAAAy2w7YAAAAAXNSR0IArs4c6QAAAR1JREFUSEtjZEAC4Rr8/5H5K298ZKSWPNwgkCVFtRXI5jL0NXcwwCyjVB7FooXbVqFYFO8VhmIRJfJgi0CuRTcEZiPIMhCgRB4UKoz4LEHxHgUckGNHLSIrALEGHSzyYSbiSgToNuLTN7AWkRU2BDSRlOpAirFlWGKCliSLQI6mJP7ol48IFUGUxhmsvMRbqFLLEpA5GPUNelVBrmXIVQzcIliFR0wKIsViWOIhWHpfPH4ObK6+pRHcfGLFkB1EMHkTayg2dYPTIlLiA59acNDB8hG+6ppcC1ESA3pzilopD7lhgzUfjTyLCDW/kJtpyC1djCIIX9ARalCi5x2cFsFSIK7yjlATGWYRejmHkRhgCtEb+zBxQo1+XOpA4gCEWBjkRLE8iwAAAABJRU5ErkJggg==); }
-
-      .toy.cucumber { --w: 16px; --h: 28px; }
-      .toy.cucumber::after { --w: 16px; --h: 30px; top: calc(var(--m) * 1px); left: 0; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAeCAYAAAAl+Z4RAAAAAXNSR0IArs4c6QAAAIVJREFUSEtjZEAD4Rr8/9HFkPkrb3xkRObDOTCNzFvP4NPP8NfbBCwPMwhsAEgzIY3opoIMAhnCSI5mmGEgQ1AMgDkPl2vQ5QehAbiCH+RUbN7C8AKyATD/gsTwhQl1YwFvCsIiidcLxBg2agADOGeORuNoGAyXdEBxxQIrOCiq2pBLH1IrVwA8halXrQxpsQAAAABJRU5ErkJggg==); }
-      .toy.cucumber.grabbed::after { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAeCAYAAAAl+Z4RAAAAAXNSR0IArs4c6QAAAIdJREFUSEtjZEAD4Rr8/9HFkPkrb3xkRObDOTCNzFvP4NPP8NfbBCwPMwhsAEgzIY3opoIMAhnCSI5mmGEgQ1AMgDkPl2vQ5QehAbiCH+RUbN7C8AKyATD/gsTwhQl1YwFvCsIiidcLxBg2agADOGeORuNoGAyXdEBxxQIrOCiq2pBLH1IrVwA8halXrQxpsQAAAABJRU5ErkJggg==); }
-      .toy-wrapper .toy.cucumber::after { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAeCAYAAAAl+Z4RAAAAAXNSR0IArs4c6QAAAIVJREFUSEtjZEAD4Rr8/9HFkPkrb3xkRObDOTCNzFvP4NPP8NfbBCwPMwhsAEgzIY3opoIMAhnCSI5mmGEgQ1AMgDkPl2vQ5QehAcgBBXIezCvIbHQ1eAORmDChbizgTUFYJDFiYdQAUkOAAZwzR6NxNAyGSzqguGKBZSGKqjbkfEhq5QoAaISsV8DV840AAAAASUVORK5CYII=); }
-
-      .toy.penguin { --w: 24px; --h: 22px; }
-      .toy.penguin::after { --w: 26px; --h: 24px; top: calc(var(--m) * -1px); left: calc(var(--m) * -1px); background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAYCAYAAADkgu3FAAAAAXNSR0IArs4c6QAAAPBJREFUSEtjZMACwjX4/2MTJ1Zs5Y2PjOhqUQRgFvyd/ZhYM7GqY06VBYsjWwi3CGQJpRag2wqyEGYZ2CJaWAKzFGYZIy0tQbYMq0WwMCY1KHHpA4mPYItgwYKespCDl+Sgw5ZMF25bhTXPxHuFMRCKS5xxNGAWgSwmJuhwFScEfbTahpekoij0yGecRRJK8kZ29YrrH0iyBKY4QlMArg8Wd3h9BJIk1TKQJdgSxqhFBOOM6KCja2IgNUnj8iZyUgcnBmwVH6WWoVsCqmXpV8PCvA6qaXEVnDA1oAIU1gYgVT3WVhCucEdvRhFqliGrBwDOBdzprDO9jAAAAABJRU5ErkJggg==); }
-      .toy.penguin.grabbed::after { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAYCAYAAADkgu3FAAAAAXNSR0IArs4c6QAAAP9JREFUSEtjZMACwjX4/2MTJ1Zs5Y2PjOhqUQRgFvyd/ZhYM7GqY06VBYsjWwi3CGQJpRag2wqyEGYZ2CJaWAKzFGYZIy0tQbZsBFgEClNYokBmE0qG+PSB5LAGHSx5IqdCmBi6hdjUoKdenBZhS6YLt63C6ql4rzB4CODy9eCzCORSYoKObB+ttuEllAZQ5EOPfMZZJKEkBmRXr7j+gSRLYIojNAXg+pBTL84MC7KUVMtAlmArL/EmhlGLQBFDdNDRNTGQmqRxJU3kpA5ODNgqPkotQ7cEVMvSr4aFeR1U0+IqOGFqQAUorA1AqnqsrSBc4Y7ejCLULENWDwD2ldbpo7PPMQAAAABJRU5ErkJggg==); }
-      .toy-wrapper .toy.penguin::after { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAYCAYAAADkgu3FAAAAAXNSR0IArs4c6QAAAPxJREFUSEtjZMACwjX4/2MTJ1Zs5Y2PjOhqUQRgFvyd/ZhYM7GqY06VBYsjWwi3CGQJpRag2wqyEGYZ2CJaWAKzFGYZIy0tQbZsBFgEClNYokBmE0qG+PSB5LAGHSx5IqdCmBi6hdjUoKdenBZhS6YLt63C6ql4rzB4CODy9eCzCORSYoKObB+ttuEllAZQ5EOPfMZZJKEkBmRXr7j+gSRLYIojNAXg+pBTL84MC7KUVMtAlmArL/EmhlGLQBFDdNDRNTGQmqRxJU3kpA5ODNgqPkotQ7cEVMvSr4aFeR1U0+IqOGFqQAUorA1AqnqsrSBc4Y7ejCLULENWDwD2ldbpo7PPMQAAAABJRU5ErkJggg==); }
-
-      .toy.robot { --w: 20px; --h: 30px; }
-      .toy.robot::after { --w: 24px; --h: 32px; top: calc(var(--m) * -1px); left: calc(var(--m) * -2px); background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAAXNSR0IArs4c6QAAAO5JREFUSEtjZMADwjX4/+OTh8mtvPGREZc6nBIgw1dc/0CM+QwRmgIMuCwBW0CsS4myDUkRyFJGkOFFtRWk6iVKfV9zB8OoBXiDamCCCGQrCJAa8dj0YfXBqAXIQUtUJIMU4YoPfHKgeCTKAphCbOmRUEIg2gKiygUsiuhjAc1LU5jPqFmqgoIGVj/AKxyaWgCrcGCpwiyKvPrh1DJIMQMrDeAVDqhqBFV71LQAZia4whm1AJYSkeMAHkTI+YCacQAyFxzJwyMfwIKJUOlIbKFH/5yMHA/EuhKfOuR2KkbjF1ejF7mBS4wamAOwtq6xNYbRW8/EqAFZAgDgjP1+jrGWQwAAAABJRU5ErkJggg==); }
-      .toy.robot.grabbed::after { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAAXNSR0IArs4c6QAAAPtJREFUSEtjZMADwjX4/+OTh8mtvPGREZc6nBIgw1dc/0CM+QwRmgIMuCwBW0CsS4myDUkRyFJGkOFFtRWk6iVKfV9zB8OoBXiDamCCCGQrCJAa8dj0YfXBqAXIQUtUJIMU4YoPfHKgeCTKAphCbOmRUEIg2gKiygUsiuhjAc1LU5jPqFmqgoIGVj/AKxyaWgCrcGCpwiyKvPrh1DJIMQMrDeAVDqhqBFV71LQAZia4whm1AJYSkeMAHkTI+YCacQAyFxzJwyMfwIKJUOlIbKFH/5yMHA/EuhKfOuR2KkbjF1ejF7mBS4wamAOwtq6xNYbRW8/EqAFZAgDgjP1+jrGWQwAAAABJRU5ErkJggg==); }
-      .toy-wrapper .toy.robot::after { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAAXNSR0IArs4c6QAAAPlJREFUSEtjZMADwjX4/+OTh8mtvPGREZc6nBIgw1dc/0CM+QwRmgIMuCwBW0CsS4myDUkRyFJGkOFFtRWk6iVKfV9zB8OoBXiDamCCCGQrCJAa8dj0YfXBqAXIQUtUJIMU4YoPfHKgeCTKAphCbOmRUEIg2gKiygUsiuhjAc1LU5jPqFmqgoIGVj/AKxyaWgCrcGCpwiyKvPrh1DJIMQMrDeAVDqhqBFV71LQAZia4whm1AJYSkeMAHkTI+YCacQAyFxzJwyMfwIKJUOlIbKFH/5yMHA/EuhKfOuR2KkbjF1ejF7mBS4wamAOwtq6xNYbRW8/EqAFZAgDgjP1+jrGWQwAAAABJRU5ErkJggg==); }
-
-      .toy.selected { pointer-events: all; cursor: pointer; }
-
-      @keyframes show-toy-1 {
-        0% { opacity: 1; transform: scale(3) translateY(0); }
-        30% { opacity: 0; }
-        100% { opacity: 0; transform: scale(1) translateY(-100vh); }
-      }
-      .toy.display { transform: scale(3); animation: show-toy-1 0.8s forwards 1s; }
-
-      .control .collection-point { filter: brightness(0.8); bottom: calc(var(--m) * 8px); }
-
-      .collection-arrow {
-        position: absolute; left: calc(var(--m) * 21px); top: calc(var(--m) * 9px);
-        --w: 8px; --h: 4px;
-        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAECAYAAACzzX7wAAAAAXNSR0IArs4c6QAAAClJREFUGFdjDDn86T8DHsAIksOlaI0tHyNYATZFIEmQOFwBsiKYJEgMAPTvDw1xBcM+AAAAAElFTkSuQmCC);
-        filter: sepia(1) brightness(0.5);
-      }
-      .collection-arrow.active { filter: none; animation: btn-glow 1s infinite; }
-    </style>
-  </head>
-  <body>
-    <div class="scanlines"></div>
-
-    <!-- Win banner -->
-    <div class="win-banner" id="winBanner">
-      <div class="win-card">
-        <div class="win-emoji">🎉</div>
-        <div class="win-title">¡Premio!</div>
-        <div class="win-sub" id="winSub">Has atrapado un juguete</div>
-        <button class="win-close" onclick="document.getElementById('winBanner').classList.remove('show')">CONTINUAR</button>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Máquina de Garras</title>
+  <style>
+    *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Layout ── */
+    body {
+      font-family: 'Courier New', monospace;
+      background: #06000f;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background-image:
+        radial-gradient(ellipse at 20% 40%, rgba(120,40,200,0.22) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 20%, rgba(0,180,220,0.14) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 95%, rgba(240,50,120,0.10) 0%, transparent 50%);
+    }
+
+    /* ── Arcade shell ── */
+    .arcade {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      filter: drop-shadow(0 0 48px rgba(140,50,255,0.5));
+    }
+
+    /* Header */
+    .cabinet-top {
+      background: linear-gradient(150deg, #1a0535 0%, #091428 100%);
+      border: 2px solid #6d28d9;
+      border-bottom: none;
+      border-radius: 14px 14px 0 0;
+      padding: 12px 18px 10px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .cabinet-title {
+      color: #e879f9;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-shadow: 0 0 12px #e879f9, 0 0 28px #c026d3;
+      white-space: nowrap;
+    }
+    .cabinet-title span { color: #fcd34d; text-shadow: 0 0 12px #fcd34d; }
+
+    .hud { display: flex; gap: 10px; }
+    .hud-item {
+      display: flex; flex-direction: column; align-items: center;
+      background: rgba(0,0,0,0.65); border: 1px solid #6d28d9;
+      border-radius: 6px; padding: 3px 10px; min-width: 46px;
+    }
+    .hud-label { color: #7c3aed; font-size: 6px; letter-spacing: 2px; text-transform: uppercase; }
+    .hud-value { color: #fcd34d; font-size: 16px; font-weight: bold; line-height: 1.3; text-shadow: 0 0 8px #fcd34d; text-align: center; }
+
+    /* Machine shell */
+    .machine-shell {
+      background: linear-gradient(180deg, #110322 0%, #080f28 100%);
+      border: 2px solid #6d28d9;
+      border-top: none; border-bottom: none;
+      padding: 10px 14px;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      width: 100%;
+    }
+    .collection-label {
+      color: #6d28d9; font-size: 6px; letter-spacing: 2px;
+      text-transform: uppercase; align-self: flex-start;
+    }
+
+    /* Controls */
+    .cabinet-controls {
+      background: linear-gradient(150deg, #1a0535 0%, #091428 100%);
+      border: 2px solid #6d28d9;
+      border-top: 1px solid #2e1065;
+      border-radius: 0 0 14px 14px;
+      padding: 14px 18px 16px;
+      width: 100%;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .game-hint { color: #8b5cf6; font-size: 7px; letter-spacing: 1px; text-align: center; }
+
+    .control-row { display: flex; gap: 10px; align-items: center; }
+
+    .game-btn {
+      font-family: 'Courier New', monospace;
+      font-size: 11px; font-weight: bold; letter-spacing: 1px;
+      padding: 10px 16px; border-radius: 8px; border: 2px solid transparent;
+      cursor: not-allowed; opacity: 0.45;
+      transition: opacity 0.2s, box-shadow 0.2s;
+      text-transform: uppercase; user-select: none; -webkit-user-select: none;
+      touch-action: none;
+    }
+    .game-btn.active {
+      cursor: pointer; opacity: 1;
+      animation: btn-pulse 1.4s ease-in-out infinite;
+    }
+    .game-btn.active:active { transform: scale(0.93); }
+
+    .btn-left  { background: #0c1a42; border-color: #1d4ed8; color: #93c5fd; }
+    .btn-right { background: #0c1a42; border-color: #1d4ed8; color: #93c5fd; }
+    .btn-drop  { background: #38071f; border-color: #9f1239; color: #fda4af; }
+
+    .btn-left.active, .btn-right.active {
+      background: #1e3a8a; border-color: #60a5fa; color: #bfdbfe;
+      box-shadow: 0 0 16px rgba(37,99,235,0.7), inset 0 0 8px rgba(37,99,235,0.3);
+    }
+    .btn-drop.active {
+      background: #881337; border-color: #f43f5e; color: #ffe4e6;
+      box-shadow: 0 0 16px rgba(244,63,94,0.7), inset 0 0 8px rgba(244,63,94,0.3);
+    }
+
+    @keyframes btn-pulse {
+      0%,100% { box-shadow: 0 0 8px currentColor; }
+      50%      { box-shadow: 0 0 22px currentColor, 0 0 36px currentColor; }
+    }
+
+    .kbd-hint { color: #374151; font-size: 7px; letter-spacing: 1px; text-align: center; }
+
+    /* Status message */
+    .status-msg {
+      color: #a78bfa; font-size: 7px; letter-spacing: 2px;
+      text-transform: uppercase; min-height: 12px; text-align: center;
+    }
+
+    /* ── Win overlay ── */
+    .win-banner {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.8);
+      align-items: center; justify-content: center;
+    }
+    .win-banner.show { display: flex; }
+    .win-card {
+      background: #06000f; border: 3px solid #fcd34d;
+      border-radius: 16px; padding: 28px 44px; text-align: center;
+      animation: win-pop 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+      box-shadow: 0 0 60px rgba(252,211,77,0.45);
+    }
+    @keyframes win-pop {
+      0%   { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1);   opacity: 1; }
+    }
+    .win-emoji { font-size: 44px; margin-bottom: 8px; }
+    .win-title {
+      color: #fcd34d; font-size: 20px; font-weight: bold;
+      letter-spacing: 4px; text-shadow: 0 0 20px #fcd34d; text-transform: uppercase;
+    }
+    .win-sub { color: #a78bfa; font-size: 10px; letter-spacing: 2px; margin-top: 6px; }
+    .win-close {
+      background: #fcd34d; color: #000; border: none; border-radius: 8px;
+      padding: 9px 26px; font-family: 'Courier New', monospace;
+      font-size: 11px; font-weight: bold; letter-spacing: 2px;
+      cursor: pointer; margin-top: 14px; text-transform: uppercase;
+      transition: transform 0.1s;
+    }
+    .win-close:hover { transform: scale(1.06); }
+
+    /* ── Scanlines ── */
+    .scanlines {
+      position: fixed; inset: 0; pointer-events: none; z-index: 300;
+      background: repeating-linear-gradient(
+        to bottom, transparent 0px, transparent 2px,
+        rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+      );
+    }
+
+    /* ════════════════════════════════════════
+       PIXEL MACHINE (original CSS, no transitions on moving parts)
+    ════════════════════════════════════════ */
+    body {
+      --brown: #57280f; --blue: #33a5da;
+      --machine-color: #32c2db; --machine-width: 160px; --m: 2;
+    }
+
+    .pix, .pix::before, .pix::after {
+      width: calc(var(--w) * var(--m));
+      height: calc(var(--h) * var(--m));
+      image-rendering: pixelated;
+      background-size: calc(var(--w) * var(--m)) calc(var(--h) * var(--m));
+    }
+    .pix::before, .pix::after { position: absolute; content: ""; }
+
+    /* Collection tray */
+    .collection-box {
+      --h: 32px;
+      width: calc(var(--m) * var(--machine-width));
+      display: flex; align-items: flex-end; justify-content: flex-start;
+      min-height: calc(var(--m) * var(--h));
+      overflow: hidden;
+      background: rgba(0,0,0,0.35); border: 1px solid #3b1a6e; border-radius: 5px;
+    }
+    .collection-box .toy-wrapper {
+      position: relative; width: calc(100% / 6);
+      display: flex; align-items: flex-end; justify-content: center; flex-shrink: 0;
+    }
+    .collection-box .toy-wrapper .toy::after { top: auto; bottom: 0; }
+    .toy-wrapper.squeeze-in { width: 0; animation: squeeze-in 0.4s forwards 1.4s; }
+    @keyframes squeeze-in { to { width: calc(100% / 6); } }
+    @keyframes show-toy-2 {
+      from { opacity: 0; transform: translateY(-80px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .toy-wrapper .toy { opacity: 0; transform: translateY(-80px); animation: show-toy-2 0.6s forwards 1s; }
+
+    /* Claw machine body */
+    .claw-machine {
+      display: flex; flex-direction: column;
+      border: 2px solid var(--brown); overflow: hidden; position: relative;
+      border-radius: 4px;
+      box-shadow: 0 0 24px rgba(50,194,219,0.25), inset 0 0 30px rgba(0,0,0,0.4);
+    }
+    .claw-machine.show-overlay::after {
+      content: ""; position: absolute; inset: 0;
+      background-color: var(--machine-color); opacity: 0.5;
+      z-index: 6; pointer-events: none;
+    }
+
+    /* Main glass box */
+    .box {
+      position: relative; background-color: #5ab8d4;
+      --w: var(--machine-width); --h: 180px;
+      height: calc(var(--h) * var(--m));
+      background-image:
+        radial-gradient(ellipse at 25% 55%, rgba(100,220,255,0.2) 0%, transparent 55%),
+        radial-gradient(ellipse at 70% 25%, rgba(255,255,255,0.08) 0%, transparent 50%);
+    }
+    /* Rail divider line */
+    .box::before {
+      background-color: var(--brown);
+      top: calc(70px * var(--m)); width: 100%; height: calc(var(--m) * 8px); z-index: 5;
+    }
+    /* Right wall */
+    .box::after {
+      background-color: var(--machine-color);
+      top: calc(70px * var(--m)); right: 0;
+      width: calc(var(--m) * 8px); height: calc(var(--m) * 170px); z-index: 2;
+    }
+
+    .machine-top, .machine-bottom {
+      position: absolute; width: 100%; --h: 70px; height: calc(var(--h) * var(--m));
+    }
+    .machine-top {
+      top: 0; display: flex; align-items: center; z-index: 1;
+    }
+    .machine-top::after {
+      content: ""; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(112,247,243,0.25); z-index: 1;
+    }
+    .machine-bottom { bottom: 0; background-color: #c5ecf3; }
+
+    /* Drop slot */
+    .collection-point {
+      position: absolute; bottom: 0; --w: 44px; --h: 24px; z-index: 0;
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAMCAYAAABm+U3GAAAAAXNSR0IArs4c6QAAADBJREFUOE9jtJqy/T8DFcGxHE9GkHGM1DYYZCjIcJoYTDMXjxqMkrZGIw8eHEMvKADnSiE1EAXSagAAAABJRU5ErkJggg==);
+    }
+
+    /* Rails — NO transition, JS moves these */
+    .rail { top: 0; left: 0; border: solid var(--blue); }
+    .rail.hori { --h: 5px; width: 100%; background-color: #fff; border-width: 2px 0; z-index: 1; }
+    .rail.vert { position: absolute; --h: 70px; --w: 5px; background-color: #fff; border-width: 0 2px; }
+
+    /* Arm joint — NO transition */
+    .arm-joint { position: absolute; top: 0; left: 0; --w: 5px; --h: 5px; z-index: -1; }
+    .arm-joint::after {
+      position: absolute; border: solid var(--blue) 2px; background-color: #fff;
+      --w: 10px; --h: 10px;
+      top: calc(var(--m) * var(--h) * -0.25); left: calc(var(--m) * var(--w) * -0.25);
+    }
+    .arm-joint::before {
+      --w: 20px; --h: 16px;
+      transform: scale(var(--scale)); margin-left: -15px; margin-top: var(--shadow-pos);
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAAAXNSR0IArs4c6QAAAF5JREFUOE9jZMABXmQc+49LDiQuMcOKEZs8iiAhQ3BZgGw43EByDYNZAjMUbCClhiEbSn0DqeU6mCsZRw3El5aJkqN+GA7+dAgLGEqTD0rWo9RQrIUDehQScjGu4gsAxKQ3Ke4v44gAAAAASUVORK5CYII=);
+      z-index: -1; opacity: 0.5;
+    }
+
+    /* Arm — NO transition on position, but smooth for h */
+    .arm {
+      position: absolute; --w: 7px; --h: 28px;
+      background-color: #fff; box-shadow: 0 0 0 2px var(--blue);
+      margin-top: calc(var(--m) * -1px); margin-left: calc(var(--m) * -1px);
+    }
+    .arm::after {
+      position: absolute; --w: 13px; --h: 7px;
+      bottom: calc(var(--m) * -1px); left: calc(var(--m) * -3px);
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAHCAYAAADTcMcaAAAAAXNSR0IArs4c6QAAAElJREFUKFNjZGBgYDBeeus/iCYGnI1WY2QEaTgTpUqMerAak2W3GVA0RWgKMKy4/gHDAGRx6miCWQEyGQbQbcawiRiPgTWRE3oA5mIzfZr3jVYAAAAASUVORK5CYII=);
+    }
+    .arm.missed::after {
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAHCAYAAADTcMcaAAAAAXNSR0IArs4c6QAAAENJREFUKFNjZGBgYDBeeus/iCYGnI1WY2QEaTgTpUqMerAak2W3GSjTFKEpADZpxfUPGLYiy+G0CaYImyHkO4+c0AMAWBctfQPWfVQAAAAASUVORK5CYII=);
+    }
+
+    /* Claws */
+    .claws { position: absolute; --w: 3px; --h: 10px; bottom: calc(var(--m) * -5px); left: calc(var(--m) * 2.5px); }
+    .claws::before, .claws::after { top: 0; --w: 10px; --h: 16px; transition: rotate 0.15s; }
+    .claws::before {
+      left: calc(var(--m) * -10px);
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAQCAYAAAAvf+5AAAAAAXNSR0IArs4c6QAAAGRJREFUKFNjZMADwjX4/6+88ZERpARMYAMgRSuuf2CI0BRgACnGqhCmCGYASDGGQmyKMEzEpQjFjfgUwRUSUgRWSIwi0hSCVBNjKjx4CClGCUeiggcWC0QFOD7FlCUKZJNhyQwAi8VlK14hrsQAAAAASUVORK5CYII=);
+      --close-angle: 45deg; transform-origin: top right;
+    }
+    .claws::after {
+      left: calc(var(--m) * 2.5px);
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAQCAYAAAAvf+5AAAAAAXNSR0IArs4c6QAAAFxJREFUKFNjZICCcA3+/ytvfGSE8dFpsARI0YrrHxgiNAUYcClmhCmCmYBLMYqJ+BTD3UTIZBTH41OM4UtcirEGBzbF5CskymqiPENU8BBSBIoI8qIQb6IgNpkBAEPjZSuK8jVuAAAAAElFTkSuQmCC);
+      --close-angle: -45deg; transform-origin: top left;
+    }
+    .arm.open .claws::before, .arm.open .claws::after { rotate: var(--close-angle); }
+
+    /* Toys */
+    .toy {
+      position: absolute; --m: 2; --w: 20px; --h: 27px;
+      transform: rotate(var(--rotate-angle,0deg)); pointer-events: none;
+    }
+    .toy::after { content: ""; }
+    .toy.selected { pointer-events: all; cursor: pointer; outline: 2px dashed #fcd34d; outline-offset: 3px; }
+
+    /* Bear */
+    .toy.bear::after { --w:24px;--h:30px;top:calc(var(--m)*-2px);left:calc(var(--m)*-2px);background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAeCAYAAAA2Lt7lAAAAAXNSR0IArs4c6QAAATNJREFUSEvtVssNwjAMbcUZwQLcYQfWQLAAU7FAEWuwA9xZAMQZgRzpRY7rOEkbTtALtLHfc54/ctuwZ7ucvfF6vD5afpb6H/P1IGTwOtw8zmS/aHJJLF9HoBmkItbOtQADAoqanu5yH4Lf7FZz50dEUCCQaCiwjIaIIK+/QS1wkIHk+wSU4NrR81u0GgGSlUscs6fvP0awOT+dvKf1NKjMYokGdZni5HKAUWEllAzlufaNcxT3AWQASKrCAoKcW5TI1hsVcK7RdByccH0OMAXpF1O1JGrNnwaeazQ+x0tBLXsK1CRAvaP+JVjqPEmgNZUkiZFD6iyJZOeCxAL3BChRnqSxeUCRuCRzsBoJl9vIn6CXrlESIXlWY5oEqCgNgDvGikFbN9UFly+y0EDuqTk25PsBag8IsJphwl4AAAAASUVORK5CYII=);}
+    .toy.bear.grabbed::after{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAeCAYAAAA2Lt7lAAAAAXNSR0IArs4c6QAAAUNJREFUSEvllr0NAjEMhe9EjWABetiBNRAswFQsAGINdoCeBUDUCORIL3KM48RHqLiGn8T+bD87l75jz3o+eeHn4XLv+Vrpe842OqENz901+hltZ10txLINAG1DKWJtXQswAVDU9OzPtyH+u81iGuwIhAokJRrqWEZDIJQ3ZtDKOWCA/B5AAreOnmfRawBKzwvVbOg/FUAReCC5vSagFmIF4s5gdXqE8h6X46Qz3Rl4ysMFlbqFDHBUWKLmBCzZ0LBVAaAHr0upy5JBq8nCczh9HBUwbjF03Dn5jSXCKUifOFU9UWv2QQP5LvA6tfZToCYA/Y7+l85K60WANlQSkoOj1FUlkpMLiOU8AtCiXKRvdUCTxEHjbcpf3ENA8jaS3H1adNSfAyCepZNZInSU5oAb5rTSrpvqBZdfZNFJ8p5as4ds30LPDrDvwGtOAAAAAElFTkSuQmCC);}
+    .toy-wrapper .toy.bear::after{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAeCAYAAAA2Lt7lAAAAAXNSR0IArs4c6QAAATVJREFUSEvtVsutwkAMTMQZQQPvDj3QBoIGqOo1AKINeoA7DYA4I9CsNCuv5f2FhQvkkpC1ZxyPbdx34lrNJg/+3J2uvTzLPcd8PQgM7v9njzPa/HWlJClfR2AZ5CK2zq0AAwJEjWt7vAzB79bzqfMDETMQpGgosI6GREyv/4JW4CQjyfsJIHDr6OVX9BYBxSiljtnj/ZcRLA83l979YhxUZnWKBnWZ4eQ04KhICQpD6zz2HpjVfcA0yEBzQaGbPzMqGFWLppNzCLheA05B3DlVa8XmuKa/S5H+L6gFTdmDKEnAemf9a7DceZbAaipNEiNnqotSpDuXJClwT8BGkyK/qkMgsgRrIbjeRoLd50dAYeXCVpUiiicXLF0QSQ1YURaAdIxpZa2b5oIrF1lGqPfUEhv4PgFUUwiwSYZ9UgAAAABJRU5ErkJggg==);}
+    /* Bunny */
+    .toy.bunny{--w:20px;--h:29px;}
+    .toy.bunny::after{--w:24px;--h:32px;top:calc(var(--m)*-2px);left:calc(var(--m)*-2px);background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAAXNSR0IArs4c6QAAAN1JREFUSEvtVtsNgzAMTCYoY9CJ2hHpRDBGO0Grq2TkOg4+KlAfSv4wjs+cH1xO5pz6w93aLtMtWxueGd+Xi7gwjNci1vnYJQvC+s4AtQuCpkHW+DYAr/ZJ09ko2o4iRAK3ON6saKSiBlFfu2kGRgHJewTXw/kZAJZrnalXG8Rxv6ABrC4yKLO979ls51Zr4LW41EXeRcMmg/lcdnvMwjxoktGWIH+8KpjOiBafjlF00W8CWIXG9PcSTXpeINYoZRfxXvubwf5dAMwatzq2UM2MqGV8hLa3ZTkj3QHyACJNPMzl3sUuAAAAAElFTkSuQmCC);}
+    .toy.bunny.grabbed::after{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAAXNSR0IArs4c6QAAAOxJREFUSEvtVsENwjAMTCaAMWAiGBEmgjFgAqpDcmUcp76UVAWpfbVR7LMv5/RyMs/psHvZtev9me0avpm9H4EIuNweRa7zcZ8sCLt3BKgFCJoGadm7AXhnnzSdG0X9KEImcIvHmxWNVJxBpGu3zGBRQPISyfVwrgPAch1RhzxuB60Atf1dAJBEVKXfRXVdOqhRVe3ABtjKpDpmHmgVCc8CHiUfKZJfHxMQqcabZvo2nZMcMW+AJaZ5navCU0sLNVZdhUz/E8A6tG/lqucFZo1ydi3nYF3gbwEw1/hkB1NDx3hTzyTPtuWMdUfBA5gROcxJDOyoAAAAAElFTkSuQmCC);}
+    .toy-wrapper .toy.bunny::after{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAAXNSR0IArs4c6QAAAOZJREFUSEvtVtsNgzAMTCZox6ATtSO2E5Ux2gmorpKRcZz4QCC1CL7Asn3J+cHlZJ5rdxqs7dG/s7Xhm/GdBCLg/nwVuW6Xc7IgrO8IUAsQNA0yx/cA8GqfNJ0HRetRhEzgFo83KxqpqEHU1+4xA6OA5C2S6+HcKQBbTE2FV3zkKSiCUbpEv9dq2vJ3AZZ0TAucKrJ3E/Z2FIAeMjltNGwS8112W8zCOGhyojVBdrwqmM6I2tjOxaSL/hPAKjSmv1s0yR6DD8Qapewi3mt/M9h/C4BZ41bHFqqZEbWMj9C2WJYz0h0gH33VNsxxz+QWAAAAAElFTkSuQmCC);}
+    /* Golem */
+    .toy.golem::after{--w:26px;--h:30px;top:calc(var(--m)*-1px);left:calc(var(--m)*-3px);background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAeCAYAAAAy2w7YAAAAAXNSR0IArs4c6QAAAQpJREFUSEtjZEAC4Rr8/5H5K298ZKSWPNwgkCVFtRXI5jL0NXcwwCyjVB7FooXbVqFYFO8VhmIRJfJgi0CuRTcEZiPIMhCgRB4UKoz4LEHxHgUckGNHiEWE4gVXKOLShzPoRi0ilBUGZ6qDxRt6QsCVkZHV0ddHhIogCgoEsFZYeYm3UKWWJSBzMOob9KqCXMuQqxi4RbAKj5iIJcViWAIiWHpfPH4ObK6+pRHcfGLFSEp1xBqKTd3gtIiU+MCnFpxhYfkIX3VNroUoiQG9OUWtlIfcsMGaj0aeRcTWvhQFHaEGJXreQW5So5R1sBSIq7wj1ESGWYRezmEkBphC9MY+TJxQox+XOpA4AFO+HuQ4QuSjAAAAAElFTkSuQmCC);}
+    .toy.golem.grabbed::after{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAeCAYAAAAy2w7YAAAAAXNSR0IArs4c6QAAARhJREFUSEtjZEAC4Rr8/5H5K298ZKSWPNwgkCVFtRXI5jL0NXcwwCyjVB7FooXbVqFYFO8VhmIRJfJgi0CuRTcEZiPIMhCgRB4UKoz4LEHxHgUckGNHLSIrALEGHSzyYSbiSgToNuLTN7AWkRU2BDSRlOpAirFlWGKCliSLQI6mJP7ol48IFUGUxhmsvMRbqFLLEpA5GPUNelVBrmXIVQzcIliFR0wKIsViWOIhWHpfPH4ObK6+pRHcfGLFkB1EMHkTayg2dYPTIlLiA59acNDB8hG+6ppcC1ESA3pzilopD7lhgzUfjTyLCDW/kJtpyC1djCIIX9ARalCi5x2cFsFSIK7yjlATGWYRejmHkRhgCtEb+zBxQo1+XOpA4gCEWBjkRLE8iwAAAABJRU5ErkJggg==);}
+    .toy-wrapper .toy.golem::after{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAeCAYAAAAy2w7YAAAAAXNSR0IArs4c6QAAAR1JREFUSEtjZEAC4Rr8/5H5K298ZKSWPNwgkCVFtRXI5jL0NXcwwCyjVB7FooXbVqFYFO8VhmIRJfJgi0CuRTcEZiPIMhCgRB4UKoz4LEHxHgUckGNHLSIrALEGHSzyYSbiSgToNuLTN7AWkRU2BDSRlOpAirFlWGKCliSLQI6mJP7ol48IFUGUxhmsvMRbqFLLEpA5GPUNelVBrmXIVQzcIliFR0wKIsViWOIhWHpfPH4ObK6+pRHcfGLFkB1EMHkTayg2dYPTIlLiA59acNDB8hG+6ppcC1ESA3pzilopD7lhgzUfjTyLCDW/kJtpyC1djCIIX9ARalCi5x2cFsFSIK7yjlATGWYRejmHkRhgCtEb+zBxQo1+XOpA4gCEWBjkRLE8iwAAAABJRU5ErkJggg==);}
+    /* Cucumber */
+    .toy.cucumber{--w:16px;--h:28px;}
+    .toy.cucumber::after{--w:16px;--h:30px;top:calc(var(--m)*1px);left:0;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAeCAYAAAAl+Z4RAAAAAXNSR0IArs4c6QAAAIVJREFUSEtjZEAD4Rr8/9HFkPkrb3xkRObDOTCNzFvP4NPP8NfbBCwPMwhsAEgzIY3opoIMAhnCSI5mmGEgQ1AMgDkPl2vQ5QehAbiCH+RUbN7C8AKyATD/gsTwhQl1YwFvCsIiidcLxBg2agADOGeORuNoGAyXdEBxxQIrOCiq2pBLH1IrVwA8halXrQxpsQAAAABJRU5ErkJggg==);}
+    .toy.cucumber.grabbed::after{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAeCAYAAAAl+Z4RAAAAAXNSR0IArs4c6QAAAIdJREFUSEtjZEAD4Rr8/9HFkPkrb3xkRObDOTCNzFvP4NPP8NfbBCwPMwhsAEgzIY3opoIMAhnCSI5mmGEgQ1AMgDkPl2vQ5QehAbiCH+RUbN7C8AKyATD/gsTwhQl1YwFvCsIiidcLxBg2agADOGeORuNoGAyXdEBxxQIrOCiq2pBLH1IrVwA8halXrQxpsQAAAABJRU5ErkJggg==);}
+    .toy-wrapper .toy.cucumber::after{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAeCAYAAAAl+Z4RAAAAAXNSR0IArs4c6QAAAIVJREFUSEtjZEAD4Rr8/9HFkPkrb3xkRObDOTCNzFvP4NPP8NfbBCwPMwhsAEgzIY3opoIMAhnCSI5mmGEgQ1AMgDkPl2vQ5QehAcgBBXIezCvIbHQ1eAORmDChbizgTUFYJDFiYdQAUkOAAZwzR6NxNAyGSzqguGKBZSGKqjbkfEhq5QoAaISsV8DV840AAAAASUVORK5CYII=);}
+    /* Penguin */
+    .toy.penguin{--w:24px;--h:22px;}
+    .toy.penguin::after{--w:26px;--h:24px;top:calc(var(--m)*-1px);left:calc(var(--m)*-1px);background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAYCAYAAADkgu3FAAAAAXNSR0IArs4c6QAAAPBJREFUSEtjZMACwjX4/2MTJ1Zs5Y2PjOhqUQRgFvyd/ZhYM7GqY06VBYsjWwi3CGQJpRag2wqyEGYZ2CJaWAKzFGYZIy0tQbYMq0WwMCY1KHHpA4mPYItgwYKespCDl+Sgw5ZMF25bhTXPxHuFMRCKS5xxNGAWgSwmJuhwFScEfbTahpekoij0yGecRRJK8kZ29YrrH0iyBKY4QlMArg8Wd3h9BJIk1TKQJdgSxqhFBOOM6KCja2IgNUnj8iZyUgcnBmwVH6WWoVsCqmXpV8PCvA6qaXEVnDA1oAIU1gYgVT3WVhCucEdvRhFqliGrBwDOBdzprDO9jAAAAABJRU5ErkJggg==);}
+    .toy.penguin.grabbed::after{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAYCAYAAADkgu3FAAAAAXNSR0IArs4c6QAAAP9JREFUSEtjZMACwjX4/2MTJ1Zs5Y2PjOhqUQRgFvyd/ZhYM7GqY06VBYsjWwi3CGQJpRag2wqyEGYZ2CJaWAKzFGYZIy0tQbZsBFgEClNYokBmE0qG+PSB5LAGHSx5IqdCmBi6hdjUoKdenBZhS6YLt63C6ql4rzB4CODy9eCzCORSYoKObB+ttuEllAZQ5EOPfMZZJKEkBmRXr7j+gSRLYIojNAXg+pBTL84MC7KUVMtAlmArL/EmhlGLQBFDdNDRNTGQmqRxJU3kpA5ODNgqPkotQ7cEVMvSr4aFeR1U0+IqOGFqQAUorA1AqnqsrSBc4Y7ejCLULENWDwD2ldbpo7PPMQAAAABJRU5ErkJggg==);}
+    .toy-wrapper .toy.penguin::after{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAYCAYAAADkgu3FAAAAAXNSR0IArs4c6QAAAPxJREFUSEtjZMACwjX4/2MTJ1Zs5Y2PjOhqUQRgFvyd/ZhYM7GqY06VBYsjWwi3CGQJpRag2wqyEGYZ2CJaWAKzFGYZIy0tQbZsBFgEClNYokBmE0qG+PSB5LAGHSx5IqdCmBi6hdjUoKdenBZhS6YLt63C6ql4rzB4CODy9eCzCORSYoKObB+ttuEllAZQ5EOPfMZZJKEkBmRXr7j+gSRLYIojNAXg+pBTL84MC7KUVMtAlmArL/EmhlGLQBFDdNDRNTGQmqRxJU3kpA5ODNgqPkotQ7cEVMvSr4aFeR1U0+IqOGFqQAUorA1AqnqsrSBc4Y7ejCLULENWDwD2ldbpo7PPMQAAAABJRU5ErkJggg==);}
+    /* Robot */
+    .toy.robot{--w:20px;--h:30px;}
+    .toy.robot::after{--w:24px;--h:32px;top:calc(var(--m)*-1px);left:calc(var(--m)*-2px);background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAAXNSR0IArs4c6QAAAO5JREFUSEtjZMADwjX4/+OTh8mtvPGREZc6nBIgw1dc/0CM+QwRmgIMuCwBW0CsS4myDUkRyFJGkOFFtRWk6iVKfV9zB8OoBXiDamCCCGQrCJAa8dj0YfXBqAXIQUtUJIMU4YoPfHKgeCTKAphCbOmRUEIg2gKiygUsiuhjAc1LU5jPqFmqgoIGVj/AKxyaWgCrcGCpwiyKvPrh1DJIMQMrDeAVDqhqBFV71LQAZia4whm1AJYSkeMAHkTI+YCacQAyFxzJwyMfwIKJUOlIbKFH/5yMHA/EuhKfOuR2KkbjF1ejF7mBS4wamAOwtq6xNYbRW8/EqAFZAgDgjP1+jrGWQwAAAABJRU5ErkJggg==);}
+    .toy.robot.grabbed::after{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAAXNSR0IArs4c6QAAAPtJREFUSEtjZMADwjX4/+OTh8mtvPGREZc6nBIgw1dc/0CM+QwRmgIMuCwBW0CsS4myDUkRyFJGkOFFtRWk6iVKfV9zB8OoBXiDamCCCGQrCJAa8dj0YfXBqAXIQUtUJIMU4YoPfHKgeCTKAphCbOmRUEIg2gKiygUsiuhjAc1LU5jPqFmqgoIGVj/AKxyaWgCrcGCpwiyKvPrh1DJIMQMrDeAVDqhqBFV71LQAZia4whm1AJYSkeMAHkTI+YCacQAyFxzJwyMfwIKJUOlIbKFH/5yMHA/EuhKfOuR2KkbjF1ejF7mBS4wamAOwtq6xNYbRW8/EqAFZAgDgjP1+jrGWQwAAAABJRU5ErkJggg==);}
+    .toy-wrapper .toy.robot::after{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAAXNSR0IArs4c6QAAAPlJREFUSEtjZMADwjX4/+OTh8mtvPGREZc6nBIgw1dc/0CM+QwRmgIMuCwBW0CsS4myDUkRyFJGkOFFtRWk6iVKfV9zB8OoBXiDamCCCGQrCJAa8dj0YfXBqAXIQUtUJIMU4YoPfHKgeCTKAphCbOmRUEIg2gKiygUsiuhjAc1LU5jPqFmqgoIGVj/AKxyaWgCrcGCpwiyKvPrh1DJIMQMrDeAVDqhqBFV71LQAZia4whm1AJYSkeMAHkTI+YCacQAyFxzJwyMfwIKJUOlIbKFH/5yMHA/EuhKfOuR2KkbjF1ejF7mBS4wamAOwtq6xNYbRW8/EqAFZAgDgjP1+jrGWQwAAAABJRU5ErkJggg==);}
+
+    @keyframes show-toy-1 {
+      0%   { opacity: 1; transform: scale(3) translateY(0); }
+      35%  { opacity: 0; }
+      100% { opacity: 0; transform: scale(1) translateY(-100vh); }
+    }
+    .toy.display { transform: scale(3); animation: show-toy-1 1s forwards 0.8s; }
+
+    /* Hidden original control div */
+    .control { display: none; }
+  </style>
+</head>
+<body>
+  <div class="scanlines"></div>
+
+  <div class="win-banner" id="winBanner">
+    <div class="win-card">
+      <div class="win-emoji">🎉</div>
+      <div class="win-title">¡Premio!</div>
+      <div class="win-sub" id="winSub">Has atrapado un juguete</div>
+      <button class="win-close" id="winClose">CONTINUAR</button>
+    </div>
+  </div>
+
+  <div class="arcade">
+    <div class="cabinet-top">
+      <div class="cabinet-title">🕹 Máquina de <span>Garras</span></div>
+      <div class="hud">
+        <div class="hud-item">
+          <span class="hud-label">Premios</span>
+          <span class="hud-value" id="scoreVal">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Intentos</span>
+          <span class="hud-value" id="attemptsVal">0</span>
+        </div>
       </div>
     </div>
 
-    <div class="arcade">
-      <!-- Header -->
-      <div class="cabinet-top">
-        <div class="cabinet-title">🕹 Máquina de <span>Garras</span></div>
-        <div class="hud">
-          <div class="hud-item">
-            <span class="hud-label">Premios</span>
-            <span class="hud-value" id="scoreVal">0</span>
-          </div>
-          <div class="hud-item">
-            <span class="hud-label">Intentos</span>
-            <span class="hud-value" id="attemptsVal">0</span>
-          </div>
-        </div>
-      </div>
+    <div class="machine-shell">
+      <span class="collection-label">Mis premios</span>
+      <div class="collection-box pix" id="collectionBox"></div>
 
-      <!-- Machine area -->
-      <div class="machine-shell">
-        <span class="collection-label">Mis premios</span>
-        <div class="collection-box pix"></div>
-
-        <div class="claw-machine">
-          <div class="box pix">
-            <div class="machine-top pix">
-              <div class="arm-joint pix">
-                <div class="arm pix">
-                  <div class="claws pix"></div>
-                </div>
+      <div class="claw-machine" id="clawMachine">
+        <div class="box pix" id="box">
+          <div class="machine-top pix" id="machineTop">
+            <div class="arm-joint pix" id="armJoint">
+              <div class="arm pix" id="arm">
+                <div class="claws pix"></div>
               </div>
-              <div class="rail vert pix"></div>
-              <div class="rail hori pix"></div>
             </div>
-            <div class="machine-bottom pix">
-              <div class="collection-point pix"></div>
-            </div>
+            <div class="rail vert pix" id="vertRail"></div>
+            <div class="rail hori pix"></div>
           </div>
-          <!-- Hidden original control (logic hooks) -->
-          <div class="control pix">
-            <div class="cover left"></div>
-            <button type="button" class="hori-btn pix"></button>
-            <button type="button" class="vert-btn pix"></button>
-            <div class="cover right">
-              <div class="instruction pix"></div>
-            </div>
-            <div class="cover bottom"></div>
-            <div class="cover top">
-              <div class="collection-arrow pix"></div>
-            </div>
+          <div class="machine-bottom pix" id="machineBottom">
             <div class="collection-point pix"></div>
           </div>
         </div>
-      </div>
-
-      <!-- Controls -->
-      <div class="cabinet-controls">
-        <div class="game-hint">Mantén MOVER, suelta y presiona BAJAR</div>
-        <div class="control-row">
-          <button class="game-btn btn-move" id="btnMove">⟶ MOVER</button>
-          <button class="game-btn btn-drop" id="btnDrop">▼ BAJAR</button>
-        </div>
-        <div class="kbd-hint">⌨ Teclas: flecha derecha (mover) · espacio (bajar)</div>
+        <div class="control"></div>
       </div>
     </div>
 
-    <script>
-      /* ── State ── */
-      const state = {
-        score: 0,
-        attempts: 0,
-        targetToy: null,
-        collectedNumber: 0,
-      };
+    <div class="cabinet-controls">
+      <div class="status-msg" id="statusMsg">Iniciando...</div>
+      <div class="control-row">
+        <button class="game-btn btn-left"  id="btnLeft">  ◀ IZQ</button>
+        <button class="game-btn btn-drop"  id="btnDrop">  ▼ BAJAR</button>
+        <button class="game-btn btn-right" id="btnRight">DER ▶</button>
+      </div>
+      <div class="kbd-hint">⌨ ← → mover &nbsp;·&nbsp; Espacio / ↓ bajar</div>
+    </div>
+  </div>
 
-      /* ── DOM shortcuts ── */
-      const $ = sel => document.querySelector(sel);
-      const el = {
-        clawMachine: $('.claw-machine'),
-        box:          $('.box'),
-        collectionBox: $('.collection-box'),
-        collectionArrow: $('.collection-arrow'),
-        scoreVal:     $('#scoreVal'),
-        attemptsVal:  $('#attemptsVal'),
-        winBanner:    $('#winBanner'),
-        winSub:       $('#winSub'),
-        btnMove:      $('#btnMove'),
-        btnDrop:      $('#btnDrop'),
-        // Hidden original buttons (logic still wired to them internally)
-        horiBtn:      $('.hori-btn'),
-        vertBtn:      $('.vert-btn'),
-      };
+<script>
+/* ══════════════════════════════════════════════════════════════
+   MÁQUINA DE GARRAS — game engine
+══════════════════════════════════════════════════════════════ */
 
-      const toys_map = {
-        bear:    { w: 40, h: 54 },
-        bunny:   { w: 40, h: 58 },
-        golem:   { w: 40, h: 54 },
-        cucumber:{ w: 32, h: 56 },
-        penguin: { w: 48, h: 44 },
-        robot:   { w: 40, h: 60 },
-      };
+// ── Constants ──────────────────────────────────────────────
+const SPEED    = 3;   // px per animation frame (claw horizontal)
+const ARM_SPEED = 4;  // px per frame (arm extends/retracts)
+const RETURN_SPEED = 5; // px per frame (reset movement)
+const M = 2;
 
-      const toyNames = {
-        bear: 'Osito', bunny: 'Conejito', golem: 'Golem',
-        cucumber: 'Pepino', penguin: 'Pingüino', robot: 'Robot',
-      };
+const TOY_TYPES = ['bear','bunny','golem','cucumber','penguin','robot'];
+const TOY_SIZES = {
+  bear:     { w: 40, h: 54 },
+  bunny:    { w: 40, h: 58 },
+  golem:    { w: 40, h: 54 },
+  cucumber: { w: 32, h: 56 },
+  penguin:  { w: 48, h: 44 },
+  robot:    { w: 40, h: 60 },
+};
+const TOY_NAMES = {
+  bear:'Osito', bunny:'Conejito', golem:'Gólem',
+  cucumber:'Pepino', penguin:'Pingüino', robot:'Robot',
+};
 
-      const m = 2;
-      const sortedToys = [...Object.keys(toys_map), ...Object.keys(toys_map)].sort(() => 0.5 - Math.random());
-      const cornerBuf = 16;
-      const machineBuf = { x: 36, y: 16 };
-      const radToDeg = r => Math.round(r * (180 / Math.PI));
-      const randomN = (min, max) => Math.round(min - 0.5 + Math.random() * (max - min + 1));
-      const adjustAngle = a => { const b = a % 360; return b < 0 ? b + 360 : b; };
+// ── DOM ────────────────────────────────────────────────────
+const elMachine    = document.getElementById('clawMachine');
+const elBox        = document.getElementById('box');
+const elTop        = document.getElementById('machineTop');
+const elJoint      = document.getElementById('armJoint');
+const elArm        = document.getElementById('arm');
+const elVert       = document.getElementById('vertRail');
+const elBottom     = document.getElementById('machineBottom');
+const elCollection = document.getElementById('collectionBox');
+const elScore      = document.getElementById('scoreVal');
+const elAttempts   = document.getElementById('attemptsVal');
+const elStatus     = document.getElementById('statusMsg');
+const elWin        = document.getElementById('winBanner');
+const elWinSub     = document.getElementById('winSub');
+const elWinClose   = document.getElementById('winClose');
+const btnLeft      = document.getElementById('btnLeft');
+const btnRight     = document.getElementById('btnRight');
+const btnDrop      = document.getElementById('btnDrop');
 
-      const { width: machineWidth, height: machineHeight, top: machineTopPx } = el.clawMachine.getBoundingClientRect();
-      const { height: machineTopH } = $('.machine-top').getBoundingClientRect();
-      const { height: machineBottomH, top: machineBottomTopPx } = $('.machine-bottom').getBoundingClientRect();
-      const maxArmLen = machineBottomTopPx - machineTopPx - machineBuf.y;
+// ── Measure layout (done once after DOM is rendered) ────────
+const boxRect    = elBox.getBoundingClientRect();
+const topRect    = elTop.getBoundingClientRect();
+const bottomRect = elBottom.getBoundingClientRect();
+const BOX_W      = boxRect.width;   // 320 px
+const BOX_H      = boxRect.height;  // 360 px
+const TOP_H      = topRect.height;  // 140 px  (70 * M)
+const BTM_TOP    = bottomRect.top - boxRect.top; // y of machine-bottom within box
+// How far the arm can extend (from joint baseline to machine-bottom top)
+const MAX_ARM    = BTM_TOP - TOP_H - 8;          // ~72–80 px usable
 
-      /* ── WorldObject ── */
-      class WorldObject {
-        constructor(props) {
-          Object.assign(this, {
-            x: 0, y: 0, z: 0, angle: 0,
-            transformOrigin: { x: 0, y: 0 },
-            interval: null, default: {}, moveWith: [],
-            el: props.className && $(`.${props.className}`),
-            ...props,
-          });
-          this.setStyles();
-          if (props.className) {
-            const { width, height } = this.el.getBoundingClientRect();
-            this.w = width; this.h = height;
-          }
-          ['x','y','w','h'].forEach(k => { this.default[k] = this[k]; });
-        }
-        setStyles() {
-          Object.assign(this.el.style, {
-            left: `${this.x}px`,
-            top:  !this.bottom ? `${this.y}px` : undefined,
-            bottom: this.bottom,
-            width:  `${this.w}px`,
-            height: `${this.h}px`,
-            transformOrigin: typeof this.transformOrigin === 'string'
-              ? this.transformOrigin
-              : `${this.transformOrigin.x}px ${this.transformOrigin.y}px`,
-          });
-          this.el.style.zIndex = this.z;
-        }
-        setTransformOrigin(to) {
-          this.transformOrigin = to === 'center' ? 'center' : to;
-          this.setStyles();
-        }
-        handleNext(next) { clearInterval(this.interval); this.interval = null; if (next) next(); }
-        resizeShadow() { el.box.style.setProperty('--scale', 0.5 + this.h / maxArmLen / 2); }
-        resumeMove(opts) { this.interval = null; this.move(opts); }
-        move({ moveKey, target, moveTime, next }) {
-          if (this.interval) { this.handleNext(next); return; }
-          const dest = target ?? this.default[moveKey];
-          this.interval = setInterval(() => {
-            const dist = Math.abs(this[moveKey] - dest);
-            if (dist < 1) { this[moveKey] = dest; this.setStyles(); this.handleNext(next); return; }
-            const step = Math.min(dist, 10) * (this[moveKey] > dest ? -1 : 1);
-            this[moveKey] += step;
-            this.setStyles();
-            if (moveKey === 'h') this.resizeShadow();
-            this.moveWith.forEach(obj => { if (!obj) return; obj[moveKey === 'h' ? 'y' : moveKey] += step; obj.setStyles(); });
-          }, moveTime || 10);
-        }
+// Wall buffers
+const BUF_X  = 20;   // left/right minimum x for joint
+const BUF_Y  = TOP_H - 16; // joint rests at bottom of machine-top
+
+// Right limit: joint center should stay clear of right wall cover (8*M = 16 px)
+const RIGHT_LIMIT = BOX_W - 16 - 16; // 288 px
+
+// ── State machine ───────────────────────────────────────────
+// Phases: 'init' | 'idle' | 'moving' | 'dropping' | 'grabbing' | 'retracting' | 'returning' | 'releasing' | 'win'
+let phase    = 'init';
+let jointX   = BUF_X;
+let jointY   = 0;          // starts at top, animates down to BUF_Y
+let armH     = 16 * M;     // resting height (28 * M in CSS default)
+const ARM_REST = 16 * M;
+let score    = 0;
+let attempts = 0;
+let targetToy = null;
+let collected = 0;
+
+// Input flags
+let holdLeft  = false;
+let holdRight = false;
+
+// Toys array
+const allToys = [];
+
+// ── Helpers ────────────────────────────────────────────────
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const setStatus = msg => { elStatus.textContent = msg; };
+const setBtn = (btn, on) => { btn.classList.toggle('active', on); };
+
+function applyJoint() {
+  elJoint.style.left = jointX + 'px';
+  elJoint.style.top  = jointY + 'px';
+  elVert.style.left  = jointX + 'px';
+  // Shadow scale: grows as arm extends
+  elBox.style.setProperty('--scale', (0.5 + armH / MAX_ARM / 2).toFixed(3));
+  elBox.style.setProperty('--shadow-pos', MAX_ARM + TOP_H - jointY + 'px');
+}
+function applyArm() {
+  elArm.style.height = armH + 'px';
+}
+
+// ── Toy spawning ─────────────────────────────────────────────
+function spawnToys() {
+  const shuffled = [...TOY_TYPES, ...TOY_TYPES].sort(() => Math.random() - 0.5);
+  const playW = BOX_W - BUF_X * 2;
+  const playH = BTM_TOP - TOP_H - 12;
+  const cols = 4, rows = 3;
+  const cellW = playW / cols;
+  const cellH = playH / rows;
+  let idx = 0;
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      if (idx >= 11) break; // 11 toys (skip one slot like original)
+      const type = shuffled[idx];
+      const size = TOY_SIZES[type];
+      const cx   = BUF_X + col * cellW + cellW / 2;
+      const cy   = TOP_H + row * cellH + cellH / 2;
+      const tx   = clamp(cx - size.w / 2 + (Math.random() * 8 - 4), BUF_X, BOX_W - size.w - 16);
+      const ty   = clamp(cy - size.h / 2 + (Math.random() * 6 - 3), TOP_H + 4, BTM_TOP - size.h - 4);
+
+      const el = document.createElement('div');
+      el.className = `toy pix ${type}`;
+      el.style.left = tx + 'px';
+      el.style.top  = ty + 'px';
+      elBox.appendChild(el);
+
+      allToys.push({ el, type, x: tx, y: ty, w: size.w, h: size.h, idx });
+      el.addEventListener('click', () => collectToy(allToys[allToys.length - 1 - (allToys.length - 1 - idx)]));
+      idx++;
+    }
+  }
+  // Fix click handlers — rebuild after push
+  allToys.forEach((toy, i) => {
+    toy.el.onclick = () => { if (phase === 'idle') collectToy(toy); };
+  });
+}
+
+// ── Grab detection ──────────────────────────────────────────
+function findToyUnderClaw() {
+  // Claw tip x/y in box-local coordinates
+  const clawX = jointX + 4;          // center of joint + tiny offset
+  const clawY = jointY + MAX_ARM + 8; // joint Y + full extension
+  const hitW  = 28, hitH = 24;       // claw hitbox
+
+  let best = null;
+  for (const toy of allToys) {
+    if (!elBox.contains(toy.el)) continue; // already removed
+    const overlapX = clawX + hitW > toy.x && clawX < toy.x + toy.w;
+    const overlapY = clawY + hitH > toy.y && clawY < toy.y + toy.h;
+    if (overlapX && overlapY) {
+      if (!best || toy.y > best.y) best = toy; // prefer lower toy
+    }
+  }
+  return best;
+}
+
+// ── Collection ──────────────────────────────────────────────
+function collectToy(toy) {
+  score++;
+  collected++;
+  elScore.textContent = score;
+  toy.el.classList.remove('selected');
+
+  // Show "display" animation in center of machine
+  toy.el.style.left = (BOX_W / 2 - toy.w / 2) + 'px';
+  toy.el.style.top  = (BOX_H / 2 - toy.h / 2) + 'px';
+  toy.el.style.zIndex = 7;
+  toy.el.style.setProperty('--rotate-angle', '0deg');
+  toy.el.classList.add('display');
+  elMachine.classList.add('show-overlay');
+
+  // Add to collection tray
+  const wrap = document.createElement('div');
+  wrap.className = 'toy-wrapper' + (collected > 6 ? ' squeeze-in' : '');
+  wrap.innerHTML = `<div class="toy pix ${toy.type}"></div>`;
+  elCollection.appendChild(wrap);
+
+  elWinSub.textContent = `¡Atrapaste un ${TOY_NAMES[toy.type]}!`;
+
+  setTimeout(() => {
+    elMachine.classList.remove('show-overlay');
+    phase = 'win';
+    setStatus('¡Premio conseguido!');
+    elWin.classList.add('show');
+  }, 1600);
+}
+
+// ── Win close ───────────────────────────────────────────────
+elWinClose.addEventListener('click', () => {
+  elWin.classList.remove('show');
+  // Reset to idle after win
+  jointX = BUF_X; jointY = BUF_Y; armH = ARM_REST;
+  applyJoint(); applyArm();
+  elArm.classList.remove('open','missed','grabbed');
+  phase = 'idle';
+  setStatus('Mueve la garra y baja');
+  setBtn(btnLeft, true); setBtn(btnRight, true); setBtn(btnDrop, false);
+});
+
+// ── Main animation loop ─────────────────────────────────────
+let raf;
+function loop() {
+  raf = requestAnimationFrame(loop);
+
+  if (phase === 'init') {
+    // Animate joint down to resting Y
+    if (jointY < BUF_Y) {
+      jointY = Math.min(jointY + RETURN_SPEED, BUF_Y);
+      applyJoint();
+    } else {
+      phase = 'idle';
+      setStatus('Mueve la garra y baja');
+      setBtn(btnLeft, true); setBtn(btnRight, true); setBtn(btnDrop, false);
+    }
+    return;
+  }
+
+  if (phase === 'idle') {
+    let moved = false;
+    if (holdLeft)  { jointX = clamp(jointX - SPEED, BUF_X, RIGHT_LIMIT); moved = true; }
+    if (holdRight) { jointX = clamp(jointX + SPEED, BUF_X, RIGHT_LIMIT); moved = true; }
+    if (moved) applyJoint();
+    return;
+  }
+
+  if (phase === 'dropping') {
+    // Extend arm downward
+    armH = Math.min(armH + ARM_SPEED, MAX_ARM);
+    applyArm();
+    if (armH >= MAX_ARM) {
+      // Arm fully extended — try to grab
+      targetToy = findToyUnderClaw();
+      elArm.classList.remove('open');
+      if (targetToy) {
+        elArm.classList.add('grabbed');
+        setStatus('¡Atrapado! Subiendo...');
+      } else {
+        elArm.classList.add('missed');
+        setStatus('Sin suerte... regresando');
       }
+      phase = 'retracting';
+    }
+    return;
+  }
 
-      /* ── Toy ── */
-      class Toy extends WorldObject {
-        constructor(props) {
-          const toyType = sortedToys[props.index];
-          const size = toys_map[toyType];
-          const bh = el.box.getBoundingClientRect().height;
-          const mbh = $('.machine-bottom').getBoundingClientRect().height;
-          const toyAreaTop = machineTopH + 16;
-          const toyAreaH = bh - toyAreaTop - 8;
-          const cols = 4, rows = 3;
-          const col = props.index % cols;
-          const row = Math.floor(props.index / cols);
-          const cellW = (machineWidth - cornerBuf * 2) / cols;
-          const cellH = toyAreaH / rows;
-          super({
-            el: Object.assign(document.createElement('div'), { className: `toy pix ${toyType}` }),
-            x: cornerBuf + col * cellW + cellW / 2 - size.w / 2 + randomN(-4, 4),
-            y: toyAreaTop + row * cellH + cellH / 2 - size.h / 2 + randomN(-2, 2),
-            z: 0, toyType, ...size, ...props,
-          });
-          el.box.append(this.el);
-          this.el.addEventListener('click', () => this.collect());
-          allToys.push(this);
-        }
-        collect() {
-          this.el.classList.remove('selected');
-          this.x = machineWidth / 2 - this.w / 2;
-          this.y = machineHeight / 2 - this.h / 2;
-          this.z = 7;
-          this.el.style.setProperty('--rotate-angle', '0deg');
-          this.setTransformOrigin('center');
-          this.el.classList.add('display');
-          el.clawMachine.classList.add('show-overlay');
-          state.score++;
-          state.collectedNumber++;
-          el.scoreVal.textContent = state.score;
-          el.collectionBox.appendChild(
-            Object.assign(document.createElement('div'), {
-              className: `toy-wrapper${state.collectedNumber > 6 ? ' squeeze-in' : ''}`,
-              innerHTML: `<div class="toy pix ${this.toyType}"></div>`,
-            })
-          );
-          el.winSub.textContent = `¡Atrapaste un ${toyNames[this.toyType] || this.toyType}!`;
-          setTimeout(() => {
-            el.clawMachine.classList.remove('show-overlay');
-            el.winBanner.classList.add('show');
-            if (!$('.selected')) el.collectionArrow.classList.remove('active');
-          }, 1800);
-        }
-        setRotateAngle() {
-          const angle = radToDeg(Math.atan2(this.y + this.h/2 - this.clawPos.y, this.x + this.w/2 - this.clawPos.x)) - 90;
-          const adj = adjustAngle(angle);
-          this.angle = adj < 180 ? adj * -1 : 360 - adj;
-          this.el.style.setProperty('--rotate-angle', `${this.angle}deg`);
-        }
-        setClawPos(pos) { this.clawPos = pos; }
-      }
+  if (phase === 'retracting') {
+    // Retract arm back up
+    armH = Math.max(armH - ARM_SPEED, ARM_REST);
+    if (targetToy) {
+      // Drag toy up with the arm
+      const newToyY = targetToy.y - (ARM_SPEED);
+      targetToy.y = newToyY;
+      targetToy.el.style.top = targetToy.y + 'px';
+    }
+    applyArm();
+    if (armH <= ARM_REST) {
+      phase = 'returning';
+      setStatus('Volviendo al inicio...');
+    }
+    return;
+  }
 
-      /* ── Setup ── */
-      const allToys = [];
-      el.box.style.setProperty('--shadow-pos', `${maxArmLen}px`);
+  if (phase === 'returning') {
+    // Move joint back to start X
+    let arrived = true;
+    if (Math.abs(jointX - BUF_X) > RETURN_SPEED) {
+      jointX += jointX > BUF_X ? -RETURN_SPEED : RETURN_SPEED;
+      arrived = false;
+    } else {
+      jointX = BUF_X;
+    }
+    // Also move toy if grabbed
+    if (targetToy) {
+      const dx = jointX - BUF_X < 0 ? -RETURN_SPEED : (jointX > BUF_X ? RETURN_SPEED : 0);
+      targetToy.x = clamp(targetToy.x - RETURN_SPEED * (jointX > BUF_X ? 1 : -1), 0, BOX_W);
+      targetToy.el.style.left = targetToy.x + 'px';
+    }
+    applyJoint();
+    if (arrived) {
+      phase = 'releasing';
+    }
+    return;
+  }
 
-      const armJoint = new WorldObject({ className: 'arm-joint' });
-      const vertRail  = new WorldObject({ className: 'vert', moveWith: [null, armJoint] });
-      const arm       = new WorldObject({ className: 'arm' });
-      armJoint.resizeShadow();
-
-      // Spawn toys (skip index 8 as original did)
-      for (let i = 0; i < 12; i++) {
-        if (i === 8) continue;
-        new Toy({ index: i });
-      }
-
-      /* ── Game logic ── */
-      const stopMove = () => {
-        clearInterval(vertRail.interval);
-        vertRail.interval = null;
-        armJoint.interval = null;
-        arm.interval = null;
-        setActive(el.btnMove, false);
-        setActive(el.btnDrop, true);
-      };
-
-      const startMoveRight = () => {
-        if (el.btnMove.classList.contains('active')) {
-          arm.el.classList.remove('missed');
-          vertRail.move({
-            moveKey: 'x',
-            target: machineWidth - armJoint.w - machineBuf.x,
-            moveTime: 10,
-            next: stopMove,
-          });
-        }
-      };
-
-      const doOverlap = (a, b) => b.x > a.x && b.x < a.x + a.w && b.y > a.y && b.y < a.y + a.h;
-
-      const getClosestToy = () => {
-        const claw = {
-          y: armJoint.y + maxArmLen + machineBuf.y + 7,
-          x: armJoint.x + 7, w: 40, h: 32,
-        };
-        const hits = allToys.filter(t => doOverlap(t, claw));
-        if (hits.length) {
-          const toy = hits.sort((a, b) => b.index - a.index)[0];
-          toy.setTransformOrigin({ x: claw.x - toy.x, y: claw.y - toy.y });
-          toy.setClawPos({ x: claw.x, y: claw.y });
-          state.targetToy = toy;
-        }
-      };
-
-      const grabToy = () => {
-        if (state.targetToy) {
-          [vertRail, armJoint, arm].forEach(o => o.moveWith[0] = state.targetToy);
-          state.targetToy.setRotateAngle();
-          state.targetToy.el.classList.add('grabbed');
-        } else {
-          arm.el.classList.add('missed');
-        }
-      };
-
-      const dropToy = () => {
-        arm.el.classList.add('open');
-        if (state.targetToy) {
-          state.targetToy.z = 3;
-          state.targetToy.move({ moveKey: 'y', target: machineHeight - state.targetToy.h - 30, moveTime: 10 });
-          [vertRail, armJoint, arm].forEach(o => o.moveWith[0] = null);
-        }
+  if (phase === 'releasing') {
+    // Drop toy at the slot (bottom of box near collection point)
+    if (targetToy) {
+      elArm.classList.add('open');
+      // Animate toy falling to collection point
+      const slotY = BTM_TOP - targetToy.h - 4;
+      if (targetToy.y < slotY) {
+        targetToy.y = Math.min(targetToy.y + RETURN_SPEED * 2, slotY);
+        targetToy.el.style.top = targetToy.y + 'px';
+      } else {
+        // Toy at slot — light it up for collection
         setTimeout(() => {
-          arm.el.classList.remove('open');
-          if (state.targetToy) {
-            state.targetToy.el.classList.add('selected');
-            el.collectionArrow.classList.add('active');
-            state.targetToy = null;
+          if (targetToy) {
+            elArm.classList.remove('open');
+            elArm.classList.remove('grabbed');
+            targetToy.el.classList.add('selected');
+            setStatus('¡Haz clic en el juguete para recogerlo!');
           }
-          resetToStart();
-        }, 700);
-      };
+          targetToy = null;
+          phase = 'idle';
+          setBtn(btnLeft, true); setBtn(btnRight, true); setBtn(btnDrop, false);
+        }, 300);
+        phase = 'waiting_click';
+      }
+    } else {
+      // Missed — just reset
+      elArm.classList.remove('missed','grabbed','open');
+      phase = 'idle';
+      setBtn(btnLeft, true); setBtn(btnRight, true); setBtn(btnDrop, false);
+    }
+    return;
+  }
 
-      const resetToStart = () => {
-        setActive(el.btnMove, false);
-        setActive(el.btnDrop, false);
-        vertRail.resumeMove({
-          moveKey: 'x',
-          next: () => armJoint.resumeMove({
-            moveKey: 'y',
-            next: () => {
-              setActive(el.btnMove, true);
-            },
-          }),
-        });
-      };
+  // 'waiting_click', 'win' — no animation needed
+}
 
-      const doDrop = () => {
-        if (!el.btnDrop.classList.contains('active')) return;
-        state.attempts++;
-        el.attemptsVal.textContent = state.attempts;
-        setActive(el.btnDrop, false);
-        getClosestToy();
-        setTimeout(() => {
-          arm.el.classList.add('open');
-          arm.move({
-            moveKey: 'h', target: maxArmLen, moveTime: 10,
-            next: () => setTimeout(() => {
-              arm.el.classList.remove('open');
-              grabToy();
-              arm.resumeMove({
-                moveKey: 'h',
-                next: () => {
-                  vertRail.resumeMove({
-                    moveKey: 'x',
-                    next: () => armJoint.resumeMove({ moveKey: 'y', next: dropToy }),
-                  });
-                },
-              });
-            }, 500),
-          });
-        }, 500);
-      };
+// ── Drop trigger ────────────────────────────────────────────
+function triggerDrop() {
+  if (phase !== 'idle') return;
+  attempts++;
+  elAttempts.textContent = attempts;
+  phase = 'dropping';
+  elArm.classList.remove('missed','grabbed');
+  elArm.classList.add('open');
+  setStatus('Bajando la garra...');
+  setBtn(btnLeft, false); setBtn(btnRight, false); setBtn(btnDrop, false);
+}
 
-      /* ── Utility ── */
-      const setActive = (btn, active) => {
-        btn.classList.toggle('active', active);
-      };
+// ── Button events ────────────────────────────────────────────
+function addHold(btn, setFlag) {
+  const start = (e) => { e.preventDefault(); setFlag(true); };
+  const stop  = (e) => { e.preventDefault(); setFlag(false); };
+  btn.addEventListener('mousedown',  start);
+  btn.addEventListener('touchstart', start, { passive: false });
+  btn.addEventListener('mouseup',    stop);
+  btn.addEventListener('mouseleave', stop);
+  btn.addEventListener('touchend',   stop);
+  btn.addEventListener('touchcancel',stop);
+}
 
-      /* ── Init: move claw to start position ── */
-      armJoint.move({
-        moveKey: 'y', target: machineTopH - machineBuf.y, moveTime: 10,
-        next: () => vertRail.resumeMove({
-          moveKey: 'x', target: machineBuf.x, moveTime: 10,
-          next: () => {
-            Object.assign(armJoint.default, { y: machineTopH - machineBuf.y, x: machineBuf.x });
-            Object.assign(vertRail.default, { x: machineBuf.x });
-            setActive(el.btnMove, true);
-          },
-        }),
-      });
+addHold(btnLeft,  v => { holdLeft  = v; });
+addHold(btnRight, v => { holdRight = v; });
+btnDrop.addEventListener('mousedown',  e => { e.preventDefault(); triggerDrop(); });
+btnDrop.addEventListener('touchstart', e => { e.preventDefault(); triggerDrop(); }, { passive: false });
 
-      /* ── Button events ── */
-      let moveHeld = false;
+// ── Enable drop button when idle ─────────────────────────────
+// We watch phase changes through a tiny polling check
+setInterval(() => {
+  if (phase === 'idle') {
+    setBtn(btnDrop, true);
+    setBtn(btnLeft,  true);
+    setBtn(btnRight, true);
+  }
+}, 200);
 
-      const onMoveStart = () => {
-        if (!el.btnMove.classList.contains('active') || moveHeld) return;
-        moveHeld = true;
-        startMoveRight();
-      };
-      const onMoveEnd = () => {
-        if (!moveHeld) return;
-        moveHeld = false;
-        clearInterval(vertRail.interval);
-        vertRail.interval = null;
-        stopMove();
-      };
+// ── Keyboard ────────────────────────────────────────────────
+const keysHeld = new Set();
+document.addEventListener('keydown', e => {
+  if (keysHeld.has(e.code)) return;
+  keysHeld.add(e.code);
+  if (e.code === 'ArrowLeft'  || e.code === 'KeyA') holdLeft  = true;
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') holdRight = true;
+  if (e.code === 'Space' || e.code === 'ArrowDown') { e.preventDefault(); triggerDrop(); }
+});
+document.addEventListener('keyup', e => {
+  keysHeld.delete(e.code);
+  if (e.code === 'ArrowLeft'  || e.code === 'KeyA') holdLeft  = false;
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') holdRight = false;
+});
 
-      el.btnMove.addEventListener('mousedown', onMoveStart);
-      el.btnMove.addEventListener('touchstart', e => { e.preventDefault(); onMoveStart(); }, { passive: false });
-      el.btnMove.addEventListener('mouseup', onMoveEnd);
-      el.btnMove.addEventListener('mouseleave', onMoveEnd);
-      el.btnMove.addEventListener('touchend', onMoveEnd);
+// ── Boot ─────────────────────────────────────────────────────
+// Set initial CSS variables
+elBox.style.setProperty('--scale', '0.5');
+elBox.style.setProperty('--shadow-pos', MAX_ARM + 'px');
 
-      el.btnDrop.addEventListener('click', doDrop);
-      el.btnDrop.addEventListener('touchstart', e => { e.preventDefault(); doDrop(); }, { passive: false });
+// Position elements at start
+elJoint.style.left = BUF_X + 'px';
+elJoint.style.top  = '0px';
+elVert.style.left  = BUF_X + 'px';
+elArm.style.height = ARM_REST + 'px';
 
-      /* ── Keyboard ── */
-      const keys = {};
-      document.addEventListener('keydown', e => {
-        if (keys[e.code]) return;
-        keys[e.code] = true;
-        if (e.code === 'ArrowRight' || e.code === 'KeyD') onMoveStart();
-        if (e.code === 'Space' || e.code === 'ArrowDown') { e.preventDefault(); doDrop(); }
-      });
-      document.addEventListener('keyup', e => {
-        keys[e.code] = false;
-        if (e.code === 'ArrowRight' || e.code === 'KeyD') onMoveEnd();
-      });
-    </script>
-  </body>
+spawnToys();
+loop(); // start RAF loop
+</script>
+</body>
 </html>
