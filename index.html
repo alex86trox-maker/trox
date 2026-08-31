@@ -6,22 +6,21 @@
 <title>Invitación de Boda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet"/>
 <style>
 *,::before,::after{box-sizing:border-box;margin:0;padding:0}
-
 html{scroll-behavior:smooth}
 body{
   min-height:100%;
-  background:#f7f5f2;
-  color:#1a1a1a;
+  background:#f8f6f2;
+  color:#1c1917;
   font-family:'Jost',sans-serif;
   font-weight:300;
   -webkit-font-smoothing:antialiased;
   -webkit-tap-highlight-color:transparent;
 }
 
-/* ─── Particle canvas (hidden by default) ─── */
+/* ─── Particle canvas ─── */
 #particle-canvas{
   position:fixed;inset:0;
   pointer-events:none;z-index:0;
@@ -33,124 +32,135 @@ body{
 #card-wrapper{
   position:relative;z-index:1;
   max-width:520px;margin:0 auto;
-  padding-bottom:80px;
-  --c-bg:#f7f5f2;
-  --c-text:#1a1a1a;
-  --c-dim:#7a7570;
-  --c-line:#c8bfb0;
-  --c-a:#1a1a1a;
-  --c-b:#e8e3dc;
-  --c-c:#3a3530;
-  --c-d:#ede9e3;
-  --c-e:#7a7570;
+  padding-bottom:100px;
+  --c-bg:#f8f6f2;
+  --c-text:#1c1917;
+  --c-dim:#78716c;
+  --c-line:#e2ddd8;
+  --c-a:#1c1917;
+  --c-b:#ede9e4;
+  --c-c:#44403c;
+  --c-d:#f0ece7;
+  --c-e:#78716c;
   --c-head:'Cormorant Garamond',Georgia,serif;
   --c-serif:'Cormorant Garamond',Georgia,serif;
   --c-mono:'Jost',sans-serif;
   --c-script:'Great Vibes',cursive;
 }
 
-/* ─── Section base ─── */
+/* ─── Section base — always visible ─── */
 #card-wrapper section{
-  padding:64px 40px;
+  padding:80px 40px;
   position:relative;
-  opacity:0;
-  transform:translateY(20px);
-  transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);
-}
-#card-wrapper section.visible{
-  opacity:1;transform:translateY(0)
-}
-#card-wrapper section.instant{
-  opacity:1;transform:none;transition:none;
 }
 
-/* Thin rule between sections */
+/* ─── Divider ─── */
 .section-rule{
-  width:1px;height:48px;
+  display:block;
+  width:1px;height:56px;
   background:var(--c-line);
   margin:0 auto;
+}
+.section-dot{
   display:block;
-  opacity:.6;
+  text-align:center;
+  font-size:10px;
+  letter-spacing:4px;
+  color:var(--c-line);
+  margin:8px 0;
 }
 
-/* ═══════════════════════════════════════
+/* ════════════════════════════════
    SPLASH
-═══════════════════════════════════════ */
+════════════════════════════════ */
 #splash{
   position:fixed;inset:0;z-index:200;
   display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  background:#f7f5f2;
+  align-items:center;justify-content:flex-end;
+  padding-bottom:60px;
   text-align:center;
-  padding:48px 40px;
-  opacity:1;
-  transition:opacity 1s ease;
+  overflow:hidden;
+  transition:opacity 1.2s cubic-bezier(.16,1,.3,1);
 }
 #splash.out{opacity:0;pointer-events:none}
 #splash.hidden{display:none}
 
-.splash-monogram{
-  font-family:var(--c-script);
-  font-size:80px;
-  color:#1a1a1a;
-  line-height:1;
-  margin-bottom:32px;
-  letter-spacing:-1px;
-  opacity:0;
-  animation:fade-rise 1.2s cubic-bezier(.16,1,.3,1) .2s forwards;
+.splash-bg{
+  position:absolute;inset:0;
+  background-image:url('https://images.unsplash.com/photo-1498022563501-6dc5d1959ab1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080&q=80');
+  background-size:cover;
+  background-position:center 20%;
 }
-#sp-15{display:none}/* edad no aplica en boda, pero ID existe */
+.splash-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(
+    to bottom,
+    rgba(0,0,0,.10) 0%,
+    rgba(0,0,0,.50) 60%,
+    rgba(0,0,0,.75) 100%
+  );
+}
+.splash-content{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;
+  align-items:center;
+  transform:translateY(8px);
+  transition:transform 0.8s cubic-bezier(.16,1,.3,1);
+}
+#splash.loaded .splash-content{transform:translateY(0)}
+
+.splash-monogram{
+  font-family:'Great Vibes',cursive;
+  font-size:72px;
+  color:rgba(255,255,255,1);
+  line-height:1;
+  margin-bottom:16px;
+  text-shadow:0 2px 32px rgba(0,0,0,.25);
+}
+#sp-15{display:none}
 
 #sp-name{
-  font-family:var(--c-script);
-  font-size:52px;
-  color:#1a1a1a;
-  line-height:1.2;
-  letter-spacing:.5px;
-  opacity:0;
-  animation:fade-rise 1.2s cubic-bezier(.16,1,.3,1) .5s forwards;
-  margin-bottom:24px;
-}
-.splash-rule{
-  width:40px;height:1px;
-  background:#1a1a1a;
-  margin:0 auto 24px;
-  opacity:0;
-  animation:fade-in 1s ease .8s forwards;
+  font-family:'Jost',sans-serif;
+  font-size:11px;font-weight:400;
+  letter-spacing:6px;text-transform:uppercase;
+  color:rgba(255,255,255,.70);
+  margin-bottom:8px;
 }
 #sp-date{
   font-family:'Jost',sans-serif;
-  font-size:11px;font-weight:400;
+  font-size:10px;font-weight:300;
   letter-spacing:5px;text-transform:uppercase;
-  color:#7a7570;
-  opacity:0;
-  animation:fade-in 1s ease 1s forwards;
-  margin-bottom:48px;
+  color:rgba(255,255,255,.50);
+  margin-bottom:40px;
 }
 #sp-btn{
   font-family:'Jost',sans-serif;
   font-size:10px;font-weight:400;
   letter-spacing:4px;text-transform:uppercase;
-  color:#1a1a1a;
+  color:rgba(255,255,255,.80);
   background:transparent;
-  border:1px solid #1a1a1a;
-  padding:14px 40px;
+  border:1px solid rgba(255,255,255,.40);
+  padding:12px 40px;
   cursor:pointer;
-  opacity:0;
-  animation:fade-in 1s ease 1.3s forwards;
-  transition:background .25s,color .25s;
+  transition:background .25s,border-color .25s;
 }
-#sp-btn:hover{background:#1a1a1a;color:#f7f5f2}
+#sp-btn:hover{
+  background:rgba(255,255,255,.15);
+  border-color:rgba(255,255,255,.7);
+}
+.splash-hashtag{
+  position:absolute;bottom:20px;left:0;right:0;z-index:2;
+  font-family:'Jost',sans-serif;
+  font-size:9px;letter-spacing:4px;
+  text-transform:uppercase;color:rgba(255,255,255,.25);
+  text-align:center;
+}
 
-@keyframes fade-rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-@keyframes fade-in{from{opacity:0}to{opacity:1}}
-
-/* ═══════════════════════════════════════
+/* ════════════════════════════════
    COVER PHOTO + NAME
-═══════════════════════════════════════ */
+════════════════════════════════ */
 .cover-section{
   padding:0!important;
-  position:relative;
 }
 #pv-retrato-wrap{
   display:block;width:100%;
@@ -164,51 +174,75 @@ body{
   display:block;
   background:#e8e3dc;
 }
-.cover-img[src=""]{
-  min-height:380px;
-  background:linear-gradient(160deg,#e8e3dc 0%,#d8d0c5 100%);
-}
 .cover-text{
-  padding:48px 40px 16px;
+  padding:48px 32px 24px;
   text-align:center;
 }
 #pv-nombre{
   font-family:var(--c-script);
-  font-size:56px;
+  font-size:52px;
   color:var(--c-text);
-  line-height:1.15;
+  line-height:1.2;
   margin-bottom:20px;
-  letter-spacing:.5px;
 }
-.card-cap{
+.cover-rule{
+  width:40px;height:1px;
+  background:var(--c-line);
+  margin:0 auto 16px;
+  display:block;
+}
+#pv-caption{
   font-family:'Cormorant Garamond',serif;
-  font-size:16px;
-  font-weight:300;
+  font-size:16px;font-weight:300;
   font-style:italic;
-  line-height:1.8;
+  line-height:1.9;
   color:var(--c-dim);
 }
 
-/* ═══════════════════════════════════════
+/* ════════════════════════════════
+   EYEBROW + SECTION TITLE
+════════════════════════════════ */
+.section-eyebrow{
+  font-family:'Jost',sans-serif;
+  font-size:9px;font-weight:400;
+  letter-spacing:5px;text-transform:uppercase;
+  color:var(--c-dim);
+  text-align:center;
+  display:block;margin-bottom:10px;
+}
+.section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:30px;font-weight:300;
+  font-style:italic;
+  color:var(--c-text);
+  text-align:center;
+  margin-bottom:36px;
+  letter-spacing:.3px;
+  line-height:1.2;
+}
+
+/* ════════════════════════════════
    COUNTDOWN
-═══════════════════════════════════════ */
+════════════════════════════════ */
+#cd{display:none}
 .cd-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:1px;
-  border:1px solid var(--c-line);
-  margin-bottom:16px;
+  margin-bottom:0;
 }
 .cd-unit{
-  padding:20px 8px;
+  padding:28px 8px 24px;
   text-align:center;
-  background:var(--c-bg);
+  position:relative;
 }
-.cd-unit + .cd-unit{border-left:1px solid var(--c-line)}
-#cd{display:none}/* hidden — we use the grid */
+.cd-unit+.cd-unit::before{
+  content:'';
+  position:absolute;left:0;top:20%;bottom:20%;
+  width:1px;background:var(--c-line);
+}
 .cd-num{
   font-family:'Cormorant Garamond',serif;
-  font-size:36px;font-weight:300;
+  font-size:40px;font-weight:300;
   color:var(--c-text);
   display:block;line-height:1;
 }
@@ -217,73 +251,59 @@ body{
   font-size:8px;letter-spacing:3px;
   text-transform:uppercase;
   color:var(--c-dim);
-  display:block;margin-top:6px;
+  display:block;margin-top:8px;
 }
 
-/* ═══════════════════════════════════════
-   SECTION HEADING
-═══════════════════════════════════════ */
-.section-eyebrow{
-  font-family:'Jost',sans-serif;
-  font-size:9px;font-weight:400;
-  letter-spacing:5px;text-transform:uppercase;
-  color:var(--c-dim);
-  text-align:center;
-  display:block;margin-bottom:8px;
-}
-.section-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:30px;font-weight:300;
-  color:var(--c-text);
-  text-align:center;
-  margin-bottom:32px;
-  letter-spacing:.5px;
-  line-height:1.2;
-}
-
-/* ═══════════════════════════════════════
-   CARD LIST
-═══════════════════════════════════════ */
-.card-list{
-  display:flex;flex-direction:column;
-}
+/* ════════════════════════════════
+   LIST
+════════════════════════════════ */
+.card-list{display:flex;flex-direction:column;}
 .card-list-item{
-  padding:14px 0;
+  padding:16px 0;
   border-bottom:1px solid var(--c-line);
   font-family:'Jost',sans-serif;
   font-size:13px;font-weight:300;
   color:var(--c-text);
-  line-height:1.6;
+  line-height:1.65;
   letter-spacing:.3px;
+  display:flex;gap:16px;align-items:baseline;
 }
-.card-list-item:first-child{border-top:1px solid var(--c-line)}
+.card-list-item:first-child{border-top:1px solid var(--c-line);}
+.card-list-time{
+  font-family:'Jost',sans-serif;
+  font-size:10px;font-weight:400;
+  letter-spacing:2px;text-transform:uppercase;
+  color:var(--c-dim);
+  white-space:nowrap;flex-shrink:0;
+}
 
-/* ═══════════════════════════════════════
+/* ════════════════════════════════
    GALLERY
-═══════════════════════════════════════ */
+════════════════════════════════ */
 .gal-prev{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:2px;
+  padding:0;
 }
 .gal-prev img{
   width:100%;aspect-ratio:1;
   object-fit:cover;display:block;
-  background:#e8e3dc;
+  background:#e0dbd4;
 }
 .gal-empty{
   grid-column:1/-1;
-  padding:48px 24px;
-  border:1px solid var(--c-line);
+  padding:56px 24px;
   text-align:center;
   font-family:'Jost',sans-serif;
-  font-size:12px;letter-spacing:2px;
+  font-size:10px;letter-spacing:4px;
   text-transform:uppercase;color:var(--c-dim);
+  border:1px solid var(--c-line);
 }
 
-/* ═══════════════════════════════════════
+/* ════════════════════════════════
    BUTTONS
-═══════════════════════════════════════ */
+════════════════════════════════ */
 .btn-outline{
   display:inline-block;
   font-family:'Jost',sans-serif;
@@ -293,9 +313,11 @@ body{
   text-decoration:none;
   border:1px solid var(--c-a);
   padding:13px 36px;
-  transition:background .25s,color .25s;
+  cursor:pointer;
+  transition:background .2s,color .2s;
+  background:transparent;
 }
-.btn-outline:hover{background:var(--c-a);color:var(--c-bg)}
+.btn-outline:hover{background:var(--c-a);color:var(--c-bg);}
 .btn-fill{
   display:inline-block;
   font-family:'Jost',sans-serif;
@@ -304,200 +326,32 @@ body{
   color:var(--c-bg);
   background:var(--c-a);
   text-decoration:none;
-  padding:13px 36px;
+  padding:14px 36px;
   border:1px solid var(--c-a);
-  transition:opacity .25s;
   cursor:pointer;
-}
-.btn-fill:hover{opacity:.8}
-
-/* ═══════════════════════════════════════
-   AUDIO PLAYER
-═══════════════════════════════════════ */
-#pv-audio-wrap{
-  border:1px solid var(--c-line);
-  padding:24px;
-  margin-bottom:32px;
-  background:rgba(255,255,255,.5);
-}
-.audio-controls{
-  display:flex;align-items:center;gap:16px;margin-bottom:16px;
-}
-#pv-play-btn{
-  width:40px;height:40px;
-  border:1px solid var(--c-a);
-  background:transparent;
-  color:var(--c-a);
-  font-size:14px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-  transition:background .2s,color .2s;
-}
-#pv-play-btn:hover{background:var(--c-a);color:var(--c-bg)}
-#pv-track-name{
-  font-family:'Jost',sans-serif;
-  font-size:12px;font-weight:300;
-  color:var(--c-text);letter-spacing:.5px;
-  flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
-}
-#pv-track-time{
-  font-family:'Jost',sans-serif;
-  font-size:11px;color:var(--c-dim);
-  white-space:nowrap;
-}
-#pv-seek,#pv-vol{
+  transition:opacity .2s;
   width:100%;
-  height:1px;
-  -webkit-appearance:none;
-  appearance:none;
-  background:var(--c-line);
-  cursor:pointer;outline:none;
-  border-radius:0;
-}
-#pv-seek::-webkit-slider-thumb,
-#pv-vol::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  width:10px;height:10px;
-  background:var(--c-a);
-  border-radius:50%;
-}
-.vol-row{
-  display:flex;align-items:center;gap:10px;margin-top:14px;
-}
-.vol-icon{
-  font-size:11px;color:var(--c-dim);
-  font-family:'Jost',sans-serif;
-}
-
-/* ═══════════════════════════════════════
-   SONG SUGGEST
-═══════════════════════════════════════ */
-#pv-song-suggest-wrap{
-  border-top:1px solid var(--c-line);
-  padding-top:32px;margin-top:32px;
-}
-.suggest-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:22px;font-weight:300;
-  color:var(--c-text);
   text-align:center;
-  margin-bottom:24px;
 }
-#song-inputs{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
-.song-input-row{display:flex;gap:8px}
-.song-input-row input{
-  flex:1;padding:10px 14px;
-  border:1px solid var(--c-line);
-  background:transparent;
-  font-family:'Jost',sans-serif;
-  font-size:13px;font-weight:300;
-  color:var(--c-text);
-  outline:none;
-  transition:border-color .2s;
-}
-.song-input-row input:focus{border-color:var(--c-a)}
-.song-input-row input::placeholder{color:var(--c-dim)}
-.song-remove-btn{
-  background:none;border:1px solid var(--c-line);
-  color:var(--c-dim);width:36px;cursor:pointer;
-  font-size:12px;transition:border-color .2s,color .2s;
-}
-.song-remove-btn:hover{border-color:var(--c-a);color:var(--c-a)}
-#song-add-btn{
-  background:none;border:none;
-  color:var(--c-dim);
-  font-family:'Jost',sans-serif;
-  font-size:11px;letter-spacing:2px;text-transform:uppercase;
-  cursor:pointer;margin-bottom:16px;
-  padding:8px 0;width:100%;text-align:left;
-  transition:color .2s;
-}
-#song-add-btn:hover{color:var(--c-a)}
-#song-suggest-form button[type="submit"]{
-  width:100%;
-}
-#song-suggest-ok{
-  text-align:center;
-  font-family:'Jost',sans-serif;
-  font-size:12px;letter-spacing:2px;
-  text-transform:uppercase;
-  color:var(--c-dim);
-  padding:16px;
-  border:1px solid var(--c-line);
-  margin-top:12px;
-}
+.btn-fill:hover{opacity:.78;}
 
-/* ═══════════════════════════════════════
-   RSVP
-═══════════════════════════════════════ */
-#rsvp-form{display:flex;flex-direction:column;gap:12px}
-#rsvp-form input,
-#rsvp-form select,
-#rsvp-form textarea{
-  width:100%;
-  padding:12px 16px;
-  border:1px solid var(--c-line);
-  background:transparent;
-  font-family:'Jost',sans-serif;
-  font-size:13px;font-weight:300;
-  color:var(--c-text);
-  outline:none;
-  -webkit-appearance:none;appearance:none;
-  border-radius:0;
-  transition:border-color .2s;
-}
-#rsvp-form input:focus,
-#rsvp-form select:focus,
-#rsvp-form textarea:focus{border-color:var(--c-a)}
-#rsvp-form input::placeholder,
-#rsvp-form textarea::placeholder{color:var(--c-dim)}
-#rsvp-form textarea{resize:vertical;min-height:80px}
-#rsvp-form button[type="submit"]{
-  width:100%;margin-top:4px;
-}
-.rsvp-error-msg{
-  font-family:'Jost',sans-serif;
-  font-size:11px;letter-spacing:1px;
-  color:#c0392b;text-align:center;
-  min-height:14px;
-}
-.rsvp-note{
-  font-family:'Jost',sans-serif;
-  font-size:12px;font-weight:300;
-  letter-spacing:.5px;
-  color:var(--c-dim);text-align:center;
-  margin-top:24px;line-height:1.7;
-}
-#rsvp-qr-wrap{
-  margin-top:28px;text-align:center;
-  padding:28px;
-  border:1px solid var(--c-line);
-}
-#rsvp-qr-wrap p{
-  font-family:'Jost',sans-serif;
-  font-size:10px;letter-spacing:3px;
-  text-transform:uppercase;
-  color:var(--c-dim);margin-top:12px;
-}
-
-/* ═══════════════════════════════════════
+/* ════════════════════════════════
    VENUE
-═══════════════════════════════════════ */
-#pv-lugar{
-  text-align:center;
-}
+════════════════════════════════ */
+#pv-lugar{text-align:center;}
 .lugar-venue{
   font-family:'Cormorant Garamond',serif;
-  font-size:26px;font-weight:300;
+  font-size:28px;font-weight:300;font-style:italic;
   color:var(--c-text);
-  display:block;margin-bottom:8px;
-  letter-spacing:.5px;
+  display:block;margin-bottom:10px;
+  letter-spacing:.4px;
 }
 .lugar-address{
   font-family:'Jost',sans-serif;
   font-size:12px;font-weight:300;
   letter-spacing:1px;color:var(--c-dim);
-  display:block;margin-bottom:20px;
+  display:block;margin-bottom:24px;
+  line-height:1.6;
 }
 .lugar-map{
   font-family:'Jost',sans-serif;
@@ -509,72 +363,242 @@ body{
   padding-bottom:2px;
   transition:border-color .2s;
 }
-.lugar-map:hover{border-color:var(--c-a)}
+.lugar-map:hover{border-color:var(--c-a);}
 
-/* ═══════════════════════════════════════
-   CLOSING
-═══════════════════════════════════════ */
-#pv-poem{
-  font-family:'Cormorant Garamond',serif;
-  font-size:17px;
-  font-weight:300;
-  font-style:italic;
-  line-height:2;
-  white-space:pre-line;
-  text-align:center;
-  color:var(--c-dim);
-  margin-bottom:36px;
-}
-.splash-name{
-  font-family:var(--c-script);
-  font-size:44px;
-  color:var(--c-text);
-  text-align:center;
-  letter-spacing:.5px;
-}
-
-/* ═══════════════════════════════════════
+/* ════════════════════════════════
    FASHION PHOTO
-═══════════════════════════════════════ */
+════════════════════════════════ */
 #pv-fashion{
   width:100%;
   aspect-ratio:4/3;
   object-fit:cover;
   display:block;
-  margin-bottom:28px;
-  background:linear-gradient(135deg,#e8e3dc,#d8d0c5);
+  margin-bottom:32px;
+  background:#e0dbd4;
 }
-#pv-fashion[src=""]{min-height:200px}
 
-/* ═══════════════════════════════════════
-   PALETTES
-═══════════════════════════════════════ */
+/* ════════════════════════════════
+   AUDIO PLAYER
+════════════════════════════════ */
+#pv-audio-wrap{
+  border:1px solid var(--c-line);
+  padding:24px 24px 20px;
+  margin-bottom:32px;
+}
+.audio-controls{
+  display:flex;align-items:center;gap:16px;margin-bottom:18px;
+}
+#pv-play-btn{
+  width:40px;height:40px;
+  border:1px solid var(--c-a);
+  background:transparent;
+  color:var(--c-a);
+  font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  transition:background .2s,color .2s;
+}
+#pv-play-btn:hover{background:var(--c-a);color:var(--c-bg);}
+#pv-track-name{
+  font-family:'Jost',sans-serif;
+  font-size:12px;font-weight:300;
+  color:var(--c-text);letter-spacing:.4px;
+  flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+#pv-track-time{
+  font-family:'Jost',sans-serif;
+  font-size:11px;color:var(--c-dim);
+  white-space:nowrap;letter-spacing:.5px;
+}
+#pv-seek,#pv-vol{
+  width:100%;
+  height:1px;
+  -webkit-appearance:none;appearance:none;
+  background:var(--c-line);
+  cursor:pointer;outline:none;border-radius:0;
+}
+#pv-seek::-webkit-slider-thumb,
+#pv-vol::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:8px;height:8px;
+  background:var(--c-a);border-radius:50%;
+}
+.vol-row{
+  display:flex;align-items:center;gap:10px;margin-top:14px;
+}
+.vol-icon{
+  font-size:9px;color:var(--c-dim);
+  font-family:'Jost',sans-serif;
+  letter-spacing:2px;text-transform:uppercase;
+}
+
+/* ════════════════════════════════
+   SONG SUGGEST
+════════════════════════════════ */
+#pv-song-suggest-wrap{
+  border-top:1px solid var(--c-line);
+  padding-top:36px;margin-top:36px;
+}
+.suggest-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:300;font-style:italic;
+  color:var(--c-text);
+  text-align:center;
+  margin-bottom:24px;
+}
+#song-inputs{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.song-input-row{display:flex;gap:8px;align-items:stretch;}
+.song-input-row input{
+  flex:1;
+  padding:12px 0;
+  border:none;border-bottom:1px solid var(--c-line);
+  background:transparent;
+  font-family:'Jost',sans-serif;
+  font-size:13px;font-weight:300;
+  color:var(--c-text);
+  outline:none;
+  transition:border-color .2s;
+  border-radius:0;
+}
+.song-input-row input:focus{border-color:var(--c-a);}
+.song-input-row input::placeholder{color:var(--c-dim);letter-spacing:.5px;}
+.song-remove-btn{
+  background:none;border:none;border-bottom:1px solid var(--c-line);
+  color:var(--c-dim);width:32px;cursor:pointer;
+  font-size:14px;transition:color .2s;padding-bottom:0;
+}
+.song-remove-btn:hover{color:var(--c-a);}
+#song-add-btn{
+  background:none;border:none;
+  color:var(--c-dim);
+  font-family:'Jost',sans-serif;
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  cursor:pointer;margin-bottom:20px;
+  padding:8px 0;width:100%;text-align:left;
+  transition:color .2s;
+}
+#song-add-btn:hover{color:var(--c-a);}
+#song-suggest-form button[type="submit"]{width:100%;}
+#song-suggest-ok{
+  text-align:center;
+  font-family:'Jost',sans-serif;
+  font-size:10px;letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--c-dim);
+  padding:18px;
+  border:1px solid var(--c-line);
+  margin-top:12px;
+}
+
+/* ════════════════════════════════
+   RSVP
+════════════════════════════════ */
+#rsvp-form{display:flex;flex-direction:column;gap:20px;}
+#rsvp-form input,
+#rsvp-form select,
+#rsvp-form textarea{
+  width:100%;
+  padding:12px 0;
+  border:none;border-bottom:1px solid var(--c-line);
+  background:transparent;
+  font-family:'Jost',sans-serif;
+  font-size:13px;font-weight:300;
+  letter-spacing:.3px;
+  color:var(--c-text);
+  outline:none;
+  -webkit-appearance:none;appearance:none;
+  border-radius:0;
+  transition:border-color .2s;
+}
+#rsvp-form input:focus,
+#rsvp-form select:focus,
+#rsvp-form textarea:focus{border-color:var(--c-a);}
+#rsvp-form input::placeholder,
+#rsvp-form textarea::placeholder{
+  color:var(--c-dim);
+  text-transform:uppercase;
+  letter-spacing:2px;
+  font-size:10px;
+}
+#rsvp-form textarea{resize:vertical;min-height:80px;}
+#rsvp-form button[type="submit"]{margin-top:4px;}
+.rsvp-error-msg{
+  font-family:'Jost',sans-serif;
+  font-size:10px;letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:#a83232;text-align:center;
+  min-height:14px;
+}
+.rsvp-note{
+  font-family:'Jost',sans-serif;
+  font-size:11px;font-weight:300;
+  letter-spacing:.8px;
+  color:var(--c-dim);text-align:center;
+  margin-top:28px;line-height:1.8;
+}
+#rsvp-qr-wrap{
+  margin-top:32px;text-align:center;
+  padding:32px;
+  border:1px solid var(--c-line);
+}
+#rsvp-qr-wrap p{
+  font-family:'Jost',sans-serif;
+  font-size:9px;letter-spacing:4px;
+  text-transform:uppercase;
+  color:var(--c-dim);margin-top:14px;
+}
+
+/* ════════════════════════════════
+   CLOSING — POEM + SIGN
+════════════════════════════════ */
+#pv-poem{
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px;font-weight:300;font-style:italic;
+  line-height:2.1;
+  white-space:pre-line;
+  text-align:center;
+  color:var(--c-dim);
+  margin-bottom:44px;
+}
+#pv-sign{
+  font-family:var(--c-script);
+  font-size:44px;
+  color:var(--c-text);
+  text-align:center;
+  letter-spacing:.5px;
+  display:block;
+}
+
+/* ════════════════════════════════
+   DARK PALETTE
+════════════════════════════════ */
 [data-theme="dark"]{
   background:#0e0d0b;
   --c-bg:#0e0d0b;
   --c-text:#f0ece6;
-  --c-dim:#7a7570;
+  --c-dim:#78716c;
   --c-line:#2a2825;
   --c-a:#f0ece6;
   --c-b:#1a1918;
   --c-c:#e0dcd6;
   --c-d:#1a1918;
-  --c-e:#7a7570;
+  --c-e:#78716c;
 }
 
-/* ═══════════════════════════════════════
+/* ════════════════════════════════
    RESPONSIVE
-═══════════════════════════════════════ */
+════════════════════════════════ */
 @media(max-width:520px){
-  #card-wrapper section{padding:48px 28px}
-  #pv-nombre{font-size:44px}
-  #sp-name{font-size:40px}
-  .splash-monogram{font-size:64px}
-  .cover-text{padding:36px 28px 12px}
+  #card-wrapper section{padding:64px 28px;}
+  #pv-nombre{font-size:44px;}
+  .cover-text{padding:36px 24px 16px;}
+  .cd-num{font-size:32px;}
+  .splash-monogram{font-size:60px;}
 }
 @media(max-width:380px){
-  #card-wrapper section{padding:40px 20px}
-  .cover-text{padding:28px 20px 8px}
+  #card-wrapper section{padding:52px 20px;}
+  .cover-text{padding:28px 20px 12px;}
+  #pv-nombre{font-size:38px;}
 }
 </style>
 </head>
@@ -582,39 +606,41 @@ body{
 
 <canvas id="particle-canvas"></canvas>
 
-<!-- ════════════════════════════════════════════════════
-     CARD WRAPPER
-════════════════════════════════════════════════════ -->
 <div id="card-wrapper" data-theme="elegante">
 
-  <!-- ── SECTION 1: Splash ── -->
+  <!-- ── SPLASH ── -->
   <section id="splash">
-    <div id="sp-15"></div>
-    <div class="splash-monogram" aria-hidden="true">S &amp; M</div>
-    <div id="sp-name">Sofía &amp; Mateo</div>
-    <div class="splash-rule"></div>
-    <div id="sp-date">20 · SEP · 2025</div>
-    <button id="sp-btn">Abrir invitación</button>
+    <div class="splash-bg"></div>
+    <div class="splash-overlay"></div>
+    <div class="splash-content">
+      <div id="sp-15"></div>
+      <div class="splash-monogram" aria-hidden="true">S &amp; M</div>
+      <div id="sp-name">SOFÍA &amp; MATEO</div>
+      <div id="sp-date">20 · SEP · 2025</div>
+      <button id="sp-btn">Abrir invitación</button>
+    </div>
+    <div class="splash-hashtag" id="splash-hashtag">#SofiayMateo2025</div>
   </section>
 
-  <!-- ── SECTION 2: Foto principal + nombre ── -->
+  <!-- ── COVER: FOTO + NOMBRE ── -->
   <section class="cover-section">
     <button id="pv-retrato-wrap" aria-label="Foto de portada" style="cursor:default">
       <img class="cover-img" id="pv-retrato" src="" alt="Foto de portada"/>
     </button>
     <div class="cover-text">
       <h1 id="pv-nombre">Sofía &amp; Mateo</h1>
-      <p class="card-cap" id="pv-caption">Dos almas que se encontraron para amarse para siempre.</p>
+      <span class="cover-rule"></span>
+      <p id="pv-caption">Dos almas que se encontraron para amarse para siempre.</p>
     </div>
   </section>
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 3: Cuenta regresiva ── -->
+  <!-- ── CUENTA REGRESIVA ── -->
   <section>
     <span class="section-eyebrow">Faltan</span>
     <div id="cd" aria-hidden="true"></div>
-    <div class="cd-grid" id="cd-grid">
+    <div class="cd-grid">
       <div class="cd-unit"><span class="cd-num" id="cd-d">00</span><span class="cd-lbl">Días</span></div>
       <div class="cd-unit"><span class="cd-num" id="cd-h">00</span><span class="cd-lbl">Horas</span></div>
       <div class="cd-unit"><span class="cd-num" id="cd-m">00</span><span class="cd-lbl">Min</span></div>
@@ -624,10 +650,10 @@ body{
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 4: Agendar en calendario [premium] ── -->
+  <!-- ── CALENDARIO [premium] ── -->
   <section id="pv-cal-sec" data-plan="premium">
     <span class="section-eyebrow">Guarda la fecha</span>
-    <div class="section-title">Añade el evento</div>
+    <p class="section-title">Añade el evento</p>
     <div style="text-align:center">
       <a id="pv-cal-btn" href="#" target="_blank" rel="noopener" class="btn-outline">
         Añadir al calendario
@@ -637,35 +663,35 @@ body{
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 5: Mi historia [premium] ── -->
+  <!-- ── HISTORIA [premium] ── -->
   <section data-plan="premium">
     <span class="section-eyebrow">Nuestra historia</span>
     <img id="pv-fashion" src="" alt="Nuestra historia"/>
-    <p class="card-cap" id="pv-history">Aquí va nuestra historia de amor...</p>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;font-style:italic;line-height:1.95;color:var(--c-dim);text-align:center;" id="pv-history">Aquí va nuestra historia de amor...</p>
   </section>
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 6: Programa / Itinerario [premium] ── -->
+  <!-- ── PROGRAMA [premium] ── -->
   <section data-plan="premium">
     <span class="section-eyebrow">El día</span>
-    <div class="section-title">Programa</div>
+    <p class="section-title">Programa</p>
     <div id="pv-itin" class="card-list"></div>
   </section>
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 7: Padrinos [deluxe] ── -->
+  <!-- ── PADRINOS [deluxe] ── -->
   <section data-plan="deluxe">
     <span class="section-eyebrow">Con el apoyo de</span>
-    <div class="section-title">Padrinos</div>
+    <p class="section-title">Padrinos</p>
     <div id="pv-padr" class="card-list"></div>
   </section>
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 8: Galería ── -->
-  <section style="padding-left:0;padding-right:0;padding-top:0">
+  <!-- ── GALERÍA ── -->
+  <section style="padding:80px 0!important;">
     <div id="pv-galeria" class="gal-prev">
       <div class="gal-empty">Galería de fotos</div>
     </div>
@@ -673,10 +699,10 @@ body{
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 9: Álbum compartido [premium] ── -->
+  <!-- ── ÁLBUM [premium] ── -->
   <section id="pv-album-sec" data-plan="premium">
     <span class="section-eyebrow">Comparte el momento</span>
-    <div class="section-title">Álbum compartido</div>
+    <p class="section-title">Álbum compartido</p>
     <div style="text-align:center">
       <a id="pv-album-btn" href="#" target="_blank" rel="noopener" class="btn-outline">
         Ver álbum
@@ -686,10 +712,10 @@ body{
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 10: Música [premium] ── -->
+  <!-- ── MÚSICA [premium] ── -->
   <section id="pv-music-sec" data-plan="premium">
     <span class="section-eyebrow">Nuestra música</span>
-    <div class="section-title">Soundtrack</div>
+    <p class="section-title">Soundtrack</p>
     <div id="pv-audio-wrap">
       <audio id="pv-audio"></audio>
       <div class="audio-controls">
@@ -699,13 +725,13 @@ body{
       </div>
       <input type="range" id="pv-seek" min="0" max="100" value="0" aria-label="Progreso"/>
       <div class="vol-row">
-        <span class="vol-icon">VOL</span>
+        <span class="vol-icon">Vol</span>
         <input type="range" id="pv-vol" min="0" max="1" step="0.01" value="0.7" aria-label="Volumen"/>
       </div>
     </div>
     <div id="pv-songs" class="card-list"></div>
     <div id="pv-song-suggest-wrap">
-      <div class="suggest-title">¿Qué canción no puede faltar?</div>
+      <p class="suggest-title">¿Qué canción no puede faltar?</p>
       <form id="song-suggest-form">
         <div id="song-inputs"></div>
         <button type="button" id="song-add-btn">+ Añadir canción</button>
@@ -717,34 +743,34 @@ body{
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 11: Mesa de regalos [deluxe] ── -->
+  <!-- ── REGALOS [deluxe] ── -->
   <section data-plan="deluxe">
     <span class="section-eyebrow">Celebra con nosotros</span>
-    <div class="section-title">Mesa de regalos</div>
+    <p class="section-title">Mesa de regalos</p>
     <div id="pv-gifts" class="card-list"></div>
   </section>
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 12: Info extra [deluxe] ── -->
+  <!-- ── EXTRA [deluxe] ── -->
   <section data-plan="deluxe">
     <span class="section-eyebrow">Antes de llegar</span>
-    <div class="section-title">Información</div>
+    <p class="section-title">Información</p>
     <div id="pv-extra" class="card-list"></div>
   </section>
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 13: Dress code ── -->
+  <!-- ── DRESS CODE ── -->
   <section>
     <span class="section-eyebrow">Vestimenta</span>
-    <div class="section-title">Dress code</div>
+    <p class="section-title">Dress code</p>
     <div id="pv-dress" class="card-list"></div>
   </section>
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 14: Lugar del evento ── -->
+  <!-- ── LUGAR ── -->
   <section>
     <span class="section-eyebrow">Nos vemos en</span>
     <div id="pv-lugar"></div>
@@ -752,18 +778,18 @@ body{
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 15: Sección libre [deluxe] ── -->
+  <!-- ── SECCIÓN LIBRE [deluxe] ── -->
   <section id="pv-custom-sec" data-plan="deluxe">
     <h3 id="pv-custom-title" class="section-title"></h3>
-    <p class="card-cap" id="pv-custom-text"></p>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;font-style:italic;line-height:1.95;color:var(--c-dim);text-align:center;" id="pv-custom-text"></p>
   </section>
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 16: RSVP [premium] ── -->
-  <section data-plan="premium">
+  <!-- ── RSVP [premium] ── -->
+  <section id="pv-rsvp-sec" data-plan="premium">
     <span class="section-eyebrow">Confirmación</span>
-    <div class="section-title">¿Nos acompañas?</div>
+    <p class="section-title">¿Nos acompañas?</p>
     <form id="rsvp-form">
       <input id="rsvp-nombre" type="text" placeholder="Tu nombre completo" required autocomplete="name"/>
       <select id="rsvp-asiste" aria-label="Asistencia">
@@ -785,19 +811,18 @@ body{
 
   <div class="section-rule"></div>
 
-  <!-- ── SECTION 17: Cierre ── -->
+  <!-- ── CIERRE ── -->
   <section>
     <p id="pv-poem"></p>
-    <p class="splash-name" id="pv-sign"></p>
+    <span id="pv-sign"></span>
   </section>
 
-</div>
+</div><!-- end #card-wrapper -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 /* ══════════════════════════════════════════════════════
-   GUEKA IDEAS — Plantilla Boda Minimalista
-   Compatible con el editor de tarjetas
+   INVITACIÓN DE BODA — Minimalista de lujo editorial
 ══════════════════════════════════════════════════════ */
 
 /* ── State ── */
@@ -870,14 +895,22 @@ const state = {
   songSuggestWa:'5215512345678',
   audioKey:'',
   audioName:'Canción de boda',
-  imgKeys:{retrato:'',fashion:''},
-  galKeys:[],
+  imgKeys:{
+    retrato:'https://images.unsplash.com/photo-1781212211159-34cfbc7681de?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080&q=80',
+    fashion:'https://images.unsplash.com/photo-1781211985596-f93879e1585d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080&q=80',
+  },
+  galKeys:[
+    'https://images.unsplash.com/photo-1780291455480-520ad5bcdc23?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600&q=80',
+    'https://images.unsplash.com/photo-1783818412493-a4259af0728e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600&q=80',
+    'https://images.unsplash.com/photo-1759308730169-9156cb9fe8fe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600&q=80',
+    'https://images.unsplash.com/photo-1781212029261-8d7da38b10da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600&q=80',
+  ],
   templateLabel:'Boda Minimalista',
 };
 
 /* ── Palettes ── */
 const PALETTES = {
-  minimal:   {bg:'#f7f5f2',text:'#1a1a1a',dim:'#7a7570',line:'#c8bfb0',a:'#1a1a1a',b:'#e8e3dc',c:'#3a3530',d:'#ede9e3',e:'#7a7570',theme:'elegante'},
+  minimal:   {bg:'#f8f6f2',text:'#1c1917',dim:'#78716c',line:'#e2ddd8',a:'#1c1917',b:'#ede9e4',c:'#44403c',d:'#f0ece7',e:'#78716c',theme:'elegante'},
   neon:      {bg:'#06000f',text:'#f3e8ff',dim:'#a78bfa',line:'#2e1065',a:'#e879f9',b:'#818cf8',c:'#38bdf8',d:'#1a0535',e:'#fcd34d',theme:'dark'},
   violeta:   {bg:'#0d0a14',text:'#f3e8ff',dim:'#9d8ec7',line:'#2a1848',a:'#a855f7',b:'#7c3aed',c:'#c084fc',d:'#1a1228',e:'#c4b5fd',theme:'dark'},
   dorado:    {bg:'#f7f4ee',text:'#2a1f0a',dim:'#8a7260',line:'#d4c4a0',a:'#b8922a',b:'#e8d49a',c:'#8a6820',d:'#f0e8d0',e:'#5a4010',theme:'elegante'},
@@ -931,7 +964,6 @@ function applyPlanGating(){
   if(albumSec) albumSec.style.display=(rank>=2&&state.albumUrl)?'':'none';
   const suggestWrap=document.getElementById('pv-song-suggest-wrap');
   if(suggestWrap) suggestWrap.style.display=state.songSuggestEnabled?'':'none';
-  // Also hide section-rules adjacent to hidden sections
   syncRules();
 }
 
@@ -940,20 +972,36 @@ function syncRules(){
     const next=rule.nextElementSibling;
     if(next&&next.tagName==='SECTION'&&next.style.display==='none'){
       rule.style.display='none';
-    } else {
+    }else{
       rule.style.display='';
     }
   });
 }
 
+/* ── Image resolver ── */
+function resolveImg(src){
+  if(!src)return'';
+  if(src.startsWith('http')||src.startsWith('/'))return src;
+  return`https://hercules-cdn.com/${src}`;
+}
+
 /* ── Helpers ── */
-function setEl(id,val){const e=document.getElementById(id);if(e)e.textContent=val??''}
-function setHtml(id,html){const e=document.getElementById(id);if(e)e.innerHTML=html}
+function setEl(id,val){const e=document.getElementById(id);if(e)e.textContent=val??'';}
+function setHtml(id,html){const e=document.getElementById(id);if(e)e.innerHTML=html;}
 
 function renderList(id,items){
   const el=document.getElementById(id);if(!el)return;
   if(!items||!items.length){el.innerHTML='';return;}
-  el.innerHTML=items.map(it=>`<div class="card-list-item">${it.v||''}</div>`).join('');
+  el.innerHTML=items.map(it=>{
+    const raw=it.v||'';
+    const sep=raw.indexOf(' — ');
+    if(sep!==-1){
+      const time=raw.substring(0,sep);
+      const desc=raw.substring(sep+3);
+      return`<div class="card-list-item"><span class="card-list-time">${time}</span><span>${desc}</span></div>`;
+    }
+    return`<div class="card-list-item">${raw}</div>`;
+  }).join('');
 }
 
 function formatDateSplash(ds){
@@ -970,7 +1018,6 @@ function renderPreview(){
   const splash=document.getElementById('splash');
   if(splash) splash.style.display=state.showSplash?'':'none';
 
-  // Splash monogram: first letters
   const mono=document.querySelector('.splash-monogram');
   if(mono){
     const parts=(state.name||'').split('&').map(s=>s.trim());
@@ -978,18 +1025,20 @@ function renderPreview(){
       ?`${parts[0][0]||''} & ${parts[1][0]||''}`
       :(state.name||'').substring(0,1);
   }
-  setEl('sp-name',state.name);
+  setEl('sp-name',(state.name||'').toUpperCase());
   setEl('sp-date',formatDateSplash(state.date));
   const spBtn=document.getElementById('sp-btn');
   if(spBtn)spBtn.textContent=state.splashBtn||'Abrir invitación';
+  const spHash=document.getElementById('splash-hashtag');
+  if(spHash)spHash.textContent=state.hashtag||'';
 
   setEl('pv-nombre',state.name);
   setEl('pv-caption',state.caption);
 
   const retrato=document.getElementById('pv-retrato');
-  if(retrato)retrato.src=state.imgKeys?.retrato?`https://hercules-cdn.com/${state.imgKeys.retrato}`:'';
+  if(retrato)retrato.src=resolveImg(state.imgKeys?.retrato);
   const fashion=document.getElementById('pv-fashion');
-  if(fashion)fashion.src=state.imgKeys?.fashion?`https://hercules-cdn.com/${state.imgKeys.fashion}`:'';
+  if(fashion)fashion.src=resolveImg(state.imgKeys?.fashion);
   setEl('pv-history',state.historyText);
 
   renderList('pv-itin',state.itinerary);
@@ -1007,13 +1056,12 @@ function renderPreview(){
   const calBtn=document.getElementById('pv-cal-btn');
   if(calBtn)calBtn.href=buildCalendarUrl();
 
-  // Lugar
   const lugarEl=document.getElementById('pv-lugar');
   if(lugarEl){
     let html=`<span class="lugar-venue">${state.venue||''}</span>`;
     if(state.address)html+=`<span class="lugar-address">${state.address}</span>`;
     if(state.mapUrl&&PLAN_RANK[state.plan]>=2){
-      html+=`<a href="${state.mapUrl}" target="_blank" rel="noopener" class="lugar-map">Ver en mapa</a>`;
+      html+=`<a href="${state.mapUrl}" target="_blank" rel="noopener" class="lugar-map">Ver en mapa →</a>`;
     }
     lugarEl.innerHTML=html;
   }
@@ -1045,7 +1093,7 @@ function renderGallery(){
   const keys=(state.galKeys||[]).slice(0,max);
   if(!keys.length){el.innerHTML='<div class="gal-empty">Galería de fotos</div>';return;}
   el.innerHTML=keys.map((k,i)=>
-    `<img src="https://hercules-cdn.com/${k}" alt="${state.galCaptions?.[i]||'Foto '+(i+1)}" loading="lazy"/>`
+    `<img src="${resolveImg(k)}" alt="${state.galCaptions?.[i]||'Foto '+(i+1)}" loading="lazy"/>`
   ).join('');
 }
 
@@ -1080,7 +1128,7 @@ function buildCalendarUrl(){
   const start=`${y}${pad(m)}${pad(d)}T${pad(h)}${pad(min)}00`;
   const endH=(h+6)%24;
   const end=`${y}${pad(m)}${pad(d)}T${pad(endH)}${pad(min)}00`;
-  return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Boda de '+name)}&dates=${start}/${end}&location=${encodeURIComponent(venue+', '+address)}`;
+  return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Boda de '+name)}&dates=${start}/${end}&location=${encodeURIComponent((venue||'')+', '+(address||''))}`;
 }
 
 /* ── Countdown ── */
@@ -1098,7 +1146,6 @@ function updateCountdown(){
   setEl('cd-h',p(Math.floor((diff%86400000)/3600000)));
   setEl('cd-m',p(Math.floor((diff%3600000)/60000)));
   setEl('cd-s',p(Math.floor((diff%60000)/1000)));
-  // Legacy single el
   setEl('cd',`${p(Math.floor(diff/86400000))}:${p(Math.floor((diff%86400000)/3600000))}:${p(Math.floor((diff%3600000)/60000))}:${p(Math.floor((diff%60000)/1000))}`);
 }
 setInterval(updateCountdown,1000);
@@ -1151,7 +1198,7 @@ updateCountdown();
     if(acomp>0)lines.push(`*Acompañantes:* ${acomp}`);
     if(msg)lines.push(`*Mensaje:* ${msg}`);
     const wa=(state.waOrganizer||'').replace(/\D/g,'');
-    window.open(`https://wa.me/${wa}?text=${encodeURIComponent(lines.join('\n'))},'_blank'`);
+    window.open(`https://wa.me/${wa}?text=${encodeURIComponent(lines.join('\n'))}`,'_blank');
     if(PLAN_RANK[state.plan]>=3&&state.rsvpPara&&typeof QRCode!=='undefined'){
       const qrWrap=document.getElementById('rsvp-qr-wrap');
       const qrCanvas=document.getElementById('rsvp-qr-canvas');
@@ -1160,7 +1207,7 @@ updateCountdown();
         new QRCode(qrCanvas,{
           text:`Boda ${state.name} | ${nombre} | ${state.date}`,
           width:160,height:160,
-          colorDark:'#1a1a1a',colorLight:'#f7f5f2',
+          colorDark:'#1c1917',colorLight:'#f8f6f2',
         });
         qrWrap.style.display='block';
       }
@@ -1199,9 +1246,7 @@ updateCountdown();
   });
 })();
 
-/* ═══════════════════════════════════════
-   PARTICLES (minimal — mostly ninguna)
-═══════════════════════════════════════ */
+/* ── Particles ── */
 const pCanvas=document.getElementById('particle-canvas');
 const pCtx=pCanvas?pCanvas.getContext('2d'):null;
 let pType='ninguna';let pParticles=[];let pAnimId=null;
@@ -1282,35 +1327,29 @@ function applyParticles(type){
 window.addEventListener('resize',resizeParticleCanvas);
 resizeParticleCanvas();
 
-/* ─── Scroll reveal ─── */
-function initScrollReveal(){
-  const obs=new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}
-    });
-  },{threshold:0.08});
-  document.querySelectorAll('#card-wrapper section:not(#splash)').forEach(sec=>obs.observe(sec));
-}
-
-/* ─── Splash ─── */
+/* ── Splash ── */
 (function(){
-  const btn=document.getElementById('sp-btn');
   const splash=document.getElementById('splash');
-  if(!btn||!splash)return;
-  btn.addEventListener('click',()=>{
-    splash.classList.add('out');
-    setTimeout(()=>splash.classList.add('hidden'),1050);
+  const btn=document.getElementById('sp-btn');
+  if(!splash)return;
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{ splash.classList.add('loaded'); });
   });
+  if(btn){
+    btn.addEventListener('click',()=>{
+      splash.classList.add('out');
+      setTimeout(()=>splash.classList.add('hidden'),1250);
+    });
+  }
 })();
 
-/* ─── INIT ─── */
+/* ── INIT ── */
 (function init(){
   loadFont(state.typography||'cormorant');
   applyFont(state.typography||'cormorant');
   applyPaletteToCard(state.palette||'minimal');
   renderPreview();
   applyParticles(state.particles||'ninguna');
-  setTimeout(initScrollReveal,200);
 })();
 </script>
 </body>
