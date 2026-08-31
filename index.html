@@ -55,9 +55,9 @@ button,input,select,textarea{font-family:'DM Sans',sans-serif;cursor:pointer;}
 
 .sp-wrap{position:relative;width:min(380px,92vw);text-align:center;padding:2.5rem 2rem;}
 
-/* Grandes rosas decorativas en esquinas del splash */
-.sp-rose-tl{position:absolute;top:-20px;left:-28px;font-size:7rem;opacity:.12;pointer-events:none;transform:rotate(-25deg);line-height:1;}
-.sp-rose-br{position:absolute;bottom:-20px;right:-28px;font-size:7rem;opacity:.12;pointer-events:none;transform:rotate(155deg);line-height:1;}
+/* Grandes rosas decorativas premium en esquinas del splash */
+.sp-rose-tl{position:absolute;top:-10px;left:-18px;pointer-events:none;transform:rotate(-25deg);opacity:.55;}
+.sp-rose-br{position:absolute;bottom:-10px;right:-18px;pointer-events:none;transform:rotate(160deg) scaleX(-1);opacity:.45;}
 
 /* Línea curva ornamental del splash */
 .sp-arc{width:100%;height:2px;background:linear-gradient(90deg,transparent 0%,var(--petal) 30%,var(--rose) 50%,var(--petal) 70%,transparent 100%);border-radius:2px;margin:1rem 0;}
@@ -92,18 +92,18 @@ button,input,select,textarea{font-family:'DM Sans',sans-serif;cursor:pointer;}
 #main{display:none;max-width:480px;margin:0 auto;background:#fdf6f0;}
 #main.show{display:block;}
 
-/* ── Garland divisor ── */
+/* ── Garland SVG ── */
 .garland{
   display:flex;align-items:center;justify-content:center;
-  gap:.5rem;padding:.6rem 1rem;
-  background:var(--warm);
-  overflow:hidden;
+  gap:.4rem;padding:.5rem 1rem;
+  background:var(--warm);overflow:hidden;
 }
 .garland-stem{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(196,86,106,.2));}
 .garland-stem-r{background:linear-gradient(90deg,rgba(196,86,106,.2),transparent);}
-.garland-flower{font-size:1rem;opacity:.5;}
+.garland-flower{display:inline-flex;align-items:center;}
 
-/* ── Section header estilo editorial ── */
+/* Ramita SVG inline en garlands */
+.garland-svg-sprig{display:inline-block;vertical-align:middle;}
 .sec-header{padding:0 1.5rem;margin-bottom:2rem;}
 .sec-tag{
   display:inline-block;padding:.3rem .9rem;
@@ -632,13 +632,125 @@ select.rsvp-input-clean option{background:#fff;color:var(--ink);}
 </head>
 <body>
 
-<!-- ═══════════════════════ SPLASH ═══════════════════════ -->
+<!-- Definición de símbolos SVG reutilizables -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+  <symbol id="sym-sprig" viewBox="0 0 72 22">
+    <path d="M2 18 C16 12 26 8 36 9 C46 8 56 12 70 18" stroke="rgba(196,86,106,.22)" stroke-width="1" fill="none" stroke-linecap="round"/>
+    <circle cx="14" cy="10" r="4.5" fill="none" stroke="rgba(196,86,106,.3)" stroke-width=".7"/>
+    <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(232,132,154,.35)" transform="rotate(0 14 10)"/>
+    <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(232,132,154,.3)" transform="rotate(72 14 10)"/>
+    <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(245,196,206,.4)" transform="rotate(144 14 10)"/>
+    <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(245,196,206,.35)" transform="rotate(216 14 10)"/>
+    <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(232,132,154,.3)" transform="rotate(288 14 10)"/>
+    <circle cx="14" cy="10" r="2.2" fill="rgba(196,86,106,.45)"/>
+    <circle cx="36" cy="7" r="5.5" fill="none" stroke="rgba(196,86,106,.25)" stroke-width=".7"/>
+    <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(232,132,154,.45)" transform="rotate(0 36 7)"/>
+    <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(232,132,154,.4)" transform="rotate(60 36 7)"/>
+    <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(245,196,206,.5)" transform="rotate(120 36 7)"/>
+    <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(245,196,206,.45)" transform="rotate(180 36 7)"/>
+    <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(232,132,154,.4)" transform="rotate(240 36 7)"/>
+    <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(232,132,154,.38)" transform="rotate(300 36 7)"/>
+    <circle cx="36" cy="7" r="2.5" fill="rgba(196,86,106,.5)"/>
+    <circle cx="58" cy="10" r="4.5" fill="none" stroke="rgba(196,86,106,.3)" stroke-width=".7"/>
+    <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(232,132,154,.35)" transform="rotate(0 58 10)"/>
+    <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(232,132,154,.3)" transform="rotate(72 58 10)"/>
+    <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(245,196,206,.4)" transform="rotate(144 58 10)"/>
+    <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(245,196,206,.35)" transform="rotate(216 58 10)"/>
+    <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(232,132,154,.3)" transform="rotate(288 58 10)"/>
+    <circle cx="58" cy="10" r="2.2" fill="rgba(196,86,106,.45)"/>
+    <path d="M25 13 C22 8 18 7 16 9" stroke="rgba(90,138,80,.4)" stroke-width=".9" fill="none"/>
+    <path d="M47 13 C50 8 54 7 56 9" stroke="rgba(90,138,80,.4)" stroke-width=".9" fill="none"/>
+  </symbol>
+  <symbol id="sym-sprig-light" viewBox="0 0 72 22">
+    <path d="M2 18 C16 12 26 8 36 9 C46 8 56 12 70 18" stroke="rgba(253,246,240,.2)" stroke-width="1" fill="none" stroke-linecap="round"/>
+    <circle cx="14" cy="10" r="4.5" fill="none" stroke="rgba(253,246,240,.25)" stroke-width=".7"/>
+    <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(253,246,240,.18)" transform="rotate(0 14 10)"/>
+    <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(253,246,240,.15)" transform="rotate(72 14 10)"/>
+    <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(253,246,240,.22)" transform="rotate(144 14 10)"/>
+    <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(253,246,240,.18)" transform="rotate(216 14 10)"/>
+    <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(253,246,240,.15)" transform="rotate(288 14 10)"/>
+    <circle cx="14" cy="10" r="2.2" fill="rgba(253,246,240,.3)"/>
+    <circle cx="36" cy="7" r="5.5" fill="none" stroke="rgba(253,246,240,.2)" stroke-width=".7"/>
+    <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(253,246,240,.22)" transform="rotate(0 36 7)"/>
+    <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(253,246,240,.2)" transform="rotate(60 36 7)"/>
+    <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(253,246,240,.25)" transform="rotate(120 36 7)"/>
+    <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(253,246,240,.22)" transform="rotate(180 36 7)"/>
+    <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(253,246,240,.2)" transform="rotate(240 36 7)"/>
+    <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(253,246,240,.18)" transform="rotate(300 36 7)"/>
+    <circle cx="36" cy="7" r="2.5" fill="rgba(253,246,240,.35)"/>
+    <circle cx="58" cy="10" r="4.5" fill="none" stroke="rgba(253,246,240,.25)" stroke-width=".7"/>
+    <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(253,246,240,.18)" transform="rotate(0 58 10)"/>
+    <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(253,246,240,.15)" transform="rotate(72 58 10)"/>
+    <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(253,246,240,.22)" transform="rotate(144 58 10)"/>
+    <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(253,246,240,.18)" transform="rotate(216 58 10)"/>
+    <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(253,246,240,.15)" transform="rotate(288 58 10)"/>
+    <circle cx="58" cy="10" r="2.2" fill="rgba(253,246,240,.3)"/>
+  </symbol>
+</svg>
 <div id="splash" onclick="openInvitation()">
   <!-- Pétalos flotantes -->
   <div id="sp-petals-wrap"></div>
   <div class="sp-wrap" onclick="event.stopPropagation()">
-    <div class="sp-rose-tl">🌹</div>
-    <div class="sp-rose-br">🌹</div>
+    <!-- Rosa botánica SVG premium — esquina superior izquierda -->
+    <div class="sp-rose-tl">
+      <svg width="110" height="150" viewBox="0 0 110 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="stem-g" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#5a8a50"/><stop offset="100%" stop-color="#7ab56e"/></linearGradient>
+          <radialGradient id="rose-g1" cx="40%" cy="35%" r="60%"><stop offset="0%" stop-color="#f5c4ce"/><stop offset="55%" stop-color="#e8849a"/><stop offset="100%" stop-color="#c4566a"/></radialGradient>
+          <radialGradient id="rose-g2" cx="45%" cy="40%" r="55%"><stop offset="0%" stop-color="#fce8ec"/><stop offset="50%" stop-color="#f0a8b8"/><stop offset="100%" stop-color="#d4687e"/></radialGradient>
+          <radialGradient id="leaf-g" cx="30%" cy="30%" r="65%"><stop offset="0%" stop-color="#8ac87a"/><stop offset="100%" stop-color="#4a7840"/></radialGradient>
+        </defs>
+        <!-- Tallo principal curvo -->
+        <path d="M55 148 C52 130 48 110 50 88 C52 68 54 50 52 30" stroke="url(#stem-g)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <!-- Espinas -->
+        <path d="M51 100 L44 96" stroke="#5a8a50" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M50 115 L57 111" stroke="#5a8a50" stroke-width="1.2" stroke-linecap="round"/>
+        <!-- Hoja izquierda -->
+        <path d="M50 88 C40 82 28 78 24 68 C30 65 44 68 50 78 C50 82 50 85 50 88Z" fill="url(#leaf-g)"/>
+        <path d="M50 88 C40 82 28 78 24 68" stroke="rgba(74,120,64,.4)" stroke-width=".7" fill="none"/>
+        <path d="M37 76 C39 72 43 70 46 72" stroke="rgba(255,255,255,.2)" stroke-width=".6" fill="none"/>
+        <!-- Hoja derecha pequeña -->
+        <path d="M51 72 C60 66 72 65 76 57 C70 54 58 58 53 68 C52 70 51 71 51 72Z" fill="url(#leaf-g)" opacity=".8"/>
+        <!-- Sépalos -->
+        <path d="M52 30 C46 24 42 18 46 12 C50 16 52 22 52 30Z" fill="#6a9860" opacity=".8"/>
+        <path d="M52 30 C58 24 62 18 58 12 C54 16 52 22 52 30Z" fill="#5a8a50" opacity=".7"/>
+        <path d="M52 30 C50 22 44 16 40 18 C42 24 47 28 52 30Z" fill="#7ab56e" opacity=".6"/>
+        <!-- Pétalos traseros -->
+        <ellipse cx="52" cy="18" rx="9" ry="14" fill="#d4687e" opacity=".5" transform="rotate(-20 52 18)"/>
+        <ellipse cx="52" cy="18" rx="9" ry="14" fill="#c4566a" opacity=".45" transform="rotate(20 52 18)"/>
+        <!-- Pétalos medios -->
+        <ellipse cx="52" cy="20" rx="10" ry="13" fill="url(#rose-g2)" transform="rotate(-10 52 20)"/>
+        <ellipse cx="52" cy="20" rx="10" ry="13" fill="url(#rose-g2)" transform="rotate(10 52 20)"/>
+        <!-- Pétalos frontales -->
+        <path d="M52 32 C44 28 38 20 40 13 C44 10 50 16 52 24 C54 16 60 10 64 13 C66 20 60 28 52 32Z" fill="url(#rose-g1)"/>
+        <path d="M52 32 C46 24 44 14 48 10 C51 8 54 14 52 24Z" fill="rgba(255,255,255,.15)"/>
+        <!-- Centro -->
+        <ellipse cx="52" cy="22" rx="5" ry="4" fill="#c4566a" opacity=".6"/>
+        <!-- Vena pétalo frontal -->
+        <path d="M52 30 Q51 22 52 14" stroke="rgba(255,255,255,.15)" stroke-width=".7" fill="none"/>
+      </svg>
+    </div>
+    <!-- Rosa botánica SVG premium — esquina inferior derecha -->
+    <div class="sp-rose-br">
+      <svg width="95" height="130" viewBox="0 0 110 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="rose-g3" cx="42%" cy="36%" r="58%"><stop offset="0%" stop-color="#f8d0da"/><stop offset="55%" stop-color="#e8849a"/><stop offset="100%" stop-color="#c4566a"/></radialGradient>
+          <radialGradient id="leaf-g2" cx="30%" cy="30%" r="65%"><stop offset="0%" stop-color="#9ad88a"/><stop offset="100%" stop-color="#4a7840"/></radialGradient>
+        </defs>
+        <path d="M55 148 C52 130 48 110 50 88 C52 68 54 50 52 30" stroke="url(#stem-g)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path d="M51 105 L43 100" stroke="#5a8a50" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M50 88 C40 82 28 78 24 68 C30 65 44 68 50 78Z" fill="url(#leaf-g2)"/>
+        <path d="M51 72 C62 66 74 65 78 57 C70 54 58 58 53 68Z" fill="url(#leaf-g2)" opacity=".75"/>
+        <path d="M52 30 C46 24 42 18 46 12 C50 16 52 22 52 30Z" fill="#6a9860" opacity=".8"/>
+        <path d="M52 30 C58 24 62 18 58 12 C54 16 52 22 52 30Z" fill="#5a8a50" opacity=".7"/>
+        <ellipse cx="52" cy="18" rx="9" ry="14" fill="#d4687e" opacity=".5" transform="rotate(-20 52 18)"/>
+        <ellipse cx="52" cy="18" rx="9" ry="14" fill="#c4566a" opacity=".45" transform="rotate(20 52 18)"/>
+        <ellipse cx="52" cy="20" rx="10" ry="13" fill="url(#rose-g3)" transform="rotate(-10 52 20)"/>
+        <ellipse cx="52" cy="20" rx="10" ry="13" fill="url(#rose-g3)" transform="rotate(10 52 20)"/>
+        <path d="M52 32 C44 28 38 20 40 13 C44 10 50 16 52 24 C54 16 60 10 64 13 C66 20 60 28 52 32Z" fill="url(#rose-g3)"/>
+        <path d="M52 32 C46 24 44 14 48 10 C51 8 54 14 52 24Z" fill="rgba(255,255,255,.18)"/>
+      </svg>
+    </div>
 
     <p class="sp-eyebrow">Gueka Ideas · Boda</p>
     <div class="sp-arc"></div>
@@ -669,15 +781,38 @@ select.rsvp-input-clean option{background:#fff;color:var(--ink);}
          title="Cambiar foto"/>
     <div id="hero-overlay"></div>
 
-    <!-- SVG Flor decorativa esquina -->
-    <svg id="hero-deco-flower" viewBox="0 0 100 100" fill="none">
-      <ellipse cx="50" cy="26" rx="12" ry="22" fill="white" transform="rotate(0 50 50)"/>
-      <ellipse cx="50" cy="26" rx="12" ry="22" fill="white" transform="rotate(60 50 50)"/>
-      <ellipse cx="50" cy="26" rx="12" ry="22" fill="white" transform="rotate(120 50 50)"/>
-      <ellipse cx="50" cy="26" rx="12" ry="22" fill="rgba(232,132,154,.7)" transform="rotate(180 50 50)"/>
-      <ellipse cx="50" cy="26" rx="12" ry="22" fill="rgba(232,132,154,.7)" transform="rotate(240 50 50)"/>
-      <ellipse cx="50" cy="26" rx="12" ry="22" fill="rgba(232,132,154,.7)" transform="rotate(300 50 50)"/>
-      <circle cx="50" cy="50" r="12" fill="white"/>
+    <!-- SVG Rosa premium — héroe -->
+    <svg id="hero-deco-flower" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="rg-p1" cx="50%" cy="60%" r="55%"><stop offset="0%" stop-color="#fff" stop-opacity=".95"/><stop offset="100%" stop-color="#f5c4ce" stop-opacity=".6"/></radialGradient>
+        <radialGradient id="rg-p2" cx="50%" cy="60%" r="55%"><stop offset="0%" stop-color="#fce8ec" stop-opacity=".9"/><stop offset="100%" stop-color="#e8849a" stop-opacity=".5"/></radialGradient>
+        <radialGradient id="rg-center" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#f5c4ce"/></radialGradient>
+        <filter id="petal-blur"><feGaussianBlur stdDeviation=".4"/></filter>
+      </defs>
+      <!-- Pétalos traseros -->
+      <ellipse cx="60" cy="30" rx="11" ry="20" fill="url(#rg-p2)" opacity=".5" transform="rotate(-30 60 60)"/>
+      <ellipse cx="60" cy="30" rx="11" ry="20" fill="url(#rg-p2)" opacity=".5" transform="rotate(30 60 60)"/>
+      <ellipse cx="60" cy="30" rx="11" ry="20" fill="url(#rg-p2)" opacity=".5" transform="rotate(150 60 60)"/>
+      <ellipse cx="60" cy="30" rx="11" ry="20" fill="url(#rg-p2)" opacity=".5" transform="rotate(210 60 60)"/>
+      <!-- Pétalos principales con venas sutiles -->
+      <ellipse cx="60" cy="28" rx="10" ry="22" fill="url(#rg-p1)" transform="rotate(0 60 60)"/>
+      <path d="M60 38 Q61 30 60 18" stroke="rgba(196,86,106,.12)" stroke-width=".8" fill="none" transform="rotate(0 60 60)"/>
+      <ellipse cx="60" cy="28" rx="10" ry="22" fill="url(#rg-p1)" transform="rotate(72 60 60)"/>
+      <path d="M60 38 Q61 30 60 18" stroke="rgba(196,86,106,.12)" stroke-width=".8" fill="none" transform="rotate(72 60 60)"/>
+      <ellipse cx="60" cy="28" rx="10" ry="22" fill="url(#rg-p1)" transform="rotate(144 60 60)"/>
+      <path d="M60 38 Q61 30 60 18" stroke="rgba(196,86,106,.12)" stroke-width=".8" fill="none" transform="rotate(144 60 60)"/>
+      <ellipse cx="60" cy="28" rx="10" ry="22" fill="url(#rg-p1)" transform="rotate(216 60 60)"/>
+      <path d="M60 38 Q61 30 60 18" stroke="rgba(196,86,106,.12)" stroke-width=".8" fill="none" transform="rotate(216 60 60)"/>
+      <ellipse cx="60" cy="28" rx="10" ry="22" fill="url(#rg-p1)" transform="rotate(288 60 60)"/>
+      <path d="M60 38 Q61 30 60 18" stroke="rgba(196,86,106,.12)" stroke-width=".8" fill="none" transform="rotate(288 60 60)"/>
+      <!-- Centro con estambres -->
+      <circle cx="60" cy="60" r="13" fill="url(#rg-center)"/>
+      <circle cx="60" cy="60" r="13" fill="none" stroke="rgba(196,86,106,.15)" stroke-width=".8"/>
+      <circle cx="57" cy="57" r="1.2" fill="rgba(196,86,106,.3)"/>
+      <circle cx="61" cy="55" r="1" fill="rgba(196,86,106,.25)"/>
+      <circle cx="63" cy="59" r="1.2" fill="rgba(196,86,106,.3)"/>
+      <circle cx="59" cy="63" r="1" fill="rgba(196,86,106,.2)"/>
+      <circle cx="55" cy="61" r="1.1" fill="rgba(196,86,106,.25)"/>
     </svg>
 
     <div id="hero-year-tag">15 · NOV · 2027</div>
@@ -696,7 +831,37 @@ select.rsvp-input-clean option{background:#fff;color:var(--ink);}
   <!-- Garland divisor -->
   <div class="garland" style="background:var(--warm);">
     <div class="garland-stem"></div>
-    <span class="garland-flower">🌸</span><span class="garland-flower">🌺</span><span class="garland-flower">🌸</span>
+    <svg class="garland-svg-sprig" width="72" height="22" viewBox="0 0 72 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 18 C16 12 26 8 36 9 C46 8 56 12 70 18" stroke="rgba(196,86,106,.22)" stroke-width="1" fill="none" stroke-linecap="round"/>
+      <!-- Flor izq -->
+      <circle cx="14" cy="10" r="4.5" fill="none" stroke="rgba(196,86,106,.3)" stroke-width=".7"/>
+      <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(232,132,154,.35)" transform="rotate(0 14 10)"/>
+      <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(232,132,154,.3)" transform="rotate(72 14 10)"/>
+      <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(245,196,206,.4)" transform="rotate(144 14 10)"/>
+      <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(245,196,206,.35)" transform="rotate(216 14 10)"/>
+      <ellipse cx="14" cy="6.5" rx="2" ry="3.2" fill="rgba(232,132,154,.3)" transform="rotate(288 14 10)"/>
+      <circle cx="14" cy="10" r="2.2" fill="rgba(196,86,106,.45)"/>
+      <!-- Flor centro -->
+      <circle cx="36" cy="7" r="5.5" fill="none" stroke="rgba(196,86,106,.25)" stroke-width=".7"/>
+      <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(232,132,154,.45)" transform="rotate(0 36 7)"/>
+      <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(232,132,154,.4)" transform="rotate(60 36 7)"/>
+      <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(245,196,206,.5)" transform="rotate(120 36 7)"/>
+      <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(245,196,206,.45)" transform="rotate(180 36 7)"/>
+      <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(232,132,154,.4)" transform="rotate(240 36 7)"/>
+      <ellipse cx="36" cy="3" rx="2.2" ry="3.5" fill="rgba(232,132,154,.38)" transform="rotate(300 36 7)"/>
+      <circle cx="36" cy="7" r="2.5" fill="rgba(196,86,106,.5)"/>
+      <!-- Flor der -->
+      <circle cx="58" cy="10" r="4.5" fill="none" stroke="rgba(196,86,106,.3)" stroke-width=".7"/>
+      <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(232,132,154,.35)" transform="rotate(0 58 10)"/>
+      <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(232,132,154,.3)" transform="rotate(72 58 10)"/>
+      <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(245,196,206,.4)" transform="rotate(144 58 10)"/>
+      <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(245,196,206,.35)" transform="rotate(216 58 10)"/>
+      <ellipse cx="58" cy="6.5" rx="2" ry="3.2" fill="rgba(232,132,154,.3)" transform="rotate(288 58 10)"/>
+      <circle cx="58" cy="10" r="2.2" fill="rgba(196,86,106,.45)"/>
+      <!-- Hojas -->
+      <path d="M25 13 C22 8 18 7 16 9" stroke="rgba(90,138,80,.4)" stroke-width=".9" fill="none"/>
+      <path d="M47 13 C50 8 54 7 56 9" stroke="rgba(90,138,80,.4)" stroke-width=".9" fill="none"/>
+    </svg>
     <div class="garland-stem garland-stem-r"></div>
   </div>
 
@@ -854,17 +1019,105 @@ select.rsvp-input-clean option{background:#fff;color:var(--ink);}
 
     <!-- Vinilo giratorio -->
     <div class="vinyl-wrap reveal">
-      <div class="vinyl-disc" id="vinyl-disc">
-        <div class="vinyl-label">
-          <span id="vinyl-label-title">Canon in D</span>
-          <div class="vinyl-hole"></div>
-        </div>
+      <!-- Vinilo premium con surcos y reflejos -->
+      <div class="vinyl-disc" id="vinyl-disc" style="background:none;position:relative;">
+        <svg viewBox="0 0 200 200" width="200" height="200" xmlns="http://www.w3.org/2000/svg" style="border-radius:50%;display:block;box-shadow:0 20px 60px rgba(45,26,26,.45),0 0 0 1px rgba(196,86,106,.15);">
+          <defs>
+            <radialGradient id="vinyl-bg" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#2a0d16"/>
+              <stop offset="35%" stop-color="#1a0810"/>
+              <stop offset="70%" stop-color="#0e0408"/>
+              <stop offset="100%" stop-color="#1a0810"/>
+            </radialGradient>
+            <radialGradient id="vinyl-sheen" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="rgba(255,255,255,.06)"/>
+              <stop offset="60%" stop-color="rgba(255,255,255,0)"/>
+            </radialGradient>
+            <radialGradient id="vinyl-label-g" cx="45%" cy="38%" r="55%">
+              <stop offset="0%" stop-color="#f5c4ce"/>
+              <stop offset="45%" stop-color="#e8849a"/>
+              <stop offset="100%" stop-color="#c4566a"/>
+            </radialGradient>
+            <radialGradient id="vinyl-label-sheen" cx="35%" cy="30%" r="60%">
+              <stop offset="0%" stop-color="rgba(255,255,255,.35)"/>
+              <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+            </radialGradient>
+          </defs>
+          <!-- Base del disco -->
+          <circle cx="100" cy="100" r="100" fill="url(#vinyl-bg)"/>
+          <!-- Surcos concéntricos — efecto vinilo real -->
+          <circle cx="100" cy="100" r="96" fill="none" stroke="rgba(255,255,255,.025)" stroke-width=".6"/>
+          <circle cx="100" cy="100" r="92" fill="none" stroke="rgba(255,255,255,.03)" stroke-width=".5"/>
+          <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,.025)" stroke-width=".5"/>
+          <circle cx="100" cy="100" r="84" fill="none" stroke="rgba(255,255,255,.03)" stroke-width=".6"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,.025)" stroke-width=".5"/>
+          <circle cx="100" cy="100" r="76" fill="none" stroke="rgba(255,255,255,.04)" stroke-width=".6"/>
+          <circle cx="100" cy="100" r="72" fill="none" stroke="rgba(255,255,255,.025)" stroke-width=".5"/>
+          <circle cx="100" cy="100" r="68" fill="none" stroke="rgba(255,255,255,.035)" stroke-width=".5"/>
+          <circle cx="100" cy="100" r="64" fill="none" stroke="rgba(255,255,255,.025)" stroke-width=".6"/>
+          <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(196,86,106,.06)" stroke-width=".8"/>
+          <circle cx="100" cy="100" r="56" fill="none" stroke="rgba(255,255,255,.03)" stroke-width=".5"/>
+          <circle cx="100" cy="100" r="52" fill="none" stroke="rgba(196,86,106,.05)" stroke-width=".6"/>
+          <!-- Brillo lateral del vinilo -->
+          <ellipse cx="70" cy="55" rx="18" ry="9" fill="rgba(255,255,255,.04)" transform="rotate(-30 70 55)"/>
+          <!-- Reflejo general -->
+          <circle cx="100" cy="100" r="100" fill="url(#vinyl-sheen)"/>
+          <!-- Etiqueta central -->
+          <circle cx="100" cy="100" r="36" fill="url(#vinyl-label-g)"/>
+          <circle cx="100" cy="100" r="36" fill="url(#vinyl-label-sheen)"/>
+          <circle cx="100" cy="100" r="36" fill="none" stroke="rgba(255,255,255,.2)" stroke-width=".8"/>
+          <!-- Texto en la etiqueta -->
+          <text x="100" y="93" text-anchor="middle" font-family="'DM Serif Display',serif" font-style="italic" font-size="7" fill="rgba(255,255,255,.9)" letter-spacing="0.5" id="vinyl-label-svg-text">A Thousand</text>
+          <text x="100" y="103" text-anchor="middle" font-family="'DM Serif Display',serif" font-style="italic" font-size="6" fill="rgba(255,255,255,.65)" letter-spacing="0.3">Years</text>
+          <text x="100" y="114" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="4.5" fill="rgba(255,255,255,.45)" letter-spacing="1">GUEKA IDEAS</text>
+          <!-- Agujero central -->
+          <circle cx="100" cy="100" r="4" fill="#0e0408"/>
+          <circle cx="100" cy="100" r="4" fill="none" stroke="rgba(255,255,255,.1)" stroke-width=".5"/>
+          <!-- Borde exterior del disco -->
+          <circle cx="100" cy="100" r="99.2" fill="none" stroke="rgba(255,255,255,.04)" stroke-width=".8"/>
+        </svg>
       </div>
-      <!-- Aguja SVG -->
-      <svg class="vinyl-needle" viewBox="0 0 40 90" fill="none" id="vinyl-needle-svg">
-        <line x1="20" y1="5" x2="35" y2="75" stroke="#c4566a" stroke-width="2.5" stroke-linecap="round"/>
-        <circle cx="35" cy="75" r="4" fill="#c4566a"/>
-        <circle cx="20" cy="8" r="6" fill="rgba(253,246,240,.9)" stroke="#c4566a" stroke-width="1.5"/>
+      <!-- Aguja de tocadiscos premium -->
+      <svg class="vinyl-needle" viewBox="0 0 50 110" fill="none" id="vinyl-needle-svg" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="needle-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#c4566a"/>
+            <stop offset="40%" stop-color="#e8849a"/>
+            <stop offset="100%" stop-color="#a03050"/>
+          </linearGradient>
+          <radialGradient id="needle-head-grad" cx="40%" cy="35%" r="55%">
+            <stop offset="0%" stop-color="#fce8ec"/>
+            <stop offset="60%" stop-color="#e8849a"/>
+            <stop offset="100%" stop-color="#c4566a"/>
+          </radialGradient>
+          <radialGradient id="needle-tip-grad" cx="40%" cy="30%" r="60%">
+            <stop offset="0%" stop-color="#e8849a"/>
+            <stop offset="100%" stop-color="#7a1a30"/>
+          </radialGradient>
+          <filter id="needle-glow" x="-30%" y="-10%" width="160%" height="120%">
+            <feGaussianBlur stdDeviation="1.2" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- Sombra suave del brazo -->
+        <path d="M26 12 Q30 50 38 96" stroke="rgba(196,86,106,.12)" stroke-width="4" stroke-linecap="round"/>
+        <!-- Cuerpo del brazo — forma ligeramente cónica -->
+        <path d="M25 12 Q29.5 50 37 96" stroke="url(#needle-grad)" stroke-width="2.8" stroke-linecap="round" filter="url(#needle-glow)"/>
+        <!-- Reflejo superior del brazo -->
+        <path d="M24.5 12 Q28.8 50 36.2 96" stroke="rgba(255,255,255,.25)" stroke-width=".9" stroke-linecap="round"/>
+        <!-- Articulación — pequeño nodo en el brazo -->
+        <ellipse cx="31" cy="55" rx="3.5" ry="2.2" fill="url(#needle-head-grad)" stroke="rgba(196,86,106,.3)" stroke-width=".6" transform="rotate(15 31 55)"/>
+        <!-- Cabeza pivote circular -->
+        <circle cx="25" cy="12" r="8.5" fill="url(#needle-head-grad)"/>
+        <circle cx="25" cy="12" r="8.5" fill="none" stroke="rgba(196,86,106,.35)" stroke-width=".8"/>
+        <!-- Tornillo central del pivote -->
+        <circle cx="25" cy="12" r="3.5" fill="url(#needle-tip-grad)"/>
+        <circle cx="25" cy="12" r="3.5" fill="none" stroke="rgba(255,255,255,.2)" stroke-width=".5"/>
+        <!-- Reflejo en cabeza -->
+        <ellipse cx="22.5" cy="9.5" rx="2.5" ry="1.8" fill="rgba(255,255,255,.3)" transform="rotate(-20 22.5 9.5)"/>
+        <!-- Punta de la aguja (diamante) -->
+        <ellipse cx="37" cy="97" rx="2.2" ry="1.4" fill="url(#needle-tip-grad)" transform="rotate(15 37 97)"/>
+        <ellipse cx="37" cy="97" rx="2.2" ry="1.4" fill="none" stroke="rgba(255,255,255,.2)" stroke-width=".4" transform="rotate(15 37 97)"/>
       </svg>
     </div>
 
@@ -1495,7 +1748,7 @@ function spinVinyl(){
   const needle=document.getElementById('vinyl-needle-svg');
   if(needle)needle.style.transform='rotate(-15deg)';
   let last=null;
-  function step(ts){if(last!==null)discAngle+=(ts-last)*0.05;last=ts;disc.style.transform=`rotate(${discAngle}deg)`;discRAF=requestAnimationFrame(step);}
+  function step(ts){if(last!==null)discAngle+=(ts-last)*0.05;last=ts;const svg=disc.querySelector('svg');if(svg)svg.style.transform=`rotate(${discAngle}deg)`;discRAF=requestAnimationFrame(step);}
   discRAF=requestAnimationFrame(step);
 }
 function stopVinyl(){
