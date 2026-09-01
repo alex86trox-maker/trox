@@ -193,6 +193,74 @@ a{text-decoration:none}
 #back-top:hover{border-color:var(--gold)}
 @media(max-width:480px){#back-top{right:12px;bottom:16px}}
 
+/* ── Music player ── */
+#music-player{
+  position:fixed;bottom:20px;left:calc(50% - 240px + 12px);
+  z-index:9900;
+}
+@media(max-width:480px){#music-player{left:12px;bottom:16px}}
+#music-toggle{
+  width:38px;height:38px;border-radius:50%;
+  background:var(--ink-4);border:1px solid var(--border-subtle);
+  color:var(--gold);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.5);
+  transition:border-color .2s,transform .2s;
+  position:relative;
+}
+#music-toggle:hover{border-color:var(--gold)}
+#music-toggle.playing{animation:ringPulse 2.4s ease-in-out infinite}
+#music-toggle svg{transition:opacity .15s}
+.music-disc{
+  position:absolute;inset:0;border-radius:50%;
+  border:1px dashed rgba(201,168,76,.35);
+  animation:spin 6s linear infinite;
+  animation-play-state:paused;
+}
+#music-toggle.playing .music-disc{animation-play-state:running}
+.music-panel{
+  position:absolute;bottom:calc(100% + 10px);left:0;
+  width:240px;padding:1rem;
+  background:rgba(10,8,10,.97);border:1px solid var(--border-subtle);
+  border-radius:var(--radius);backdrop-filter:blur(16px);
+  box-shadow:0 10px 34px rgba(0,0,0,.6);
+  opacity:0;transform:translateY(8px) scale(.97);pointer-events:none;
+  transition:opacity .2s,transform .2s;
+  transform-origin:bottom left;
+}
+.music-panel.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.music-title{
+  font-family:'Montserrat',sans-serif;font-weight:400;
+  font-size:.5rem;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:.7rem;
+}
+.music-track-name{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:.95rem;color:var(--cream);margin-bottom:.8rem;
+  overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+.music-url-group{display:flex;gap:.4rem;margin-bottom:.5rem}
+.music-url-input{
+  flex:1;min-width:0;
+  background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.17);
+  border-radius:3px;padding:.5rem .55rem;
+  color:var(--cream);font-family:'Montserrat',sans-serif;font-size:.6rem;
+}
+.music-url-input:focus{outline:none;border-color:var(--gold)}
+.music-url-btn{
+  flex-shrink:0;width:32px;height:32px;border-radius:3px;
+  border:1px solid var(--border-subtle);color:var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s,border-color .2s;
+}
+.music-url-btn:hover{background:rgba(201,168,76,.08);border-color:var(--gold)}
+.music-reset{
+  font-family:'Montserrat',sans-serif;font-weight:300;
+  font-size:.46rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-muted);background:none;border:none;padding:0;
+  transition:color .2s;
+}
+.music-reset:hover{color:var(--gold)}
+
 /* ── Toast ── */
 #toast-container{
   position:fixed;bottom:60px;left:50%;transform:translateX(-50%);
@@ -1639,6 +1707,29 @@ a{text-decoration:none}
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
 </button>
 
+<!-- Music player -->
+<div id="music-player">
+  <div class="music-panel" id="music-panel">
+    <p class="music-title">Música de la boda</p>
+    <p class="music-track-name" id="music-track-name">Canción demo</p>
+    <div class="music-url-group">
+      <input type="url" id="music-url-input" class="music-url-input" placeholder="Pega el enlace de una canción (mp3)" />
+      <button class="music-url-btn" id="music-url-load" aria-label="Cargar canción">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <button type="button" class="music-reset" id="music-reset">Usar canción demo</button>
+  </div>
+  <button id="music-toggle" aria-label="Reproducir música">
+    <span class="music-disc"></span>
+    <svg id="music-icon-play" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    <svg id="music-icon-pause" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+  </button>
+  <audio id="music-audio" loop preload="none">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
+  </audio>
+</div>
+
 <script>
 'use strict';
 
@@ -1650,6 +1741,10 @@ const DB_NAME       = 'bodaPhotos';
 const DB_VERSION    = 1;
 const STORE_NAME    = 'photos';
 const CLABE_DIGITS  = '012345678901 2345'.replace(/\s/g,''); // valor real usado al copiar
+const DEFAULT_SONG_URL  = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+const DEFAULT_SONG_NAME = 'Canción demo';
+const MUSIC_URL_KEY  = 'bodaMusicUrl';
+const MUSIC_NAME_KEY = 'bodaMusicName';
 
 // ── DOM ────────────────────────────────────────────────────────
 const splash    = document.getElementById('splash');
@@ -1669,6 +1764,7 @@ if (sessionStorage.getItem('bodaOpened')) {
     initRevealObserver();
     startCountdown();
     initPhotoGallery();
+    initMusicPlayer();
   });
 }
 
@@ -1732,6 +1828,7 @@ openBtn.addEventListener('click', () => {
     initRevealObserver();
     startCountdown();
     initPhotoGallery();
+    initMusicPlayer();
   }, 900);
 });
 
@@ -2175,6 +2272,83 @@ if (htag) {
     navigator.clipboard.writeText('#IsabellaYAlejandro2026')
       .then(() => showToast('Hashtag copiado'))
       .catch(() => {});
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// MUSIC PLAYER — manual play, custom URL via localStorage
+// ════════════════════════════════════════════════════════════════
+function initMusicPlayer() {
+  const audio     = document.getElementById('music-audio');
+  const toggle    = document.getElementById('music-toggle');
+  const panel     = document.getElementById('music-panel');
+  const trackName = document.getElementById('music-track-name');
+  const urlInput  = document.getElementById('music-url-input');
+  const loadBtn   = document.getElementById('music-url-load');
+  const resetBtn  = document.getElementById('music-reset');
+  const iconPlay  = document.getElementById('music-icon-play');
+  const iconPause = document.getElementById('music-icon-pause');
+  if (!audio || !toggle) return;
+
+  const savedUrl  = localStorage.getItem(MUSIC_URL_KEY);
+  const savedName = localStorage.getItem(MUSIC_NAME_KEY);
+  if (savedUrl) {
+    audio.querySelector('source').src = savedUrl;
+    audio.load();
+    trackName.textContent = savedName || 'Canción personalizada';
+  }
+
+  const setPlayingUI = playing => {
+    toggle.classList.toggle('playing', playing);
+    iconPlay.style.display  = playing ? 'none' : '';
+    iconPause.style.display = playing ? '' : 'none';
+    toggle.setAttribute('aria-label', playing ? 'Pausar música' : 'Reproducir música');
+  };
+
+  toggle.addEventListener('click', () => {
+    if (audio.paused) {
+      audio.play().then(() => setPlayingUI(true)).catch(() => showToast('No se pudo reproducir la canción'));
+      panel.classList.add('open');
+    } else {
+      audio.pause();
+      setPlayingUI(false);
+    }
+  });
+
+  document.addEventListener('click', e => {
+    if (!panel.contains(e.target) && e.target !== toggle && !toggle.contains(e.target)) {
+      panel.classList.remove('open');
+    }
+  });
+
+  audio.addEventListener('ended', () => setPlayingUI(false));
+  audio.addEventListener('pause', () => setPlayingUI(false));
+  audio.addEventListener('play',  () => setPlayingUI(true));
+
+  loadBtn.addEventListener('click', () => {
+    const url = urlInput.value.trim();
+    if (!url) { showToast('Pega un enlace de audio válido'); return; }
+    const name = url.split('/').pop()?.split('?')[0] || 'Canción personalizada';
+    audio.pause();
+    audio.querySelector('source').src = url;
+    audio.load();
+    trackName.textContent = name;
+    localStorage.setItem(MUSIC_URL_KEY, url);
+    localStorage.setItem(MUSIC_NAME_KEY, name);
+    urlInput.value = '';
+    audio.play().then(() => setPlayingUI(true)).catch(() => showToast('No se pudo cargar esa canción'));
+    showToast('✓  Canción actualizada');
+  });
+
+  resetBtn.addEventListener('click', () => {
+    audio.pause();
+    audio.querySelector('source').src = DEFAULT_SONG_URL;
+    audio.load();
+    trackName.textContent = DEFAULT_SONG_NAME;
+    localStorage.removeItem(MUSIC_URL_KEY);
+    localStorage.removeItem(MUSIC_NAME_KEY);
+    setPlayingUI(false);
+    showToast('Canción demo restaurada');
   });
 }
 </script>
