@@ -12,6 +12,11 @@
   if(new URLSearchParams(location.search).get('preview')==='1'){sessionStorage.setItem('bodaOpened','1');document.documentElement.style.setProperty('--hide-splash','1');}
   </script>
   <style>
+/* Mientras splash visible, html+body NO pueden scrollear */
+html, body { height: 100%; overflow: hidden; }
+/* Cuando se activa la tarjeta, se restaura */
+body.card-open { overflow-y: auto; overflow-x: hidden; height: auto; }
+html.card-open { overflow: visible; height: auto; }
 /* ════════════════════════════════════════
    BODA.CSS — Wedding Invitation
    Max 480px card, centered on screen
@@ -1737,9 +1742,6 @@ a{text-decoration:none}
 
 // Prevent browser from restoring scroll position on page load/back
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-// Lock BOTH html and body scroll while splash is visible
-document.documentElement.style.overflow = 'hidden';
-document.body.style.overflow = 'hidden';
 
 // ── Config ─────────────────────────────────────────────────────
 const WEDDING_DATE  = new Date('2026-02-14T19:00:00');
@@ -1765,6 +1767,8 @@ const backTopBtn  = document.getElementById('back-top');
 if (sessionStorage.getItem('bodaOpened')) {
   splash.style.display = 'none';
   mainEl.classList.remove('hidden');
+  document.documentElement.classList.add('card-open');
+  document.body.classList.add('card-open');
   document.documentElement.style.overflow = '';
   document.body.style.overflow = '';
   history.replaceState(null, '', location.pathname);
@@ -1825,30 +1829,38 @@ const PETAL_COLORS = ['#c9a84c','#e8d5a0','#8a6f2e','#f0ece4','#d4b87e'];
 // ════════════════════════════════════════════════════════════════
 openBtn.addEventListener('click', () => {
   sessionStorage.setItem('bodaOpened', '1');
+
+  // Fade out splash
   splash.classList.add('closing');
   cancelAnimationFrame(starRAF);
 
   setTimeout(() => {
-    // 1. Hide splash first
-    splash.style.display = 'none';
-    // 2. Force scroll to absolute top on all scroll containers
-    document.documentElement.style.scrollBehavior = 'auto';
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    window.scrollTo(0, 0);
-    // 3. Show main content NOW that scroll is at 0
-    mainEl.classList.remove('hidden');
-    // 4. Unlock scroll
+    // 1. Quitar splash del DOM por completo
+    splash.remove();
+
+    // 2. Desbloquear scroll en html y body
+    document.documentElement.classList.add('card-open');
+    document.body.classList.add('card-open');
     document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
-    history.replaceState(null, '', location.pathname);
-    // 5. Restore smooth scroll after paint
+
+    // 3. Mostrar tarjeta
+    mainEl.classList.remove('hidden');
+
+    // 4. Garantizar que arranca desde el top (sin smooth)
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    // 5. Re-habilitar smooth después del primer paint
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         document.documentElement.style.scrollBehavior = '';
-        window.scrollTo(0, 0);
       });
     });
+
+    history.replaceState(null, '', location.pathname);
     initScrollWatcher();
     initDotNav();
     initHeroParticles();
