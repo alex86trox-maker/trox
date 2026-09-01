@@ -331,24 +331,31 @@ body{
   text-align:center;padding:5rem 2rem 4rem;width:100%;max-width:440px;
 }
 
+/* Hero animations fire only when .anim-ready is added */
+#hero .inner > *{
+  opacity:0;transform:translateY(20px);transition:opacity 0.7s cubic-bezier(0.22,1,0.36,1),transform 0.7s cubic-bezier(0.22,1,0.36,1);
+}
+#hero.anim-ready .hero-eyebrow{opacity:1;transform:none;transition-delay:0.05s}
+#hero.anim-ready .hero-names{opacity:1;transform:none;transition-delay:0.15s}
+#hero.anim-ready .hero-union-row{opacity:1;transform:none;transition-delay:0.25s}
+#hero.anim-ready .hero-card{opacity:1;transform:none;transition-delay:0.35s}
+
 .hero-eyebrow{
   font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.48em;
   text-transform:uppercase;font-weight:600;
-  color:rgba(212,175,55,0.7);margin-bottom:1.25rem;
-  animation:fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) 0.1s both;
+  color:rgba(212,175,55,0.7);margin-bottom:1.5rem;
+  position:relative;z-index:2;
 }
 
 .hero-names{
   font-family:'Great Vibes',cursive;
   font-size:clamp(3.2rem,13vw,5rem);line-height:0.95;
   margin-bottom:1.1rem;
-  animation:fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) 0.2s both;
 }
 
 .hero-union-row{
   display:flex;align-items:center;gap:14px;
   width:100%;margin-bottom:2.25rem;
-  animation:fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) 0.3s both;
 }
 .hero-hline{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.5))}
 .hero-hline+.hero-hline{background:linear-gradient(270deg,transparent,rgba(212,175,55,0.5))}
@@ -363,7 +370,7 @@ body{
   width:100%;border:1px solid var(--gold-border);
   background:rgba(8,8,8,0.8);backdrop-filter:blur(24px);
   overflow:hidden;position:relative;
-  animation:borderPulse 4s ease-in-out infinite 1s, fadeUp 1s cubic-bezier(0.22,1,0.36,1) 0.4s both;
+  animation:borderPulse 4s ease-in-out infinite 1.5s;
 }
 .hero-card-bar{height:2px;background:linear-gradient(90deg,var(--gold-dark),var(--cream),var(--gold))}
 .hero-card-inner{padding:1.6rem 1.75rem}
@@ -1832,6 +1839,13 @@ function closeSplash(e){
   setTimeout(async()=>{
     splash.style.display='none';
     main.style.display='block';
+    // Trigger hero entrance animations now that main is visible
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        const hero = document.getElementById('hero');
+        if(hero) hero.classList.add('anim-ready');
+      });
+    });
     initCountdown();
     initScrollAnim();
     await renderGallery();
