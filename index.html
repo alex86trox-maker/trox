@@ -381,229 +381,312 @@ section:first-of-type::before{display:none}
 .gal-prev > div:hover img{transform:scale(1.07);filter:sepia(0) brightness(1) contrast(1.04)}
 
 /* ══════════════════════════════════════
-   AUDIO PLAYER — premium
+   AUDIO PLAYER — rediseño v3
 ══════════════════════════════════════ */
 #pv-audio-wrap{
-  padding:0;
-  background:linear-gradient(160deg,rgba(139,26,26,.07) 0%,rgba(184,134,11,.04) 50%,rgba(139,26,26,.05) 100%);
-  border:1px solid rgba(184,134,11,.28);
-  border-top:2px solid rgba(184,134,11,.55);
+  position:relative;
+  padding:2rem 1.75rem 1.5rem;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 0%, rgba(184,134,11,.07) 0%, transparent 70%),
+    linear-gradient(180deg, rgba(20,4,4,.0) 0%, rgba(139,26,26,.05) 100%);
+  border:1px solid rgba(184,134,11,.22);
+  border-top:none;
   margin-bottom:1.75rem;
-  box-shadow:0 8px 40px rgba(139,26,26,.1),inset 0 1px 0 rgba(184,134,11,.18);
-  position:relative;overflow:hidden;
+  overflow:hidden;
 }
-/* Subtle inner glow from top */
+/* Línea dorada superior ornamental */
+#pv-audio-wrap::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent 0%,rgba(184,134,11,.2) 15%,rgba(184,134,11,.85) 35%,rgba(240,220,150,1) 50%,rgba(184,134,11,.85) 65%,rgba(184,134,11,.2) 85%,transparent 100%);
+}
+/* Velo ambiental inferior */
 #pv-audio-wrap::after{
-  content:'';position:absolute;top:0;left:0;right:0;height:80px;
-  background:radial-gradient(ellipse 70% 100% at 50% 0%,rgba(184,134,11,.06),transparent);
+  content:'';position:absolute;bottom:0;left:0;right:0;height:60px;
+  background:linear-gradient(0deg,rgba(139,26,26,.05),transparent);
   pointer-events:none;
 }
 
-/* Header row: disc + info + load */
-.ap-header{
-  display:flex;align-items:center;gap:1rem;
-  padding:1.4rem 1.5rem 1rem;
+/* Esquinas ornamentales */
+.ap-corn{
+  position:absolute;font-size:.65rem;color:rgba(184,134,11,.55);
+  line-height:1;pointer-events:none;z-index:1;
+}
+.ap-corn-tl{top:.55rem;left:.7rem}
+.ap-corn-tr{top:.55rem;right:.7rem}
+.ap-corn-bl{bottom:.55rem;left:.7rem}
+.ap-corn-br{bottom:.55rem;right:.7rem}
+
+/* ── Escenario: ondas + medallón ── */
+.ap-stage{
+  display:flex;align-items:center;justify-content:center;
+  gap:0;margin-bottom:1.1rem;
+  height:90px;
+}
+
+/* Medallón */
+.ap-medallion{
+  position:relative;flex-shrink:0;
+  width:90px;height:90px;
+  display:flex;align-items:center;justify-content:center;
+}
+.ap-medallion-ring{
+  position:absolute;inset:-6px;
+  border:1px solid rgba(184,134,11,.22);
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(184,134,11,.04),transparent 70%);
+  animation:medallionPulse 3s ease-in-out infinite alternate;
+}
+@keyframes medallionPulse{
+  from{box-shadow:0 0 0 0 rgba(184,134,11,.12),0 0 18px rgba(184,134,11,.06)}
+  to{box-shadow:0 0 0 6px rgba(184,134,11,.0),0 0 28px rgba(184,134,11,.14)}
 }
 .ap-disc{
-  flex-shrink:0;width:56px;height:56px;
-  filter:drop-shadow(0 4px 16px rgba(139,26,26,.35));
-  transition:transform 3s linear;
+  width:80px;height:80px;flex-shrink:0;
+  filter:drop-shadow(0 4px 18px rgba(139,26,26,.5)) drop-shadow(0 0 8px rgba(184,134,11,.2));
+  cursor:default;
 }
 .ap-disc.spinning{
-  animation:discSpin 4s linear infinite;
+  animation:discSpin 5s linear infinite;
 }
-@keyframes discSpin{
-  from{transform:rotate(0deg)}
-  to{transform:rotate(360deg)}
+@keyframes discSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* Ondas simétricas */
+.ap-wave-left,
+.ap-wave-right{
+  display:flex;align-items:center;gap:3px;
+  flex:1;height:90px;
+  overflow:hidden;
 }
-.ap-disc-svg{width:100%;height:100%;display:block}
-.ap-track-info{flex:1;min-width:0}
+.ap-wave-left{justify-content:flex-end;flex-direction:row-reverse;padding-right:10px}
+.ap-wave-right{justify-content:flex-start;padding-left:10px}
+.ap-wave-left span,
+.ap-wave-right span{
+  flex-shrink:0;width:5px;
+  background:linear-gradient(180deg,rgba(184,134,11,.7),rgba(139,26,26,.3));
+  border-radius:2px;
+  height:5px;
+}
+/* alturas estáticas por posición */
+.ap-wave-left span:nth-child(1),.ap-wave-right span:nth-child(1){height:40px}
+.ap-wave-left span:nth-child(2),.ap-wave-right span:nth-child(2){height:26px}
+.ap-wave-left span:nth-child(3),.ap-wave-right span:nth-child(3){height:55px}
+.ap-wave-left span:nth-child(4),.ap-wave-right span:nth-child(4){height:18px}
+.ap-wave-left span:nth-child(5),.ap-wave-right span:nth-child(5){height:48px}
+.ap-wave-left span:nth-child(6),.ap-wave-right span:nth-child(6){height:34px}
+.ap-wave-left span:nth-child(7),.ap-wave-right span:nth-child(7){height:62px}
+.ap-wave-left span:nth-child(8),.ap-wave-right span:nth-child(8){height:22px}
+.ap-wave-left span:nth-child(9),.ap-wave-right span:nth-child(9){height:44px}
+.ap-wave-left span:nth-child(10),.ap-wave-right span:nth-child(10){height:30px}
+.ap-wave-left span:nth-child(11),.ap-wave-right span:nth-child(11){height:16px}
+.ap-wave-left span:nth-child(12),.ap-wave-right span:nth-child(12){height:50px}
+.ap-wave-left span:nth-child(13),.ap-wave-right span:nth-child(13){height:36px}
+.ap-wave-left span:nth-child(14),.ap-wave-right span:nth-child(14){height:24px}
+.ap-wave-left span:nth-child(15),.ap-wave-right span:nth-child(15){height:10px}
+/* animación al reproducir */
+.ap-wave-left.playing span,.ap-wave-right.playing span{
+  animation:waveAnim 1.4s ease-in-out infinite alternate;
+}
+.ap-wave-left span:nth-child(1){animation-delay:0s}
+.ap-wave-left span:nth-child(2){animation-delay:.1s}
+.ap-wave-left span:nth-child(3){animation-delay:.22s}
+.ap-wave-left span:nth-child(4){animation-delay:.06s}
+.ap-wave-left span:nth-child(5){animation-delay:.18s}
+.ap-wave-left span:nth-child(6){animation-delay:.3s}
+.ap-wave-left span:nth-child(7){animation-delay:.04s}
+.ap-wave-left span:nth-child(8){animation-delay:.14s}
+.ap-wave-left span:nth-child(9){animation-delay:.26s}
+.ap-wave-left span:nth-child(10){animation-delay:.08s}
+.ap-wave-left span:nth-child(11){animation-delay:.2s}
+.ap-wave-left span:nth-child(12){animation-delay:.32s}
+.ap-wave-left span:nth-child(13){animation-delay:.12s}
+.ap-wave-left span:nth-child(14){animation-delay:.24s}
+.ap-wave-left span:nth-child(15){animation-delay:.02s}
+.ap-wave-right span:nth-child(1){animation-delay:.05s}
+.ap-wave-right span:nth-child(2){animation-delay:.17s}
+.ap-wave-right span:nth-child(3){animation-delay:.09s}
+.ap-wave-right span:nth-child(4){animation-delay:.25s}
+.ap-wave-right span:nth-child(5){animation-delay:.13s}
+.ap-wave-right span:nth-child(6){animation-delay:.03s}
+.ap-wave-right span:nth-child(7){animation-delay:.21s}
+.ap-wave-right span:nth-child(8){animation-delay:.29s}
+.ap-wave-right span:nth-child(9){animation-delay:.07s}
+.ap-wave-right span:nth-child(10){animation-delay:.19s}
+.ap-wave-right span:nth-child(11){animation-delay:.31s}
+.ap-wave-right span:nth-child(12){animation-delay:.11s}
+.ap-wave-right span:nth-child(13){animation-delay:.23s}
+.ap-wave-right span:nth-child(14){animation-delay:.15s}
+.ap-wave-right span:nth-child(15){animation-delay:.27s}
+@keyframes waveAnim{
+  0%{transform:scaleY(.25);opacity:.4}
+  100%{transform:scaleY(1);opacity:1}
+}
+
+/* ── Info de pista ── */
+.ap-track-block{
+  text-align:center;margin-bottom:1.2rem;
+}
+.ap-track-eyebrow{
+  font-size:.7rem;color:rgba(184,134,11,.45);
+  letter-spacing:.5em;margin-bottom:.35rem;
+}
 .ap-track-name{
   font-family:'Cinzel',serif;
-  font-size:.6rem;letter-spacing:.05em;
+  font-size:.7rem;letter-spacing:.07em;
   color:var(--c-text);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  margin-bottom:.3rem;font-weight:500;
-}
-.ap-track-time{
-  font-family:'Cormorant Garamond',Georgia,serif;
-  font-size:.85rem;color:var(--c-dim);
-  letter-spacing:.08em;
-}
-.ap-load-btn{
-  flex-shrink:0;
-  width:34px;height:34px;
-  display:flex;align-items:center;justify-content:center;
-  border:1px solid rgba(184,134,11,.3);
-  background:linear-gradient(145deg,rgba(184,134,11,.08),rgba(139,26,26,.06));
-  color:var(--c-c);
-  cursor:pointer;
-  transition:all .25s;
-  position:relative;z-index:1;
-}
-.ap-load-btn:hover{
-  background:rgba(184,134,11,.14);
-  border-color:rgba(184,134,11,.6);
-  transform:translateY(-1px);
-  box-shadow:0 4px 14px rgba(184,134,11,.2);
+  font-weight:600;
 }
 
-/* Waveform visualizer */
-.ap-wave{
-  display:flex;align-items:flex-end;justify-content:center;
-  gap:3px;height:36px;
-  padding:0 1.5rem;
-  margin-bottom:.75rem;
-}
-.ap-wave span{
-  flex:1;max-width:7px;
-  background:linear-gradient(180deg,rgba(184,134,11,.6),rgba(139,26,26,.35));
-  border-radius:1px 1px 0 0;
-  height:4px;
-  transition:height .15s ease;
-}
-.ap-wave.playing span{
-  animation:waveBar 1.2s ease-in-out infinite alternate;
-}
-.ap-wave span:nth-child(1){animation-delay:0s;--h:28px}
-.ap-wave span:nth-child(2){animation-delay:.08s;--h:18px}
-.ap-wave span:nth-child(3){animation-delay:.16s;--h:32px}
-.ap-wave span:nth-child(4){animation-delay:.04s;--h:14px}
-.ap-wave span:nth-child(5){animation-delay:.22s;--h:24px}
-.ap-wave span:nth-child(6){animation-delay:.1s;--h:30px}
-.ap-wave span:nth-child(7){animation-delay:.18s;--h:10px}
-.ap-wave span:nth-child(8){animation-delay:.06s;--h:20px}
-.ap-wave span:nth-child(9){animation-delay:.26s;--h:34px}
-.ap-wave span:nth-child(10){animation-delay:.14s;--h:16px}
-.ap-wave span:nth-child(11){animation-delay:.02s;--h:22px}
-.ap-wave span:nth-child(12){animation-delay:.2s;--h:28px}
-.ap-wave span:nth-child(13){animation-delay:.12s;--h:12px}
-.ap-wave span:nth-child(14){animation-delay:.28s;--h:36px}
-.ap-wave span:nth-child(15){animation-delay:.07s;--h:20px}
-.ap-wave span:nth-child(16){animation-delay:.15s;--h:26px}
-.ap-wave span:nth-child(17){animation-delay:.23s;--h:14px}
-.ap-wave span:nth-child(18){animation-delay:.03s;--h:32px}
-.ap-wave span:nth-child(19){animation-delay:.19s;--h:18px}
-.ap-wave span:nth-child(20){animation-delay:.11s;--h:28px}
-.ap-wave span:nth-child(21){animation-delay:.09s;--h:22px}
-.ap-wave span:nth-child(22){animation-delay:.25s;--h:36px}
-.ap-wave span:nth-child(23){animation-delay:.17s;--h:12px}
-.ap-wave span:nth-child(24){animation-delay:.05s;--h:24px}
-.ap-wave span:nth-child(25){animation-delay:.21s;--h:16px}
-.ap-wave span:nth-child(26){animation-delay:.13s;--h:30px}
-.ap-wave span:nth-child(27){animation-delay:.29s;--h:20px}
-.ap-wave span:nth-child(28){animation-delay:.01s;--h:34px}
-.ap-wave span:nth-child(29){animation-delay:.27s;--h:10px}
-.ap-wave span:nth-child(30){animation-delay:.09s;--h:24px}
-@keyframes waveBar{
-  from{height:4px}
-  to{height:var(--h,20px)}
-}
-
-/* Seek bar */
+/* ── Seek ── */
 .ap-seek-wrap{
-  padding:0 1.5rem;
-  margin-bottom:1rem;
+  margin-bottom:1.3rem;
 }
+.ap-seek-labels{
+  display:flex;justify-content:space-between;
+  font-family:'Cormorant Garamond',serif;
+  font-size:.82rem;color:var(--c-dim);
+  margin-bottom:.45rem;
+  letter-spacing:.06em;
+}
+.ap-seek-scroll{
+  position:relative;
+  /* Extremos de pergamino */
+}
+.ap-seek-scroll::before,
+.ap-seek-scroll::after{
+  content:'';position:absolute;top:50%;transform:translateY(-50%);
+  width:8px;height:8px;
+  border:1px solid rgba(184,134,11,.45);
+  background:rgba(139,26,26,.18);
+  border-radius:50%;
+  z-index:2;
+}
+.ap-seek-scroll::before{left:-4px}
+.ap-seek-scroll::after{right:-4px}
 .ap-seek-track{
-  position:relative;height:4px;
-  background:rgba(139,26,26,.15);
-  border-radius:2px;cursor:pointer;
-  overflow:visible;
+  position:relative;height:3px;
+  background:rgba(139,26,26,.14);
+  cursor:pointer;overflow:visible;
+  margin:0 6px;
 }
 .ap-seek-track::before{
-  content:'';position:absolute;inset:-6px 0;/* hit area */
+  content:'';position:absolute;inset:-8px 0;
 }
 .ap-seek-fill{
   position:absolute;left:0;top:0;bottom:0;width:0%;
-  background:linear-gradient(90deg,var(--c-a),var(--c-c));
-  border-radius:2px;
+  background:linear-gradient(90deg,rgba(139,26,26,.6),rgba(184,134,11,.9));
   transition:width .25s linear;
-  box-shadow:0 0 6px rgba(184,134,11,.35);
 }
 .ap-seek-thumb{
-  position:absolute;top:50%;transform:translate(-50%,-50%);
-  left:0%;
-  width:12px;height:12px;
-  background:linear-gradient(135deg,var(--c-c),var(--c-a));
-  border:2px solid rgba(240,226,192,.9);
-  border-radius:2px;
-  transform:translate(-50%,-50%) rotate(45deg);
-  box-shadow:0 2px 8px rgba(139,26,26,.4);
-  transition:left .25s linear,transform .2s;
+  position:absolute;top:50%;left:0%;
+  transform:translate(-50%,-50%);
+  color:rgba(184,134,11,.95);
+  width:14px;height:14px;
+  display:flex;align-items:center;justify-content:center;
+  filter:drop-shadow(0 1px 4px rgba(139,26,26,.5));
+  transition:left .25s linear;
   cursor:grab;
 }
-.ap-seek-thumb:active{cursor:grabbing;transform:translate(-50%,-50%) rotate(45deg) scale(1.3)}
+.ap-seek-thumb:active{cursor:grabbing;filter:drop-shadow(0 2px 8px rgba(184,134,11,.7))}
 
-/* Controls */
+/* ── Controles ── */
 .ap-controls{
-  display:flex;align-items:center;
-  padding:0 1.5rem 1.4rem;
-  gap:.75rem;
-}
-.ap-btn-sm{
-  flex-shrink:0;width:30px;height:30px;
   display:flex;align-items:center;justify-content:center;
-  background:none;border:none;
-  color:var(--c-dim);cursor:pointer;
-  transition:color .2s;
-}
-.ap-btn-sm:hover{color:var(--c-c)}
-.ap-vol-slider{
-  width:64px;flex-shrink:0;
-  height:3px;cursor:pointer;
-  accent-color:var(--c-c);
-  opacity:.7;transition:opacity .2s;
-}
-.ap-vol-slider:hover{opacity:1}
-.ap-main-controls{
-  flex:1;display:flex;align-items:center;justify-content:center;gap:.85rem;
+  gap:1.25rem;margin-bottom:1.1rem;
 }
 .ap-btn-ctrl{
-  width:38px;height:38px;
+  width:42px;height:42px;
   display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(145deg,rgba(139,26,26,.06),rgba(184,134,11,.04));
-  border:1px solid rgba(184,134,11,.22);
-  color:var(--c-a);cursor:pointer;
-  transition:all .25s;
+  background:transparent;
+  border:1px solid rgba(184,134,11,.2);
+  color:rgba(184,134,11,.6);
+  cursor:pointer;transition:all .22s;
+  position:relative;
+}
+.ap-btn-ctrl::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(184,134,11,0);transition:background .22s;
 }
 .ap-btn-ctrl:hover{
-  background:rgba(184,134,11,.1);
-  border-color:rgba(184,134,11,.5);
-  transform:scale(1.08);
-  color:var(--c-c);
+  color:rgba(184,134,11,1);
+  border-color:rgba(184,134,11,.55);
+  transform:scale(1.1);
 }
 .ap-btn-play{
-  width:56px;height:56px;
+  width:64px;height:64px;
   display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(145deg,#8b1a1a,#5c0e0e);
-  border:2px solid rgba(184,134,11,.55);
-  border-top-color:rgba(184,134,11,.9);
-  color:#f0e2c0;cursor:pointer;
+  background:
+    radial-gradient(circle at 40% 35%, rgba(200,60,40,.7), rgba(80,8,8,.95));
+  border:2px solid rgba(184,134,11,.6);
+  border-top-color:rgba(240,210,100,.85);
+  color:#f5e8c8;cursor:pointer;
   box-shadow:
-    0 6px 28px rgba(139,26,26,.45),
-    0 2px 0 rgba(0,0,0,.3),
-    inset 0 1px 0 rgba(240,226,192,.12);
+    0 8px 32px rgba(139,26,26,.55),
+    0 2px 0 rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,230,150,.15),
+    inset 0 -1px 0 rgba(0,0,0,.25);
   transition:all .25s cubic-bezier(.2,0,.2,1);
   position:relative;overflow:hidden;
 }
-.ap-btn-play::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:50%;
-  background:linear-gradient(180deg,rgba(255,255,255,.08),transparent);
-  pointer-events:none;
+.ap-btn-play::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:48%;
+  background:linear-gradient(180deg,rgba(255,255,255,.1),transparent);
+  pointer-events:none;border-radius:inherit;
 }
 .ap-btn-play:hover{
-  background:linear-gradient(145deg,#a01f1f,#6e1111);
-  transform:scale(1.08) translateY(-2px);
-  box-shadow:0 10px 36px rgba(139,26,26,.6),0 2px 0 rgba(0,0,0,.3),inset 0 1px 0 rgba(240,226,192,.18);
+  background:radial-gradient(circle at 40% 35%, rgba(220,70,50,.75), rgba(100,12,12,1));
+  transform:scale(1.1) translateY(-2px);
+  box-shadow:0 14px 44px rgba(139,26,26,.7),0 2px 0 rgba(0,0,0,.4),inset 0 1px 0 rgba(255,230,150,.2);
 }
-.ap-btn-play:active{transform:scale(1.02) translateY(0)}
+.ap-btn-play:active{transform:scale(1.04) translateY(0)}
+
+/* ── Footer: volumen + cargar ── */
+.ap-footer-row{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:.75rem;
+  padding-top:.9rem;
+  border-top:1px solid rgba(184,134,11,.1);
+}
+.ap-vol-group{
+  display:flex;align-items:center;gap:.4rem;flex:1;
+}
+.ap-btn-sm{
+  flex-shrink:0;width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  background:none;border:none;
+  color:var(--c-dim);cursor:pointer;transition:color .2s;
+}
+.ap-btn-sm:hover{color:var(--c-c)}
+.ap-vol-slider{
+  flex:1;max-width:90px;
+  height:2px;cursor:pointer;
+  accent-color:var(--c-c);
+  opacity:.65;transition:opacity .2s;
+}
+.ap-vol-slider:hover{opacity:1}
+.ap-load-btn{
+  display:flex;align-items:center;gap:.45rem;
+  padding:.42rem .85rem;
+  border:1px solid rgba(184,134,11,.28);
+  background:linear-gradient(145deg,rgba(184,134,11,.06),rgba(139,26,26,.05));
+  color:rgba(184,134,11,.75);
+  font-family:'Cinzel',serif;font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;
+  cursor:pointer;transition:all .22s;
+  flex-shrink:0;
+}
+.ap-load-btn:hover{
+  border-color:rgba(184,134,11,.6);
+  color:rgba(184,134,11,1);
+  background:rgba(184,134,11,.1);
+  transform:translateY(-1px);
+  box-shadow:0 3px 12px rgba(184,134,11,.15);
+}
 
 .audio-meta{flex:1;min-width:0}
 #audio-status{
   font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:.18em;
   text-transform:uppercase;color:var(--c-dim);text-align:center;
-  padding:0 1.5rem .75rem;display:none;
+  margin-top:.5rem;display:none;
 }
 
 /* ══════════════════════════════════════
@@ -1030,9 +1113,9 @@ section:first-of-type::before{display:none}
 #main-footer{
   padding:3.5rem 2.25rem 3rem;
   text-align:center;
-  background:linear-gradient(180deg,#dfd0a4 0%,#d4c498 100%);
+  background:linear-gradient(180deg,#150805 0%,#0d0504 100%);
   position:relative;
-  border-top:1px solid rgba(184,134,11,.2);
+  border-top:2px solid rgba(184,134,11,.45);
 }
 #main-footer::before{
   content:'';display:block;
@@ -1040,24 +1123,45 @@ section:first-of-type::before{display:none}
   background:linear-gradient(90deg,transparent,rgba(184,134,11,.65) 20%,rgba(184,134,11,.65) 80%,transparent);
   margin-bottom:3rem;
 }
+.footer-logo-wrap{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 2rem;
+  padding:1.4rem 2rem;
+  max-width:360px;
+  border:1px solid rgba(184,134,11,.25);
+  border-top:2px solid rgba(184,134,11,.55);
+  box-shadow:inset 0 1px 0 rgba(184,134,11,.12);
+  background:rgba(255,255,255,.03);
+}
+/* Esquinas del recuadro logo */
+.footer-logo-corner{
+  position:absolute;
+  font-size:.6rem;
+  color:rgba(184,134,11,.6);
+  line-height:1;pointer-events:none;
+}
+.footer-logo-corner-tl{top:.45rem;left:.6rem}
+.footer-logo-corner-tr{top:.45rem;right:.6rem}
+.footer-logo-corner-bl{bottom:.45rem;left:.6rem}
+.footer-logo-corner-br{bottom:.45rem;right:.6rem}
 .footer-logo-img{
   display:block;
-  margin:0 auto 1.5rem;
-  width:300px;
-  max-width:88%;
-  /* The logo is light-on-white; invert + sepia gives it warm parchment tones */
-  filter:sepia(.18) contrast(1.05) brightness(.92);
+  width:260px;
+  max-width:100%;
+  /* sin filtro — el fondo oscuro ya da el contraste */
+  filter:brightness(1.15) contrast(1.08) saturate(.85);
 }
 .footer-divider{
   display:flex;align-items:center;justify-content:center;
-  gap:.65rem;margin:1.75rem auto;max-width:220px;opacity:.5;
+  gap:.65rem;margin:1.75rem auto;max-width:220px;opacity:.7;
 }
-.footer-divider-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,#8b1a1a)}
-.footer-divider-line.r{background:linear-gradient(90deg,#8b1a1a,transparent)}
+.footer-divider-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(184,134,11,.6))}
+.footer-divider-line.r{background:linear-gradient(90deg,rgba(184,134,11,.6),transparent)}
 .footer-copy{
   font-family:'Cinzel',serif;
   font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;
-  color:#5a3e22;line-height:2.5;max-width:340px;margin:0 auto;
+  color:rgba(184,134,11,.65);line-height:2.5;max-width:340px;margin:0 auto;
   font-weight:500;
 }
 
@@ -1436,87 +1540,130 @@ section:first-of-type::before{display:none}
   <div class="sec-rule"><div class="sec-rule-line"></div><span class="sec-rule-icon">♪</span><div class="sec-rule-line"></div></div>
 
   <div id="pv-audio-wrap">
-    <!-- Top: track info + load button -->
-    <div class="ap-header">
-      <div class="ap-disc" id="ap-disc">
-        <svg viewBox="0 0 56 56" fill="none" class="ap-disc-svg">
-          <circle cx="28" cy="28" r="26" fill="rgba(139,26,26,.18)" stroke="rgba(184,134,11,.35)" stroke-width="1"/>
-          <circle cx="28" cy="28" r="18" fill="rgba(139,26,26,.12)" stroke="rgba(184,134,11,.22)" stroke-width=".8" stroke-dasharray="4 3"/>
-          <circle cx="28" cy="28" r="9" fill="rgba(139,26,26,.22)" stroke="rgba(184,134,11,.45)" stroke-width="1"/>
-          <circle cx="28" cy="28" r="3.5" fill="rgba(184,134,11,.7)"/>
-          <!-- Ornamental spokes -->
-          <line x1="28" y1="4" x2="28" y2="12" stroke="rgba(184,134,11,.3)" stroke-width=".8"/>
-          <line x1="28" y1="44" x2="28" y2="52" stroke="rgba(184,134,11,.3)" stroke-width=".8"/>
-          <line x1="4" y1="28" x2="12" y2="28" stroke="rgba(184,134,11,.3)" stroke-width=".8"/>
-          <line x1="44" y1="28" x2="52" y2="28" stroke="rgba(184,134,11,.3)" stroke-width=".8"/>
-        </svg>
+
+    <!-- Esquinas ornamentales -->
+    <span class="ap-corn ap-corn-tl">✦</span>
+    <span class="ap-corn ap-corn-tr">✦</span>
+    <span class="ap-corn ap-corn-bl">✦</span>
+    <span class="ap-corn ap-corn-br">✦</span>
+
+    <!-- Medallón + ondas -->
+    <div class="ap-stage">
+      <!-- Ondas izquierda (espejo) -->
+      <div class="ap-wave ap-wave-left" id="ap-wave-left">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
       </div>
-      <div class="ap-track-info">
-        <div id="pv-track-name" class="ap-track-name">Sin pista seleccionada</div>
-        <div id="pv-track-time" class="ap-track-time">0:00 / 0:00</div>
+
+      <!-- Disco medallón central -->
+      <div class="ap-medallion">
+        <div class="ap-medallion-ring"></div>
+        <div class="ap-disc" id="ap-disc">
+          <svg viewBox="0 0 80 80" fill="none" width="80" height="80">
+            <defs>
+              <radialGradient id="dg1" cx="40%" cy="35%" r="60%">
+                <stop offset="0%" stop-color="rgba(200,80,40,.55)"/>
+                <stop offset="100%" stop-color="rgba(60,10,10,.9)"/>
+              </radialGradient>
+            </defs>
+            <circle cx="40" cy="40" r="38" fill="url(#dg1)" stroke="rgba(184,134,11,.5)" stroke-width="1.2"/>
+            <circle cx="40" cy="40" r="29" fill="none" stroke="rgba(184,134,11,.25)" stroke-width=".8" stroke-dasharray="5 4"/>
+            <circle cx="40" cy="40" r="20" fill="rgba(80,10,10,.55)" stroke="rgba(184,134,11,.4)" stroke-width="1"/>
+            <circle cx="40" cy="40" r="11" fill="rgba(30,5,5,.7)" stroke="rgba(184,134,11,.6)" stroke-width="1.2"/>
+            <circle cx="40" cy="40" r="4.5" fill="rgba(184,134,11,.85)"/>
+            <!-- fleur-de-lis simplificada -->
+            <path d="M40 23 Q42 27 40 30 Q38 27 40 23Z" fill="rgba(184,134,11,.5)"/>
+            <path d="M40 57 Q42 53 40 50 Q38 53 40 57Z" fill="rgba(184,134,11,.5)"/>
+            <path d="M23 40 Q27 42 30 40 Q27 38 23 40Z" fill="rgba(184,134,11,.5)"/>
+            <path d="M57 40 Q53 42 50 40 Q53 38 57 40Z" fill="rgba(184,134,11,.5)"/>
+          </svg>
+        </div>
       </div>
-      <label for="audio-file-input" class="ap-load-btn" title="Cargar audio">
-        <svg viewBox="0 0 20 20" fill="none" width="16" height="16">
-          <path d="M10 13V4M10 4L7 7M10 4L13 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M4 16h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+
+      <!-- Ondas derecha -->
+      <div class="ap-wave ap-wave-right" id="ap-wave">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- Nombre de pista -->
+    <div class="ap-track-block">
+      <div class="ap-track-eyebrow">♪ ♪ ♪</div>
+      <div id="pv-track-name" class="ap-track-name">Sin pista seleccionada</div>
+    </div>
+
+    <!-- Barra de progreso tipo pergamino -->
+    <div class="ap-seek-wrap">
+      <div class="ap-seek-labels">
+        <span id="ap-cur-time">0:00</span>
+        <span id="ap-dur-time">0:00</span>
+      </div>
+      <div class="ap-seek-scroll">
+        <div class="ap-seek-track" id="ap-seek-track">
+          <div class="ap-seek-fill" id="ap-seek-fill"></div>
+          <div class="ap-seek-thumb" id="ap-seek-thumb">
+            <svg viewBox="0 0 10 10" width="10" height="10"><path d="M5 0L10 5L5 10L0 5Z" fill="currentColor"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fila de controles principal -->
+    <div class="ap-controls">
+      <button id="pv-rew-btn" class="ap-btn-ctrl" title="−10s">
+        <svg viewBox="0 0 22 22" fill="none" width="18" height="18">
+          <path d="M11 4 A7 7 0 1 0 18 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M11 2v5L7 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="11" y="15" font-size="4.5" fill="currentColor" font-family="Cinzel,serif" text-anchor="middle" letter-spacing=".5">10</text>
         </svg>
+      </button>
+
+      <button id="pv-play-btn" class="ap-btn-play">
+        <svg id="ap-play-icon" viewBox="0 0 24 24" fill="none" width="24" height="24">
+          <path d="M7 4l13 8-13 8V4z" fill="currentColor"/>
+        </svg>
+      </button>
+
+      <button id="pv-fwd-btn" class="ap-btn-ctrl" title="+10s">
+        <svg viewBox="0 0 22 22" fill="none" width="18" height="18">
+          <path d="M11 4 A7 7 0 1 1 4 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M11 2v5l4-2.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="11" y="15" font-size="4.5" fill="currentColor" font-family="Cinzel,serif" text-anchor="middle" letter-spacing=".5">10</text>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Fila inferior: volumen + cargar -->
+    <div class="ap-footer-row">
+      <div class="ap-vol-group">
+        <button id="pv-mute-btn" class="ap-btn-sm" title="Silenciar">
+          <svg id="ap-vol-icon" viewBox="0 0 20 20" fill="none" width="15" height="15">
+            <path d="M4 7H2a1 1 0 00-1 1v4a1 1 0 001 1h2l4 3V4L4 7z" fill="currentColor" opacity=".8"/>
+            <path d="M13 7c1.5.8 2 2 2 3s-.5 2.2-2 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M16 5c2 1.5 2.5 3 2.5 5s-.5 3.5-2.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".5"/>
+          </svg>
+        </button>
+        <input type="range" id="pv-vol" min="0" max="1" step="0.02" value="0.7" class="ap-vol-slider">
+      </div>
+
+      <label for="audio-file-input" class="ap-load-btn" title="Cargar pista">
+        <svg viewBox="0 0 18 18" fill="none" width="14" height="14">
+          <path d="M9 12V3M9 3L6 6M9 3L12 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 15h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span>Cargar</span>
       </label>
       <input type="file" id="audio-file-input" accept="audio/*" style="display:none">
     </div>
 
-    <!-- Waveform visualizer (decorative bars) -->
-    <div class="ap-wave" id="ap-wave">
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-    </div>
-
-    <!-- Seek bar -->
-    <div class="ap-seek-wrap">
-      <div class="ap-seek-track" id="ap-seek-track">
-        <div class="ap-seek-fill" id="ap-seek-fill"></div>
-        <div class="ap-seek-thumb" id="ap-seek-thumb"></div>
-      </div>
-    </div>
-
-    <!-- Controls row -->
-    <div class="ap-controls">
-      <button id="pv-mute-btn" class="ap-btn-sm" title="Silenciar">
-        <svg id="ap-vol-icon" viewBox="0 0 20 20" fill="none" width="16" height="16">
-          <path d="M4 7H2a1 1 0 00-1 1v4a1 1 0 001 1h2l4 3V4L4 7z" fill="currentColor" opacity=".7"/>
-          <path d="M13 7c1.5.8 2 2 2 3s-.5 2.2-2 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-          <path d="M15.5 5c2.2 1.3 3 3 3 5s-.8 3.7-3 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".55"/>
-        </svg>
-      </button>
-      <input type="range" id="pv-vol" min="0" max="1" step="0.02" value="0.7" class="ap-vol-slider">
-      <div class="ap-main-controls">
-        <button id="pv-rew-btn" class="ap-btn-ctrl" title="−10s">
-          <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
-            <path d="M3 10a7 7 0 107-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M3 4v6h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <text x="7" y="13.5" font-size="5" fill="currentColor" font-family="serif" text-anchor="middle">10</text>
-          </svg>
-        </button>
-        <button id="pv-play-btn" class="ap-btn-play">
-          <svg id="ap-play-icon" viewBox="0 0 24 24" fill="none" width="22" height="22">
-            <path d="M7 4l13 8-13 8V4z" fill="currentColor"/>
-          </svg>
-        </button>
-        <button id="pv-fwd-btn" class="ap-btn-ctrl" title="+10s">
-          <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
-            <path d="M17 10a7 7 0 10-7-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M17 4v6h-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <text x="13" y="13.5" font-size="5" fill="currentColor" font-family="serif" text-anchor="middle">10</text>
-          </svg>
-        </button>
-      </div>
-    </div>
-
     <audio id="pv-audio" preload="auto"></audio>
     <div id="audio-status"></div>
+
+    <!-- hidden compat -->
+    <div id="pv-track-time" style="display:none">0:00 / 0:00</div>
   </div>
 
   <div id="pv-songs" class="card-list"></div>
@@ -1674,16 +1821,22 @@ section:first-of-type::before{display:none}
 <!-- ── FOOTER ── -->
 <footer id="main-footer">
 
-  <!-- Logo real de Gueka Ideas -->
-  <img
-    src="https://hercules-cdn.com/file_j3sDbqcfpTjV0jsIj8PdB1GX"
-    alt="Gueka Ideas"
-    class="footer-logo-img"
-  >
+  <!-- Logo Gueka Ideas -->
+  <div class="footer-logo-wrap">
+    <span class="footer-logo-corner footer-logo-corner-tl">✦</span>
+    <span class="footer-logo-corner footer-logo-corner-tr">✦</span>
+    <span class="footer-logo-corner footer-logo-corner-bl">✦</span>
+    <span class="footer-logo-corner footer-logo-corner-br">✦</span>
+    <img
+      src="https://hercules-cdn.com/file_j3sDbqcfpTjV0jsIj8PdB1GX"
+      alt="Gueka Ideas"
+      class="footer-logo-img"
+    >
+  </div>
 
   <div class="footer-divider">
     <span class="footer-divider-line"></span>
-    <span style="font-size:.7rem;color:#8b1a1a">✦</span>
+    <span style="font-size:.7rem;color:#b8860b">✦</span>
     <span class="footer-divider-line r"></span>
   </div>
 
@@ -2021,6 +2174,8 @@ function initAudio(){
     if(playIcon)playIcon.querySelector('path').setAttribute('d',playing?PAUSE_PATH:PLAY_PATH);
     if(disc){if(playing){disc.classList.add('spinning');}else{disc.classList.remove('spinning');}}
     if(wave){if(playing){wave.classList.add('playing');}else{wave.classList.remove('playing');}}
+    const waveL=document.getElementById('ap-wave-left');
+    if(waveL){if(playing){waveL.classList.add('playing');}else{waveL.classList.remove('playing');}}
   }
 
   function updSeek(){
@@ -2030,6 +2185,10 @@ function initAudio(){
     const pct=dur>0?(cur/dur)*100:0;
     if(seekFill)seekFill.style.width=pct+'%';
     if(seekThumb)seekThumb.style.left=pct+'%';
+    const curEl=document.getElementById('ap-cur-time');
+    const durEl=document.getElementById('ap-dur-time');
+    if(curEl)curEl.textContent=_fmt(cur);
+    if(durEl)durEl.textContent=_fmt(dur);
     if(timeEl)timeEl.textContent=_fmt(cur)+' / '+_fmt(dur);
   }
 
