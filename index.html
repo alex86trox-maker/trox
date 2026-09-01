@@ -19,13 +19,14 @@
 
 /* ── Reset ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent;overflow-anchor:none}
 body{
   background:#1a1612;
   color:#f0ece4;
   font-family:'Cormorant Garamond',Georgia,serif;
   overflow-x:hidden;min-height:100vh;
   display:flex;justify-content:center;
+  overflow-anchor:none;
 }
 input,textarea,button,select{font-family:inherit}
 button{cursor:pointer;border:none;background:none}
@@ -1818,10 +1819,19 @@ openBtn.addEventListener('click', () => {
   cancelAnimationFrame(starRAF);
 
   setTimeout(() => {
+    history.replaceState(null, '', location.pathname);
+    // Reset scroll BEFORE showing main to avoid landing mid-page
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
     splash.style.display = 'none';
     mainEl.classList.remove('hidden');
-    history.replaceState(null, '', location.pathname);
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    // Restore smooth scroll after a tick
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.documentElement.style.scrollBehavior = '';
+      });
+    });
     initScrollWatcher();
     initDotNav();
     initHeroParticles();
