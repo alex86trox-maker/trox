@@ -1737,7 +1737,8 @@ a{text-decoration:none}
 
 // Prevent browser from restoring scroll position on page load/back
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-// Lock body scroll while splash is visible
+// Lock BOTH html and body scroll while splash is visible
+document.documentElement.style.overflow = 'hidden';
 document.body.style.overflow = 'hidden';
 
 // ── Config ─────────────────────────────────────────────────────
@@ -1762,7 +1763,9 @@ const backTopBtn  = document.getElementById('back-top');
 
 // ── Skip splash si ya fue abierto esta sesión ─────────────────
 if (sessionStorage.getItem('bodaOpened')) {
+  splash.style.display = 'none';
   mainEl.classList.remove('hidden');
+  document.documentElement.style.overflow = '';
   document.body.style.overflow = '';
   history.replaceState(null, '', location.pathname);
   window.addEventListener('load', () => {
@@ -1826,20 +1829,24 @@ openBtn.addEventListener('click', () => {
   cancelAnimationFrame(starRAF);
 
   setTimeout(() => {
-    history.replaceState(null, '', location.pathname);
-    // Ensure we're at the very top before revealing
+    // 1. Hide splash first
+    splash.style.display = 'none';
+    // 2. Force scroll to absolute top on all scroll containers
     document.documentElement.style.scrollBehavior = 'auto';
-    window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-    splash.style.display = 'none';
+    window.scrollTo(0, 0);
+    // 3. Show main content NOW that scroll is at 0
     mainEl.classList.remove('hidden');
-    // Unlock body scroll
+    // 4. Unlock scroll
+    document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
-    // Restore smooth scroll after two frames
+    history.replaceState(null, '', location.pathname);
+    // 5. Restore smooth scroll after paint
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         document.documentElement.style.scrollBehavior = '';
+        window.scrollTo(0, 0);
       });
     });
     initScrollWatcher();
