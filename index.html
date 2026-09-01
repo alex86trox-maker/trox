@@ -27,7 +27,6 @@
     min-height: 100vh;
   }
   #app { max-width: 480px; margin: 0 auto; overflow-x: hidden; position: relative; }
-  #petal-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 8888; }
 
   /* ── Animations ── */
   @keyframes goldShimmer { 0%{background-position:0% center} 100%{background-position:200% center} }
@@ -419,10 +418,14 @@
   #footer-sec .signature-pill { display:inline-block; margin-bottom:1.5rem; border-radius:9999px; padding:0.95rem 2.5rem; background:rgba(255,255,255,0.05); backdrop-filter:blur(20px); box-shadow:0 8px 40px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.08); }
   #footer-sec .signature-text { font-family:'Great Vibes',cursive; font-size:2.2rem; color:rgba(240,235,220,0.96); filter:drop-shadow(0 1px 8px rgba(107,125,94,0.3)); }
   #footer-sec .brand-copy { margin-top:14px; font-size:0.75rem; color:rgba(200,195,170,0.55); letter-spacing:0.05em; }
+  #footer-sec .brand-logo-wrap { position:relative; z-index:1; margin:2.5rem auto 1.5rem; display:flex; flex-direction:column; align-items:center; gap:1rem; }
+  #footer-sec .brand-logo-wrap img { width:min(320px,80vw); filter:drop-shadow(0 4px 20px rgba(0,0,0,0.25)); border-radius:18px; background:rgba(255,255,255,0.92); padding:1.1rem 1.4rem; box-shadow:0 10px 40px rgba(0,0,0,0.3); }
+  #footer-sec .brand-legal { position:relative; z-index:1; max-width:420px; margin:0 auto; padding-top:1.5rem; border-top:1px solid rgba(200,190,150,0.15); font-size:0.72rem; line-height:1.9; color:rgba(210,205,180,0.6); letter-spacing:0.02em; }
+  #footer-sec .brand-legal strong { color:rgba(230,225,200,0.85); font-weight:600; }
 </style>
 </head>
 <body>
-<canvas id="petal-canvas"></canvas>
+
 
 <div id="app">
 
@@ -768,6 +771,10 @@
       </div>
       <p class="poem">Hoy comenzamos a escribir<br>el capítulo más hermoso<br>de nuestra historia juntos.</p>
       <div class="signature-pill glow-border-dark" style="position:relative;z-index:1"><p class="signature-text" id="footer-names">Isabella &amp; Mateo</p></div>
+      <div class="brand-logo-wrap">
+        <img src="https://hercules-cdn.com/file_XUpPWVD8vPuCPB7c58S9IANC" alt="Gueka Ideas" loading="lazy" />
+      </div>
+      <p class="brand-legal">Esta tarjeta digital es propiedad exclusiva de <strong>Gueka Ideas</strong>.<br>Uso permitido únicamente para fines personales.<br>© 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</p>
       <p class="brand-copy" style="position:relative;z-index:1">© <span id="year"></span> · Con todo nuestro amor</p>
     </footer>
 
@@ -827,44 +834,6 @@ const GIFTS = [
     body: null,
   },
 ];
-
-/* ── Petal canvas ── */
-const canvas = document.getElementById('petal-canvas');
-const ctx = canvas.getContext('2d');
-let petals = [];
-function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-function makePetal() {
-  return {
-    x: Math.random() * canvas.width,
-    y: -20 - Math.random() * 100,
-    r: 4 + Math.random() * 5,
-    speed: 0.6 + Math.random() * 1.2,
-    drift: Math.random() * 1.4 - 0.7,
-    rot: Math.random() * Math.PI * 2,
-    rotSpeed: (Math.random() - 0.5) * 0.03,
-    color: Math.random() > 0.5 ? 'rgba(201,164,74,0.75)' : 'rgba(107,125,94,0.55)',
-  };
-}
-for (let i = 0; i < 26; i++) petals.push(makePetal());
-function animatePetals() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  petals.forEach((p) => {
-    p.y += p.speed; p.x += p.drift; p.rot += p.rotSpeed;
-    if (p.y > canvas.height + 20) { p.y = -20; p.x = Math.random() * canvas.width; }
-    ctx.save();
-    ctx.translate(p.x, p.y);
-    ctx.rotate(p.rot);
-    ctx.beginPath();
-    ctx.ellipse(0, 0, p.r, p.r * 0.6, 0, 0, Math.PI * 2);
-    ctx.fillStyle = p.color;
-    ctx.fill();
-    ctx.restore();
-  });
-  requestAnimationFrame(animatePetals);
-}
-animatePetals();
 
 /* ── Splash ── */
 function closeSplash() {
