@@ -307,7 +307,8 @@ a{text-decoration:none}
 ════════════════════════════════════════ */
 #splash{
   position:fixed;inset:0;
-  left:50%;transform:translateX(-50%);
+  left:0;right:0;top:0;bottom:0;
+  width:100%;max-width:none;
   z-index:9999;overflow:hidden;
   background:var(--ink);
   display:flex;align-items:center;justify-content:center;
@@ -316,7 +317,7 @@ a{text-decoration:none}
 }
 :root[style*="--hide-splash"] #splash { display:none!important; }
 :root[style*="--hide-splash"] #main   { display:block!important; }
-#splash.closing{opacity:0;transform:translateX(-50%) scale(1.04);pointer-events:none}
+#splash.closing{opacity:0;transform:scale(1.04);pointer-events:none}
 
 #star-canvas{position:absolute;inset:0;width:100%;height:100%}
 .splash-glow{
@@ -1734,6 +1735,11 @@ a{text-decoration:none}
 <script>
 'use strict';
 
+// Prevent browser from restoring scroll position on page load/back
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+// Lock body scroll while splash is visible
+document.body.style.overflow = 'hidden';
+
 // ── Config ─────────────────────────────────────────────────────
 const WEDDING_DATE  = new Date('2026-02-14T19:00:00');
 // ⚠️ Cambia este número por el WhatsApp real de los novios (con código de país, sin +)
@@ -1757,6 +1763,7 @@ const backTopBtn  = document.getElementById('back-top');
 // ── Skip splash si ya fue abierto esta sesión ─────────────────
 if (sessionStorage.getItem('bodaOpened')) {
   mainEl.classList.remove('hidden');
+  document.body.style.overflow = '';
   history.replaceState(null, '', location.pathname);
   window.addEventListener('load', () => {
     initScrollWatcher();
@@ -1778,8 +1785,8 @@ let stars = [];
 let starRAF = null;
 
 function initStars() {
-  starCanvas.width  = starCanvas.offsetWidth  || Math.min(480, window.innerWidth);
-  starCanvas.height = starCanvas.offsetHeight || window.innerHeight;
+  starCanvas.width  = window.innerWidth;
+  starCanvas.height = window.innerHeight;
   stars = Array.from({ length: 120 }, () => ({
     x: Math.random() * starCanvas.width,
     y: Math.random() * starCanvas.height,
@@ -1820,13 +1827,16 @@ openBtn.addEventListener('click', () => {
 
   setTimeout(() => {
     history.replaceState(null, '', location.pathname);
-    // Reset scroll BEFORE showing main to avoid landing mid-page
+    // Ensure we're at the very top before revealing
     document.documentElement.style.scrollBehavior = 'auto';
     window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     splash.style.display = 'none';
     mainEl.classList.remove('hidden');
-    // Restore smooth scroll after a tick
+    // Unlock body scroll
+    document.body.style.overflow = '';
+    // Restore smooth scroll after two frames
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         document.documentElement.style.scrollBehavior = '';
