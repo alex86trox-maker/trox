@@ -18,6 +18,23 @@ body{
   overflow-x:hidden;
   line-height:1.6;
   -webkit-font-smoothing:antialiased;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-height:100vh;
+}
+#invite{
+  width:100%;
+  max-width:480px;
+}
+#splash{
+  position:fixed;
+  top:0;bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:480px;
+  z-index:9999;
 }
 button{font-family:inherit;cursor:pointer;border:none;background:none}
 input,select,textarea{font-family:inherit;color:#fff;-webkit-appearance:none}
@@ -28,7 +45,6 @@ select option{background:#1a000f}
 /* ── Keyframes ── */
 @keyframes goldShimmer{0%{background-position:0% center}100%{background-position:200% center}}
 @keyframes blinkColon{0%,100%{opacity:1}50%{opacity:.18}}
-@keyframes petalFall{0%{transform:translateY(-30px) rotate(0deg) scale(1);opacity:.95}100%{transform:translateY(110vh) rotate(800deg) scale(.6);opacity:0}}
 @keyframes tickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes heartFloat{0%,100%{transform:translateY(0) rotate(-4deg) scale(1)}50%{transform:translateY(-14px) rotate(4deg) scale(1.08)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
@@ -102,8 +118,8 @@ select option{background:#1a000f}
 
 /* ── Layout wrappers ── */
 .section{padding:5.5rem 1.5rem}
-.section-inner{max-width:540px;margin:0 auto}
-.section-inner-wide{max-width:600px;margin:0 auto}
+.section-inner{max-width:440px;margin:0 auto}
+.section-inner-wide{max-width:460px;margin:0 auto}
 .section-header{text-align:center;margin-bottom:3rem}
 
 .block-wrap{
@@ -170,14 +186,14 @@ select option{background:#1a000f}
 }
 .btn-outline:hover{transform:translateY(-1px)}
 
-/* ── Petals ── */
-.petal{position:fixed;pointer-events:none;z-index:9998;opacity:0}
+/* ── Petals (removed) ── */
 
 /* ══════════════════════════════════════
    SPLASH
 ══════════════════════════════════════ */
 #splash{
-  position:fixed;inset:0;z-index:9999;
+  /* position/sizing set by the global rule above */
+  z-index:9999;
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   cursor:pointer;overflow:hidden;
@@ -446,9 +462,6 @@ select option{background:#1a000f}
 </style>
 </head>
 <body>
-
-<!-- Petals -->
-<div id="petals"></div>
 
 <!-- ══════════════════════════════════════
      SPLASH
@@ -1123,31 +1136,11 @@ function openInvite() {
   document.getElementById('splash').classList.add('hidden');
   const inv = document.getElementById('invite');
   inv.classList.add('visible');
-  initPetals();
   startCountdown();
   setTimeout(observeSpine, 700);
 }
 document.getElementById('splash').addEventListener('click', openInvite);
-
-/* ── Petals ── */
-function initPetals() {
-  const c = document.getElementById('petals');
-  const colors = ['#FFD700','#FFF8C0','#FFFDE0','rgba(255,215,0,.55)','rgba(255,248,200,.8)'];
-  for (let i = 0; i < 22; i++) {
-    const p = document.createElement('div');
-    p.className = 'petal';
-    const sz = 6 + Math.random() * 12;
-    p.style.cssText = [
-      `left:${Math.random()*100}%`,
-      `background:${colors[Math.floor(Math.random()*colors.length)]}`,
-      `width:${sz}px`,
-      `height:${sz*1.4}px`,
-      `border-radius:${Math.random()>.5?'50% 50% 50% 10%':'40% 60% 60% 30%'}`,
-      `animation:petalFall ${5+Math.random()*6}s ${Math.random()*10}s ease-in infinite`,
-    ].join(';');
-    c.appendChild(p);
-  }
-}
+if (location.search.includes('preview')) openInvite();
 
 /* ── Ticker ── */
 (function() {
