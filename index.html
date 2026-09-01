@@ -9,17 +9,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Great+Vibes&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet" />
   <script>
+  // Limpiar hash del URL INMEDIATAMENTE para evitar que el navegador salte a una sección
+  if (location.hash) history.replaceState(null, '', location.pathname + (location.search || ''));
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   if(new URLSearchParams(location.search).get('reset')==='1'){sessionStorage.removeItem('bodaOpened');}
   if(sessionStorage.getItem('bodaOpened')){document.documentElement.style.setProperty('--hide-splash','1');}
   if(new URLSearchParams(location.search).get('preview')==='1'){sessionStorage.setItem('bodaOpened','1');document.documentElement.style.setProperty('--hide-splash','1');}
   </script>
   <style>
 /* Ocultar controles flotantes cuando la tarjeta no está activa */
-#main.hidden ~ #dot-nav,
 #main.hidden #dot-nav,
 #main.hidden #back-top,
 #main.hidden #music-player,
-#main.hidden #toast-container { display: none !important; }
+#main.hidden #toast-container,
+#main.hidden #scroll-progress { display: none !important; }
+
+/* Ocultar dot-nav también durante la transición de apertura */
+#dot-nav.nav-hidden { display: none !important; }
 
 /* Mientras splash visible, html+body NO pueden scrollear */
 html, body { height: 100%; overflow: hidden; }
@@ -1837,8 +1843,11 @@ if (sessionStorage.getItem('bodaOpened')) {
   document.body.classList.add('card-open');
   document.documentElement.style.overflow = '';
   document.body.style.overflow = '';
-  history.replaceState(null, '', location.pathname);
+  // Limpiar hash para no saltar a ninguna sección
+  if (location.hash) history.replaceState(null, '', location.pathname);
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   window.addEventListener('load', () => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     initScrollWatcher();
     initDotNav();
     initHeroParticles();
@@ -1896,6 +1905,10 @@ const PETAL_COLORS = ['#c9a84c','#e8d5a0','#8a6f2e','#f0ece4','#d4b87e'];
 openBtn.addEventListener('click', () => {
   sessionStorage.setItem('bodaOpened', '1');
 
+  // Ocultar dot-nav ANTES de mostrar la tarjeta
+  const dotNav = document.getElementById('dot-nav');
+  if (dotNav) dotNav.classList.add('nav-hidden');
+
   // Fade out splash
   splash.classList.add('closing');
   cancelAnimationFrame(starRAF);
@@ -1910,23 +1923,23 @@ openBtn.addEventListener('click', () => {
     document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
 
-    // 3. Mostrar tarjeta
-    mainEl.classList.remove('hidden');
-
-    // 4. Garantizar que arranca desde el top (sin smooth)
+    // 3. Forzar scroll top ANTES de mostrar la tarjeta
     document.documentElement.style.scrollBehavior = 'auto';
-    window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 
-    // 5. Re-habilitar smooth después del primer paint
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.documentElement.style.scrollBehavior = '';
-      });
-    });
+    // 4. Mostrar tarjeta
+    mainEl.classList.remove('hidden');
 
+    // 5. Scroll top otra vez tras mostrar
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
+    // 6. Limpiar hash por si acaso
     history.replaceState(null, '', location.pathname);
+
     initScrollWatcher();
     initDotNav();
     initHeroParticles();
@@ -1934,6 +1947,17 @@ openBtn.addEventListener('click', () => {
     startCountdown();
     initPhotoGallery();
     initMusicPlayer();
+
+    // 7. Mostrar dot-nav después de que todo está en top
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        if (dotNav) dotNav.classList.remove('nav-hidden');
+        // Restaurar smooth scroll
+        document.documentElement.style.scrollBehavior = '';
+      });
+    });
   }, 900);
 });
 
