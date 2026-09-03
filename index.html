@@ -125,10 +125,34 @@ body{font-family:'Inter',sans-serif;background:#2C001D;color:#e8ddd5;overflow-x:
 ::-webkit-scrollbar-track{background:var(--black)}
 ::-webkit-scrollbar-thumb{background:var(--wine);border-radius:2px}
 /* ── CURSOR PERSONALIZADO ── */
-#cur{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--rose-mid);pointer-events:none;z-index:999999;transform:translate(-50%,-50%);transition:width .3s,height .3s;mix-blend-mode:difference}
-#cur-ring{position:fixed;width:32px;height:32px;border-radius:50%;border:1px solid var(--rose-mid);pointer-events:none;z-index:999998;transform:translate(-50%,-50%);opacity:.4;transition:width .3s,height .3s,opacity .3s}
+#cur{
+  position:fixed;top:0;left:0;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--rose-mid);pointer-events:none;z-index:999999;
+  transform:translate(-50%,-50%);
+  transition:width .25s var(--ease),height .25s var(--ease),opacity .3s;
+  mix-blend-mode:difference;
+  opacity:0;
+  will-change:transform;
+}
+#cur-ring{
+  position:fixed;top:0;left:0;
+  width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--rose-mid);pointer-events:none;z-index:999998;
+  transform:translate(-50%,-50%);
+  opacity:0;
+  transition:width .35s var(--ease),height .35s var(--ease),opacity .35s,border-color .3s;
+  will-change:transform;
+}
+/* estados hover */
 .cur-big #cur{width:5px;height:5px}
-.cur-big #cur-ring{width:52px;height:52px;opacity:.2}
+.cur-big #cur-ring{width:52px;height:52px;opacity:.18!important;border-color:var(--rose-light)}
+/* click */
+.cur-click #cur{width:5px;height:5px}
+.cur-click #cur-ring{width:20px;height:20px;opacity:.7!important}
+/* visible después del primer movimiento */
+#cur.ready{opacity:1}
+#cur-ring.ready{opacity:.4}
 @media(hover:none){
   #cur,#cur-ring{display:none}
   body{cursor:auto}
@@ -655,6 +679,11 @@ input[type=number]{-moz-appearance:textfield}
 </style>
 </head>
 <body>
+
+<!-- ── CURSOR ELEMENTS (faltaban en el HTML original) ── -->
+<div id="cur" aria-hidden="true"></div>
+<div id="cur-ring" aria-hidden="true"></div>
+
 <a class="skip-link" href="#contenido-principal">Ir al contenido principal</a>
 <div id="progress-bar" role="progressbar" aria-hidden="true"></div>
 
@@ -1361,6 +1390,84 @@ input[type=number]{-moz-appearance:textfield}
 <script>
 // Year
 document.getElementById('ftYear').textContent = new Date().getFullYear();
+
+// ---- CURSOR PERSONALIZADO (igual que velvett-agency.com) ----
+(function(){
+  var cur  = document.getElementById('cur');
+  var ring = document.getElementById('cur-ring');
+  if(!cur || !ring) return;
+
+  // Posición objetivo (mouse real)
+  var mx = -200, my = -200;
+  // Posición interpolada del anillo
+  var rx = -200, ry = -200;
+  var started = false;
+
+  // Primer movimiento: hacer visibles ambos elementos
+  function onFirstMove(e){
+    mx = e.clientX; my = e.clientY;
+    rx = mx; ry = my;
+    cur.style.transform  = 'translate(-50%,-50%) translateX(' + mx + 'px) translateY(' + my + 'px)';
+    ring.style.transform = 'translate(-50%,-50%) translateX(' + rx + 'px) translateY(' + ry + 'px)';
+    // Usamos left/top directo (más simple y compatible)
+    cur.style.left  = mx + 'px';
+    cur.style.top   = my + 'px';
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    cur.classList.add('ready');
+    ring.classList.add('ready');
+    started = true;
+    document.removeEventListener('mousemove', onFirstMove);
+    document.addEventListener('mousemove', trackMouse, {passive:true});
+    raf();
+  }
+
+  function trackMouse(e){
+    mx = e.clientX;
+    my = e.clientY;
+    // Punto central: snap instantáneo
+    cur.style.left = mx + 'px';
+    cur.style.top  = my + 'px';
+  }
+
+  function raf(){
+    // Anillo: interpolación suave (lerp factor 0.12 = mismo feeling del sitio)
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(raf);
+  }
+
+  document.addEventListener('mousemove', onFirstMove, {passive:true});
+
+  // Hover en interactivos
+  var hoverSels = 'a,button,[role="button"],input,select,textarea,.off-item,.set-card,.stat-box,.proc-card,.faq-hd,.loc-item,.soc,.wpp,.nav-burger';
+  document.querySelectorAll(hoverSels).forEach(function(el){
+    el.addEventListener('mouseenter', function(){ document.body.classList.add('cur-big'); });
+    el.addEventListener('mouseleave', function(){ document.body.classList.remove('cur-big'); });
+  });
+
+  // Click: efecto de compresión
+  document.addEventListener('mousedown', function(){
+    document.body.classList.add('cur-click');
+  });
+  document.addEventListener('mouseup', function(){
+    document.body.classList.remove('cur-click');
+  });
+
+  // Salir/entrar a la ventana
+  document.addEventListener('mouseleave', function(){
+    if(!started) return;
+    cur.style.opacity  = '0';
+    ring.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', function(){
+    if(!started) return;
+    cur.style.opacity  = '1';
+    ring.style.opacity = '.4';
+  });
+})();
 
 // ---- URGENCY BAR offset ----
 function setNavTop(){
