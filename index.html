@@ -129,26 +129,28 @@ body{font-family:'Inter',sans-serif;background:#2C001D;color:#e8ddd5;overflow-x:
   position:fixed;top:0;left:0;
   width:8px;height:8px;border-radius:50%;
   background:var(--rose-mid);pointer-events:none;z-index:999999;
+  transform:translate(0px,0px) translate(-50%,-50%);
   transition:width .25s var(--ease),height .25s var(--ease),opacity .3s;
   mix-blend-mode:difference;
   opacity:0;
-  will-change:left,top;
+  will-change:transform;
 }
 #cur-ring{
   position:fixed;top:0;left:0;
   width:32px;height:32px;border-radius:50%;
   border:1px solid var(--rose-mid);pointer-events:none;z-index:999998;
+  transform:translate(0px,0px) translate(-50%,-50%);
   opacity:0;
   transition:width .35s var(--ease),height .35s var(--ease),opacity .35s,border-color .3s;
-  will-change:left,top;
+  will-change:transform;
 }
-/* estados hover */
+/* hover sobre elementos interactivos */
 .cur-big #cur{width:5px;height:5px}
 .cur-big #cur-ring{width:52px;height:52px;opacity:.18!important;border-color:var(--rose-light)}
 /* click */
 .cur-click #cur{width:5px;height:5px}
 .cur-click #cur-ring{width:20px;height:20px;opacity:.7!important}
-/* visible después del primer movimiento */
+/* visible tras el primer movimiento */
 #cur.ready{opacity:1}
 #cur-ring.ready{opacity:.4}
 @media(hover:none){
@@ -1389,79 +1391,73 @@ input[type=number]{-moz-appearance:textfield}
 // Year
 document.getElementById('ftYear').textContent = new Date().getFullYear();
 
-// ---- CURSOR PERSONALIZADO (igual que velvett-agency.com) ----
+// ---- CURSOR PERSONALIZADO ----
 (function(){
   var cur  = document.getElementById('cur');
   var ring = document.getElementById('cur-ring');
   if(!cur || !ring) return;
 
-  // Posición objetivo (mouse real)
-  var mx = -200, my = -200;
-  // Posición interpolada del anillo
-  var rx = -200, ry = -200;
+  var mx = 0, my = 0; // posición real del mouse
+  var rx = 0, ry = 0; // posición interpolada del anillo
   var started = false;
 
-  // Centrar el elemento: left/top apunta al centro del círculo
-  // cur = 8px → radio 4px  |  ring = 32px → radio 16px
-  var CUR_R  = 4;
-  var RING_R = 16;
-
-  function placeCur(x, y){
-    cur.style.left = (x - CUR_R)  + 'px';
-    cur.style.top  = (y - CUR_R)  + 'px';
+  // Mueve el elemento usando transform doble:
+  //   translate(X,Y)         → lleva el origen al punto del mouse
+  //   translate(-50%,-50%)   → centra el círculo exactamente sobre ese punto
+  // Este método es inmune al tamaño del elemento y funciona hasta el borde 0,0
+  function setCur(x, y){
+    cur.style.transform = 'translate(' + x + 'px,' + y + 'px) translate(-50%,-50%)';
   }
-  function placeRing(x, y){
-    ring.style.left = (x - RING_R) + 'px';
-    ring.style.top  = (y - RING_R) + 'px';
+  function setRing(x, y){
+    ring.style.transform = 'translate(' + x + 'px,' + y + 'px) translate(-50%,-50%)';
   }
 
-  // Primer movimiento: posicionar y hacer visibles
+  // Primer movimiento del mouse: posicionar ambos y hacerlos visibles
   function onFirstMove(e){
     mx = e.clientX; my = e.clientY;
     rx = mx; ry = my;
-    placeCur(mx, my);
-    placeRing(rx, ry);
+    setCur(mx, my);
+    setRing(rx, ry);
     cur.classList.add('ready');
     ring.classList.add('ready');
     started = true;
     document.removeEventListener('mousemove', onFirstMove);
-    document.addEventListener('mousemove', trackMouse, {passive:true});
-    raf();
+    document.addEventListener('mousemove', onMove, {passive:true});
+    loop();
   }
 
-  function trackMouse(e){
+  function onMove(e){
     mx = e.clientX;
     my = e.clientY;
-    // Punto central: snap instantáneo
-    placeCur(mx, my);
+    // Punto: snap instantáneo al mouse
+    setCur(mx, my);
   }
 
-  function raf(){
-    // Anillo: interpolación suave (lerp 0.12)
+  // RAF loop: anillo sigue al mouse con lerp suave (0.12)
+  function loop(){
     rx += (mx - rx) * 0.12;
     ry += (my - ry) * 0.12;
-    placeRing(rx, ry);
-    requestAnimationFrame(raf);
+    setRing(rx, ry);
+    requestAnimationFrame(loop);
   }
 
   document.addEventListener('mousemove', onFirstMove, {passive:true});
 
-  // Hover en interactivos — expande el anillo
-  var hoverSels = 'a,button,[role="button"],input,select,textarea,.off-item,.set-card,.stat-box,.proc-card,.faq-hd,.loc-item,.soc,.wpp,.nav-burger';
-  document.querySelectorAll(hoverSels).forEach(function(el){
+  // Hover: anillo crece sobre elementos interactivos
+  var hoverEls = document.querySelectorAll(
+    'a,button,[role="button"],input,select,textarea,' +
+    '.off-item,.set-card,.stat-box,.proc-card,.faq-hd,.loc-item,.soc,.wpp,.nav-burger'
+  );
+  hoverEls.forEach(function(el){
     el.addEventListener('mouseenter', function(){ document.body.classList.add('cur-big'); });
     el.addEventListener('mouseleave', function(){ document.body.classList.remove('cur-big'); });
   });
 
-  // Click: efecto de compresión
-  document.addEventListener('mousedown', function(){
-    document.body.classList.add('cur-click');
-  });
-  document.addEventListener('mouseup', function(){
-    document.body.classList.remove('cur-click');
-  });
+  // Click: compresión del anillo
+  document.addEventListener('mousedown', function(){ document.body.classList.add('cur-click'); });
+  document.addEventListener('mouseup',   function(){ document.body.classList.remove('cur-click'); });
 
-  // Ocultar al salir de la ventana, mostrar al entrar
+  // Visibilidad al salir/entrar del viewport
   document.addEventListener('mouseleave', function(){
     if(!started) return;
     cur.style.opacity  = '0';
