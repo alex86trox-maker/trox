@@ -129,20 +129,18 @@ body{font-family:'Inter',sans-serif;background:#2C001D;color:#e8ddd5;overflow-x:
   position:fixed;top:0;left:0;
   width:8px;height:8px;border-radius:50%;
   background:var(--rose-mid);pointer-events:none;z-index:999999;
-  transform:translate(-50%,-50%);
   transition:width .25s var(--ease),height .25s var(--ease),opacity .3s;
   mix-blend-mode:difference;
   opacity:0;
-  will-change:transform;
+  will-change:left,top;
 }
 #cur-ring{
   position:fixed;top:0;left:0;
   width:32px;height:32px;border-radius:50%;
   border:1px solid var(--rose-mid);pointer-events:none;z-index:999998;
-  transform:translate(-50%,-50%);
   opacity:0;
   transition:width .35s var(--ease),height .35s var(--ease),opacity .35s,border-color .3s;
-  will-change:transform;
+  will-change:left,top;
 }
 /* estados hover */
 .cur-big #cur{width:5px;height:5px}
@@ -1403,17 +1401,26 @@ document.getElementById('ftYear').textContent = new Date().getFullYear();
   var rx = -200, ry = -200;
   var started = false;
 
-  // Primer movimiento: hacer visibles ambos elementos
+  // Centrar el elemento: left/top apunta al centro del círculo
+  // cur = 8px → radio 4px  |  ring = 32px → radio 16px
+  var CUR_R  = 4;
+  var RING_R = 16;
+
+  function placeCur(x, y){
+    cur.style.left = (x - CUR_R)  + 'px';
+    cur.style.top  = (y - CUR_R)  + 'px';
+  }
+  function placeRing(x, y){
+    ring.style.left = (x - RING_R) + 'px';
+    ring.style.top  = (y - RING_R) + 'px';
+  }
+
+  // Primer movimiento: posicionar y hacer visibles
   function onFirstMove(e){
     mx = e.clientX; my = e.clientY;
     rx = mx; ry = my;
-    cur.style.transform  = 'translate(-50%,-50%) translateX(' + mx + 'px) translateY(' + my + 'px)';
-    ring.style.transform = 'translate(-50%,-50%) translateX(' + rx + 'px) translateY(' + ry + 'px)';
-    // Usamos left/top directo (más simple y compatible)
-    cur.style.left  = mx + 'px';
-    cur.style.top   = my + 'px';
-    ring.style.left = rx + 'px';
-    ring.style.top  = ry + 'px';
+    placeCur(mx, my);
+    placeRing(rx, ry);
     cur.classList.add('ready');
     ring.classList.add('ready');
     started = true;
@@ -1426,22 +1433,20 @@ document.getElementById('ftYear').textContent = new Date().getFullYear();
     mx = e.clientX;
     my = e.clientY;
     // Punto central: snap instantáneo
-    cur.style.left = mx + 'px';
-    cur.style.top  = my + 'px';
+    placeCur(mx, my);
   }
 
   function raf(){
-    // Anillo: interpolación suave (lerp factor 0.12 = mismo feeling del sitio)
+    // Anillo: interpolación suave (lerp 0.12)
     rx += (mx - rx) * 0.12;
     ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px';
-    ring.style.top  = ry + 'px';
+    placeRing(rx, ry);
     requestAnimationFrame(raf);
   }
 
   document.addEventListener('mousemove', onFirstMove, {passive:true});
 
-  // Hover en interactivos
+  // Hover en interactivos — expande el anillo
   var hoverSels = 'a,button,[role="button"],input,select,textarea,.off-item,.set-card,.stat-box,.proc-card,.faq-hd,.loc-item,.soc,.wpp,.nav-burger';
   document.querySelectorAll(hoverSels).forEach(function(el){
     el.addEventListener('mouseenter', function(){ document.body.classList.add('cur-big'); });
@@ -1456,7 +1461,7 @@ document.getElementById('ftYear').textContent = new Date().getFullYear();
     document.body.classList.remove('cur-click');
   });
 
-  // Salir/entrar a la ventana
+  // Ocultar al salir de la ventana, mostrar al entrar
   document.addEventListener('mouseleave', function(){
     if(!started) return;
     cur.style.opacity  = '0';
