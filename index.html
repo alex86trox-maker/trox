@@ -440,6 +440,8 @@ footer{background:var(--black);border-top:1px solid var(--border)}
 @media(max-width:1024px){
   #nav .nav-links,#nav .nav-rating{display:none}
   .nav-burger{display:flex}
+  /* Ocultar botón POSTULARME en tablet/móvil para no chocar con logo */
+  .nav-cta{display:none}
   .two-col{grid-template-columns:1fr}
   .sidebar{position:static;top:auto}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
@@ -452,7 +454,11 @@ footer{background:var(--black);border-top:1px solid var(--border)}
   #mouse-glow{display:none}
 }
 @media(max-width:640px){
-  :root{--ub-h:32px}
+  /* La urgency bar en móvil pequeño ocupa ~52px (3 líneas) */
+  :root{--ub-h:52px}
+  .urgency-bar{flex-wrap:wrap;justify-content:center;padding:7px 36px 7px 12px;gap:4px 6px;font-size:.62rem}
+  .ub-close{position:absolute;right:8px;top:50%;transform:translateY(-50%)}
+  .urgency-bar{position:relative}
   .page-hero{min-height:75vh}
   .hero-actions{flex-direction:column;align-items:stretch}
   .btn-p,.btn-g,.btn-wa{width:100%;justify-content:center}
@@ -470,6 +476,9 @@ footer{background:var(--black);border-top:1px solid var(--border)}
   .cookie-btn-reject,.cookie-btn-accept{flex:1;text-align:center}
   .sticky-cta{display:none!important}
   #sp-toast{display:none!important}
+}
+@media(max-width:400px){
+  :root{--ub-h:64px}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
@@ -958,11 +967,11 @@ footer{background:var(--black);border-top:1px solid var(--border)}
     <div class="ft-bot">
       <span class="ft-copy">&copy; 2025 VELVETT Agency &mdash; Bogot&aacute;, Colombia. Todos los derechos reservados.</span>
       <div class="ft-legal">
-        <button type="button" onclick="openModal('privModal')" aria-label="Pol&iacute;tica de privacidad">Pol&iacute;tica de Privacidad</button>
+        <a href="#" onclick="openModal('privModal');return false;" aria-label="Pol&iacute;tica de privacidad">Pol&iacute;tica de Privacidad</a>
         <span class="ft-sep" aria-hidden="true">&#8226;</span>
-        <button type="button" onclick="openModal('termModal')" aria-label="T&eacute;rminos de uso">T&eacute;rminos de Uso</button>
+        <a href="#" onclick="openModal('termModal');return false;" aria-label="T&eacute;rminos de uso">T&eacute;rminos de Uso</a>
         <span class="ft-sep" aria-hidden="true">&#8226;</span>
-        <button type="button" id="cookieSettingsBtn" aria-label="Configuraci&oacute;n de cookies">Cookies</button>
+        <a href="#" id="cookieSettingsBtn" onclick="document.getElementById('cookieBanner').classList.toggle('show');return false;" aria-label="Configuraci&oacute;n de cookies">Cookies</a>
       </div>
     </div>
   </div><!-- /ft-main -->
@@ -1184,7 +1193,7 @@ footer{background:var(--black);border-top:1px solid var(--border)}
   }
   if (cookieAccept) cookieAccept.addEventListener('click', function () { dismissCookieBanner('accepted'); });
   if (cookieReject) cookieReject.addEventListener('click', function () { dismissCookieBanner('rejected'); });
-  if (cookieSettingsBtn) cookieSettingsBtn.addEventListener('click', function () { cookieBanner.classList.toggle('show'); });
+  if (cookieSettingsBtn) cookieSettingsBtn.addEventListener('click', function (e) { e.preventDefault(); cookieBanner.classList.toggle('show'); });
   showCookieBanner();
 
   /* ===== SP TOAST (social proof) ===== */
