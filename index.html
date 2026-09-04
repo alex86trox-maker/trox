@@ -124,9 +124,9 @@ section:nth-child(even){background:rgba(201,168,76,.018)}
 .splash-petals-bg,.splash-deco,.splash-rings,.ring{display:none}
 
 /* COVER */
-#pv-retrato-wrap{width:100%;height:520px;position:relative;overflow:hidden;cursor:pointer;display:block;border-bottom:1px solid var(--c-line)}
-#pv-retrato-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:70%;background:linear-gradient(to top,var(--c-bg) 0%,rgba(14,12,10,.5) 60%,transparent 100%);pointer-events:none}
-.cover-img{width:100%;height:100%;object-fit:cover;display:block}
+#pv-retrato-wrap{width:100%;height:620px;position:relative;overflow:hidden;cursor:pointer;display:block;border-bottom:1px solid var(--c-line)}
+#pv-retrato-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:55%;background:linear-gradient(to top,var(--c-bg) 0%,rgba(14,12,10,.45) 55%,transparent 100%);pointer-events:none}
+.cover-img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
 .cover-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:2.5rem 1.8rem;pointer-events:none;z-index:2}
 #pv-nombres{font-family:var(--c-script);font-size:3.6rem;text-align:center;line-height:1.2;text-shadow:0 2px 24px rgba(0,0,0,.7),0 0 40px rgba(201,168,76,.25);overflow-wrap:break-word;word-break:break-word;width:100%}
 #pv-caption.card-cap{font-family:var(--c-serif);font-size:1rem;letter-spacing:.06em;color:rgba(245,237,224,.88);text-align:center;font-style:italic;margin-top:.55rem;line-height:1.55;text-shadow:0 1px 12px rgba(0,0,0,.6)}
@@ -767,6 +767,23 @@ body.splash-lock{overflow:hidden;height:100%;touch-action:none}
 
 </div><!-- /card-wrapper -->
 
+<!-- FOOTER GUEKA IDEAS -->
+<footer id="gueka-footer" style="max-width:480px;margin:0 auto;background:#0a0805;border-top:1px solid rgba(201,168,76,.18);padding:2.8rem 2rem 2.4rem;text-align:center">
+  <img src="https://hercules-cdn.com/file_oEyquPmuf7NaVh6bwzrtQfLM"
+       alt="Gueka Ideas — Create · Invite · Celebrate"
+       style="width:260px;max-width:72vw;margin:0 auto 1.4rem;display:block;opacity:.92;filter:brightness(1.08) contrast(1.05)">
+  <div style="font-family:'Cinzel',serif;font-size:.44rem;letter-spacing:.32em;color:rgba(201,168,76,.7);text-transform:uppercase;line-height:1.9;margin-bottom:.7rem">
+    Esta tarjeta digital es propiedad exclusiva de Gueka Ideas
+  </div>
+  <div style="font-family:'EB Garamond','Cormorant Garamond',serif;font-size:.78rem;color:rgba(245,237,224,.35);line-height:1.75;font-style:italic;max-width:320px;margin:0 auto .9rem">
+    Uso permitido únicamente para fines personales.
+  </div>
+  <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.4),transparent);margin:0 auto .9rem"></div>
+  <div style="font-family:'Cinzel',serif;font-size:.42rem;letter-spacing:.28em;color:rgba(201,168,76,.45);text-transform:uppercase">
+    © 2026 Gueka Ideas · Todos los derechos reservados
+  </div>
+</footer>
+
 <script>
 // ─────────────────────────────────────────
 // DATA — edita aquí los datos de la boda
@@ -774,7 +791,7 @@ body.splash-lock{overflow:hidden;height:100%;touch-action:none}
 const DATA = {
   novio: 'Carlos',
   novia: 'Ana',
-  fecha: '2026-03-15T17:00:00',
+  fecha: '2026-03-15T17:00:00-05:00',
   fechaTexto: '15 Mar 2026',
   hora: '5:00 PM',
   venue: 'Bogotá',
@@ -1061,21 +1078,30 @@ function initCover() {
 // ─────────────────────────────────────────
 function initCountdown() {
   const target = new Date(DATA.fecha).getTime();
+  const elDays  = document.getElementById('cd-days');
+  const elHours = document.getElementById('cd-hours');
+  const elMins  = document.getElementById('cd-mins');
+  const elSecs  = document.getElementById('cd-secs');
+
   function tick() {
-    const now = Date.now();
-    const diff = target - now;
+    const diff = target - Date.now();
     if (diff <= 0) {
-      document.getElementById('cd-days').textContent = '00';
-      document.getElementById('cd-hours').textContent = '00';
-      document.getElementById('cd-mins').textContent = '00';
-      document.getElementById('cd-secs').textContent = '00';
+      elDays.textContent  = '000';
+      elHours.textContent = '00';
+      elMins.textContent  = '00';
+      elSecs.textContent  = '00';
       return;
     }
-    document.getElementById('cd-days').textContent = String(Math.floor(diff/86400000)).padStart(3,'0');
-    document.getElementById('cd-hours').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
-    document.getElementById('cd-mins').textContent = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
-    document.getElementById('cd-secs').textContent = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+    const days  = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins  = Math.floor((diff % 3600000)  / 60000);
+    const secs  = Math.floor((diff % 60000)    / 1000);
+    elDays.textContent  = String(days).padStart(3, '0');
+    elHours.textContent = String(hours).padStart(2, '0');
+    elMins.textContent  = String(mins).padStart(2, '0');
+    elSecs.textContent  = String(secs).padStart(2, '0');
   }
+  // run immediately so numbers show at once
   tick();
   setInterval(tick, 1000);
 }
