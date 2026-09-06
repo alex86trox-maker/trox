@@ -302,6 +302,119 @@ section { position:relative; overflow:hidden; }
 }
 .pulse-ring { animation: pulseRing 2s ease-out infinite; }
 
+/* ══ COUNTDOWN RING STYLES ══ */
+.cd-ring-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: .5rem;
+  flex-wrap: wrap;
+  padding: .25rem 0 .5rem;
+}
+.cd-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .55rem;
+}
+.cd-ring-svg {
+  transform: rotate(-90deg);
+  overflow: visible;
+  filter: drop-shadow(0 0 10px rgba(212,175,55,.18));
+}
+.cd-ring-track {
+  fill: none;
+  stroke: rgba(255,255,255,.06);
+  stroke-width: 3.5;
+}
+.cd-ring-fill {
+  fill: none;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset .85s cubic-bezier(.4,0,.2,1);
+}
+.cd-ring-fill.secs {
+  transition: stroke-dashoffset .35s linear;
+}
+.cd-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.cd-num {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.02em;
+}
+.cd-label-txt {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .43rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(212,175,55,.55);
+  text-align: center;
+}
+.cd-colon {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: rgba(212,175,55,.3);
+  align-self: center;
+  margin-bottom: 1.5rem;
+  animation: colonBlink 1s ease-in-out infinite;
+  line-height: 1;
+}
+@keyframes colonBlink {
+  0%,100% { opacity: .3; }
+  50%      { opacity: .9; }
+}
+@keyframes secGlow {
+  0%,100% { filter: drop-shadow(0 0 4px rgba(184,212,232,.3)); }
+  50%     { filter: drop-shadow(0 0 14px rgba(184,212,232,.85)); }
+}
+.cd-secs-num {
+  animation: secGlow 1s ease-in-out infinite;
+}
+
+/* Wedding countdown "days to go" badge */
+.cd-days-badge {
+  margin-top: .5rem;
+  text-align: center;
+}
+.cd-days-badge .badge-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: rgba(212,175,55,.07);
+  border: 1px solid rgba(212,175,55,.22);
+  border-radius: 50px;
+  padding: .3rem .85rem;
+}
+.cd-days-badge .badge-txt {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .5rem;
+  letter-spacing: .18em;
+  color: rgba(212,175,55,.7);
+}
+
+/* Countdown shimmer line */
+.cd-shimmer-line {
+  width: 100%;
+  height: 1px;
+  margin: .85rem 0 .55rem;
+  overflow: hidden;
+  border-radius: 1px;
+}
+.cd-shimmer-inner {
+  height: 100%;
+  background: linear-gradient(90deg,transparent,var(--go),transparent);
+  animation: shimmer 3.5s ease-in-out infinite;
+}
+
 /* ══ MUSIC PLAYER ══ */
 #music-player {
   position: fixed; bottom: 5rem; right: 1.1rem; z-index: 300;
@@ -806,7 +919,7 @@ section { position:relative; overflow:hidden; }
 
   <!-- ── COUNTDOWN ── -->
   <div class="sec-pad reveal" id="r6">
-    <div class="glass">
+    <div class="glass" style="padding:1.6rem 1.2rem 1.4rem;">
       <p class="sec-label">⏱ CUENTA REGRESIVA</p>
       <p class="sec-title" style="font-size:1.3rem;">¡La boda se acerca!</p>
       <div class="sec-ornament">
@@ -814,7 +927,8 @@ section { position:relative; overflow:hidden; }
         <span style="color:var(--go);font-size:.75rem;">🌹 ✦ 💍 ✦ 🌹</span>
         <div class="orn-line r"></div>
       </div>
-      <div id="countdown" style="display:flex;justify-content:center;gap:.8rem;flex-wrap:wrap;"></div>
+      <!-- Ring countdown rendered by JS -->
+      <div id="countdown"></div>
     </div>
   </div>
 
@@ -910,72 +1024,37 @@ section { position:relative; overflow:hidden; }
     <div style="border-radius:14px;overflow:hidden;border:1px solid rgba(212,175,55,.25);margin-bottom:.9rem;background:linear-gradient(145deg,#100820,#1a0f2e);position:relative;">
       <svg viewBox="0 0 380 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
         <defs>
-          <!-- Gradientes de fondo -->
           <radialGradient id="bgGrad" cx="50%" cy="50%" r="60%">
             <stop offset="0%"   stop-color="#1e1040"/>
             <stop offset="100%" stop-color="#0a0516"/>
           </radialGradient>
-          <!-- Brillo dorado en el pin -->
           <radialGradient id="pinGlow" cx="50%" cy="50%" r="50%">
             <stop offset="0%"   stop-color="#d4af37" stop-opacity=".7"/>
             <stop offset="100%" stop-color="#d4af37" stop-opacity="0"/>
           </radialGradient>
-          <!-- Brillo rojo rosa -->
           <radialGradient id="destGlow" cx="50%" cy="50%" r="50%">
             <stop offset="0%"   stop-color="#c0566e" stop-opacity=".5"/>
             <stop offset="100%" stop-color="#c0566e" stop-opacity="0"/>
           </radialGradient>
-          <!-- Línea de ruta: gradiente dorado -->
           <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%"   stop-color="#d4af37" stop-opacity="0"/>
             <stop offset="40%"  stop-color="#d4af37" stop-opacity=".8"/>
             <stop offset="100%" stop-color="#c0566e" stop-opacity=".9"/>
           </linearGradient>
-          <!-- Clip path -->
           <clipPath id="mapClip">
             <rect width="380" height="220" rx="14"/>
           </clipPath>
-          <!-- Filtros de blur para glow -->
           <filter id="glow1" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
           </filter>
           <filter id="glow2" x="-80%" y="-80%" width="260%" height="260%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
           </filter>
-          <!-- Dash animado -->
           <style>
-            @keyframes dashMove {
-              from { stroke-dashoffset: 320; }
-              to   { stroke-dashoffset: 0; }
-            }
-            @keyframes dashLoop {
-              0%   { stroke-dashoffset: 320; opacity: 0; }
-              5%   { opacity: 1; }
-              90%  { opacity: 1; }
-              100% { stroke-dashoffset: 0; opacity: 0; }
-            }
             @keyframes pinBounce {
               0%,100% { transform: translateY(0); }
               40%     { transform: translateY(-7px); }
               60%     { transform: translateY(-3px); }
-            }
-            @keyframes pingRing {
-              0%   { r: 6; opacity: .9; }
-              100% { r: 22; opacity: 0; }
-            }
-            @keyframes pingRing2 {
-              0%   { r: 4; opacity: .7; }
-              100% { r: 18; opacity: 0; }
-            }
-            @keyframes dotPulse {
-              0%,100% { opacity: .3; r: 2; }
-              50%     { opacity: 1;  r: 3.5; }
-            }
-            @keyframes carMove {
-              0%   { offset-distance: 0%; opacity: 0; }
-              4%   { opacity: 1; }
-              92%  { opacity: 1; }
-              100% { offset-distance: 100%; opacity: 0; }
             }
             @keyframes glowPulse {
               0%,100% { opacity: .15; }
@@ -988,92 +1067,45 @@ section { position:relative; overflow:hidden; }
             #pin-group { animation: pinBounce 2.4s ease-in-out infinite; transform-origin: 226px 98px; transform-box: fill-box; }
           </style>
         </defs>
-
         <g clip-path="url(#mapClip)">
-
-          <!-- Fondo -->
           <rect width="380" height="220" fill="url(#bgGrad)"/>
-
-          <!-- Grid de calles (fondo) -->
           <g stroke="rgba(212,175,55,.06)" stroke-width=".6" style="animation:gridFade 4s ease-in-out infinite;">
-            <line x1="0"   y1="44"  x2="380" y2="44"/>
-            <line x1="0"   y1="88"  x2="380" y2="88"/>
-            <line x1="0"   y1="132" x2="380" y2="132"/>
-            <line x1="0"   y1="176" x2="380" y2="176"/>
-            <line x1="60"  y1="0"   x2="60"  y2="220"/>
-            <line x1="120" y1="0"   x2="120" y2="220"/>
-            <line x1="180" y1="0"   x2="180" y2="220"/>
-            <line x1="240" y1="0"   x2="240" y2="220"/>
-            <line x1="300" y1="0"   x2="300" y2="220"/>
+            <line x1="0" y1="44" x2="380" y2="44"/><line x1="0" y1="88" x2="380" y2="88"/>
+            <line x1="0" y1="132" x2="380" y2="132"/><line x1="0" y1="176" x2="380" y2="176"/>
+            <line x1="60" y1="0" x2="60" y2="220"/><line x1="120" y1="0" x2="120" y2="220"/>
+            <line x1="180" y1="0" x2="180" y2="220"/><line x1="240" y1="0" x2="240" y2="220"/>
+            <line x1="300" y1="0" x2="300" y2="220"/>
           </g>
-
-          <!-- Bloques de ciudad (manzanas) -->
           <g fill="rgba(212,175,55,.05)" stroke="rgba(212,175,55,.08)" stroke-width=".5">
-            <rect x="68"  y="52"  width="44" height="28" rx="3"/>
-            <rect x="128" y="52"  width="44" height="28" rx="3"/>
-            <rect x="68"  y="96"  width="44" height="28" rx="3"/>
-            <rect x="128" y="96"  width="44" height="28" rx="3"/>
-            <rect x="248" y="52"  width="44" height="28" rx="3"/>
-            <rect x="308" y="52"  width="44" height="28" rx="3"/>
-            <rect x="248" y="96"  width="44" height="28" rx="3"/>
-            <rect x="308" y="96"  width="44" height="28" rx="3"/>
-            <rect x="68"  y="140" width="44" height="28" rx="3"/>
-            <rect x="128" y="140" width="44" height="28" rx="3"/>
-            <rect x="248" y="140" width="44" height="28" rx="3"/>
-            <rect x="308" y="140" width="44" height="28" rx="3"/>
+            <rect x="68" y="52" width="44" height="28" rx="3"/><rect x="128" y="52" width="44" height="28" rx="3"/>
+            <rect x="68" y="96" width="44" height="28" rx="3"/><rect x="128" y="96" width="44" height="28" rx="3"/>
+            <rect x="248" y="52" width="44" height="28" rx="3"/><rect x="308" y="52" width="44" height="28" rx="3"/>
+            <rect x="248" y="96" width="44" height="28" rx="3"/><rect x="308" y="96" width="44" height="28" rx="3"/>
+            <rect x="68" y="140" width="44" height="28" rx="3"/><rect x="128" y="140" width="44" height="28" rx="3"/>
+            <rect x="248" y="140" width="44" height="28" rx="3"/><rect x="308" y="140" width="44" height="28" rx="3"/>
           </g>
-
-          <!-- Avenidas principales -->
           <line x1="0" y1="110" x2="380" y2="110" stroke="rgba(255,255,255,.07)" stroke-width="3"/>
           <line x1="190" y1="0" x2="190" y2="220" stroke="rgba(255,255,255,.07)" stroke-width="3"/>
           <line x1="0" y1="66" x2="380" y2="66" stroke="rgba(255,255,255,.04)" stroke-width="1.5"/>
           <line x1="0" y1="154" x2="380" y2="154" stroke="rgba(255,255,255,.04)" stroke-width="1.5"/>
-
-          <!-- Parque (zona verde tenue) -->
           <ellipse cx="84" cy="168" rx="28" ry="18" fill="rgba(60,120,60,.12)" stroke="rgba(80,160,80,.15)" stroke-width=".8"/>
           <text x="84" y="172" text-anchor="middle" font-size="8" fill="rgba(100,200,100,.3)">🌳</text>
-
-          <!-- Río / zona azul decorativa -->
           <path d="M0 190 Q95 178 190 188 Q285 198 380 182" stroke="rgba(80,140,200,.18)" stroke-width="4" fill="none" stroke-linecap="round"/>
-
-          <!-- Ruta desde origen hasta destino -->
-          <path id="route-path"
-            d="M 50 168 L 50 110 L 190 110 L 190 88 L 226 88"
-            stroke="url(#routeGrad)" stroke-width="2.5" fill="none"
-            stroke-linecap="round" stroke-linejoin="round"
-            stroke-dasharray="320" stroke-dashoffset="320">
-            <animate attributeName="stroke-dashoffset"
-              from="320" to="0"
-              dur="2.6s" begin="0.5s" fill="freeze" calcMode="spline"
-              keySplines="0.4 0 0.2 1"/>
+          <path id="route-path" d="M 50 168 L 50 110 L 190 110 L 190 88 L 226 88" stroke="url(#routeGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="320" stroke-dashoffset="320">
+            <animate attributeName="stroke-dashoffset" from="320" to="0" dur="2.6s" begin="0.5s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
           </path>
-          <!-- Ruta glow -->
-          <path d="M 50 168 L 50 110 L 190 110 L 190 88 L 226 88"
-            stroke="rgba(212,175,55,.25)" stroke-width="6" fill="none"
-            stroke-linecap="round" stroke-linejoin="round"
-            filter="url(#glow1)"
-            stroke-dasharray="320" stroke-dashoffset="320">
-            <animate attributeName="stroke-dashoffset"
-              from="320" to="0"
-              dur="2.6s" begin="0.5s" fill="freeze"/>
+          <path d="M 50 168 L 50 110 L 190 110 L 190 88 L 226 88" stroke="rgba(212,175,55,.25)" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow1)" stroke-dasharray="320" stroke-dashoffset="320">
+            <animate attributeName="stroke-dashoffset" from="320" to="0" dur="2.6s" begin="0.5s" fill="freeze"/>
           </path>
-
-          <!-- Carro animado sobre la ruta -->
           <g style="offset-path:path('M 50 168 L 50 110 L 190 110 L 190 88 L 226 88');animation:carMove 3.2s ease-in-out 0.5s infinite;">
             <circle r="5" fill="rgba(212,175,55,.9)" filter="url(#glow1)"/>
             <circle r="3" fill="#fff"/>
           </g>
-
-          <!-- Punto de origen -->
           <circle cx="50" cy="168" r="18" fill="url(#pinGlow)" style="animation:glowPulse 2s ease-in-out infinite;"/>
           <circle cx="50" cy="168" r="6" fill="rgba(212,175,55,.3)" stroke="rgba(212,175,55,.6)" stroke-width="1.5"/>
           <circle cx="50" cy="168" r="3" fill="#d4af37"/>
           <text x="50" y="190" text-anchor="middle" font-size="7" fill="rgba(212,175,55,.55)" font-family="Montserrat,sans-serif" letter-spacing=".5">TÚ ESTÁS AQUÍ</text>
-
-          <!-- Glow del destino -->
           <circle cx="226" cy="88" r="32" fill="url(#destGlow)" style="animation:glowPulse 2s ease-in-out infinite .4s;"/>
-
-          <!-- Rings de ping del destino -->
           <circle cx="226" cy="88" fill="none" stroke="#c0566e" stroke-width="1.2" opacity=".8">
             <animate attributeName="r" from="6" to="24" dur="2s" repeatCount="indefinite"/>
             <animate attributeName="opacity" from=".8" to="0" dur="2s" repeatCount="indefinite"/>
@@ -1082,40 +1114,23 @@ section { position:relative; overflow:hidden; }
             <animate attributeName="r" from="4" to="18" dur="2s" begin="0.7s" repeatCount="indefinite"/>
             <animate attributeName="opacity" from=".6" to="0" dur="2s" begin="0.7s" repeatCount="indefinite"/>
           </circle>
-
-          <!-- Pin del destino (animado con bounce) -->
           <g id="pin-group">
-            <!-- Sombra del pin -->
             <ellipse cx="226" cy="100" rx="8" ry="3" fill="rgba(0,0,0,.4)"/>
-            <!-- Cuerpo del pin -->
-            <path d="M226 58 C215 58 208 66 208 76 C208 90 226 102 226 102 C226 102 244 90 244 76 C244 66 237 58 226 58Z"
-              fill="#c0566e" stroke="#d4af37" stroke-width="1.5"/>
-            <!-- Círculo interior -->
+            <path d="M226 58 C215 58 208 66 208 76 C208 90 226 102 226 102 C226 102 244 90 244 76 C244 66 237 58 226 58Z" fill="#c0566e" stroke="#d4af37" stroke-width="1.5"/>
             <circle cx="226" cy="76" r="7" fill="rgba(255,255,255,.25)"/>
-            <!-- Icono 💒 en el pin -->
             <text x="226" y="80" text-anchor="middle" font-size="9">💒</text>
           </g>
-
-          <!-- Label del destino -->
           <rect x="158" y="104" width="136" height="22" rx="11" fill="rgba(14,8,22,.85)" stroke="rgba(212,175,55,.35)" stroke-width="1"/>
           <text x="226" y="119" text-anchor="middle" font-size="7.5" fill="#d4af37" font-family="Montserrat,sans-serif" font-weight="600" letter-spacing=".8">CAPILLA &amp; SALÓN</text>
-
-          <!-- Puntos de interés secundarios -->
           <g fill="rgba(180,160,220,.5)">
             <circle cx="120" cy="66" r="2.5"><animate attributeName="opacity" values=".3;1;.3" dur="3s" begin="0s" repeatCount="indefinite"/></circle>
             <circle cx="300" cy="66" r="2.5"><animate attributeName="opacity" values=".3;1;.3" dur="3s" begin=".8s" repeatCount="indefinite"/></circle>
             <circle cx="120" cy="154" r="2.5"><animate attributeName="opacity" values=".3;1;.3" dur="3s" begin="1.6s" repeatCount="indefinite"/></circle>
             <circle cx="300" cy="154" r="2.5"><animate attributeName="opacity" values=".3;1;.3" dur="3s" begin="2.4s" repeatCount="indefinite"/></circle>
           </g>
-
-          <!-- Borde exterior con brillo dorado -->
-          <rect x="0" y="0" width="380" height="220" rx="14"
-            fill="none" stroke="rgba(212,175,55,.22)" stroke-width="1.5"/>
-
-          <!-- Título superior -->
+          <rect x="0" y="0" width="380" height="220" rx="14" fill="none" stroke="rgba(212,175,55,.22)" stroke-width="1.5"/>
           <rect x="8" y="8" width="112" height="18" rx="9" fill="rgba(14,8,22,.8)" stroke="rgba(212,175,55,.3)" stroke-width=".8"/>
           <text x="64" y="20" text-anchor="middle" font-size="7" fill="rgba(212,175,55,.85)" font-family="Montserrat,sans-serif" letter-spacing=".9">📍 BOGOTÁ · COLOMBIA</text>
-
         </g>
       </svg>
     </div>
@@ -1146,9 +1161,8 @@ section { position:relative; overflow:hidden; }
       <div class="orn-line r"></div>
     </div>
     <p class="cg" style="text-align:center;font-size:.95rem;color:rgba(245,235,224,.65);margin-bottom:1.3rem;line-height:1.6;">Esta noche merece tu mejor versión.<br/>Tema: <span style="color:var(--go);">Elegance &amp; Romance</span> 🌹</p>
-    <!-- Color palette -->
     <div style="display:flex;justify-content:center;gap:.5rem;margin-bottom:1.3rem;flex-wrap:wrap;">
-      <div style="display:flex;align-items:center;gap:.4rem;" class="mn" style="font-size:.55rem;">
+      <div style="display:flex;align-items:center;gap:.4rem;">
         <span class="swatch" style="background:#f5ebe0;border:1px solid rgba(255,255,255,.3);"></span>
         <span class="mn" style="font-size:.5rem;color:rgba(245,235,224,.5);">Ivory</span>
       </div>
@@ -1179,12 +1193,10 @@ section { position:relative; overflow:hidden; }
     </div>
     <p class="cg" style="text-align:center;font-size:.95rem;color:rgba(245,235,224,.55);margin-bottom:1.3rem;line-height:1.6;">¡Habrá banquete y celebración para todos!<br/>Confirma antes del <span style="color:var(--go);">7 de Febrero</span></p>
     <div class="glass">
-      <!-- Toggle -->
       <div style="display:flex;gap:.4rem;margin-bottom:1.1rem;background:rgba(255,255,255,.04);border-radius:50px;padding:.25rem;border:1px solid rgba(255,255,255,.07);">
         <button id="btn-yes" onclick="setAttendance('yes')" class="ripple-host mn" style="flex:1;border:none;border-radius:50px;padding:.55rem .5rem;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;background:linear-gradient(135deg,var(--go),#c9a030);color:#0e0a14;transition:all .25s;">✓ SÍ ASISTIRÉ</button>
         <button id="btn-no"  onclick="setAttendance('no')"  class="ripple-host mn" style="flex:1;border:none;border-radius:50px;padding:.55rem .5rem;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:rgba(255,255,255,.38);transition:all .25s;">✗ NO PODRÉ</button>
       </div>
-      <!-- Form -->
       <div style="display:flex;flex-direction:column;gap:.7rem;">
         <input id="rsvp-name"   type="text"   class="field" placeholder="Tu nombre completo"/>
         <div id="extra-fields">
@@ -1213,7 +1225,6 @@ section { position:relative; overflow:hidden; }
       <div class="gl"></div><span style="color:var(--go);">💍</span><div class="gr"></div>
     </div>
 
-    <!-- Logo Gueka Ideas -->
     <div style="margin:1.6rem auto 0.5rem;max-width:240px;">
       <img src="https://hercules-cdn.com/file_Fxloap2ovHRNaSCoerUN36ID" alt="Gueka Ideas" style="width:100%;display:block;opacity:1;filter:invert(1) brightness(2);"/>
     </div>
@@ -1237,7 +1248,7 @@ section { position:relative; overflow:hidden; }
 </div>
 
 <script>
-// ── Data ───────────────────────────────────────────────────────────────────────
+// ── Data ──────────────────────────────────────────────────────────────────────
 const GALLERY = [
   { url:"https://images.unsplash.com/photo-1520854221256-17451cc331bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"El gran día 🌹" },
   { url:"https://images.unsplash.com/photo-1606216794074-735e91aa2c92?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800", caption:"Amor eterno 💍" },
@@ -1312,11 +1323,11 @@ function makePetals(id){
   const c = document.getElementById(id);
   if(!c) return;
   [
-    {e:"🌹",d:0,  x:8, dur:13},{e:"🌸",d:3, x:22,dur:16},
-    {e:"💍",d:6,  x:52,dur:19},{e:"✨",d:1, x:72,dur:11},
-    {e:"🌹",d:9,  x:88,dur:14},{e:"🌸",d:4, x:38,dur:17},
-    {e:"⭐",d:2,  x:63,dur:12},{e:"🕊️",d:5,x:45,dur:15},
-    {e:"🌷",d:7,  x:18,dur:20},{e:"✦", d:10,x:80,dur:10},
+    {e:"🌹",d:0,x:8,dur:13},{e:"🌸",d:3,x:22,dur:16},
+    {e:"💍",d:6,x:52,dur:19},{e:"✨",d:1,x:72,dur:11},
+    {e:"🌹",d:9,x:88,dur:14},{e:"🌸",d:4,x:38,dur:17},
+    {e:"⭐",d:2,x:63,dur:12},{e:"🕊️",d:5,x:45,dur:15},
+    {e:"🌷",d:7,x:18,dur:20},{e:"✦",d:10,x:80,dur:10},
   ].forEach(c2=>{
     const p = document.createElement("div");
     p.textContent = c2.e;
@@ -1336,42 +1347,170 @@ window.addEventListener("scroll", ()=>{
   bt.classList.toggle("visible", scrolled > 400);
 });
 
-// ── Countdown ──────────────────────────────────────────────────────────────────
-function updateCountdown(){
-  const target = new Date("2026-02-14T18:00:00-05:00"); // Bogotá UTC-5
-  const now    = new Date();
-  const diff   = target - now;
+// ══════════════════════════════════════════════════════════════
+// ── IMPROVED COUNTDOWN WITH SVG RINGS ──
+// ══════════════════════════════════════════════════════════════
+// Wedding date: 14 Feb 2026, 6PM Bogotá (UTC-5)
+const WEDDING_DATE = new Date("2026-02-14T18:00:00-05:00");
+// Approximate reference start date for "days" ring (1 year before)
+const DAYS_REF = new Date("2025-02-14T18:00:00-05:00");
+const TOTAL_DAYS_RANGE = Math.round((WEDDING_DATE - DAYS_REF) / 86400000);
+
+// SVG ring parameters
+const RING_R  = 36;          // radius
+const RING_CX = 44;          // center x/y
+const RING_SZ = 88;          // viewBox size
+const RING_C  = 2 * Math.PI * RING_R; // circumference ≈ 226.2
+
+// Each unit: color, text color, glow color, max value, label
+const CD_UNITS = [
+  { id:"cd-days", l:"DÍAS",   max: TOTAL_DAYS_RANGE, color:"#d4af37", glow:"rgba(212,175,55,.75)", textColor:"#d4af37", isSec: false },
+  { id:"cd-hrs",  l:"HORAS",  max: 24,               color:"#c0566e", glow:"rgba(192,86,110,.75)", textColor:"#c0566e", isSec: false },
+  { id:"cd-mins", l:"MIN",    max: 60,               color:"#dfa070", glow:"rgba(223,160,112,.75)", textColor:"#dfa070", isSec: false },
+  { id:"cd-secs", l:"SEG",    max: 60,               color:"#b8d4e8", glow:"rgba(184,212,232,.85)", textColor:"#b8d4e8", isSec: true  },
+];
+
+// Build the countdown HTML once
+function buildCountdownHTML(){
   const cd = document.getElementById("countdown");
   if(!cd) return;
+
+  // Outer shimmer line
+  const shimmerLine = `
+    <div class="cd-shimmer-line">
+      <div class="cd-shimmer-inner"></div>
+    </div>`;
+
+  const rings = CD_UNITS.map((u,i) => {
+    const colon = i < 3 ? `<div class="cd-colon">:</div>` : "";
+    return `
+      <div class="cd-unit">
+        <div style="position:relative;width:${RING_SZ}px;height:${RING_SZ}px;">
+          <svg class="cd-ring-svg" viewBox="0 0 ${RING_SZ} ${RING_SZ}" width="${RING_SZ}" height="${RING_SZ}">
+            <!-- Outer decorative ring (faint) -->
+            <circle cx="${RING_CX}" cy="${RING_CX}" r="${RING_R+5}" fill="none"
+              stroke="rgba(212,175,55,.05)" stroke-width="1"/>
+            <!-- Track -->
+            <circle id="${u.id}-track" cx="${RING_CX}" cy="${RING_CX}" r="${RING_R}"
+              class="cd-ring-track"/>
+            <!-- Progress fill -->
+            <circle id="${u.id}-fill" cx="${RING_CX}" cy="${RING_CX}" r="${RING_R}"
+              class="cd-ring-fill${u.isSec ? " secs" : ""}"
+              stroke="${u.color}"
+              stroke-dasharray="${RING_C.toFixed(2)}"
+              stroke-dashoffset="${RING_C.toFixed(2)}"/>
+            <!-- Dot at end of arc (cap indicator) -->
+            <circle id="${u.id}-dot" cx="${RING_CX}" cy="${RING_CX - RING_R}" r="3.5"
+              fill="${u.color}"
+              style="transform-origin:${RING_CX}px ${RING_CX}px;filter:drop-shadow(0 0 4px ${u.glow});"/>
+          </svg>
+          <!-- Number display in center -->
+          <div class="cd-inner">
+            <span id="${u.id}-num" class="cd-num${u.isSec ? " cd-secs-num" : ""}"
+              style="font-size:1.55rem;color:${u.textColor};
+                filter:drop-shadow(0 0 10px ${u.glow});
+                text-shadow:0 0 18px ${u.glow};">
+              --
+            </span>
+          </div>
+        </div>
+        <span class="cd-label-txt">${u.l}</span>
+      </div>
+      ${colon}
+    `;
+  }).join("");
+
+  const daysLeft = Math.ceil((WEDDING_DATE - new Date()) / 86400000);
+  const badge = daysLeft > 0 ? `
+    <div class="cd-days-badge">
+      <div class="badge-inner">
+        <span style="font-size:.8rem;">🌹</span>
+        <span class="badge-txt">FALTAN <strong style="color:var(--go);letter-spacing:.06em;">${daysLeft}</strong> DÍAS PARA LA BODA</span>
+        <span style="font-size:.8rem;">🌹</span>
+      </div>
+    </div>` : `
+    <div class="cd-days-badge">
+      <div class="badge-inner">
+        <span style="font-size:.8rem;">💍</span>
+        <span class="badge-txt" style="color:var(--go);">¡HOY ES EL GRAN DÍA!</span>
+        <span style="font-size:.8rem;">💍</span>
+      </div>
+    </div>`;
+
+  cd.innerHTML = `
+    ${shimmerLine}
+    <div class="cd-ring-wrap">${rings}</div>
+    ${badge}
+  `;
+}
+
+// Previous values to detect changes and animate
+const _prev = { days:-1, hrs:-1, mins:-1, secs:-1 };
+
+function updateCountdown(){
+  const now  = new Date();
+  const diff = WEDDING_DATE - now;
+  const cd   = document.getElementById("countdown");
+  if(!cd) return;
+
   if(diff <= 0){
-    cd.innerHTML=`
-      <div style="text-align:center;padding:.5rem 0;">
-        <p class="pf" style="color:var(--go);font-size:1.3rem;margin-bottom:.3rem;">¡Hoy es el gran día!</p>
-        <p style="font-size:1.8rem;">💍🌹💒</p>
+    // Wedding day!
+    cd.innerHTML = `
+      <div style="text-align:center;padding:1.2rem 0;">
+        <p class="pf" style="color:var(--go);font-size:1.5rem;margin-bottom:.5rem;font-style:italic;">¡Hoy es el gran día!</p>
+        <p style="font-size:2rem;filter:drop-shadow(0 0 14px rgba(212,175,55,.8));">💍🌹💒</p>
+        <p class="mn" style="font-size:.55rem;letter-spacing:.18em;color:rgba(212,175,55,.6);margin-top:.6rem;">ISABELLA &amp; MATEO · PARA SIEMPRE</p>
       </div>`;
     return;
   }
-  const units = [
-    {v:Math.floor(diff/86400000),        l:"DÍAS"},
-    {v:Math.floor(diff%86400000/3600000),l:"HRS"},
-    {v:Math.floor(diff%3600000/60000),   l:"MIN"},
-    {v:Math.floor(diff%60000/1000),      l:"SEG"},
-  ];
-  cd.innerHTML = units.map(u=>`
-    <div style="text-align:center;">
-      <div style="background:linear-gradient(145deg,rgba(212,175,55,.18),rgba(212,175,55,.06));
-                  border:1px solid rgba(212,175,55,.35);border-radius:14px;
-                  padding:.8rem .9rem;margin-bottom:.4rem;
-                  box-shadow:0 0 18px rgba(212,175,55,.12);min-width:66px;">
-        <span class="pf" style="font-size:2rem;color:var(--go);font-weight:700;
-              text-shadow:0 0 20px rgba(212,175,55,.6);letter-spacing:-.02em;
-              display:block;line-height:1;">${pad(u.v)}</span>
-      </div>
-      <p class="mn" style="font-size:.48rem;letter-spacing:.16em;
-         color:rgba(212,175,55,.65);text-transform:uppercase;">${u.l}</p>
-    </div>
-  `).join(`<span style="color:rgba(212,175,55,.4);font-size:1.8rem;
-    align-self:flex-start;margin-top:.6rem;padding:0 .1rem;">:</span>`);
+
+  const days = Math.floor(diff / 86400000);
+  const hrs  = Math.floor(diff % 86400000 / 3600000);
+  const mins = Math.floor(diff % 3600000 / 60000);
+  const secs = Math.floor(diff % 60000 / 1000);
+
+  const vals = [days, hrs, mins, secs];
+  const prevs = [_prev.days, _prev.hrs, _prev.mins, _prev.secs];
+  const keys  = ["days","hrs","mins","secs"];
+
+  // Build HTML if first run
+  if(!document.getElementById("cd-days-num")) buildCountdownHTML();
+
+  CD_UNITS.forEach((u, i) => {
+    const v   = vals[i];
+    const numEl  = document.getElementById(`${u.id}-num`);
+    const fillEl = document.getElementById(`${u.id}-fill`);
+    const dotEl  = document.getElementById(`${u.id}-dot`);
+    if(!numEl || !fillEl) return;
+
+    // Update number with flip if changed
+    if(v !== prevs[i]){
+      numEl.textContent = pad(v);
+      // Brief scale pop on digit change
+      numEl.style.transition = "transform .18s cubic-bezier(.34,1.56,.64,1), opacity .18s";
+      numEl.style.transform  = "scale(1.28)";
+      numEl.style.opacity    = "0.6";
+      setTimeout(()=>{
+        numEl.style.transform = "scale(1)";
+        numEl.style.opacity   = "1";
+      }, 180);
+    }
+
+    // Update SVG ring offset
+    // Ring fills clockwise representing time REMAINING proportion
+    // Full ring = all time remaining, empty = time is up
+    const progress  = v / u.max;       // fraction remaining
+    const offset    = RING_C * (1 - progress); // dashoffset: 0 = full, C = empty
+    fillEl.style.strokeDashoffset = offset.toFixed(3);
+
+    // Rotate the end-cap dot
+    if(dotEl){
+      const deg = progress * 360;
+      dotEl.style.transform = `rotate(${deg}deg)`;
+    }
+  });
+
+  _prev.days = days; _prev.hrs = hrs; _prev.mins = mins; _prev.secs = secs;
 }
 
 // ── Gallery ────────────────────────────────────────────────────────────────────
@@ -1400,7 +1539,6 @@ function galSet(i){ galIdx=i; clearInterval(galTimer); renderGallery(); startGal
 function galMove(dir){ galIdx=(galIdx+dir+GALLERY.length)%GALLERY.length; clearInterval(galTimer); renderGallery(); startGalTimer(); }
 function startGalTimer(){ galTimer=setInterval(()=>{ galIdx=(galIdx+1)%GALLERY.length; renderGallery(); },4500); }
 
-// Swipe support for gallery
 function initSwipe(){
   const el = document.getElementById("gal-touch");
   if(!el) return;
@@ -1428,10 +1566,9 @@ function lbMove(dir){
   document.getElementById("lb-img").src = GALLERY[galIdx].url;
   document.getElementById("lb-counter").textContent = `${galIdx+1} / ${GALLERY.length}`;
 }
-// Close lightbox on backdrop click
 document.getElementById("lightbox").addEventListener("click", e=>{ if(e.target===e.currentTarget) closeLightbox(); });
 
-// ── Programa (timeline) ────────────────────────────────────────────────────────
+// ── Programa ───────────────────────────────────────────────────────────────────
 function renderPrograma(){
   const list = document.getElementById("programa-list");
   if(!list) return;
@@ -1521,7 +1658,7 @@ function renderDresscode(){
   `).join("");
 }
 
-// ── RSVP ────────────────────────────────────────────────────────────────────────
+// ── RSVP ─────────────────────────────────────────────────────────────────────
 function setAttendance(val){
   attendance = val;
   const by = document.getElementById("btn-yes");
@@ -1543,9 +1680,9 @@ function setAttendance(val){
 }
 
 function sendRSVP(){
-  const name    = document.getElementById("rsvp-name").value.trim();
-  const guests  = document.getElementById("rsvp-guests")?.value || "";
-  const msg     = document.getElementById("rsvp-msg")?.value.trim() || "";
+  const name   = document.getElementById("rsvp-name").value.trim();
+  const guests = document.getElementById("rsvp-guests")?.value || "";
+  const msg    = document.getElementById("rsvp-msg")?.value.trim() || "";
 
   if(!name){
     document.getElementById("rsvp-name").style.borderColor = "rgba(201,99,122,.7)";
@@ -1554,8 +1691,7 @@ function sendRSVP(){
     return;
   }
 
-  // Build WhatsApp message
-  const WA_NUMBER = "573000000000"; // ← REEMPLAZA con el número real (formato: 57XXXXXXXXXX)
+  const WA_NUMBER = "573000000000";
   let waMsg = "";
   if(attendance === "yes"){
     waMsg  = `💍 *CONFIRMACIÓN DE ASISTENCIA*\n`;
@@ -1576,7 +1712,6 @@ function sendRSVP(){
   window.open(url, "_blank");
   showToast(attendance==="yes" ? `¡Nos vemos pronto, ${name}! 🌹💍` : `Gracias por avisar, ${name} 🌹`);
 
-  // Clear form
   document.getElementById("rsvp-name").value = "";
   const gf = document.getElementById("rsvp-guests");
   if(gf) gf.value = "";
@@ -1620,11 +1755,10 @@ async function loadGalleryFromDB(){
     await openGalDB();
     const stored = await dbGetAll();
     if(stored.length > 0){
-      // Merge stored photos at the front of GALLERY (mark as local)
       const local = stored.map(r=>({ url: r.dataURL, caption: r.caption || "📷 Foto del evento", local: true, id: r.id }));
       GALLERY.unshift(...local);
     }
-  } catch(e){ /* IndexedDB not available, proceed with defaults */ }
+  } catch(e){ /* IndexedDB not available */ }
 }
 
 async function uploadGalleryPhotos(input){
@@ -1645,14 +1779,13 @@ async function uploadGalleryPhotos(input){
       galIdx = 0;
       renderGallery();
     } catch(e){
-      // Fallback: just show in memory
       GALLERY.unshift({ url: dataURL, caption: record.caption });
       galIdx = 0;
       renderGallery();
     }
   }
   showToast("¡Fotos guardadas localmente! 💾🌹");
-  input.value = ""; // reset input
+  input.value = "";
 }
 
 // ── Music Player ──────────────────────────────────────────────────────────────
@@ -1660,8 +1793,6 @@ let musicReady = false;
 
 function initMusic(){
   const audio = document.getElementById("wedding-audio");
-  // Free-use wedding instrumental from Pixabay CDN (no servers, just a public URL)
-  // User can replace by long-pressing the 🎵 button to pick a local file
   audio.src = "https://cdn.pixabay.com/audio/2023/07/11/audio_9c5f5e9a6c.mp3";
   audio.volume = 0.35;
   musicReady = true;
@@ -1691,7 +1822,6 @@ function toggleMusic(){
   }
 }
 
-// Long-press on music button to load local file
 (function(){
   let lpt;
   const btn = document.getElementById("music-btn");
@@ -1752,6 +1882,8 @@ function openInvitation(){
     renderPrograma();
     renderAccordions();
     renderDresscode();
+    // Build rings first, then start ticking
+    buildCountdownHTML();
     updateCountdown();
     setInterval(updateCountdown, 1000);
     window.scrollTo(0,0);
@@ -1762,7 +1894,6 @@ function openInvitation(){
 makeStars("splash-stars", 110);
 makePetals("petals");
 
-// Preview mode: ?preview skips butterfly and shows invitation directly
 if(location.search.includes("preview")){
   document.getElementById("bfly-intro").style.display="none";
   document.getElementById("bfly-canvas").style.display="none";
@@ -1770,7 +1901,6 @@ if(location.search.includes("preview")){
   document.getElementById("bfly-skip").style.display="none";
   const splash=document.getElementById("splash");
   splash.style.display="flex";
-  // Auto-open invitation on ?preview=hero
   if(location.search.includes("hero")){
     splash.style.display="none";
     const hero=document.getElementById("hero");
@@ -1780,7 +1910,7 @@ if(location.search.includes("preview")){
     makePetals("petals2");
     loadGalleryFromDB().then(()=>{ renderGallery(); startGalTimer(); initSwipe(); });
     renderPrograma(); renderAccordions(); renderDresscode();
-    updateCountdown(); setInterval(updateCountdown,1000);
+    buildCountdownHTML(); updateCountdown(); setInterval(updateCountdown,1000);
   }
 }
 </script>
@@ -1910,7 +2040,6 @@ if(location.search.includes("preview")){
     ctx2.stroke(); ctx2.restore();
   }
 
-  // refs
   const bmsH=document.getElementById("bms-header"), bmsT=document.getElementById("bms-title"),
         bmsD=document.getElementById("bms-div"),
         bmsA=document.getElementById("bms-a"), bmsB=document.getElementById("bms-b"),
@@ -1925,7 +2054,6 @@ if(location.search.includes("preview")){
     const t=(now-bT0)/1000;
     const cx=BW/2, cy=BH/2;
 
-    // ambient particles
     for(const f of flies2){
       f.ph+=.015; f.x+=f.vx+Math.sin(f.ph)*.18; f.y+=f.vy+Math.cos(f.ph)*.18;
       if(f.x<0)f.x=BW; if(f.x>BW)f.x=0; if(f.y<0)f.y=BH; if(f.y>BH)f.y=0;
@@ -1934,7 +2062,6 @@ if(location.search.includes("preview")){
       ctx2.beginPath(); ctx2.arc(f.x,f.y,f.s,0,6.28); ctx2.fill(); ctx2.restore();
     }
 
-    // whispers
     if(t>3){
       if(Math.random()>.97) addWhisper();
       for(let i=whispers.length-1;i>=0;i--){
@@ -1946,7 +2073,6 @@ if(location.search.includes("preview")){
       }
     }
 
-    // reveal messages
     if(t>2.4&&bStep===0){bmsH.classList.add("show");burst2(cx,cy-100,14);bStep=1;}
     if(t>3.1&&bStep===1){bmsT.classList.add("show");burst2(cx,cy-50,24);bStep=2;}
     if(t>3.9&&bStep===2){bmsD.classList.add("show");bmsA.classList.add("show");burst2(cx,cy,12);bStep=3;}
@@ -1956,7 +2082,6 @@ if(location.search.includes("preview")){
     if(t>8.6&&bStep===6){bmsF.classList.add("show");burst2(cx,cy+100,22);bStep=7;}
     if(t>10&&bStep===7){bflySkip.classList.add("visible");bStep=8;}
 
-    // phase management
     if(t<2.4)       bPhase=0;
     else if(t<13)   bPhase=1;
     else { if(bPhase!==2){bPhase=2;bHeartStart=t;} }
@@ -1993,7 +2118,6 @@ if(location.search.includes("preview")){
       drawBfly2(b);
     }
 
-    // particles
     for(let i=parts.length-1;i>=0;i--){
       const p=parts[i]; p.x+=p.vx; p.y+=p.vy; p.l-=p.dc;
       if(p.l<=0){parts.splice(i,1);continue;}
@@ -2001,7 +2125,6 @@ if(location.search.includes("preview")){
       else { ctx2.save(); ctx2.globalAlpha=p.l; ctx2.fillStyle=p.c; ctx2.shadowColor=p.c; ctx2.shadowBlur=4; ctx2.beginPath(); ctx2.arc(p.x,p.y,p.s*p.l,0,6.28); ctx2.fill(); ctx2.restore(); }
     }
 
-    // petals
     if(t>5){
       if(Math.random()>.93) addPetal2();
       for(let i=petals2.length-1;i>=0;i--){
@@ -2012,13 +2135,10 @@ if(location.search.includes("preview")){
       }
     }
 
-    // auto-advance to splash after full animation
     if(t>17) { skipBflyAnim(); return; }
-
     requestAnimationFrame(bLoop);
   }
 
-  // Start on tap
   bflyIntro.addEventListener("click", ()=>{
     if(bStarted) return;
     bStarted=true;
@@ -2028,14 +2148,12 @@ if(location.search.includes("preview")){
     requestAnimationFrame(bLoop);
   });
 
-  // Tap on canvas: burst
   bflyCanvas.addEventListener("pointerdown", e=>{
     if(!bStarted) return;
     burst2(e.clientX,e.clientY,22);
     addPetal2(); addPetal2();
   });
 
-  // Skip / finish
   window.skipBflyAnim = function(){
     bflyCanvas.style.transition="opacity .6s ease"; bflyCanvas.style.opacity="0";
     document.getElementById("bfly-stage").style.transition="opacity .6s"; document.getElementById("bfly-stage").style.opacity="0";
@@ -2044,12 +2162,10 @@ if(location.search.includes("preview")){
       bflyCanvas.remove();
       document.getElementById("bfly-stage").remove();
       bflySkip.remove();
-      // Now show the normal splash
       document.getElementById("splash").style.display="flex";
     },650);
   };
 
-  // Initially hide the main splash until butterfly anim finishes
   document.getElementById("splash").style.display="none";
 })();
 </script>
