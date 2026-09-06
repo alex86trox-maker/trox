@@ -302,6 +302,68 @@ section { position:relative; overflow:hidden; }
 }
 .pulse-ring { animation: pulseRing 2s ease-out infinite; }
 
+/* ══ MUSIC PLAYER ══ */
+#music-player {
+  position: fixed; bottom: 5rem; right: 1.1rem; z-index: 300;
+  display: flex; flex-direction: column; align-items: flex-end; gap: .5rem;
+}
+#music-btn {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(212,175,55,.28), rgba(212,175,55,.1));
+  border: 1px solid rgba(212,175,55,.55);
+  color: var(--go); font-size: 1.2rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; backdrop-filter: blur(10px);
+  box-shadow: 0 0 18px rgba(212,175,55,.25);
+  transition: background .25s, transform .2s;
+  flex-shrink: 0;
+}
+#music-btn:hover { background: rgba(212,175,55,.36); transform: scale(1.08); }
+#music-btn.playing { box-shadow: 0 0 24px rgba(212,175,55,.55); }
+.music-bar {
+  display: flex; align-items: center; gap: .5rem;
+  background: rgba(14,8,22,.88); border: 1px solid rgba(212,175,55,.25);
+  border-radius: 50px; padding: .35rem .8rem;
+  backdrop-filter: blur(12px);
+  opacity: 0; transform: translateX(12px); pointer-events: none;
+  transition: opacity .3s, transform .3s;
+  max-width: 180px;
+}
+.music-bar.show { opacity: 1; transform: translateX(0); pointer-events: all; }
+.music-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .5rem; letter-spacing: .1em;
+  color: rgba(212,175,55,.8); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; max-width: 120px;
+}
+.music-eq {
+  display: flex; align-items: flex-end; gap: 2px; height: 14px;
+}
+.music-eq span {
+  width: 2px; background: var(--go); border-radius: 2px;
+  animation: eqBounce .6s ease-in-out infinite alternate;
+}
+.music-eq span:nth-child(2) { animation-delay: .15s; }
+.music-eq span:nth-child(3) { animation-delay: .3s; }
+@keyframes eqBounce {
+  0%   { height: 3px; }
+  100% { height: 12px; }
+}
+.music-eq.paused span { animation-play-state: paused; height: 4px; }
+
+/* ══ GALLERY UPLOAD ══ */
+.gal-upload-btn {
+  position: absolute; top: .65rem; left: .65rem;
+  background: rgba(0,0,0,.55); border: 1px solid rgba(212,175,55,.35);
+  border-radius: 50px; padding: .25rem .65rem;
+  font-family: 'Montserrat', sans-serif; font-size: .5rem;
+  letter-spacing: .1em; color: rgba(212,175,55,.8);
+  cursor: pointer; backdrop-filter: blur(6px); z-index: 2;
+  transition: background .2s;
+}
+.gal-upload-btn:hover { background: rgba(0,0,0,.8); }
+#gal-file-input { display: none; }
+
 /* ══════════════════════════════════════
    BUTTERFLY INTRO OVERLAY
 ══════════════════════════════════════ */
@@ -550,6 +612,19 @@ section { position:relative; overflow:hidden; }
 
 <!-- Back to top -->
 <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Volver arriba">↑</button>
+
+<!-- ══ MUSIC PLAYER ══ -->
+<div id="music-player">
+  <div class="music-bar" id="music-bar">
+    <div class="music-eq" id="music-eq">
+      <span></span><span></span><span></span>
+    </div>
+    <span class="music-title" id="music-title">Cargando...</span>
+  </div>
+  <button id="music-btn" onclick="toggleMusic()" title="Música">🎵</button>
+</div>
+<audio id="wedding-audio" loop preload="none"></audio>
+<input type="file" id="music-file-input" accept="audio/*" style="display:none" onchange="loadMusicFile(this)"/>
 
 <!-- ══ BUTTERFLY INTRO ══ -->
 <div id="bfly-intro">
@@ -806,6 +881,9 @@ section { position:relative; overflow:hidden; }
         <!-- Nav -->
         <button onclick="galMove(-1)" style="position:absolute;left:.6rem;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.45);border:1px solid rgba(212,175,55,.35);color:var(--go);width:38px;height:38px;border-radius:50%;font-size:1.1rem;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);transition:background .2s;">‹</button>
         <button onclick="galMove(1)"  style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.45);border:1px solid rgba(212,175,55,.35);color:var(--go);width:38px;height:38px;border-radius:50%;font-size:1.1rem;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);transition:background .2s;">›</button>
+        <!-- Upload button -->
+        <label for="gal-file-input" class="gal-upload-btn">📷 AÑADIR FOTO</label>
+        <input type="file" id="gal-file-input" accept="image/*" multiple onchange="uploadGalleryPhotos(this)"/>
         <!-- Counter badge -->
         <div id="gal-counter" class="mn" style="position:absolute;top:.7rem;right:.7rem;background:rgba(0,0,0,.55);border:1px solid rgba(212,175,55,.3);border-radius:50px;padding:.2rem .6rem;font-size:.55rem;letter-spacing:.1em;color:rgba(212,175,55,.8);backdrop-filter:blur(6px);"></div>
       </div>
@@ -1113,8 +1191,9 @@ section { position:relative; overflow:hidden; }
           <input id="rsvp-guests" type="number" class="field" min="1" max="10" placeholder="Número de acompañantes" style="margin-bottom:.7rem;"/>
           <textarea id="rsvp-msg" class="field" placeholder="Mensaje o restricción alimentaria (opcional)" rows="2" style="resize:none;padding:.75rem 1rem;line-height:1.5;"></textarea>
         </div>
-        <button onclick="sendRSVP()" class="btn-gold ripple-host">
-          ENVIAR CONFIRMACIÓN &nbsp;💍
+        <button onclick="sendRSVP()" class="btn-gold ripple-host" style="display:flex;align-items:center;justify-content:center;gap:.5rem;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          CONFIRMAR POR WHATSAPP
         </button>
       </div>
     </div>
@@ -1259,24 +1338,40 @@ window.addEventListener("scroll", ()=>{
 
 // ── Countdown ──────────────────────────────────────────────────────────────────
 function updateCountdown(){
-  const diff = new Date("2026-02-14T18:00:00") - new Date();
+  const target = new Date("2026-02-14T18:00:00-05:00"); // Bogotá UTC-5
+  const now    = new Date();
+  const diff   = target - now;
   const cd = document.getElementById("countdown");
   if(!cd) return;
-  if(diff <= 0){ cd.innerHTML=`<p class="pf" style="color:var(--go);font-size:1.1rem;">¡Hoy es el gran día! 💍🌹</p>`; return; }
+  if(diff <= 0){
+    cd.innerHTML=`
+      <div style="text-align:center;padding:.5rem 0;">
+        <p class="pf" style="color:var(--go);font-size:1.3rem;margin-bottom:.3rem;">¡Hoy es el gran día!</p>
+        <p style="font-size:1.8rem;">💍🌹💒</p>
+      </div>`;
+    return;
+  }
   const units = [
-    {v:Math.floor(diff/86400000),       l:"DÍAS"},
+    {v:Math.floor(diff/86400000),        l:"DÍAS"},
     {v:Math.floor(diff%86400000/3600000),l:"HRS"},
-    {v:Math.floor(diff%3600000/60000),  l:"MIN"},
-    {v:Math.floor(diff%60000/1000),     l:"SEG"},
+    {v:Math.floor(diff%3600000/60000),   l:"MIN"},
+    {v:Math.floor(diff%60000/1000),      l:"SEG"},
   ];
   cd.innerHTML = units.map(u=>`
-    <div style="text-align:center;min-width:60px;">
-      <div class="glass" style="padding:.65rem .6rem;margin-bottom:.35rem;background:linear-gradient(145deg,rgba(212,175,55,.1),rgba(212,175,55,.04));">
-        <span class="pf flip-digit" style="font-size:1.75rem;color:var(--go);font-weight:600;">${pad(u.v)}</span>
+    <div style="text-align:center;">
+      <div style="background:linear-gradient(145deg,rgba(212,175,55,.18),rgba(212,175,55,.06));
+                  border:1px solid rgba(212,175,55,.35);border-radius:14px;
+                  padding:.8rem .9rem;margin-bottom:.4rem;
+                  box-shadow:0 0 18px rgba(212,175,55,.12);min-width:66px;">
+        <span class="pf" style="font-size:2rem;color:var(--go);font-weight:700;
+              text-shadow:0 0 20px rgba(212,175,55,.6);letter-spacing:-.02em;
+              display:block;line-height:1;">${pad(u.v)}</span>
       </div>
-      <p class="mn" style="font-size:.42rem;letter-spacing:.14em;color:rgba(212,175,55,.55);text-transform:uppercase;">${u.l}</p>
+      <p class="mn" style="font-size:.48rem;letter-spacing:.16em;
+         color:rgba(212,175,55,.65);text-transform:uppercase;">${u.l}</p>
     </div>
-  `).join(`<span style="color:rgba(212,175,55,.35);font-size:1.5rem;align-self:flex-start;margin-top:.5rem;">:</span>`);
+  `).join(`<span style="color:rgba(212,175,55,.4);font-size:1.8rem;
+    align-self:flex-start;margin-top:.6rem;padding:0 .1rem;">:</span>`);
 }
 
 // ── Gallery ────────────────────────────────────────────────────────────────────
@@ -1448,23 +1543,180 @@ function setAttendance(val){
 }
 
 function sendRSVP(){
-  const name = document.getElementById("rsvp-name").value.trim();
+  const name    = document.getElementById("rsvp-name").value.trim();
+  const guests  = document.getElementById("rsvp-guests")?.value || "";
+  const msg     = document.getElementById("rsvp-msg")?.value.trim() || "";
+
   if(!name){
     document.getElementById("rsvp-name").style.borderColor = "rgba(201,99,122,.7)";
     setTimeout(()=>document.getElementById("rsvp-name").style.borderColor="", 1800);
     showToast("Por favor ingresa tu nombre 🌹");
     return;
   }
-  if(attendance==="yes"){
-    showToast(`¡Gracias ${name}! Los novios te esperan 🌹💍`);
+
+  // Build WhatsApp message
+  const WA_NUMBER = "573000000000"; // ← REEMPLAZA con el número real (formato: 57XXXXXXXXXX)
+  let waMsg = "";
+  if(attendance === "yes"){
+    waMsg  = `💍 *CONFIRMACIÓN DE ASISTENCIA*\n`;
+    waMsg += `📋 Nombre: ${name}\n`;
+    if(guests) waMsg += `👥 Acompañantes: ${guests}\n`;
+    if(msg)    waMsg += `📝 Nota: ${msg}\n`;
+    waMsg += `\n✅ *SÍ asistiré* a la boda de Isabella & Mateo 🌹\n`;
+    waMsg += `📅 14 · FEB · 2026 | 6:00 PM\n`;
+    waMsg += `📍 Capilla & Salón · Bogotá`;
   } else {
-    showToast(`Gracias ${name} por avisarnos 🌹`);
+    waMsg  = `💌 *RESPUESTA DE INVITACIÓN*\n`;
+    waMsg += `📋 Nombre: ${name}\n`;
+    if(msg) waMsg += `📝 Mensaje: ${msg}\n`;
+    waMsg += `\n😔 Lamentablemente *no podré asistir* a la boda de Isabella & Mateo.`;
   }
+
+  const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
+  window.open(url, "_blank");
+  showToast(attendance==="yes" ? `¡Nos vemos pronto, ${name}! 🌹💍` : `Gracias por avisar, ${name} 🌹`);
+
+  // Clear form
   document.getElementById("rsvp-name").value = "";
   const gf = document.getElementById("rsvp-guests");
   if(gf) gf.value = "";
   const mf = document.getElementById("rsvp-msg");
   if(mf) mf.value = "";
+}
+
+// ── IndexedDB Gallery ─────────────────────────────────────────────────────────
+const DB_NAME = "boda_gallery", DB_STORE = "photos", DB_VER = 1;
+let galDB = null;
+
+function openGalDB(){
+  return new Promise((res, rej)=>{
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(DB_STORE, {keyPath:"id", autoIncrement:true});
+    req.onsuccess = e => { galDB = e.target.result; res(galDB); };
+    req.onerror   = () => rej(req.error);
+  });
+}
+
+function dbGetAll(){
+  return new Promise((res,rej)=>{
+    const tx = galDB.transaction(DB_STORE,"readonly");
+    const req = tx.objectStore(DB_STORE).getAll();
+    req.onsuccess = ()=> res(req.result);
+    req.onerror   = ()=> rej(req.error);
+  });
+}
+
+function dbAdd(record){
+  return new Promise((res,rej)=>{
+    const tx = galDB.transaction(DB_STORE,"readwrite");
+    const req = tx.objectStore(DB_STORE).add(record);
+    req.onsuccess = ()=> res(req.result);
+    req.onerror   = ()=> rej(req.error);
+  });
+}
+
+async function loadGalleryFromDB(){
+  try {
+    await openGalDB();
+    const stored = await dbGetAll();
+    if(stored.length > 0){
+      // Merge stored photos at the front of GALLERY (mark as local)
+      const local = stored.map(r=>({ url: r.dataURL, caption: r.caption || "📷 Foto del evento", local: true, id: r.id }));
+      GALLERY.unshift(...local);
+    }
+  } catch(e){ /* IndexedDB not available, proceed with defaults */ }
+}
+
+async function uploadGalleryPhotos(input){
+  if(!input.files.length) return;
+  const files = Array.from(input.files);
+  showToast(`Guardando ${files.length} foto${files.length>1?"s":""}... 📷`);
+  for(const file of files){
+    const dataURL = await new Promise(res=>{
+      const fr = new FileReader();
+      fr.onload = e => res(e.target.result);
+      fr.readAsDataURL(file);
+    });
+    const record = { dataURL, caption: "📷 " + file.name.replace(/\.[^.]+$/,""), ts: Date.now() };
+    try {
+      if(!galDB) await openGalDB();
+      await dbAdd(record);
+      GALLERY.unshift({ url: dataURL, caption: record.caption, local: true });
+      galIdx = 0;
+      renderGallery();
+    } catch(e){
+      // Fallback: just show in memory
+      GALLERY.unshift({ url: dataURL, caption: record.caption });
+      galIdx = 0;
+      renderGallery();
+    }
+  }
+  showToast("¡Fotos guardadas localmente! 💾🌹");
+  input.value = ""; // reset input
+}
+
+// ── Music Player ──────────────────────────────────────────────────────────────
+let musicReady = false;
+
+function initMusic(){
+  const audio = document.getElementById("wedding-audio");
+  // Free-use wedding instrumental from Pixabay CDN (no servers, just a public URL)
+  // User can replace by long-pressing the 🎵 button to pick a local file
+  audio.src = "https://cdn.pixabay.com/audio/2023/07/11/audio_9c5f5e9a6c.mp3";
+  audio.volume = 0.35;
+  musicReady = true;
+  document.getElementById("music-title").textContent = "Romantic Piano 🎹";
+}
+
+function toggleMusic(){
+  const audio  = document.getElementById("wedding-audio");
+  const btn    = document.getElementById("music-btn");
+  const bar    = document.getElementById("music-bar");
+  const eq     = document.getElementById("music-eq");
+
+  if(!musicReady) initMusic();
+
+  if(audio.paused){
+    audio.play().then(()=>{
+      btn.textContent = "🎶";
+      btn.classList.add("playing");
+      bar.classList.add("show");
+      eq.classList.remove("paused");
+    }).catch(()=> showToast("Toca de nuevo para activar la música 🎵"));
+  } else {
+    audio.pause();
+    btn.textContent = "🎵";
+    btn.classList.remove("playing");
+    eq.classList.add("paused");
+  }
+}
+
+// Long-press on music button to load local file
+(function(){
+  let lpt;
+  const btn = document.getElementById("music-btn");
+  btn.addEventListener("pointerdown", ()=>{ lpt = setTimeout(()=>{ document.getElementById("music-file-input").click(); }, 600); });
+  btn.addEventListener("pointerup",   ()=> clearTimeout(lpt));
+  btn.addEventListener("pointerleave",()=> clearTimeout(lpt));
+})();
+
+function loadMusicFile(input){
+  if(!input.files[0]) return;
+  const file  = input.files[0];
+  const url   = URL.createObjectURL(file);
+  const audio = document.getElementById("wedding-audio");
+  audio.src   = url;
+  audio.volume= 0.35;
+  musicReady  = true;
+  document.getElementById("music-title").textContent = file.name.replace(/\.[^.]+$/,"");
+  audio.play().then(()=>{
+    document.getElementById("music-btn").textContent = "🎶";
+    document.getElementById("music-btn").classList.add("playing");
+    document.getElementById("music-bar").classList.add("show");
+    document.getElementById("music-eq").classList.remove("paused");
+    showToast("¡Música lista! 🎵🌹");
+  });
+  input.value = "";
 }
 
 // ── Reveal on scroll ─────────────────────────────────────────────────────────
@@ -1492,9 +1744,11 @@ function openInvitation(){
     setupReveal();
     makeStars("hero-stars", 90);
     makePetals("petals2");
-    renderGallery();
-    startGalTimer();
-    initSwipe();
+    loadGalleryFromDB().then(()=>{
+      renderGallery();
+      startGalTimer();
+      initSwipe();
+    });
     renderPrograma();
     renderAccordions();
     renderDresscode();
@@ -1524,7 +1778,7 @@ if(location.search.includes("preview")){
     setupReveal();
     makeStars("hero-stars",90);
     makePetals("petals2");
-    renderGallery(); startGalTimer(); initSwipe();
+    loadGalleryFromDB().then(()=>{ renderGallery(); startGalTimer(); initSwipe(); });
     renderPrograma(); renderAccordions(); renderDresscode();
     updateCountdown(); setInterval(updateCountdown,1000);
   }
