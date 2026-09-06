@@ -1110,7 +1110,8 @@ section { position:relative; overflow:hidden; }
       <div style="display:flex;flex-direction:column;gap:.7rem;">
         <input id="rsvp-name"   type="text"   class="field" placeholder="Tu nombre completo"/>
         <div id="extra-fields">
-          <input id="rsvp-guests" type="number" class="field" min="1" max="10" placeholder="Número de acompañantes"/>
+          <input id="rsvp-guests" type="number" class="field" min="1" max="10" placeholder="Número de acompañantes" style="margin-bottom:.7rem;"/>
+          <textarea id="rsvp-msg" class="field" placeholder="Mensaje o restricción alimentaria (opcional)" rows="2" style="resize:none;padding:.75rem 1rem;line-height:1.5;"></textarea>
         </div>
         <button onclick="sendRSVP()" class="btn-gold ripple-host">
           ENVIAR CONFIRMACIÓN &nbsp;💍
@@ -1134,8 +1135,8 @@ section { position:relative; overflow:hidden; }
     </div>
 
     <!-- Logo Gueka Ideas -->
-    <div style="margin:1.6rem auto 0.5rem;max-width:240px;padding:1.2rem 1.6rem;background:rgba(212,175,55,.07);border:1px solid rgba(212,175,55,.22);border-radius:12px;box-shadow:0 0 28px rgba(212,175,55,.12),0 0 6px rgba(0,0,0,.6);">
-      <img src="https://hercules-cdn.com/file_Fxloap2ovHRNaSCoerUN36ID" alt="Gueka Ideas" style="width:100%;display:block;opacity:.92;filter:invert(1) brightness(.95) sepia(.18) drop-shadow(0 0 8px rgba(212,175,55,.5));"/>
+    <div style="margin:1.6rem auto 0.5rem;max-width:240px;">
+      <img src="https://hercules-cdn.com/file_Fxloap2ovHRNaSCoerUN36ID" alt="Gueka Ideas" style="width:100%;display:block;opacity:1;filter:invert(1) brightness(2);"/>
     </div>
     <p class="mn" style="font-size:.58rem;color:rgba(212,175,55,.45);letter-spacing:.1em;line-height:2;max-width:300px;margin:.6rem auto 0;">
       Esta tarjeta digital es propiedad exclusiva de Gueka Ideas.<br/>
@@ -1177,9 +1178,9 @@ const PROGRAMA = [
 ];
 
 const ACCORDIONS = [
-  { key:"nequi",     icon:"🌹", label:"NEQUI",     sub:"Envío digital · Colombia", color:"#7d2645" },
-  { key:"daviplata", icon:"💒", label:"DAVIPLATA", sub:"Envío digital · Colombia", color:"#c0566e" },
-  { key:"pse",       icon:"💍", label:"PSE",       sub:"Pago seguro en línea",      color:"#d4af37" },
+  { key:"nequi",     icon:"🌹", label:"NEQUI",     sub:"Envío digital · Colombia", color:"#7d2645", number:"300 000 0000", owner:"Isabella Ramírez" },
+  { key:"daviplata", icon:"💒", label:"DAVIPLATA", sub:"Envío digital · Colombia", color:"#c0566e", number:"300 000 0000", owner:"Isabella Ramírez" },
+  { key:"pse",       icon:"💍", label:"PSE",       sub:"Pago seguro en línea",      color:"#d4af37", number:"300 000 0000", owner:"Isabella Ramírez" },
 ];
 
 const DRESSCODE = [
@@ -1374,8 +1375,8 @@ function renderAccordions(){
         <div style="padding-top:.9rem;border-top:1px solid rgba(212,175,55,.13);margin-top:.75rem;">
           <p class="cg" style="font-size:.88rem;color:rgba(245,235,224,.65);margin-bottom:.6rem;">Datos para transferencia:</p>
           <div style="background:rgba(212,175,55,.07);border:1px solid rgba(212,175,55,.18);border-radius:12px;padding:.85rem;font-family:'Montserrat',sans-serif;font-size:.68rem;color:var(--mi);letter-spacing:.04em;line-height:1.8;">
-            <div>Número: <span style="color:var(--go);font-weight:600;">300 000 0000</span></div>
-            <div>A nombre de: <span style="color:var(--go);font-weight:600;">Isabella Ramírez</span></div>
+            <div>Número: <span style="color:var(--go);font-weight:600;">${a.number}</span></div>
+            <div>A nombre de: <span style="color:var(--go);font-weight:600;">${a.owner}</span></div>
           </div>
           <button onclick="copyAccount('${a.key}')" class="btn-outline ripple-host" style="width:100%;margin-top:.65rem;justify-content:center;">
             COPIAR NÚMERO
@@ -1403,9 +1404,11 @@ function toggleAccordion(key){
 }
 
 function copyAccount(key){
-  navigator.clipboard.writeText("3000000000")
+  const acc = ACCORDIONS.find(a=>a.key===key);
+  const num = acc ? acc.number.replace(/\s/g,"") : "3000000000";
+  navigator.clipboard.writeText(num)
     .then(()=> showToast("¡Número copiado! 💍"))
-    .catch(()=> showToast("Copia: 300 000 0000"));
+    .catch(()=> showToast("Copia: " + (acc ? acc.number : "300 000 0000")));
 }
 
 // ── Dress Code ──────────────────────────────────────────────────────────────────
@@ -1460,6 +1463,8 @@ function sendRSVP(){
   document.getElementById("rsvp-name").value = "";
   const gf = document.getElementById("rsvp-guests");
   if(gf) gf.value = "";
+  const mf = document.getElementById("rsvp-msg");
+  if(mf) mf.value = "";
 }
 
 // ── Reveal on scroll ─────────────────────────────────────────────────────────
@@ -1502,6 +1507,28 @@ function openInvitation(){
 // ── Init ─────────────────────────────────────────────────────────────────────
 makeStars("splash-stars", 110);
 makePetals("petals");
+
+// Preview mode: ?preview skips butterfly and shows invitation directly
+if(location.search.includes("preview")){
+  document.getElementById("bfly-intro").style.display="none";
+  document.getElementById("bfly-canvas").style.display="none";
+  document.getElementById("bfly-stage").style.display="none";
+  document.getElementById("bfly-skip").style.display="none";
+  const splash=document.getElementById("splash");
+  splash.style.display="flex";
+  // Auto-open invitation on ?preview=hero
+  if(location.search.includes("hero")){
+    splash.style.display="none";
+    const hero=document.getElementById("hero");
+    hero.style.display="block";
+    setupReveal();
+    makeStars("hero-stars",90);
+    makePetals("petals2");
+    renderGallery(); startGalTimer(); initSwipe();
+    renderPrograma(); renderAccordions(); renderDresscode();
+    updateCountdown(); setInterval(updateCountdown,1000);
+  }
+}
 </script>
 
 <!-- ══ BUTTERFLY ANIMATION JS ══ -->
