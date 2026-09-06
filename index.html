@@ -6,7 +6,7 @@
 <title>Boda · Isabella &amp; Mateo · Elegance Forever</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&family=Alex+Brush&display=swap" rel="stylesheet"/>
 <style>
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -301,6 +301,243 @@ section { position:relative; overflow:hidden; }
   100% { transform: scale(.95); box-shadow: 0 0 0 0 rgba(212,175,55,0); }
 }
 .pulse-ring { animation: pulseRing 2s ease-out infinite; }
+
+/* ══════════════════════════════════════
+   BUTTERFLY INTRO OVERLAY
+══════════════════════════════════════ */
+#bfly-intro {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: opacity 1s ease, transform 1s ease;
+}
+#bfly-intro.hide { opacity: 0; transform: scale(1.12); pointer-events: none; }
+
+.bfly-nebula {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 90vw; max-width: 420px; height: 75vh;
+  background: radial-gradient(ellipse at center,
+    rgba(107,30,80,.35) 0%, rgba(192,132,252,.12) 40%,
+    rgba(212,175,55,.08) 70%, transparent 85%);
+  filter: blur(55px); pointer-events: none;
+  animation: bflyNebula 7s ease-in-out infinite alternate;
+}
+@keyframes bflyNebula {
+  0%   { opacity:.6; transform: translate(-50%,-50%) scale(.95); }
+  100% { opacity: 1; transform: translate(-50%,-50%) scale(1.05); }
+}
+
+.bfly-beam {
+  position: absolute; top: 42%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 150vw; height: 2px;
+  background: linear-gradient(90deg, transparent,
+    rgba(212,175,55,.3), rgba(201,99,122,.38), rgba(212,175,55,.3), transparent);
+  filter: blur(2px); opacity: .55; pointer-events: none;
+}
+
+#bfly-canvas {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 201; opacity: 0; transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+#bfly-canvas.active { opacity: 1; pointer-events: all; }
+
+/* intro content */
+.bfly-content {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  text-align: center; padding: 0 2rem;
+}
+.bfly-emoji {
+  font-size: 3.5rem;
+  animation: bflyFloat 2.5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 22px rgba(212,175,55,.8));
+}
+@keyframes bflyFloat {
+  0%   { transform: translateY(0) rotate(-8deg); }
+  100% { transform: translateY(-14px) rotate(10deg); }
+}
+.bfly-whisper {
+  font-family: 'Alex Brush', cursive;
+  font-size: 2.1rem; color: #f5ebe0;
+  text-shadow: 0 0 18px rgba(255,255,255,.4), 0 0 40px rgba(212,175,55,.4);
+  animation: bflyWhisper 3s ease-in-out infinite alternate;
+}
+@keyframes bflyWhisper {
+  0%   { opacity:.7; letter-spacing: 1px; }
+  100% { opacity: 1; letter-spacing: 3px; }
+}
+.bfly-tap-ring {
+  position: relative; width: 90px; height: 90px;
+  display: flex; align-items: center; justify-content: center;
+}
+.bfly-ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 2px solid rgba(212,175,55,.5);
+  animation: bflyRing 2s ease-out infinite;
+}
+.bfly-ring.r2 { animation-delay: .7s; }
+@keyframes bflyRing {
+  0%   { transform: scale(.6); opacity: 1; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+.bfly-tap-heart {
+  font-size: 2.6rem;
+  animation: bflyHeart 1.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 14px rgba(212,175,55,.9));
+  z-index: 2;
+}
+@keyframes bflyHeart {
+  0%,100% { transform: scale(1); }
+  15%     { transform: scale(1.22); }
+  30%     { transform: scale(1); }
+  45%     { transform: scale(1.15); }
+}
+.bfly-cta {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .62rem; letter-spacing: .28em;
+  text-transform: uppercase; color: rgba(212,175,55,.55);
+  animation: bflyCta 2.5s ease-in-out infinite alternate;
+}
+@keyframes bflyCta { 0%{opacity:.4} 100%{opacity: 1} }
+
+/* floating symbols */
+.bfly-floats { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.bfly-ft {
+  position: absolute; color: rgba(212,175,55,.3);
+  animation: bflyFloatUp linear infinite;
+}
+.bfly-ft.f1{left:10%;bottom:-20px;font-size:1.3rem;animation-duration:7s;animation-delay:0s;}
+.bfly-ft.f2{left:75%;bottom:-20px;font-size:1rem;animation-duration:9s;animation-delay:1.5s;}
+.bfly-ft.f3{left:33%;bottom:-20px;font-size:.9rem;color:rgba(192,132,252,.3);animation-duration:8s;animation-delay:3s;}
+.bfly-ft.f4{left:58%;bottom:-20px;font-size:1.2rem;animation-duration:10s;animation-delay:2s;}
+.bfly-ft.f5{left:88%;bottom:-20px;font-size:.8rem;color:rgba(255,255,255,.2);animation-duration:6.5s;animation-delay:4s;}
+@keyframes bflyFloatUp {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: .5; }
+  100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+}
+
+/* message stage */
+#bfly-stage {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 202; pointer-events: none;
+  width: min(92vw, 420px);
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; padding: 10px 16px;
+}
+.bfly-msg-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  opacity: 0; transform: translateY(12px);
+  transition: opacity .8s ease, transform .8s cubic-bezier(.16,1,.3,1);
+}
+.bfly-msg-header.show { opacity: 1; transform: translateY(0); }
+.bfly-badge-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .58rem; font-weight: 600;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: rgba(212,175,55,.85);
+  text-shadow: 0 0 10px rgba(212,175,55,.6);
+}
+.bfly-badge-icon { font-size: .9rem; animation: bflyHeart 1.8s ease-in-out infinite alternate; }
+
+.bfly-title-group {
+  margin-bottom: 10px; opacity: 0; transform: scale(.92);
+  transition: opacity 1s ease, transform 1s cubic-bezier(.16,1,.3,1);
+}
+.bfly-title-group.show { opacity: 1; transform: scale(1); }
+.bfly-title-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 1.2rem;
+  letter-spacing: .14em; color: rgba(245,235,224,.85);
+  text-shadow: 0 0 14px rgba(255,255,255,.4); margin-bottom: 4px;
+}
+.bfly-title-main {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.bfly-cursive {
+  font-family: 'Alex Brush', cursive;
+  font-size: 4rem; line-height: 1.1;
+  background: linear-gradient(135deg, #f5ebe0 0%, #d4af37 38%, #c0566e 70%, #a855f7 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 22px rgba(212,175,55,.75));
+}
+.bfly-icon-float {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 0 12px rgba(212,175,55,.8));
+  animation: iconFloat 2.5s ease-in-out infinite alternate;
+}
+@keyframes iconFloat {
+  0%   { transform: translateY(0) rotate(-6deg); }
+  100% { transform: translateY(-8px) rotate(8deg); }
+}
+
+.bfly-divider {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; margin-bottom: 14px; color: var(--go);
+  opacity: 0; transform: scaleX(.4);
+  transition: opacity .8s ease, transform .8s cubic-bezier(.16,1,.3,1);
+}
+.bfly-divider.show { opacity: 1; transform: scaleX(1); }
+.bfly-divider .bdiv-line {
+  width: 70px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,.9), transparent);
+}
+.bfly-divider .bdiv-star { font-size: .75rem; filter: drop-shadow(0 0 5px #d4af37); }
+
+.bfly-body { display: flex; flex-direction: column; gap: 9px; margin-bottom: 14px; }
+.bfly-line {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem; line-height: 1.65; color: rgba(245,235,224,.92);
+  text-shadow: 0 2px 14px rgba(0,0,0,.9), 0 0 8px rgba(255,255,255,.1);
+  opacity: 0; transform: translateY(12px);
+  transition: opacity .9s ease, transform .9s cubic-bezier(.16,1,.3,1);
+}
+.bfly-line.show { opacity: .95; transform: translateY(0); }
+.bfly-accent {
+  font-style: italic; font-size: 1.05rem !important;
+  color: #d4af37 !important;
+  text-shadow: 0 0 14px rgba(212,175,55,.5), 0 2px 14px rgba(0,0,0,.9) !important;
+  margin-top: 4px;
+}
+
+.bfly-footer {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 1s ease, transform 1s cubic-bezier(.16,1,.3,1);
+}
+.bfly-footer.show { opacity: 1; transform: translateY(0); }
+.bfly-sig {
+  font-family: 'Alex Brush', cursive;
+  font-size: 2rem; color: rgba(212,175,55,.9);
+  text-shadow: 0 0 16px rgba(212,175,55,.7);
+}
+
+/* skip button */
+#bfly-skip {
+  position: fixed; bottom: 1.8rem; right: 1.2rem; z-index: 210;
+  background: rgba(14,8,22,.75); border: 1px solid rgba(212,175,55,.35);
+  border-radius: 50px; padding: .45rem 1rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .55rem; letter-spacing: .14em;
+  color: rgba(212,175,55,.65); cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: opacity .3s, background .2s;
+  opacity: 0; pointer-events: none;
+}
+#bfly-skip.visible { opacity: 1; pointer-events: all; }
+#bfly-skip:hover { background: rgba(14,8,22,.95); color: var(--go); }
+
+@media (max-width: 430px) {
+  .bfly-whisper { font-size: 1.8rem; }
+  .bfly-cursive { font-size: 3.2rem; }
+  .bfly-title-sub { font-size: 1rem; }
+  .bfly-line { font-size: .9rem; }
+}
 </style>
 </head>
 <body>
@@ -313,6 +550,64 @@ section { position:relative; overflow:hidden; }
 
 <!-- Back to top -->
 <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Volver arriba">↑</button>
+
+<!-- ══ BUTTERFLY INTRO ══ -->
+<div id="bfly-intro">
+  <div class="bfly-nebula"></div>
+  <div class="bfly-beam"></div>
+  <div class="bfly-content">
+    <div class="bfly-emoji">🦋</div>
+    <div class="bfly-whisper">Tengo algo que contarte...</div>
+    <div class="bfly-tap-ring">
+      <div class="bfly-ring"></div>
+      <div class="bfly-ring r2"></div>
+      <span class="bfly-tap-heart">💍</span>
+    </div>
+    <div class="bfly-cta">toca para abrir tu corazón</div>
+  </div>
+  <div class="bfly-floats">
+    <span class="bfly-ft f1">♡</span>
+    <span class="bfly-ft f2">♡</span>
+    <span class="bfly-ft f3">✦</span>
+    <span class="bfly-ft f4">🌹</span>
+    <span class="bfly-ft f5">✦</span>
+  </div>
+</div>
+
+<canvas id="bfly-canvas"></canvas>
+
+<!-- Message stage shown during butterfly animation -->
+<div id="bfly-stage">
+  <div class="bfly-msg-header" id="bms-header">
+    <span class="bfly-badge-icon">💒</span>
+    <span class="bfly-badge-text">PARA LOS SERES QUE AMAMOS</span>
+    <span class="bfly-badge-icon">💒</span>
+  </div>
+  <div class="bfly-title-group" id="bms-title">
+    <div class="bfly-title-sub">hoy dos almas se unen</div>
+    <div class="bfly-title-main">
+      <span class="bfly-cursive">Para Siempre</span>
+      <span class="bfly-icon-float">🌹</span>
+    </div>
+  </div>
+  <div class="bfly-divider" id="bms-div">
+    <span class="bdiv-star">✦</span>
+    <span class="bdiv-line"></span>
+    <span class="bdiv-star">✦</span>
+  </div>
+  <div class="bfly-body">
+    <p class="bfly-line" id="bms-a">En un mundo de millones de almas,</p>
+    <p class="bfly-line" id="bms-b">nuestros corazones se eligieron — y se volverían a elegir, en cada vida, sin dudarlo.</p>
+    <p class="bfly-line" id="bms-c">Eres mi lugar más cálido, mi pensamiento de madrugada y la razón por la que creo en el para siempre.</p>
+    <p class="bfly-line bfly-accent" id="bms-d">Hoy no solo nos casamos — hoy llegamos a casa. 💒🌹</p>
+  </div>
+  <div class="bfly-footer" id="bms-footer">
+    <span class="bfly-sig">Isabella &amp; Mateo</span>
+    <span class="bfly-badge-icon">✨</span>
+  </div>
+</div>
+
+<button id="bfly-skip" onclick="skipBflyAnim()">SALTAR →</button>
 
 <div id="app">
 
@@ -533,9 +828,218 @@ section { position:relative; overflow:hidden; }
       <p class="pf" style="font-size:1.05rem;color:var(--go);margin-bottom:.35rem;">CAPILLA &amp; SALÓN DE EVENTOS</p>
       <p class="cg" style="color:rgba(245,235,224,.6);font-size:.95rem;line-height:1.5;">Avenida del Amor 456<br/>Bogotá, Colombia</p>
     </div>
-    <div style="border-radius:14px;overflow:hidden;border:1px solid rgba(212,175,55,.2);margin-bottom:.9rem;">
-      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127292!2d-74.0721!3d4.7110!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9bfd2da6ffff%3A0x239d635520a33914!2sBogot%C3%A1!5e0!3m2!1ses!2sco!4v1699000000000"
-        width="100%" height="200" style="border:0;display:block;filter:grayscale(.3) brightness(.8);" allowfullscreen loading="lazy"></iframe>
+    <!-- SVG Mapa animado -->
+    <div style="border-radius:14px;overflow:hidden;border:1px solid rgba(212,175,55,.25);margin-bottom:.9rem;background:linear-gradient(145deg,#100820,#1a0f2e);position:relative;">
+      <svg viewBox="0 0 380 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+        <defs>
+          <!-- Gradientes de fondo -->
+          <radialGradient id="bgGrad" cx="50%" cy="50%" r="60%">
+            <stop offset="0%"   stop-color="#1e1040"/>
+            <stop offset="100%" stop-color="#0a0516"/>
+          </radialGradient>
+          <!-- Brillo dorado en el pin -->
+          <radialGradient id="pinGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#d4af37" stop-opacity=".7"/>
+            <stop offset="100%" stop-color="#d4af37" stop-opacity="0"/>
+          </radialGradient>
+          <!-- Brillo rojo rosa -->
+          <radialGradient id="destGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#c0566e" stop-opacity=".5"/>
+            <stop offset="100%" stop-color="#c0566e" stop-opacity="0"/>
+          </radialGradient>
+          <!-- Línea de ruta: gradiente dorado -->
+          <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#d4af37" stop-opacity="0"/>
+            <stop offset="40%"  stop-color="#d4af37" stop-opacity=".8"/>
+            <stop offset="100%" stop-color="#c0566e" stop-opacity=".9"/>
+          </linearGradient>
+          <!-- Clip path -->
+          <clipPath id="mapClip">
+            <rect width="380" height="220" rx="14"/>
+          </clipPath>
+          <!-- Filtros de blur para glow -->
+          <filter id="glow1" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+          </filter>
+          <filter id="glow2" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+          </filter>
+          <!-- Dash animado -->
+          <style>
+            @keyframes dashMove {
+              from { stroke-dashoffset: 320; }
+              to   { stroke-dashoffset: 0; }
+            }
+            @keyframes dashLoop {
+              0%   { stroke-dashoffset: 320; opacity: 0; }
+              5%   { opacity: 1; }
+              90%  { opacity: 1; }
+              100% { stroke-dashoffset: 0; opacity: 0; }
+            }
+            @keyframes pinBounce {
+              0%,100% { transform: translateY(0); }
+              40%     { transform: translateY(-7px); }
+              60%     { transform: translateY(-3px); }
+            }
+            @keyframes pingRing {
+              0%   { r: 6; opacity: .9; }
+              100% { r: 22; opacity: 0; }
+            }
+            @keyframes pingRing2 {
+              0%   { r: 4; opacity: .7; }
+              100% { r: 18; opacity: 0; }
+            }
+            @keyframes dotPulse {
+              0%,100% { opacity: .3; r: 2; }
+              50%     { opacity: 1;  r: 3.5; }
+            }
+            @keyframes carMove {
+              0%   { offset-distance: 0%; opacity: 0; }
+              4%   { opacity: 1; }
+              92%  { opacity: 1; }
+              100% { offset-distance: 100%; opacity: 0; }
+            }
+            @keyframes glowPulse {
+              0%,100% { opacity: .15; }
+              50%     { opacity: .4;  }
+            }
+            @keyframes gridFade {
+              0%,100% { opacity: .04; }
+              50%     { opacity: .09; }
+            }
+            #pin-group { animation: pinBounce 2.4s ease-in-out infinite; transform-origin: 226px 98px; transform-box: fill-box; }
+          </style>
+        </defs>
+
+        <g clip-path="url(#mapClip)">
+
+          <!-- Fondo -->
+          <rect width="380" height="220" fill="url(#bgGrad)"/>
+
+          <!-- Grid de calles (fondo) -->
+          <g stroke="rgba(212,175,55,.06)" stroke-width=".6" style="animation:gridFade 4s ease-in-out infinite;">
+            <line x1="0"   y1="44"  x2="380" y2="44"/>
+            <line x1="0"   y1="88"  x2="380" y2="88"/>
+            <line x1="0"   y1="132" x2="380" y2="132"/>
+            <line x1="0"   y1="176" x2="380" y2="176"/>
+            <line x1="60"  y1="0"   x2="60"  y2="220"/>
+            <line x1="120" y1="0"   x2="120" y2="220"/>
+            <line x1="180" y1="0"   x2="180" y2="220"/>
+            <line x1="240" y1="0"   x2="240" y2="220"/>
+            <line x1="300" y1="0"   x2="300" y2="220"/>
+          </g>
+
+          <!-- Bloques de ciudad (manzanas) -->
+          <g fill="rgba(212,175,55,.05)" stroke="rgba(212,175,55,.08)" stroke-width=".5">
+            <rect x="68"  y="52"  width="44" height="28" rx="3"/>
+            <rect x="128" y="52"  width="44" height="28" rx="3"/>
+            <rect x="68"  y="96"  width="44" height="28" rx="3"/>
+            <rect x="128" y="96"  width="44" height="28" rx="3"/>
+            <rect x="248" y="52"  width="44" height="28" rx="3"/>
+            <rect x="308" y="52"  width="44" height="28" rx="3"/>
+            <rect x="248" y="96"  width="44" height="28" rx="3"/>
+            <rect x="308" y="96"  width="44" height="28" rx="3"/>
+            <rect x="68"  y="140" width="44" height="28" rx="3"/>
+            <rect x="128" y="140" width="44" height="28" rx="3"/>
+            <rect x="248" y="140" width="44" height="28" rx="3"/>
+            <rect x="308" y="140" width="44" height="28" rx="3"/>
+          </g>
+
+          <!-- Avenidas principales -->
+          <line x1="0" y1="110" x2="380" y2="110" stroke="rgba(255,255,255,.07)" stroke-width="3"/>
+          <line x1="190" y1="0" x2="190" y2="220" stroke="rgba(255,255,255,.07)" stroke-width="3"/>
+          <line x1="0" y1="66" x2="380" y2="66" stroke="rgba(255,255,255,.04)" stroke-width="1.5"/>
+          <line x1="0" y1="154" x2="380" y2="154" stroke="rgba(255,255,255,.04)" stroke-width="1.5"/>
+
+          <!-- Parque (zona verde tenue) -->
+          <ellipse cx="84" cy="168" rx="28" ry="18" fill="rgba(60,120,60,.12)" stroke="rgba(80,160,80,.15)" stroke-width=".8"/>
+          <text x="84" y="172" text-anchor="middle" font-size="8" fill="rgba(100,200,100,.3)">🌳</text>
+
+          <!-- Río / zona azul decorativa -->
+          <path d="M0 190 Q95 178 190 188 Q285 198 380 182" stroke="rgba(80,140,200,.18)" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+          <!-- Ruta desde origen hasta destino -->
+          <path id="route-path"
+            d="M 50 168 L 50 110 L 190 110 L 190 88 L 226 88"
+            stroke="url(#routeGrad)" stroke-width="2.5" fill="none"
+            stroke-linecap="round" stroke-linejoin="round"
+            stroke-dasharray="320" stroke-dashoffset="320">
+            <animate attributeName="stroke-dashoffset"
+              from="320" to="0"
+              dur="2.6s" begin="0.5s" fill="freeze" calcMode="spline"
+              keySplines="0.4 0 0.2 1"/>
+          </path>
+          <!-- Ruta glow -->
+          <path d="M 50 168 L 50 110 L 190 110 L 190 88 L 226 88"
+            stroke="rgba(212,175,55,.25)" stroke-width="6" fill="none"
+            stroke-linecap="round" stroke-linejoin="round"
+            filter="url(#glow1)"
+            stroke-dasharray="320" stroke-dashoffset="320">
+            <animate attributeName="stroke-dashoffset"
+              from="320" to="0"
+              dur="2.6s" begin="0.5s" fill="freeze"/>
+          </path>
+
+          <!-- Carro animado sobre la ruta -->
+          <g style="offset-path:path('M 50 168 L 50 110 L 190 110 L 190 88 L 226 88');animation:carMove 3.2s ease-in-out 0.5s infinite;">
+            <circle r="5" fill="rgba(212,175,55,.9)" filter="url(#glow1)"/>
+            <circle r="3" fill="#fff"/>
+          </g>
+
+          <!-- Punto de origen -->
+          <circle cx="50" cy="168" r="18" fill="url(#pinGlow)" style="animation:glowPulse 2s ease-in-out infinite;"/>
+          <circle cx="50" cy="168" r="6" fill="rgba(212,175,55,.3)" stroke="rgba(212,175,55,.6)" stroke-width="1.5"/>
+          <circle cx="50" cy="168" r="3" fill="#d4af37"/>
+          <text x="50" y="190" text-anchor="middle" font-size="7" fill="rgba(212,175,55,.55)" font-family="Montserrat,sans-serif" letter-spacing=".5">TÚ ESTÁS AQUÍ</text>
+
+          <!-- Glow del destino -->
+          <circle cx="226" cy="88" r="32" fill="url(#destGlow)" style="animation:glowPulse 2s ease-in-out infinite .4s;"/>
+
+          <!-- Rings de ping del destino -->
+          <circle cx="226" cy="88" fill="none" stroke="#c0566e" stroke-width="1.2" opacity=".8">
+            <animate attributeName="r" from="6" to="24" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" from=".8" to="0" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="226" cy="88" fill="none" stroke="#d4af37" stroke-width="1" opacity=".6">
+            <animate attributeName="r" from="4" to="18" dur="2s" begin="0.7s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" from=".6" to="0" dur="2s" begin="0.7s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Pin del destino (animado con bounce) -->
+          <g id="pin-group">
+            <!-- Sombra del pin -->
+            <ellipse cx="226" cy="100" rx="8" ry="3" fill="rgba(0,0,0,.4)"/>
+            <!-- Cuerpo del pin -->
+            <path d="M226 58 C215 58 208 66 208 76 C208 90 226 102 226 102 C226 102 244 90 244 76 C244 66 237 58 226 58Z"
+              fill="#c0566e" stroke="#d4af37" stroke-width="1.5"/>
+            <!-- Círculo interior -->
+            <circle cx="226" cy="76" r="7" fill="rgba(255,255,255,.25)"/>
+            <!-- Icono 💒 en el pin -->
+            <text x="226" y="80" text-anchor="middle" font-size="9">💒</text>
+          </g>
+
+          <!-- Label del destino -->
+          <rect x="158" y="104" width="136" height="22" rx="11" fill="rgba(14,8,22,.85)" stroke="rgba(212,175,55,.35)" stroke-width="1"/>
+          <text x="226" y="119" text-anchor="middle" font-size="7.5" fill="#d4af37" font-family="Montserrat,sans-serif" font-weight="600" letter-spacing=".8">CAPILLA &amp; SALÓN</text>
+
+          <!-- Puntos de interés secundarios -->
+          <g fill="rgba(180,160,220,.5)">
+            <circle cx="120" cy="66" r="2.5"><animate attributeName="opacity" values=".3;1;.3" dur="3s" begin="0s" repeatCount="indefinite"/></circle>
+            <circle cx="300" cy="66" r="2.5"><animate attributeName="opacity" values=".3;1;.3" dur="3s" begin=".8s" repeatCount="indefinite"/></circle>
+            <circle cx="120" cy="154" r="2.5"><animate attributeName="opacity" values=".3;1;.3" dur="3s" begin="1.6s" repeatCount="indefinite"/></circle>
+            <circle cx="300" cy="154" r="2.5"><animate attributeName="opacity" values=".3;1;.3" dur="3s" begin="2.4s" repeatCount="indefinite"/></circle>
+          </g>
+
+          <!-- Borde exterior con brillo dorado -->
+          <rect x="0" y="0" width="380" height="220" rx="14"
+            fill="none" stroke="rgba(212,175,55,.22)" stroke-width="1.5"/>
+
+          <!-- Título superior -->
+          <rect x="8" y="8" width="112" height="18" rx="9" fill="rgba(14,8,22,.8)" stroke="rgba(212,175,55,.3)" stroke-width=".8"/>
+          <text x="64" y="20" text-anchor="middle" font-size="7" fill="rgba(212,175,55,.85)" font-family="Montserrat,sans-serif" letter-spacing=".9">📍 BOGOTÁ · COLOMBIA</text>
+
+        </g>
+      </svg>
     </div>
     <a href="https://maps.google.com/?q=Bogota+Colombia" target="_blank" class="btn-outline">
       🗺️ CÓMO LLEGAR
@@ -629,10 +1133,13 @@ section { position:relative; overflow:hidden; }
       <div class="gl"></div><span style="color:var(--go);">💍</span><div class="gr"></div>
     </div>
 
-    <p class="mn" style="font-size:.48rem;color:rgba(255,255,255,.15);letter-spacing:.07em;line-height:1.9;max-width:300px;margin:0 auto;">
-      Esta plantilla digital es propiedad exclusiva de Gueka Ideas.<br/>
-      Uso permitido únicamente para fines personales. Queda prohibida la reproducción,<br/>
-      distribución, modificación o reventa sin autorización escrita.<br/><br/>
+    <!-- Logo Gueka Ideas -->
+    <div style="margin:0 auto 1.2rem;max-width:200px;">
+      <img src="https://hercules-cdn.com/file_Fxloap2ovHRNaSCoerUN36ID" alt="Gueka Ideas" style="width:100%;opacity:.75;filter:invert(1) brightness(.78) sepia(.15);"/>
+    </div>
+    <p class="mn" style="font-size:.58rem;color:rgba(255,255,255,.35);letter-spacing:.09em;line-height:2;max-width:300px;margin:0 auto;">
+      Esta tarjeta digital es propiedad exclusiva de Gueka Ideas.<br/>
+      Uso permitido únicamente para fines personales.<br/><br/>
       © 2026 GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS
     </p>
   </div>
@@ -995,6 +1502,275 @@ function openInvitation(){
 // ── Init ─────────────────────────────────────────────────────────────────────
 makeStars("splash-stars", 110);
 makePetals("petals");
+</script>
+
+<!-- ══ BUTTERFLY ANIMATION JS ══ -->
+<script>
+(function(){
+  const bflyIntro  = document.getElementById("bfly-intro");
+  const bflyCanvas = document.getElementById("bfly-canvas");
+  const bflySkip   = document.getElementById("bfly-skip");
+  const ctx2       = bflyCanvas.getContext("2d");
+
+  let BW, BH;
+  function bResize(){ BW = bflyCanvas.width = innerWidth; BH = bflyCanvas.height = innerHeight; }
+  addEventListener("resize", bResize);
+  bResize();
+
+  let bStarted = false, bT0 = 0, bStep = 0;
+
+  const BPAL = [
+    { p:"#d4af37", m:"#c9a030", d:"#1e1028", g:"rgba(212,175,55,.55)" },
+    { p:"#c0566e", m:"#a855f7", d:"#1f042e", g:"rgba(192,86,110,.55)" },
+    { p:"#f5ebe0", m:"#dfa070", d:"#2e1810", g:"rgba(245,235,224,.55)" },
+    { p:"#a855f7", m:"#ec4899", d:"#1e0533", g:"rgba(168,85,247,.55)" },
+    { p:"#e8d5f5", m:"#c0566e", d:"#1a0a22", g:"rgba(232,213,245,.55)" },
+  ];
+
+  function heartPt(t){ return { x: 16*Math.pow(Math.sin(t),3), y: -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t)) }; }
+  const heartSlots = [];
+  for(let i=0;i<18;i++){ const t=(i/18)*Math.PI*2; heartSlots.push(heartPt(t)); }
+
+  const bflies = [];
+  for(let i=0;i<18;i++){
+    const pal = BPAL[i%BPAL.length];
+    bflies.push({
+      id:i, x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+      sz: i<2 ? 24 : Math.random()*8+12,
+      vx:(Math.random()-.5)*3.4, vy:(Math.random()-.5)*3.4,
+      hd:Math.random()*6.28, fp:Math.random()*6.28, fs:Math.random()*.12+.17,
+      pal, oR:Math.random()*120+80, oA:Math.random()*6.28, oS:(Math.random()-.5)*.024,
+      hero: i<2
+    });
+  }
+
+  const MAX_P=90, parts=[], petals2=[], whispers=[];
+  const flies2 = Array.from({length:22},()=>({
+    x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+    s:Math.random()*1.5+.6, vx:(Math.random()-.5)*.22, vy:(Math.random()-.5)*.22,
+    a:Math.random()*.5+.28, ph:Math.random()*6.28,
+    c:Math.random()>.5?"#d4af37":"#c0566e"
+  }));
+
+  function addTrail(x,y,c){
+    if(parts.length>=MAX_P) return;
+    parts.push({x:x+(Math.random()-.5)*5,y:y+(Math.random()-.5)*5,vx:(Math.random()-.5)*.6,vy:(Math.random()-.5)*.6+.12,s:Math.random()*2+.8,l:1,dc:Math.random()*.024+.018,c,h:Math.random()>.85});
+  }
+  function burst2(x,y,n){
+    const room=MAX_P-parts.length;
+    for(let i=0;i<Math.min(n,room);i++){
+      const a=Math.random()*6.28,sp=Math.random()*4+1;
+      parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-.5,s:Math.random()*2.2+1,l:1,dc:Math.random()*.018+.01,c:Math.random()>.5?"#d4af37":"#c0566e",h:Math.random()>.7});
+    }
+  }
+
+  const wTxts = ["te amo","siempre","para siempre","💍","amor eterno","te quiero","mi amor","💒","hoy y siempre","juntos para siempre"];
+  function addWhisper(){
+    if(whispers.length>8) return;
+    whispers.push({x:Math.random()*BW*.7+BW*.15,y:BH+10,vy:-(Math.random()*.38+.22),vx:(Math.random()-.5)*.28,alpha:Math.random()*.28+.14,size:Math.random()*4+10,text:wTxts[Math.floor(Math.random()*wTxts.length)],col:Math.random()>.5?"rgba(212,175,55,":"rgba(192,86,110,",life:1,decay:Math.random()*.0018+.0009});
+  }
+  function addPetal2(){
+    if(petals2.length>14) return;
+    petals2.push({x:Math.random()*BW,y:-22,s:Math.random()*5+8,vx:(Math.random()-.5)*.55,vy:Math.random()*.5+.35,sw:Math.random()*.014+.006,swP:Math.random()*6.28,a:Math.random()*6.28,aS:(Math.random()-.5)*.013,fl:Math.random()*6.28,fS:Math.random()*.018+.007,c:Math.random()>.5?"#c0566e":"#7d2645"});
+  }
+
+  function drawHeart2(x,y,sz,col,al){
+    ctx2.save(); ctx2.globalAlpha=Math.max(0,al); ctx2.fillStyle=col;
+    ctx2.beginPath();
+    const t=sz*.3;
+    ctx2.moveTo(x,y+t);
+    ctx2.bezierCurveTo(x,y,x-sz/2,y,x-sz/2,y+t);
+    ctx2.bezierCurveTo(x-sz/2,y+(sz+t)/2,x,y+sz,x,y+sz);
+    ctx2.bezierCurveTo(x,y+sz,x+sz/2,y+(sz+t)/2,x+sz/2,y+t);
+    ctx2.bezierCurveTo(x+sz/2,y,x,y,x,y+t);
+    ctx2.fill(); ctx2.restore();
+  }
+
+  function drawPetal2(p){
+    ctx2.save(); ctx2.translate(p.x,p.y); ctx2.rotate(p.a); ctx2.scale(Math.cos(p.fl),1);
+    ctx2.globalAlpha=.75;
+    const g=ctx2.createRadialGradient(0,-p.s*.2,p.s*.1,0,0,p.s*.9);
+    g.addColorStop(0,"#f5d0d8"); g.addColorStop(.35,p.c); g.addColorStop(1,"#4c0519");
+    ctx2.fillStyle=g;
+    ctx2.beginPath(); ctx2.moveTo(0,-p.s*.9);
+    ctx2.bezierCurveTo(p.s*.75,-p.s*.8,p.s*.85,p.s*.35,0,p.s*.9);
+    ctx2.bezierCurveTo(-p.s*.85,p.s*.35,-p.s*.75,-p.s*.8,0,-p.s*.9);
+    ctx2.fill(); ctx2.restore();
+  }
+
+  function drawBfly2(b){
+    ctx2.save(); ctx2.translate(b.x,b.y); ctx2.rotate(b.hd+Math.PI/2);
+    const w=Math.cos(b.fp), s=b.sz;
+    ctx2.shadowColor=b.pal.g; ctx2.shadowBlur=7;
+    const gF=ctx2.createLinearGradient(0,0,-s*1.5,-s*.6);
+    gF.addColorStop(0,"#fff"); gF.addColorStop(.2,b.pal.p); gF.addColorStop(.7,b.pal.m); gF.addColorStop(1,b.pal.d);
+    const gH=ctx2.createLinearGradient(0,0,-s,s);
+    gH.addColorStop(0,b.pal.p); gH.addColorStop(.6,b.pal.m); gH.addColorStop(1,b.pal.d);
+    for(const sx of [1,-1]){
+      ctx2.save(); ctx2.scale(sx*w,1);
+      ctx2.beginPath(); ctx2.moveTo(0,0);
+      ctx2.bezierCurveTo(-s*.6,-s*.4,-s*1.4,-s*1.1,-s*1.6,-s*.6);
+      ctx2.bezierCurveTo(-s*1.7,0,-s*.9,s*.4,0,0);
+      ctx2.fillStyle=gF; ctx2.fill();
+      ctx2.strokeStyle="#0a0516"; ctx2.lineWidth=.7; ctx2.stroke();
+      ctx2.beginPath(); ctx2.moveTo(0,s*.1);
+      ctx2.bezierCurveTo(-s*.5,s*.2,-s*1.2,s*.6,-s,s*1.1);
+      ctx2.bezierCurveTo(-s*.6,s*1.3,-s*.2,s*.8,0,s*.3);
+      ctx2.fillStyle=gH; ctx2.fill(); ctx2.stroke();
+      ctx2.restore();
+    }
+    ctx2.shadowBlur=0;
+    ctx2.fillStyle="#0e0a14";
+    ctx2.beginPath(); ctx2.ellipse(0,0,s*.08,s*.36,0,0,6.28); ctx2.fill();
+    ctx2.strokeStyle=b.pal.p; ctx2.lineWidth=.85;
+    ctx2.beginPath();
+    ctx2.moveTo(-s*.04,-s*.32); ctx2.quadraticCurveTo(-s*.15,-s*.58,-s*.24,-s*.54);
+    ctx2.moveTo(s*.04,-s*.32);  ctx2.quadraticCurveTo(s*.15,-s*.58,s*.24,-s*.54);
+    ctx2.stroke(); ctx2.restore();
+  }
+
+  // refs
+  const bmsH=document.getElementById("bms-header"), bmsT=document.getElementById("bms-title"),
+        bmsD=document.getElementById("bms-div"),
+        bmsA=document.getElementById("bms-a"), bmsB=document.getElementById("bms-b"),
+        bmsC=document.getElementById("bms-c"), bmsD2=document.getElementById("bms-d"),
+        bmsF=document.getElementById("bms-footer");
+
+  let bPhase=0, bHeartStart=0;
+  const bflyHScale = ()=> Math.min(BW,BH)*.017;
+
+  function bLoop(now){
+    ctx2.clearRect(0,0,BW,BH);
+    const t=(now-bT0)/1000;
+    const cx=BW/2, cy=BH/2;
+
+    // ambient particles
+    for(const f of flies2){
+      f.ph+=.015; f.x+=f.vx+Math.sin(f.ph)*.18; f.y+=f.vy+Math.cos(f.ph)*.18;
+      if(f.x<0)f.x=BW; if(f.x>BW)f.x=0; if(f.y<0)f.y=BH; if(f.y>BH)f.y=0;
+      ctx2.save(); ctx2.globalAlpha=f.a*(Math.sin(f.ph)*.28+.72);
+      ctx2.fillStyle=f.c; ctx2.shadowColor=f.c; ctx2.shadowBlur=4;
+      ctx2.beginPath(); ctx2.arc(f.x,f.y,f.s,0,6.28); ctx2.fill(); ctx2.restore();
+    }
+
+    // whispers
+    if(t>3){
+      if(Math.random()>.97) addWhisper();
+      for(let i=whispers.length-1;i>=0;i--){
+        const w=whispers[i]; w.x+=w.vx; w.y+=w.vy; w.life-=w.decay;
+        if(w.life<=0||w.y<-30){whispers.splice(i,1);continue;}
+        ctx2.save(); ctx2.globalAlpha=w.alpha*w.life;
+        ctx2.font=`${w.size}px 'Alex Brush',cursive`; ctx2.fillStyle=w.col+(w.alpha*w.life).toFixed(2)+")";
+        ctx2.textAlign="center"; ctx2.fillText(w.text,w.x,w.y); ctx2.restore();
+      }
+    }
+
+    // reveal messages
+    if(t>2.4&&bStep===0){bmsH.classList.add("show");burst2(cx,cy-100,14);bStep=1;}
+    if(t>3.1&&bStep===1){bmsT.classList.add("show");burst2(cx,cy-50,24);bStep=2;}
+    if(t>3.9&&bStep===2){bmsD.classList.add("show");bmsA.classList.add("show");burst2(cx,cy,12);bStep=3;}
+    if(t>4.9&&bStep===3){bmsB.classList.add("show");burst2(cx,cy+15,12);bStep=4;}
+    if(t>6.0&&bStep===4){bmsC.classList.add("show");burst2(cx,cy+35,14);bStep=5;}
+    if(t>7.3&&bStep===5){bmsD2.classList.add("show");burst2(cx,cy+60,18);bStep=6;}
+    if(t>8.6&&bStep===6){bmsF.classList.add("show");burst2(cx,cy+100,22);bStep=7;}
+    if(t>10&&bStep===7){bflySkip.classList.add("visible");bStep=8;}
+
+    // phase management
+    if(t<2.4)       bPhase=0;
+    else if(t<13)   bPhase=1;
+    else { if(bPhase!==2){bPhase=2;bHeartStart=t;} }
+
+    for(const b of bflies){
+      b.fp+=b.fs;
+      if(bPhase===0){
+        b.x+=b.vx; b.y+=b.vy;
+        if(b.x<28)b.vx=Math.abs(b.vx); if(b.x>BW-28)b.vx=-Math.abs(b.vx);
+        if(b.y<28)b.vy=Math.abs(b.vy); if(b.y>BH-28)b.vy=-Math.abs(b.vy);
+        b.hd=Math.atan2(b.vy,b.vx);
+        if(Math.random()>.62)addTrail(b.x,b.y,b.pal.p);
+      } else if(bPhase===1){
+        if(b.hero){
+          const tx=b.id===0?cx-110:cx+110, ty=cy-120;
+          b.x+=(tx-b.x)*.04; b.y+=(ty-b.y)*.04;
+          b.hd+=(0-b.hd)*.06; b.fs=.062;
+        } else {
+          b.oA+=b.oS;
+          const tx=cx+Math.cos(b.oA)*(b.oR+30), ty=cy+Math.sin(b.oA)*(b.oR*.58+30);
+          b.x+=(tx-b.x)*.04; b.y+=(ty-b.y)*.04;
+          b.hd=Math.atan2(ty-b.y,tx-b.x);
+        }
+        if(Math.random()>.74)addTrail(b.x,b.y,b.pal.p);
+      } else {
+        const ht=t-bHeartStart, ease=Math.min(1,ht/3);
+        const slot=heartSlots[b.id%heartSlots.length];
+        const sc=bflyHScale();
+        const tx=cx+slot.x*sc, ty=cy-35+slot.y*sc;
+        b.x+=(tx-b.x)*ease*.06; b.y+=(ty-b.y)*ease*.06;
+        b.hd+=(0-b.hd)*.04; b.fs=.1+Math.sin(t*2)*.03;
+        if(Math.random()>.8)addTrail(b.x,b.y,b.pal.p);
+      }
+      drawBfly2(b);
+    }
+
+    // particles
+    for(let i=parts.length-1;i>=0;i--){
+      const p=parts[i]; p.x+=p.vx; p.y+=p.vy; p.l-=p.dc;
+      if(p.l<=0){parts.splice(i,1);continue;}
+      if(p.h) drawHeart2(p.x,p.y,p.s*p.l,p.c,p.l);
+      else { ctx2.save(); ctx2.globalAlpha=p.l; ctx2.fillStyle=p.c; ctx2.shadowColor=p.c; ctx2.shadowBlur=4; ctx2.beginPath(); ctx2.arc(p.x,p.y,p.s*p.l,0,6.28); ctx2.fill(); ctx2.restore(); }
+    }
+
+    // petals
+    if(t>5){
+      if(Math.random()>.93) addPetal2();
+      for(let i=petals2.length-1;i>=0;i--){
+        const p=petals2[i]; p.swP+=p.sw; p.a+=p.aS; p.fl+=p.fS;
+        p.x+=p.vx+Math.sin(p.swP)*.55; p.y+=p.vy;
+        if(p.y>BH+28){petals2.splice(i,1);continue;}
+        drawPetal2(p);
+      }
+    }
+
+    // auto-advance to splash after full animation
+    if(t>17) { skipBflyAnim(); return; }
+
+    requestAnimationFrame(bLoop);
+  }
+
+  // Start on tap
+  bflyIntro.addEventListener("click", ()=>{
+    if(bStarted) return;
+    bStarted=true;
+    bflyIntro.classList.add("hide");
+    bflyCanvas.classList.add("active");
+    bT0=performance.now();
+    requestAnimationFrame(bLoop);
+  });
+
+  // Tap on canvas: burst
+  bflyCanvas.addEventListener("pointerdown", e=>{
+    if(!bStarted) return;
+    burst2(e.clientX,e.clientY,22);
+    addPetal2(); addPetal2();
+  });
+
+  // Skip / finish
+  window.skipBflyAnim = function(){
+    bflyCanvas.style.transition="opacity .6s ease"; bflyCanvas.style.opacity="0";
+    document.getElementById("bfly-stage").style.transition="opacity .6s"; document.getElementById("bfly-stage").style.opacity="0";
+    bflySkip.style.opacity="0";
+    setTimeout(()=>{
+      bflyCanvas.remove();
+      document.getElementById("bfly-stage").remove();
+      bflySkip.remove();
+      // Now show the normal splash
+      document.getElementById("splash").style.display="flex";
+    },650);
+  };
+
+  // Initially hide the main splash until butterfly anim finishes
+  document.getElementById("splash").style.display="none";
+})();
 </script>
 </body>
 </html>
