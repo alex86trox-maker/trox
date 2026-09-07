@@ -92,12 +92,8 @@ body{font-family:'DM Sans',sans-serif;color:#2A1F16;overflow-x:hidden}
 /* Section label */
 .section-label{font-family:'DM Sans',sans-serif;font-size:.55rem;letter-spacing:.6em;font-weight:700;text-transform:uppercase}
 
-/* Gallery */
-.gal-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.gal-slide.enter-down{animation:slideDown .5s cubic-bezier(0.22,1,0.36,1) both}
-.gal-slide.enter-up{animation:slideUp .5s cubic-bezier(0.22,1,0.36,1) both}
-.gal-slide.exit-up{animation:slideOutUp .5s cubic-bezier(0.22,1,0.36,1) both}
-.gal-slide.exit-down{animation:slideOutDown .5s cubic-bezier(0.22,1,0.36,1) both}
+/* Gallery WebGL */
+#gal-canvas-host{position:absolute;inset:0;width:100%;height:100%}
 .gal-vdot{width:6px;height:6px;border-radius:1px;cursor:pointer;border:none;transition:all .3s;background:rgba(232,160,32,.2);padding:0;display:block;transform:rotate(45deg)}
 .gal-vdot.active{background:#E8A020;height:18px;border-radius:2px;box-shadow:0 0 8px rgba(232,160,32,.6)}
 .gal-thumb-v{border-radius:3px;overflow:hidden;flex-shrink:0;width:52px;height:64px;cursor:pointer;border:2px solid rgba(232,160,32,.2);opacity:.35;transition:all .25s;background-size:cover;background-position:center}
@@ -483,8 +479,9 @@ button{cursor:pointer}
     <div id="gal-tabs" style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px"></div>
     <div style="display:flex;gap:12px;align-items:stretch">
       <div id="gal-vdots" style="display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;padding:8px 0;flex-shrink:0;width:14px"></div>
+      <!-- Main viewport — WebGL ZoomBlur -->
       <div class="amber-card" id="gal-viewport" style="flex:1;position:relative;height:440px;overflow:hidden;cursor:grab;user-select:none;border-radius:4px">
-        <div id="gal-images" style="position:absolute;inset:0;overflow:hidden"></div>
+        <div id="gal-canvas-host" style="position:absolute;inset:0"></div>
         <div style="position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(to top,rgba(42,31,22,.85) 0%,rgba(42,31,22,.08) 45%,transparent 100%)"></div>
         <div id="gal-counter" style="position:absolute;top:12px;left:12px;z-index:10;border-radius:3px;padding:5px 14px;background:rgba(42,31,22,.75);border:1px solid rgba(232,160,32,.4);font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:700;color:#E8A020;letter-spacing:.12em;backdrop-filter:blur(8px)"></div>
         <div style="position:absolute;bottom:0;left:0;right:0;z-index:3;padding:1.5rem 1.25rem 1.1rem">
@@ -660,6 +657,7 @@ button{cursor:pointer}
 
 </div><!-- /app -->
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const EVENT_DATE = new Date('2026-06-14T18:00:00');
 
@@ -761,6 +759,7 @@ const GIFT_OPTIONS = [
 
 let currentSong=0,isPlaying=false,galTab=0,galIdx=0,galTimer=null,attendVal='';
 let galAnimating=false;
+let _galThree=null;
 
 function closeSplash(){
   document.getElementById('splash').classList.add('hidden');
@@ -795,36 +794,39 @@ function startCountdown(){
 function buildGallery(){
   const el=document.getElementById('gal-tabs');
   el.innerHTML=GAL_TABS.map((t,i)=>`<button class="gallery-tab ${i===0?'active':''}" onclick="switchGalTab(${i})">${t.label}</button>`).join('');
-  renderGalImages(null);initGalTouch();
+  initWebGLGallery();initGalTouch();
 }
-function renderGalImages(dir){
+function initWebGLGallery(){
+  if(_galThree)_galThree.destroy();
+  _galThree=WebGLZoomBlurGallery({
+    hostId:'gal-canvas-host',
+    images:GAL_TABS[galTab].images,
+    onSlideChange:(idx)=>{
+      galIdx=idx;
+      const imgs=GAL_TABS[galTab].images;
+      document.getElementById('gal-caption').textContent=imgs[idx].caption;
+      document.getElementById('gal-counter').textContent=`${idx+1} / ${imgs.length}`;
+      document.getElementById('gal-index-label').textContent=`FOTO ${idx+1} DE ${imgs.length}`;
+      const vd=document.getElementById('gal-vdots');
+      vd.innerHTML=imgs.map((_,i)=>`<button class="gal-vdot ${i===idx?'active':''}" onclick="goGal(${i})"></button>`).join('');
+      const th=document.getElementById('gal-thumbs');
+      th.innerHTML=imgs.map((img,i)=>`<div class="gal-thumb-v ${i===idx?'active':''}" onclick="goGal(${i})" style="background-image:url(${img.src})"></div>`).join('');
+    }
+  });
+  _galThree.start();
   const imgs=GAL_TABS[galTab].images;
-  const c=document.getElementById('gal-images');
-  if(dir===null){
-    c.innerHTML=`<img class="gal-slide" src="${imgs[galIdx].src}" alt="${imgs[galIdx].caption}"/>`;
-  } else {
-    const enter=dir==='next'?'enter-up':'enter-down';
-    const exit=dir==='next'?'exit-up':'exit-down';
-    const old=c.querySelector('img');
-    if(old)old.classList.add(exit);
-    const img=document.createElement('img');
-    img.className=`gal-slide ${enter}`;img.src=imgs[galIdx].src;img.alt=imgs[galIdx].caption;
-    c.appendChild(img);
-    setTimeout(()=>{if(old)old.remove();galAnimating=false;},520);
-  }
-  document.getElementById('gal-caption').textContent=imgs[galIdx].caption;
-  document.getElementById('gal-counter').textContent=`${galIdx+1} / ${imgs.length}`;
-  document.getElementById('gal-index-label').textContent=`FOTO ${galIdx+1} DE ${imgs.length}`;
+  document.getElementById('gal-caption').textContent=imgs[0].caption;
+  document.getElementById('gal-counter').textContent=`1 / ${imgs.length}`;
+  document.getElementById('gal-index-label').textContent=`FOTO 1 DE ${imgs.length}`;
   const vd=document.getElementById('gal-vdots');
-  vd.innerHTML=imgs.map((_,i)=>`<button class="gal-vdot ${i===galIdx?'active':''}" onclick="goGal(${i})"></button>`).join('');
+  vd.innerHTML=imgs.map((_,i)=>`<button class="gal-vdot ${i===0?'active':''}" onclick="goGal(${i})"></button>`).join('');
   const th=document.getElementById('gal-thumbs');
-  th.innerHTML=imgs.map((img,i)=>`<div class="gal-thumb-v ${i===galIdx?'active':''}" onclick="goGal(${i})" style="background-image:url(${img.src})"></div>`).join('');
-  clearInterval(galTimer);galTimer=setInterval(()=>galNext(),4500);
+  th.innerHTML=imgs.map((img,i)=>`<div class="gal-thumb-v ${i===0?'active':''}" onclick="goGal(${i})" style="background-image:url(${img.src})"></div>`).join('');
 }
-function switchGalTab(i){galTab=i;galIdx=0;galAnimating=false;document.querySelectorAll('.gallery-tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));renderGalImages(null);}
-function goGal(i){if(galAnimating)return;const dir=i>galIdx?'next':'prev';galIdx=i;galAnimating=true;renderGalImages(dir);}
-function galNext(){if(galAnimating)return;const l=GAL_TABS[galTab].images.length;galIdx=(galIdx+1)%l;galAnimating=true;renderGalImages('next');}
-function galPrev(){if(galAnimating)return;const l=GAL_TABS[galTab].images.length;galIdx=(galIdx-1+l)%l;galAnimating=true;renderGalImages('prev');}
+function switchGalTab(i){galTab=i;galIdx=0;galAnimating=false;document.querySelectorAll('.gallery-tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));initWebGLGallery();}
+function goGal(i){if(_galThree)_galThree.goTo(i);}
+function galNext(){if(_galThree)_galThree.next();}
+function galPrev(){if(_galThree)_galThree.prev();}
 function initGalTouch(){
   const vp=document.getElementById('gal-viewport');
   let startY=0,drag=false;
@@ -832,6 +834,63 @@ function initGalTouch(){
   vp.addEventListener('touchend',e=>{if(!drag)return;const dy=e.changedTouches[0].clientY-startY;if(Math.abs(dy)>40)dy<0?galNext():galPrev();drag=false;});
   vp.addEventListener('mousedown',e=>{startY=e.clientY;drag=true;vp.style.cursor='grabbing';});
   window.addEventListener('mouseup',e=>{if(!drag)return;const dy=e.clientY-startY;if(Math.abs(dy)>40)dy<0?galNext():galPrev();drag=false;vp.style.cursor='grab';});
+}
+
+function WebGLZoomBlurGallery({hostId,images,onSlideChange}){
+  let renderer,scene,camera,mat1,mat2,plane1,plane2;
+  let progress=0,mouseX=0.5,mouseY=0.5;
+  let cx1=0.5,cy1=0.5,cx2=0.5,cy2=0.5;
+  let textures=[],rafId=null,destroyed=false,currentIdx=0,autoTimer=null;
+  const host=document.getElementById(hostId);
+  const W=()=>host.offsetWidth,H=()=>host.offsetHeight;
+  const FRAG=`uniform sampler2D map;uniform vec2 center;uniform float strength;uniform vec2 uvOffset;uniform vec2 uvScale;varying vec2 vUv;float rand(vec3 s,float seed){return fract(sin(dot(gl_FragCoord.xyz+seed,s))*43758.5453+seed);}void main(){vec2 tUv=vUv*uvScale+uvOffset;if(abs(strength)>0.001){vec4 col=vec4(0.);float total=0.;vec2 toC=center*uvScale+uvOffset-tUv;float off=rand(vec3(12.9898,78.233,151.7182),0.);for(float t=0.;t<=20.;t++){float pct=(t+off)/20.;float w=2.*(pct-pct*pct);vec4 tx=texture2D(map,tUv+toC*pct*strength);tx.rgb*=tx.a;col+=tx*w;total+=w;}gl_FragColor=col/total;gl_FragColor.rgb/=gl_FragColor.a+0.00001;gl_FragColor.a=1.-abs(strength);}else{gl_FragColor=texture2D(map,tUv);}}`;
+  const VERT=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  function uvs(tex){const iR=tex.image.width/tex.image.height,vR=W()/H();let ox=0,oy=0,sx=1,sy=1;if(iR>vR){sx=vR/iR;ox=(1-sx)/2;}else{sy=iR/vR;oy=(1-sy)/2;}return{ox,oy,sx,sy};}
+  function makeMat(tex){const u=uvs(tex);return new THREE.ShaderMaterial({transparent:true,uniforms:{map:{value:tex},center:{value:new THREE.Vector2(.5,.5)},strength:{value:0},uvOffset:{value:new THREE.Vector2(u.ox,u.oy)},uvScale:{value:new THREE.Vector2(u.sx,u.sy)}},vertexShader:VERT,fragmentShader:FRAG});}
+  function makePlane(m){return new THREE.Mesh(new THREE.PlaneGeometry(2,2),m);}
+  function setP(p){const p01=((p%1)+1)%1;mat1.uniforms.strength.value=p01;mat2.uniforms.strength.value=-1+p01;}
+  function navigate(ni){
+    if(ni===currentIdx)return;
+    const N=textures.length;ni=((ni%N)+N)%N;const nx=(ni+1)%N;
+    mat1.uniforms.map.value=textures[ni];mat2.uniforms.map.value=textures[nx];
+    const u1=uvs(textures[ni]),u2=uvs(textures[nx]);
+    mat1.uniforms.uvOffset.value.set(u1.ox,u1.oy);mat1.uniforms.uvScale.value.set(u1.sx,u1.sy);
+    mat2.uniforms.uvOffset.value.set(u2.ox,u2.oy);mat2.uniforms.uvScale.value.set(u2.sx,u2.sy);
+    const t0=performance.now(),dur=900,dir=ni>currentIdx?1:-1,sp=progress%1;
+    function af(now){const t=Math.min((now-t0)/dur,1),e=t<.5?2*t*t:-1+(4-2*t)*t;progress=lerp(sp,sp+dir,e);setP(progress);if(t<1)requestAnimationFrame(af);else progress=Math.round(progress);}
+    requestAnimationFrame(af);
+    currentIdx=ni;onSlideChange&&onSlideChange(ni);
+    clearTimeout(autoTimer);autoTimer=setTimeout(()=>{if(!destroyed)navigate((currentIdx+1)%textures.length);},4500);
+  }
+  function tick(){if(destroyed)return;rafId=requestAnimationFrame(tick);cx1=lerp(cx1,mouseX,.07);cy1=lerp(cy1,mouseY,.07);cx2=lerp(cx2,mouseX,.07);cy2=lerp(cy2,mouseY,.07);mat1.uniforms.center.value.set(cx1,cy1);mat2.uniforms.center.value.set(cx2,cy2);renderer.render(scene,camera);}
+  function onMouse(e){const r=host.getBoundingClientRect();mouseX=(e.clientX-r.left)/r.width;mouseY=1-(e.clientY-r.top)/r.height;}
+  function onResize(){if(!renderer||destroyed)return;renderer.setSize(W(),H());[mat1,mat2].forEach(m=>{if(!m)return;const u=uvs(m.uniforms.map.value);m.uniforms.uvOffset.value.set(u.ox,u.oy);m.uniforms.uvScale.value.set(u.sx,u.sy);});}
+  return{
+    start(){
+      renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+      renderer.setPixelRatio(window.devicePixelRatio);renderer.setSize(W(),H());
+      host.appendChild(renderer.domElement);
+      camera=new THREE.OrthographicCamera(-1,1,1,-1,.1,10);camera.position.z=1;
+      scene=new THREE.Scene();
+      Promise.all(images.map(img=>new Promise(res=>{new THREE.TextureLoader().load(img.src,tex=>{img._tex=tex;res(tex);});}))).then(txs=>{
+        textures=txs;
+        mat1=makeMat(textures[0]);mat2=makeMat(textures[1]||textures[0]);
+        plane1=makePlane(mat1);plane2=makePlane(mat2);
+        scene.add(plane2,plane1);setP(0);
+        mat1.uniforms.strength.value=-0.9;
+        const t0=performance.now();
+        function ea(now){const tt=Math.min((now-t0)/2000,1),e=tt<.5?2*tt*tt:-1+(4-2*tt)*tt;mat1.uniforms.strength.value=lerp(-.9,0,e);if(tt<1)requestAnimationFrame(ea);}
+        requestAnimationFrame(ea);tick();
+        clearTimeout(autoTimer);autoTimer=setTimeout(()=>{if(!destroyed)navigate(1%textures.length);},4500);
+        host.addEventListener('mousemove',onMouse);window.addEventListener('resize',onResize);
+      });
+    },
+    next(){navigate((currentIdx+1)%images.length);},
+    prev(){navigate((currentIdx-1+images.length)%images.length);},
+    goTo(i){navigate(i);},
+    destroy(){destroyed=true;cancelAnimationFrame(rafId);clearTimeout(autoTimer);host.removeEventListener('mousemove',onMouse);window.removeEventListener('resize',onResize);if(renderer){renderer.dispose();host.innerHTML='';}}
+  };
 }
 
 function buildItinerary(){
