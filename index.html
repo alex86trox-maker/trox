@@ -423,37 +423,85 @@ input,textarea,select{font-family:inherit}
 }
 
 /* ══ LOVE STORY ════════════════════════════════════ */
-.story-wrap{max-width:380px;margin:0 auto;position:relative}
+.story-wrap{max-width:420px;margin:0 auto;position:relative;display:flex;flex-direction:column;gap:0}
+
+/* línea vertical izquierda */
 .story-line{
-  position:absolute;left:50%;top:0;bottom:0;width:1px;
-  background:repeating-linear-gradient(to bottom,rgba(201,149,108,.4) 0 5px,transparent 5px 11px);
-  transform:translateX(-50%);
+  position:absolute;left:28px;top:0;bottom:0;width:2px;
+  background:linear-gradient(to bottom,transparent,rgba(201,149,108,.5) 10%,rgba(201,149,108,.5) 90%,transparent);
 }
 .story-item{
-  display:flex;gap:0;padding-bottom:36px;align-items:flex-start;
+  display:flex;gap:0;padding-bottom:0;align-items:stretch;
+  position:relative;
 }
-.story-item:nth-child(even){flex-direction:row-reverse}
-.story-side{flex:1;padding:0 20px}
-.story-side.left{text-align:right}
-.story-side.right{text-align:left}
-.story-center{
-  flex-shrink:0;width:36px;height:36px;border-radius:50%;
-  background:linear-gradient(145deg,#7a4e28,#c9956c);
-  border:2px solid var(--card2);
+/* anula el nth-child reverse del diseño viejo */
+.story-item:nth-child(even){flex-direction:row}
+
+/* nodo de la línea */
+.story-node{
+  flex-shrink:0;width:58px;display:flex;flex-direction:column;
+  align-items:center;padding-top:22px;gap:0;position:relative;z-index:2;
+}
+.story-dot{
+  width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(145deg,#0e0c1e,#1a1530);
+  border:2px solid rgba(201,149,108,.5);
   display:flex;align-items:center;justify-content:center;
-  font-size:14px;z-index:2;position:relative;
-  box-shadow:0 0 18px rgba(201,149,108,.45);
+  font-size:18px;
+  box-shadow:0 0 20px rgba(201,149,108,.3),0 0 0 4px rgba(201,149,108,.06);
+  flex-shrink:0;
 }
+.story-connector{
+  flex:1;width:2px;background:linear-gradient(to bottom,rgba(201,149,108,.3),rgba(201,149,108,.08));
+  margin-top:4px;
+}
+.story-item:last-child .story-connector{display:none}
+
+/* card de contenido */
+.story-card{
+  flex:1;margin:12px 0 24px 0;
+  background:linear-gradient(140deg,rgba(16,13,32,.95),rgba(10,9,22,.98));
+  border:1px solid rgba(201,149,108,.2);
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,.6);
+  transition:border-color .3s,transform .3s;
+}
+.story-card:hover{border-color:rgba(201,149,108,.45);transform:translateX(3px)}
+
+/* banda dorada superior de la card */
+.story-card-accent{
+  height:3px;
+  background:linear-gradient(90deg,var(--gold-d),var(--gold),var(--gold2),var(--gold));
+  opacity:.7;
+}
+.story-card-body{padding:16px 20px 18px}
+
 .story-year{
   font-family:'Marcellus',serif;font-size:9px;
-  letter-spacing:.2em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:5px;display:block;
+  letter-spacing:.4em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:6px;display:block;
 }
 .story-event-title{
-  font-family:'Playfair Display',serif;font-size:17px;
-  color:var(--fg);margin-bottom:5px;
+  font-family:'Playfair Display',serif;font-size:20px;
+  color:var(--fg);margin-bottom:8px;font-weight:400;line-height:1.2;
 }
-.story-event-desc{font-size:13px;color:var(--fg3);font-style:italic;line-height:1.5}
+.story-event-desc{
+  font-size:14px;color:var(--fg2);font-style:italic;line-height:1.65;
+  border-left:2px solid rgba(201,149,108,.25);
+  padding-left:12px;
+}
+
+/* etiqueta lateral del año */
+.story-year-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(201,149,108,.1);border:1px solid rgba(201,149,108,.25);
+  border-radius:20px;padding:3px 10px;
+  font-family:'Marcellus',serif;font-size:9px;
+  letter-spacing:.3em;text-transform:uppercase;color:var(--gold);
+  margin-bottom:10px;
+}
+.story-year-badge::before{content:'✦';font-size:7px}
 
 /* ══ COUNTDOWN ══════════════════════════════════════ */
 .cd-wrap{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
@@ -618,6 +666,7 @@ input,textarea,select{font-family:inherit}
   position:relative;
 }
 .photo-item:hover .photo-bg{transform:scale(1.06)}
+.photo-item:hover img{transform:scale(1.06)}
 .photo-overlay{
   position:absolute;inset:0;
   background:linear-gradient(to top,rgba(5,6,13,.8) 0%,transparent 50%);
@@ -791,19 +840,6 @@ input,textarea,select{font-family:inherit}
 }
 .copy-btn:hover{background:rgba(201,149,108,.12)}
 
-/* ══ WATERMARK ═══════════════════════════════════════ */
-#watermark{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  z-index:4;pointer-events:none;width:100%;max-width:480px;
-  display:flex;justify-content:center;align-items:center;
-  padding:8px 0 6px;
-  background:linear-gradient(to top,rgba(5,6,13,.7) 60%,transparent);
-}
-#watermark img{
-  height:40px;width:auto;opacity:.5;
-  filter:brightness(5) saturate(0);
-}
-
 /* ══ FOOTER ══════════════════════════════════════════ */
 .footer{text-align:center;padding:50px 24px 70px;position:relative}
 .footer::before{
@@ -956,38 +992,15 @@ input,textarea,select{font-family:inherit}
   <section id="sec-portada" class="sec" data-nav="Inicio">
     <div class="divider thick glow"></div>
     <div class="portada-wrap" id="portada-img">
-      <div class="portada-sky"></div>
-      <!-- starfield -->
-      <svg class="portada-stars-svg" viewBox="0 0 480 640" preserveAspectRatio="xMidYMid slice">
-        <circle cx="60"  cy="40"  r="1"   fill="#fff" opacity=".8"/>
-        <circle cx="130" cy="25"  r="1.5" fill="#fff" opacity=".6"/>
-        <circle cx="220" cy="55"  r="1"   fill="#fff" opacity=".9"/>
-        <circle cx="300" cy="18"  r="1.2" fill="#fff" opacity=".5"/>
-        <circle cx="380" cy="60"  r="1"   fill="#fff" opacity=".7"/>
-        <circle cx="440" cy="32"  r="1.5" fill="#fff" opacity=".6"/>
-        <circle cx="90"  cy="90"  r="1"   fill="#fff" opacity=".4"/>
-        <circle cx="190" cy="115" r="1.2" fill="#fff" opacity=".7"/>
-        <circle cx="350" cy="95"  r="1"   fill="#fff" opacity=".5"/>
-        <circle cx="460" cy="110" r="1.5" fill="#fff" opacity=".8"/>
-        <circle cx="30"  cy="150" r="1"   fill="#fff" opacity=".6"/>
-        <circle cx="160" cy="160" r="1.2" fill="#fff" opacity=".4"/>
-        <circle cx="410" cy="145" r="1"   fill="#fff" opacity=".7"/>
-        <circle cx="240" cy="200" r="1.5" fill="#fff" opacity=".3"/>
-        <circle cx="330" cy="170" r="1"   fill="#fff" opacity=".6"/>
-        <!-- tiny diamond stars -->
-        <path d="M100 70 L103 77 L100 84 L97 77 Z" fill="rgba(201,149,108,.6)"/>
-        <path d="M260 45 L262 50 L260 55 L258 50 Z" fill="rgba(201,149,108,.4)"/>
-        <path d="M420 80 L422 86 L420 92 L418 86 Z" fill="rgba(201,149,108,.5)"/>
-      </svg>
+      <!-- Foto real de los novios como fondo -->
+      <img
+        src="https://images.unsplash.com/photo-1596457221755-b96bc3a6df18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NzIwMTN8MHwxfHNlYXJjaHwxfHx3ZWRkaW5nJTIwY291cGxlJTIwcm9tYW50aWMlMjBlbGVnYW50JTIwcG9ydHJhaXQlMjBwcm9mZXNzaW9uYWx8ZW58MHx8fHwxNzg4ODAzMjUxfDA&ixlib=rb-4.1.0&q=80&w=1080"
+        alt="Isabella & Mateo"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;z-index:1;"
+      />
       <div class="portada-glow" id="parallax-bg"></div>
-      <!-- decorative rings -->
-      <svg class="portada-rings" viewBox="0 0 240 240" fill="none">
-        <circle cx="90"  cy="120" r="72" stroke="#c9956c" stroke-width="1.5" fill="none"/>
-        <circle cx="150" cy="120" r="72" stroke="#c9956c" stroke-width="1.5" fill="none"/>
-        <circle cx="120" cy="120" r="108" stroke="rgba(201,149,108,.3)" stroke-width="1" fill="none"/>
-      </svg>
-      <div class="portada-overlay"></div>
-      <div class="portada-text">
+      <div class="portada-overlay" style="background:linear-gradient(to bottom,rgba(5,6,13,.25) 0%,rgba(5,6,13,.55) 55%,rgba(5,6,13,.98) 100%);z-index:2"></div>
+      <div class="portada-text" style="z-index:3">
         <p class="portada-label">Con todo nuestro amor, les invitamos a celebrar</p>
         <div class="portada-names">
           Isabella<span class="portada-amp">&amp;</span>Mateo
@@ -1032,51 +1045,86 @@ input,textarea,select{font-family:inherit}
       </div>
       <div class="story-wrap">
         <div class="story-line"></div>
+
+        <!-- 2019 -->
         <div class="story-item stagger">
-          <div class="story-side left">
-            <span class="story-year">2019</span>
-            <div class="story-event-title">El primer encuentro</div>
-            <div class="story-event-desc">Nos conocimos en una galería de arte. Una mirada bastó.</div>
+          <div class="story-node">
+            <div class="story-dot">☕</div>
+            <div class="story-connector"></div>
           </div>
-          <div class="story-center">☕</div>
-          <div class="story-side right"></div>
-        </div>
-        <div class="story-item stagger">
-          <div class="story-side left"></div>
-          <div class="story-center">🌊</div>
-          <div class="story-side right">
-            <span class="story-year">2020</span>
-            <div class="story-event-title">Primera escapada juntos</div>
-            <div class="story-event-desc">Carretera Austral. El cielo y el mar, solo nosotros.</div>
+          <div class="story-card">
+            <div class="story-card-accent"></div>
+            <div class="story-card-body">
+              <span class="story-year-badge">2019</span>
+              <div class="story-event-title">El primer encuentro</div>
+              <div class="story-event-desc">Nos conocimos en una galería de arte. Sus ojos entre los cuadros. Una mirada bastó para saberlo.</div>
+            </div>
           </div>
         </div>
+
+        <!-- 2020 -->
         <div class="story-item stagger">
-          <div class="story-side left">
-            <span class="story-year">2022</span>
-            <div class="story-event-title">Nos fuimos a vivir juntos</div>
-            <div class="story-event-desc">Un pequeño departamento lleno de grandes momentos.</div>
+          <div class="story-node">
+            <div class="story-dot">🌊</div>
+            <div class="story-connector"></div>
           </div>
-          <div class="story-center">🏡</div>
-          <div class="story-side right"></div>
-        </div>
-        <div class="story-item stagger">
-          <div class="story-side left"></div>
-          <div class="story-center">💍</div>
-          <div class="story-side right">
-            <span class="story-year">2025</span>
-            <div class="story-event-title">La propuesta</div>
-            <div class="story-event-desc">En París, bajo la lluvia. Ella dijo sí entre lágrimas y risas.</div>
+          <div class="story-card">
+            <div class="story-card-accent"></div>
+            <div class="story-card-body">
+              <span class="story-year-badge">2020</span>
+              <div class="story-event-title">Primera escapada juntos</div>
+              <div class="story-event-desc">Carretera Austral. El cielo interminable, el mar a un lado, y solo nosotros descubriendo que éramos inseparables.</div>
+            </div>
           </div>
         </div>
+
+        <!-- 2022 -->
         <div class="story-item stagger">
-          <div class="story-side left">
-            <span class="story-year">2026</span>
-            <div class="story-event-title">¡Nos casamos!</div>
-            <div class="story-event-desc">Y ahora empieza el mejor capítulo de nuestra historia.</div>
+          <div class="story-node">
+            <div class="story-dot">🏡</div>
+            <div class="story-connector"></div>
           </div>
-          <div class="story-center" style="background:linear-gradient(145deg,#8b3a5a,#c9956c)">💒</div>
-          <div class="story-side right"></div>
+          <div class="story-card">
+            <div class="story-card-accent"></div>
+            <div class="story-card-body">
+              <span class="story-year-badge">2022</span>
+              <div class="story-event-title">Nuestro primer hogar</div>
+              <div class="story-event-desc">Un pequeño departamento que llenamos de música, libros y risas. Ahí aprendimos a construir algo juntos.</div>
+            </div>
+          </div>
         </div>
+
+        <!-- 2025 -->
+        <div class="story-item stagger">
+          <div class="story-node">
+            <div class="story-dot">💍</div>
+            <div class="story-connector"></div>
+          </div>
+          <div class="story-card">
+            <div class="story-card-accent" style="background:linear-gradient(90deg,#8b3a5a,#c9956c,#e8c9a0)"></div>
+            <div class="story-card-body">
+              <span class="story-year-badge">2025</span>
+              <div class="story-event-title">La propuesta</div>
+              <div class="story-event-desc">En París, bajo la lluvia, arrodillado entre el brillo de los adoquines. Ella dijo sí entre lágrimas y risas eternas.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2026 -->
+        <div class="story-item stagger">
+          <div class="story-node">
+            <div class="story-dot" style="background:linear-gradient(145deg,#5a1a32,#c9956c);border-color:var(--gold);box-shadow:0 0 24px rgba(201,149,108,.6),0 0 0 4px rgba(201,149,108,.12)">💒</div>
+          </div>
+          <div class="story-card" style="border-color:rgba(201,149,108,.4)">
+            <div class="story-card-accent" style="background:linear-gradient(90deg,#7a4e28,#c9956c,#e8c9a0,#c9956c);opacity:1"></div>
+            <div class="story-card-body">
+              <span class="story-year-badge" style="background:rgba(201,149,108,.18);border-color:rgba(201,149,108,.5)">2026</span>
+              <div class="story-event-title" style="color:var(--gold2)">¡Nos casamos!</div>
+              <div class="story-event-desc" style="border-color:rgba(201,149,108,.5);color:var(--fg)">Y ahora empieza el capítulo más hermoso de nuestra historia. Gracias por ser parte de este momento.</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -1219,48 +1267,41 @@ input,textarea,select{font-family:inherit}
         </div>
       </div>
       <div class="photo-grid">
-        <div class="photo-item tall stagger" onclick="openLightbox('🌹', 'El primer encuentro')">
-          <div class="photo-bg" style="background:linear-gradient(160deg,#1a0e28,#2d1a42);flex-direction:column;gap:10px">
-            <div style="font-size:48px">🌹</div>
-            <div style="font-family:'Playfair Display',serif;font-size:11px;color:rgba(201,149,108,.5);letter-spacing:.2em">2019</div>
-          </div>
+        <!-- foto 1: pareja besándose, tall -->
+        <div class="photo-item tall stagger" onclick="openLightbox('photo', 'Isabella &amp; Mateo', 'https://images.unsplash.com/photo-1596457221755-b96bc3a6df18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=900')">
+          <img src="https://images.unsplash.com/photo-1596457221755-b96bc3a6df18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Isabella & Mateo" style="width:100%;height:100%;object-fit:cover;transition:transform .4s ease"/>
           <div class="photo-overlay"></div>
-          <div class="photo-caption">El primer encuentro</div>
+          <div class="photo-caption">Isabella &amp; Mateo</div>
         </div>
-        <div class="photo-item stagger" onclick="openLightbox('🌊', 'Carretera Austral')">
-          <div class="photo-bg" style="background:linear-gradient(160deg,#0a1a2e,#1a2e4a)">
-            <div style="font-size:40px">🌊</div>
-          </div>
+        <!-- foto 2 -->
+        <div class="photo-item stagger" onclick="openLightbox('photo', 'Nuestra historia', 'https://images.unsplash.com/photo-1510181414401-d3f2aa71a124?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=900')">
+          <img src="https://images.unsplash.com/photo-1510181414401-d3f2aa71a124?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=500" alt="Nuestra historia" style="width:100%;height:100%;object-fit:cover;transition:transform .4s ease"/>
           <div class="photo-overlay"></div>
-          <div class="photo-caption">Carretera Austral</div>
+          <div class="photo-caption">Nuestra historia</div>
         </div>
-        <div class="photo-item stagger" onclick="openLightbox('🗼', 'París, la propuesta')">
-          <div class="photo-bg" style="background:linear-gradient(160deg,#1a1e0e,#2e3018)">
-            <div style="font-size:40px">🗼</div>
-          </div>
+        <!-- foto 3 -->
+        <div class="photo-item stagger" onclick="openLightbox('photo', 'Amor eterno', 'https://images.unsplash.com/photo-1621621668101-d5c8329b3784?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=900')">
+          <img src="https://images.unsplash.com/photo-1621621668101-d5c8329b3784?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=500" alt="Amor eterno" style="width:100%;height:100%;object-fit:cover;transition:transform .4s ease"/>
           <div class="photo-overlay"></div>
-          <div class="photo-caption">París, la propuesta</div>
+          <div class="photo-caption">Amor eterno</div>
         </div>
-        <div class="photo-item stagger" onclick="openLightbox('💍', 'El anillo')">
-          <div class="photo-bg" style="background:linear-gradient(160deg,#1a1208,#2e2010)">
-            <div style="font-size:40px">💍</div>
-          </div>
+        <!-- foto 4 -->
+        <div class="photo-item stagger" onclick="openLightbox('photo', 'El gran día', 'https://images.unsplash.com/photo-1571753217087-980e556e16ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=900')">
+          <img src="https://images.unsplash.com/photo-1571753217087-980e556e16ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=500" alt="El gran día" style="width:100%;height:100%;object-fit:cover;transition:transform .4s ease"/>
           <div class="photo-overlay"></div>
-          <div class="photo-caption">El anillo</div>
+          <div class="photo-caption">El gran día</div>
         </div>
-        <div class="photo-item stagger" onclick="openLightbox('🥂', 'La celebración')">
-          <div class="photo-bg" style="background:linear-gradient(160deg,#1a0810,#2e1020)">
-            <div style="font-size:40px">🥂</div>
-          </div>
+        <!-- foto 5 -->
+        <div class="photo-item stagger" onclick="openLightbox('photo', 'Para siempre', 'https://images.unsplash.com/photo-1654994088648-e18f010da116?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=900')">
+          <img src="https://images.unsplash.com/photo-1654994088648-e18f010da116?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=500" alt="Para siempre" style="width:100%;height:100%;object-fit:cover;transition:transform .4s ease"/>
           <div class="photo-overlay"></div>
-          <div class="photo-caption">La celebración</div>
+          <div class="photo-caption">Para siempre</div>
         </div>
-        <div class="photo-item stagger" onclick="openLightbox('💑', 'Nuestra boda')">
-          <div class="photo-bg" style="background:linear-gradient(160deg,#0e1820,#18283a)">
-            <div style="font-size:40px">💑</div>
-          </div>
+        <!-- foto 6 -->
+        <div class="photo-item stagger" onclick="openLightbox('photo', 'Nuestro amor', 'https://images.unsplash.com/photo-1593614405051-ff61be2b3ff1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=900')">
+          <img src="https://images.unsplash.com/photo-1593614405051-ff61be2b3ff1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=500" alt="Nuestro amor" style="width:100%;height:100%;object-fit:cover;transition:transform .4s ease"/>
           <div class="photo-overlay"></div>
-          <div class="photo-caption">Próximamente...</div>
+          <div class="photo-caption">Nuestro amor</div>
         </div>
       </div>
       <div style="text-align:center;margin-top:18px">
@@ -1703,7 +1744,7 @@ input,textarea,select{font-family:inherit}
       <div class="divider"></div>
       <img src="https://hercules-cdn.com/file_OkTZviF5nPia7cNEgsUfndxv"
            alt="Gueka Ideas"
-           style="height:64px;width:auto;opacity:.75;filter:brightness(5) saturate(0);margin-top:18px" />
+           style="height:100px;width:auto;opacity:.92;filter:brightness(4) saturate(0) drop-shadow(0 0 14px rgba(201,149,108,.35));margin-top:22px" />
       <p style="font-family:'Marcellus',serif;font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:#4a3820;line-height:1.9;text-align:center;max-width:320px;margin-top:4px">
         Esta tarjeta digital es propiedad exclusiva de Gueka Ideas<br>
         Uso permitido únicamente para fines personales.<br>
@@ -1713,11 +1754,6 @@ input,textarea,select{font-family:inherit}
   </footer>
 
 </div><!-- /wrapper -->
-
-<!-- WATERMARK FLOTANTE -->
-<div id="watermark">
-  <img src="https://hercules-cdn.com/file_OkTZviF5nPia7cNEgsUfndxv" alt="Gueka Ideas" />
-</div>
 
 <script>
 /* ══ TUNNEL CANVAS (splash background) ═══════════════════════════════ */
@@ -2031,12 +2067,20 @@ function copyText(id) {
 }
 
 /* ══ LIGHTBOX ════════════════════════════════════════════ */
-function openLightbox(icon, caption) {
+function openLightbox(type, caption, imgUrl) {
   const lb = document.getElementById('lightbox');
-  document.getElementById('lightbox-content').innerHTML = `
-    <div style="font-size:90px;margin-bottom:16px">${icon}</div>
-    <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:22px;color:var(--gold)">${caption}</div>
-  `;
+  if (type === 'photo' && imgUrl) {
+    document.getElementById('lightbox-content').innerHTML = `
+      <img src="${imgUrl}" alt="${caption}"
+        style="max-width:88vw;max-height:72vh;border-radius:4px;display:block;box-shadow:0 20px 60px rgba(0,0,0,.8)"/>
+      <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:18px;color:var(--gold);margin-top:14px">${caption}</div>
+    `;
+  } else {
+    document.getElementById('lightbox-content').innerHTML = `
+      <div style="font-size:90px;margin-bottom:16px">${type}</div>
+      <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:22px;color:var(--gold)">${caption}</div>
+    `;
+  }
   lb.classList.add('open');
 }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
