@@ -36,7 +36,8 @@
   --sec-py:4rem;
 }
 
-html{ scroll-behavior:auto; scroll-padding-top:0; }
+html{ scroll-behavior:auto; scroll-padding-top:0; scrollbar-width:none; -ms-overflow-style:none; }
+html::-webkit-scrollbar{display:none}
 body{
   background:var(--bg);
   color:var(--ink);
@@ -88,7 +89,14 @@ button{font-family:inherit;border-radius:0}
 @keyframes sparkle{0%,100%{transform:scale(0) rotate(0deg);opacity:0}45%,55%{transform:scale(1) rotate(180deg);opacity:1}}
 @keyframes starFloat{0%,100%{transform:translateY(0) scale(1);opacity:.55}50%{transform:translateY(-5px) scale(1.1);opacity:1}}
 @keyframes heartBeat{0%,100%{transform:scale(1)}14%{transform:scale(1.14)}28%{transform:scale(1)}42%{transform:scale(1.08)}70%{transform:scale(1)}}
-@keyframes lineGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes pinDrop{0%{transform:translateY(-18px) scaleY(.7);opacity:0}70%{transform:translateY(4px) scaleY(1.08);opacity:1}100%{transform:translateY(0) scaleY(1);opacity:1}}
+@keyframes pinBounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}60%{transform:translateY(-3px)}}
+@keyframes ripple{0%{r:0;opacity:.7}100%{r:38;opacity:0}}
+@keyframes ripple2{0%{r:0;opacity:.5}100%{r:56;opacity:0}}
+@keyframes roadDraw{from{stroke-dashoffset:500}to{stroke-dashoffset:0}}
+@keyframes dotPulse{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.4);opacity:1}}
+@keyframes mapFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes gridFade{0%,100%{opacity:.06}50%{opacity:.12}}
 @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes dotPop{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
 @keyframes revealUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
@@ -180,68 +188,96 @@ section{padding:var(--sec-py) var(--sec-px);position:relative;overflow-x:hidden}
 ══════════════════════════════════════════ */
 #splash{
   position:fixed;inset:0;z-index:9999;
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
   cursor:pointer;user-select:none;overflow:hidden;
   background:var(--bg);
   transition:opacity .9s cubic-bezier(.4,0,.2,1),transform .9s cubic-bezier(.4,0,.2,1)
 }
 #splash.closing{opacity:0;transform:scale(1.05) translateY(-16px);pointer-events:none}
-#splash .splash-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.18;filter:grayscale(25%) blur(1px)}
-#splash .vignette{position:absolute;inset:0;background:radial-gradient(ellipse 85% 85% at 50% 50%,rgba(6,6,8,.5) 15%,rgba(6,6,8,.97) 100%)}
+#splash .splash-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.13;filter:grayscale(30%) blur(2px)}
+#splash .vignette{position:absolute;inset:0;background:radial-gradient(ellipse 90% 90% at 50% 50%,rgba(6,6,8,.45) 0%,rgba(6,6,8,.98) 100%)}
 /* Canvas de partículas — z-index:1, detrás de todo el contenido */
 #heart-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
 /* Overlay de vignette encima del canvas */
 #splash .canvas-overlay{
   position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:radial-gradient(ellipse 70% 65% at 50% 50%, transparent 60%, rgba(6,6,8,.7) 100%);
+  background:radial-gradient(ellipse 60% 55% at 50% 52%, transparent 45%, rgba(6,6,8,.82) 100%);
 }
 /* Contenido principal — z-index:10, siempre encima del canvas */
 #splash .content{
   position:relative;z-index:10;
-  display:flex;flex-direction:column;align-items:center;text-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
   width:100%;height:100%;
-  padding:0;
+  padding:max(2rem,4svh) 1.6rem max(2.2rem,4svh);
+  gap:0;
   animation:fadeInUp 1s cubic-bezier(.22,1,.36,1) .3s both
 }
-/* Bloque superior: fondo sólido para tapar partículas */
+/* Ya no se usan bloques sólidos — el corazón es fondo decorativo */
 #splash .content .top-block{
-  position:relative;z-index:1;
-  flex-shrink:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
-  padding:max(1.6rem,3svh) 1.4rem 1.2rem;
-  width:100%;gap:.2rem;
-  background:rgba(6,6,8,1);
+  display:contents;
 }
-/* Zona central transparente: el corazón se ve aquí */
-.heart-gap{flex:1;}
-/* Bloque inferior: fondo sólido para tapar partículas */
 #splash .content .bot-block{
-  position:relative;z-index:1;
-  flex-shrink:0;width:100%;
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-  padding:1.2rem 1.4rem max(2rem,3.5svh);
-  gap:.38rem;
-  background:rgba(6,6,8,1);
+  display:contents;
 }
-#splash .tag{font-family:var(--f-head);font-size:10px;letter-spacing:.42em;color:var(--rose);margin-bottom:.4rem;text-transform:uppercase;filter:drop-shadow(0 0 5px rgba(212,105,138,.4))}
-#splash .monogram{font-family:var(--f-script);font-size:clamp(3.2rem,12vw,4.6rem);line-height:1;color:var(--gold-l);filter:drop-shadow(0 0 28px rgba(201,168,76,.7));margin-bottom:.1rem}
+.heart-gap{display:none;}
+
+/* Línea ornamental entre nombres y datos */
+.splash-orn-line{
+  display:block;margin:.9rem auto;width:160px;height:1px;
+  background:linear-gradient(to right,transparent,rgba(201,168,76,.55),transparent);
+  position:relative;
+}
+.splash-orn-line::before{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:6px;height:6px;background:var(--rose);
+  box-shadow:0 0 8px rgba(212,105,138,.7);
+}
+
+#splash .tag{
+  font-family:var(--f-head);font-size:10px;letter-spacing:.52em;color:var(--rose);
+  text-transform:uppercase;filter:drop-shadow(0 0 6px rgba(212,105,138,.5));
+  margin-bottom:.55rem;
+}
+#splash .monogram{
+  font-family:var(--f-script);font-size:clamp(4rem,16vw,6rem);line-height:1;
+  color:var(--gold-l);filter:drop-shadow(0 0 32px rgba(201,168,76,.75));
+  margin-bottom:.1rem;
+}
 #splash .names-pill{
-  display:flex;flex-direction:column;align-items:center;gap:.08rem;
-  background:rgba(6,6,8,.65);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  padding:.5rem 1.6rem .45rem;
-  border:1px solid rgba(201,168,76,.28);
-  box-shadow:0 4px 24px rgba(0,0,0,.5)
+  display:flex;flex-direction:column;align-items:center;gap:.12rem;
+  background:rgba(6,6,8,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  padding:.7rem 2rem .65rem;
+  border:1px solid rgba(201,168,76,.32);
+  box-shadow:0 4px 32px rgba(0,0,0,.55),var(--glow-gold);
+  margin-bottom:0;
 }
-#splash .amp{font-family:var(--f-script);font-size:clamp(1.1rem,4.2vw,1.5rem);color:rgba(212,105,138,.95);display:block;filter:drop-shadow(0 1px 6px rgba(212,105,138,.5));line-height:1.2}
-#splash .names-line{font-family:var(--f-head);font-size:clamp(.68rem,2.6vw,.82rem);letter-spacing:.26em;color:rgba(240,208,100,.92);line-height:1.5}
+#splash .amp{
+  font-family:var(--f-script);font-size:clamp(1.2rem,4.8vw,1.65rem);
+  color:rgba(212,105,138,.98);display:block;
+  filter:drop-shadow(0 1px 8px rgba(212,105,138,.55));line-height:1.3;
+}
+#splash .names-line{
+  font-family:var(--f-head);font-size:clamp(.72rem,2.8vw,.88rem);
+  letter-spacing:.3em;color:rgba(240,208,100,.95);line-height:1.6;
+}
 #splash .date-strip{
-  border:1px solid rgba(201,168,76,.48);padding:.45rem 1.3rem;
-  font-family:var(--f-head);font-size:11px;letter-spacing:.26em;color:rgba(240,208,100,.96);
-  background:rgba(6,6,8,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  animation:pulseGold 3s ease-in-out infinite
+  border:1px solid rgba(201,168,76,.5);padding:.55rem 1.5rem;
+  font-family:var(--f-head);font-size:11px;letter-spacing:.28em;color:rgba(240,208,100,.98);
+  background:rgba(6,6,8,.68);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  animation:pulseGold 3s ease-in-out infinite;
+  margin-bottom:0;
 }
-#splash .open-btn{padding:.85rem 2rem;font-size:12px;letter-spacing:.32em;animation:goldShimmer 2.5s linear infinite,pulseRose 3s ease-in-out infinite 1.8s}
-#splash .hint{font-family:var(--f-head);font-size:9.5px;letter-spacing:.2em;color:var(--hint)}
+#splash .open-btn{
+  padding:.9rem 2.2rem;font-size:12px;letter-spacing:.34em;
+  animation:goldShimmer 2.5s linear infinite,pulseRose 3s ease-in-out infinite 1.8s;
+  margin-bottom:0;
+}
+#splash .hint{font-family:var(--f-head);font-size:9px;letter-spacing:.22em;color:var(--hint);margin-top:.2rem}
+/* Espaciadores ajustados */
+#splash .sp1{height:clamp(.5rem,1.5svh,.9rem)}
+#splash .sp2{height:clamp(.6rem,1.8svh,1.1rem)}
+#splash .sp3{height:clamp(.7rem,2svh,1.2rem)}
 
 /* ══════════════════════════════════════════
    MAIN
@@ -377,8 +413,19 @@ section{padding:var(--sec-py) var(--sec-px);position:relative;overflow-x:hidden}
 .loc-meta .k{font-family:var(--f-head);font-size:10px;letter-spacing:.3em;color:rgba(201,168,76,.6);margin-bottom:5px}
 .loc-meta .v{font-family:var(--f-disp);font-size:.94rem;font-weight:700;color:var(--ink)}
 .loc-note{padding:1.2rem 1.4rem;font-family:var(--f-body);font-size:.95rem;line-height:1.8;color:var(--body);font-style:italic;border-top:1px solid rgba(201,168,76,.06);margin-top:.2rem}
-.loc-map{width:100%;height:210px;margin-top:0}
+.loc-map{width:100%;height:210px;margin-top:0;position:relative;overflow:hidden;background:var(--surface2);border-top:1px solid rgba(201,168,76,.1)}
 .loc-map iframe{width:100%;height:100%;border:none;display:block;filter:grayscale(25%) contrast(1.08)}
+.svg-map{width:100%;height:100%;display:block}
+.map-grid{animation:gridFade 4s ease-in-out infinite}
+.map-road{stroke-dasharray:500;animation:roadDraw 2.2s cubic-bezier(.22,1,.36,1) forwards}
+.map-road-2{stroke-dasharray:500;animation:roadDraw 2.6s cubic-bezier(.22,1,.36,1) .3s forwards}
+.map-road-3{stroke-dasharray:500;animation:roadDraw 2.4s cubic-bezier(.22,1,.36,1) .15s forwards}
+.map-pin-grp{transform-origin:50% 90%;animation:pinDrop .7s cubic-bezier(.22,1,.36,1) .8s both}
+.map-pin-bounce{transform-origin:50% 90%;animation:pinBounce 3.2s ease-in-out 1.5s infinite}
+.map-ripple1{transform-origin:50% 50%;animation:ripple 2.2s ease-out 1.4s infinite}
+.map-ripple2{transform-origin:50% 50%;animation:ripple2 2.2s ease-out 1.9s infinite}
+.map-label{animation:slideUp .6s cubic-bezier(.22,1,.36,1) 1.2s both}
+.map-float{animation:mapFloat 4s ease-in-out infinite}
 .loc-btn-wrap{padding:1.2rem 1.4rem}
 .loc-btn{width:100%;min-height:52px;font-size:13px;letter-spacing:.32em}
 
@@ -601,21 +648,22 @@ textarea.in{min-height:80px;resize:vertical;line-height:1.65}
       <p class="tag">Luxury Wedding · Bogotá 2026</p>
       <span class="monogram gold-text">V&amp;S</span>
     </div>
-    <div class="heart-gap"></div>
-    <div class="bot-block">
-      <div class="names-pill">
-        <p class="names-line">VALENTINA · HERRERA</p>
-        <p class="amp">se casan con</p>
-        <p class="names-line">SEBASTIÁN · MOLINA</p>
-      </div>
-      <div class="date-strip">20 · JUN · 2026 &nbsp;|&nbsp; 5:00 PM</div>
-      <button class="btn-gold open-btn" type="button" id="btn-open">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-9-6-9-12a9 9 0 0118 0c0 6-9 12-9 12z"/></svg>
-        Abrir Invitación
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-9-6-9-12a9 9 0 0118 0c0 6-9 12-9 12z"/></svg>
-      </button>
-      <p class="hint">Toca en cualquier lugar para abrir</p>
+    <div class="sp1"></div>
+    <div class="names-pill">
+      <p class="names-line">VALENTINA · HERRERA</p>
+      <p class="amp">se casan con</p>
+      <p class="names-line">SEBASTIÁN · MOLINA</p>
     </div>
+    <span class="splash-orn-line"></span>
+    <div class="date-strip">20 · JUN · 2026 &nbsp;|&nbsp; 5:00 PM · BOGOTÁ</div>
+    <div class="sp2"></div>
+    <button class="btn-gold open-btn" type="button" id="btn-open">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-9-6-9-12a9 9 0 0118 0c0 6-9 12-9 12z"/></svg>
+      Abrir Invitación
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-9-6-9-12a9 9 0 0118 0c0 6-9 12-9 12z"/></svg>
+    </button>
+    <p class="hint">Toca en cualquier lugar para abrir</p>
+    <div class="bot-block"></div>
   </div>
 </div>
 
@@ -800,7 +848,82 @@ textarea.in{min-height:80px;resize:vertical;line-height:1.65}
       </div>
       <div class="loc-meta"><div><div class="k">LLEGADA</div><div class="v">4:30 PM</div></div><div><div class="k">INICIA</div><div class="v">5:00 PM</div></div><div><div class="k">DURACIÓN</div><div class="v">~60 min</div></div></div>
       <p class="loc-note">Te pedimos llegar con al menos 20 minutos de anticipación. Las puertas de la catedral se cerrarán puntualmente al dar inicio la ceremonia.</p>
-      <div class="loc-map"><iframe title="Ubicación de la ceremonia · La Candelaria, Bogotá" loading="lazy" src="https://maps.google.com/maps?q=La+Candelaria,+Bogot%C3%A1,+Colombia&output=embed"></iframe></div>
+      <div class="loc-map">
+        <svg class="svg-map" viewBox="0 0 420 210" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- Fondo -->
+          <rect width="420" height="210" fill="#0d0d14"/>
+          <!-- Grid -->
+          <g class="map-grid" stroke="rgba(201,168,76,.14)" stroke-width=".5">
+            <line x1="0" y1="30" x2="420" y2="30"/><line x1="0" y1="60" x2="420" y2="60"/>
+            <line x1="0" y1="90" x2="420" y2="90"/><line x1="0" y1="120" x2="420" y2="120"/>
+            <line x1="0" y1="150" x2="420" y2="150"/><line x1="0" y1="180" x2="420" y2="180"/>
+            <line x1="60" y1="0" x2="60" y2="210"/><line x1="120" y1="0" x2="120" y2="210"/>
+            <line x1="180" y1="0" x2="180" y2="210"/><line x1="240" y1="0" x2="240" y2="210"/>
+            <line x1="300" y1="0" x2="300" y2="210"/><line x1="360" y1="0" x2="360" y2="210"/>
+          </g>
+          <!-- Manzanas / bloques -->
+          <rect x="22" y="12" width="52" height="34" rx="2" fill="rgba(201,168,76,.07)" stroke="rgba(201,168,76,.18)" stroke-width=".7"/>
+          <rect x="88" y="12" width="44" height="34" rx="2" fill="rgba(201,168,76,.05)" stroke="rgba(201,168,76,.13)" stroke-width=".7"/>
+          <rect x="146" y="12" width="62" height="34" rx="2" fill="rgba(212,105,138,.06)" stroke="rgba(212,105,138,.16)" stroke-width=".7"/>
+          <rect x="22" y="62" width="38" height="46" rx="2" fill="rgba(201,168,76,.05)" stroke="rgba(201,168,76,.13)" stroke-width=".7"/>
+          <rect x="72" y="62" width="56" height="28" rx="2" fill="rgba(201,168,76,.07)" stroke="rgba(201,168,76,.18)" stroke-width=".7"/>
+          <rect x="72" y="100" width="56" height="16" rx="2" fill="rgba(201,168,76,.04)" stroke="rgba(201,168,76,.1)" stroke-width=".7"/>
+          <rect x="240" y="12" width="48" height="42" rx="2" fill="rgba(212,105,138,.06)" stroke="rgba(212,105,138,.14)" stroke-width=".7"/>
+          <rect x="300" y="12" width="36" height="28" rx="2" fill="rgba(201,168,76,.05)" stroke="rgba(201,168,76,.12)" stroke-width=".7"/>
+          <rect x="340" y="12" width="60" height="42" rx="2" fill="rgba(201,168,76,.07)" stroke="rgba(201,168,76,.18)" stroke-width=".7"/>
+          <rect x="240" y="70" width="72" height="38" rx="2" fill="rgba(201,168,76,.05)" stroke="rgba(201,168,76,.13)" stroke-width=".7"/>
+          <rect x="324" y="70" width="76" height="24" rx="2" fill="rgba(212,105,138,.05)" stroke="rgba(212,105,138,.13)" stroke-width=".7"/>
+          <rect x="22" y="130" width="80" height="30" rx="2" fill="rgba(201,168,76,.06)" stroke="rgba(201,168,76,.14)" stroke-width=".7"/>
+          <rect x="22" y="170" width="50" height="30" rx="2" fill="rgba(201,168,76,.05)" stroke="rgba(201,168,76,.12)" stroke-width=".7"/>
+          <rect x="84" y="130" width="66" height="70" rx="2" fill="rgba(212,105,138,.05)" stroke="rgba(212,105,138,.12)" stroke-width=".7"/>
+          <rect x="240" y="124" width="54" height="40" rx="2" fill="rgba(201,168,76,.06)" stroke="rgba(201,168,76,.14)" stroke-width=".7"/>
+          <rect x="306" y="124" width="44" height="30" rx="2" fill="rgba(201,168,76,.05)" stroke="rgba(201,168,76,.12)" stroke-width=".7"/>
+          <rect x="362" y="124" width="38" height="54" rx="2" fill="rgba(212,105,138,.06)" stroke="rgba(212,105,138,.13)" stroke-width=".7"/>
+          <rect x="240" y="175" width="110" height="25" rx="2" fill="rgba(201,168,76,.06)" stroke="rgba(201,168,76,.14)" stroke-width=".7"/>
+          <!-- Vías principales -->
+          <path d="M0 105 Q80 102 180 105 Q280 108 420 105" class="map-road" stroke="rgba(201,168,76,.55)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M210 0 Q210 60 210 105 Q210 155 210 210" class="map-road-2" stroke="rgba(212,105,138,.48)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M0 55 Q140 53 420 55" class="map-road-3" stroke="rgba(201,168,76,.28)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M0 160 Q160 158 420 160" class="map-road-3" stroke="rgba(201,168,76,.22)" stroke-width="2" stroke-linecap="round" style="animation-delay:.2s"/>
+          <path d="M120 0 Q121 105 120 210" class="map-road-3" stroke="rgba(201,168,76,.22)" stroke-width="2" stroke-linecap="round" style="animation-delay:.4s"/>
+          <path d="M300 0 Q301 105 300 210" class="map-road-3" stroke="rgba(201,168,76,.22)" stroke-width="2" stroke-linecap="round" style="animation-delay:.6s"/>
+          <!-- Ripple ondas -->
+          <circle cx="210" cy="105" class="map-ripple1" fill="none" stroke="rgba(212,105,138,.55)" stroke-width="1.5" r="0"/>
+          <circle cx="210" cy="105" class="map-ripple2" fill="none" stroke="rgba(201,168,76,.4)" stroke-width="1" r="0"/>
+          <!-- Pin grupo -->
+          <g class="map-pin-grp">
+            <g class="map-pin-bounce">
+              <!-- Sombra del pin -->
+              <ellipse cx="210" cy="107" rx="8" ry="3" fill="rgba(0,0,0,.45)"/>
+              <!-- Pin forma -->
+              <path d="M210 56 C197 56 188 65 188 76 C188 91 210 107 210 107 C210 107 232 91 232 76 C232 65 223 56 210 56 Z" fill="rgba(212,105,138,.95)" stroke="rgba(255,255,255,.35)" stroke-width="1.2"/>
+              <!-- Brillo del pin -->
+              <ellipse cx="204" cy="68" rx="4" ry="5" fill="rgba(255,255,255,.22)" transform="rotate(-15 204 68)"/>
+              <!-- Icono en el pin -->
+              <path d="M204 76 a6 6 0 1 1 12 0 a6 6 0 0 1-12 0z" fill="rgba(255,255,255,.9)" stroke="none"/>
+              <path d="M210 72 v2 M210 78 v2 M206 76 h2 M212 76 h2" stroke="rgba(212,105,138,.9)" stroke-width="1.2" stroke-linecap="round"/>
+            </g>
+          </g>
+          <!-- Etiqueta flotante -->
+          <g class="map-label">
+            <rect x="128" y="36" width="108" height="24" rx="3" fill="rgba(9,9,12,.92)" stroke="rgba(201,168,76,.52)" stroke-width="1"/>
+            <text x="182" y="52" font-family="'Bebas Neue',sans-serif" font-size="11" fill="rgba(240,208,100,.9)" text-anchor="middle" letter-spacing="1.5">LA CANDELARIA</text>
+          </g>
+          <!-- Puntos de interés -->
+          <circle cx="150" cy="55" r="3" fill="rgba(201,168,76,.55)" style="animation:dotPulse 2.5s ease-in-out infinite"/>
+          <circle cx="300" cy="55" r="2.5" fill="rgba(212,105,138,.55)" style="animation:dotPulse 2.5s ease-in-out .5s infinite"/>
+          <circle cx="90" cy="160" r="2.5" fill="rgba(201,168,76,.45)" style="animation:dotPulse 2.5s ease-in-out 1s infinite"/>
+          <circle cx="330" cy="160" r="3" fill="rgba(212,105,138,.45)" style="animation:dotPulse 2.5s ease-in-out 1.5s infinite"/>
+          <!-- Degradado borde -->
+          <rect width="420" height="210" fill="url(#mapVigCeremonia)"/>
+          <defs>
+            <radialGradient id="mapVigCeremonia" cx="50%" cy="50%" r="70%">
+              <stop offset="55%" stop-color="transparent"/>
+              <stop offset="100%" stop-color="rgba(9,9,12,.75)"/>
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
       <div class="loc-btn-wrap"><a class="btn-gold loc-btn" target="_blank" rel="noopener noreferrer" href="https://maps.google.com/maps?q=La+Candelaria,+Bogot%C3%A1,+Colombia"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Ver ruta · Ceremonia</a></div>
     </div>
   </section>
@@ -819,7 +942,82 @@ textarea.in{min-height:80px;resize:vertical;line-height:1.65}
       </div>
       <div class="loc-meta"><div><div class="k">INICIA</div><div class="v">6:30 PM</div></div><div><div class="k">TERMINA</div><div class="v">2:00 AM</div></div><div><div class="k">VALET</div><div class="v">Incluido</div></div></div>
       <p class="loc-note">Estacionamiento gratuito con servicio de valet. El ingreso es por la puerta principal; tu nombre ya estará en nuestra lista de invitados.</p>
-      <div class="loc-map"><iframe title="Ubicación de la recepción · Chicó Norte, Bogotá" loading="lazy" src="https://maps.google.com/maps?q=Chico+Norte,+Bogot%C3%A1,+Colombia&output=embed"></iframe></div>
+      <div class="loc-map">
+        <svg class="svg-map" viewBox="0 0 420 210" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- Fondo -->
+          <rect width="420" height="210" fill="#0d0d14"/>
+          <!-- Grid -->
+          <g class="map-grid" stroke="rgba(212,105,138,.12)" stroke-width=".5">
+            <line x1="0" y1="35" x2="420" y2="35"/><line x1="0" y1="70" x2="420" y2="70"/>
+            <line x1="0" y1="105" x2="420" y2="105"/><line x1="0" y1="140" x2="420" y2="140"/>
+            <line x1="0" y1="175" x2="420" y2="175"/>
+            <line x1="70" y1="0" x2="70" y2="210"/><line x1="140" y1="0" x2="140" y2="210"/>
+            <line x1="210" y1="0" x2="210" y2="210"/><line x1="280" y1="0" x2="280" y2="210"/>
+            <line x1="350" y1="0" x2="350" y2="210"/>
+          </g>
+          <!-- Zona verde / parque -->
+          <rect x="155" y="75" width="110" height="60" rx="3" fill="rgba(46,120,70,.14)" stroke="rgba(46,180,80,.22)" stroke-width="1"/>
+          <circle cx="190" cy="105" r="10" fill="rgba(46,180,80,.12)" stroke="rgba(46,180,80,.2)" stroke-width=".8"/>
+          <circle cx="230" cy="97" r="7" fill="rgba(46,180,80,.1)" stroke="rgba(46,180,80,.18)" stroke-width=".8"/>
+          <circle cx="240" cy="118" r="8" fill="rgba(46,180,80,.1)" stroke="rgba(46,180,80,.18)" stroke-width=".8"/>
+          <!-- Manzanas -->
+          <rect x="14" y="14" width="60" height="40" rx="2" fill="rgba(201,168,76,.07)" stroke="rgba(201,168,76,.17)" stroke-width=".7"/>
+          <rect x="84" y="14" width="44" height="28" rx="2" fill="rgba(201,168,76,.05)" stroke="rgba(201,168,76,.13)" stroke-width=".7"/>
+          <rect x="84" y="50" width="44" height="16" rx="2" fill="rgba(212,105,138,.05)" stroke="rgba(212,105,138,.12)" stroke-width=".7"/>
+          <rect x="14" y="64" width="36" height="50" rx="2" fill="rgba(212,105,138,.06)" stroke="rgba(212,105,138,.14)" stroke-width=".7"/>
+          <rect x="58" y="78" width="40" height="36" rx="2" fill="rgba(201,168,76,.05)" stroke="rgba(201,168,76,.12)" stroke-width=".7"/>
+          <rect x="282" y="14" width="52" height="38" rx="2" fill="rgba(201,168,76,.07)" stroke="rgba(201,168,76,.17)" stroke-width=".7"/>
+          <rect x="346" y="14" width="60" height="46" rx="2" fill="rgba(212,105,138,.06)" stroke="rgba(212,105,138,.14)" stroke-width=".7"/>
+          <rect x="282" y="62" width="42" height="30" rx="2" fill="rgba(201,168,76,.05)" stroke="rgba(201,168,76,.12)" stroke-width=".7"/>
+          <rect x="334" y="66" width="72" height="44" rx="2" fill="rgba(201,168,76,.07)" stroke="rgba(201,168,76,.17)" stroke-width=".7"/>
+          <rect x="14" y="148" width="76" height="48" rx="2" fill="rgba(201,168,76,.06)" stroke="rgba(201,168,76,.14)" stroke-width=".7"/>
+          <rect x="100" y="148" width="50" height="30" rx="2" fill="rgba(212,105,138,.05)" stroke="rgba(212,105,138,.12)" stroke-width=".7"/>
+          <rect x="100" y="184" width="50" height="22" rx="2" fill="rgba(201,168,76,.04)" stroke="rgba(201,168,76,.1)" stroke-width=".7"/>
+          <rect x="282" y="148" width="64" height="54" rx="2" fill="rgba(201,168,76,.06)" stroke="rgba(201,168,76,.14)" stroke-width=".7"/>
+          <rect x="356" y="148" width="50" height="40" rx="2" fill="rgba(212,105,138,.06)" stroke="rgba(212,105,138,.13)" stroke-width=".7"/>
+          <!-- Hacienda (destacada) -->
+          <rect x="162" y="82" width="96" height="46" rx="3" fill="rgba(212,105,138,.13)" stroke="rgba(212,105,138,.42)" stroke-width="1.2"/>
+          <line x1="162" y1="82" x2="258" y2="82" stroke="rgba(212,105,138,.5)" stroke-width=".8"/>
+          <!-- Vías -->
+          <path d="M0 105 Q105 103 155 105 Q258 107 420 105" class="map-road" stroke="rgba(201,168,76,.52)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M210 0 Q210 75 210 105 Q210 148 210 210" class="map-road-2" stroke="rgba(212,105,138,.45)" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M0 70 Q420 68 420 70" class="map-road-3" stroke="rgba(201,168,76,.26)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M0 148 Q420 146 420 148" class="map-road-3" stroke="rgba(201,168,76,.22)" stroke-width="2" stroke-linecap="round" style="animation-delay:.18s"/>
+          <path d="M140 0 Q141 105 140 210" class="map-road-3" stroke="rgba(201,168,76,.22)" stroke-width="2" stroke-linecap="round" style="animation-delay:.35s"/>
+          <path d="M280 0 Q281 105 280 210" class="map-road-3" stroke="rgba(201,168,76,.22)" stroke-width="2" stroke-linecap="round" style="animation-delay:.55s"/>
+          <!-- Ripples -->
+          <circle cx="210" cy="105" class="map-ripple1" fill="none" stroke="rgba(201,168,76,.6)" stroke-width="1.5" r="0"/>
+          <circle cx="210" cy="105" class="map-ripple2" fill="none" stroke="rgba(212,105,138,.4)" stroke-width="1" r="0"/>
+          <!-- Pin -->
+          <g class="map-pin-grp">
+            <g class="map-pin-bounce">
+              <ellipse cx="210" cy="107" rx="8" ry="3" fill="rgba(0,0,0,.45)"/>
+              <path d="M210 56 C197 56 188 65 188 76 C188 91 210 107 210 107 C210 107 232 91 232 76 C232 65 223 56 210 56 Z" fill="rgba(201,168,76,.95)" stroke="rgba(255,255,255,.35)" stroke-width="1.2"/>
+              <ellipse cx="204" cy="68" rx="4" ry="5" fill="rgba(255,255,255,.22)" transform="rotate(-15 204 68)"/>
+              <!-- Casa icono -->
+              <path d="M202 80 h16 v10 h-16 z M210 71 L200 80 M210 71 L220 80" fill="none" stroke="rgba(9,9,12,.85)" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+              <rect x="206" y="83" width="8" height="7" fill="rgba(9,9,12,.7)"/>
+            </g>
+          </g>
+          <!-- Etiqueta -->
+          <g class="map-label">
+            <rect x="116" y="30" width="120" height="24" rx="3" fill="rgba(9,9,12,.92)" stroke="rgba(212,105,138,.52)" stroke-width="1"/>
+            <text x="176" y="46" font-family="'Bebas Neue',sans-serif" font-size="11" fill="rgba(253,219,233,.9)" text-anchor="middle" letter-spacing="1.5">CHICÓ NORTE</text>
+          </g>
+          <!-- Puntos interés -->
+          <circle cx="80" cy="105" r="3" fill="rgba(201,168,76,.55)" style="animation:dotPulse 2.5s ease-in-out infinite"/>
+          <circle cx="340" cy="105" r="2.5" fill="rgba(212,105,138,.55)" style="animation:dotPulse 2.5s ease-in-out .6s infinite"/>
+          <circle cx="140" cy="160" r="2.5" fill="rgba(201,168,76,.45)" style="animation:dotPulse 2.5s ease-in-out 1.1s infinite"/>
+          <circle cx="310" cy="160" r="3" fill="rgba(212,105,138,.45)" style="animation:dotPulse 2.5s ease-in-out 1.6s infinite"/>
+          <rect width="420" height="210" fill="url(#mapVigRecepcion)"/>
+          <defs>
+            <radialGradient id="mapVigRecepcion" cx="50%" cy="50%" r="70%">
+              <stop offset="55%" stop-color="transparent"/>
+              <stop offset="100%" stop-color="rgba(9,9,12,.75)"/>
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
       <div class="loc-btn-wrap"><a class="btn-gold loc-btn" target="_blank" rel="noopener noreferrer" href="https://maps.google.com/maps?q=Chico+Norte,+Bogot%C3%A1,+Colombia"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Ver ruta · Recepción</a></div>
     </div>
   </section>
@@ -983,7 +1181,7 @@ textarea.in{min-height:80px;resize:vertical;line-height:1.65}
         <text x="30" y="33" font-family="'Great Vibes',serif" font-size="11" fill="rgba(240,208,100,.78)" text-anchor="middle">V&amp;S</text>
       </svg>
     </div>
-    <svg width="260" height="36" viewBox="0 0 260 36" fill="none" style="display:block;margin:0 auto 1.8rem" aria-hidden="true"><line x1="0" y1="18" x2="84" y2="18" stroke="rgba(201,168,76,.28)" stroke-width="1"/><path d="M92 18 q9-11 18 0 q9 11 18 0" fill="none" stroke="rgba(212,105,138,.48)" stroke-width="1.2"/><path d="M130 9 v18 M126 13 q4-4 8 0 M122 18 q8-6 16 0" fill="none" stroke="rgba(201,168,76,.32)" stroke-width="1"/><path d="M148 18 q9-11 18 0 q9 11 18 0" fill="none" stroke="rgba(212,105,138,.48)" stroke-width="1.2"/><line x1="178" y1="18" x2="260" y2="18" stroke="rgba(201,168,76,.28)" stroke-width="1"/><circle cx="130" cy="18" r="2.8" fill="rgba(201,168,76,.48)"/></svg>
+    <img src="https://hercules-cdn.com/file_BC1R4T19nXXT0KGOjrd2kk7M" alt="Copa de vino brindando" style="width:140px;height:auto;display:block;margin:0 auto 1.8rem;filter:drop-shadow(0 4px 18px rgba(201,168,76,.35));animation:sealPulse 4.5s ease-in-out infinite" />
     <p class="poem">Que el amor que hoy prometemos<br />sea más grande cada amanecer,<br />y que juntos construyamos<br />el hogar que soñamos tener.</p>
     <div class="sign-pill"><div class="s">Valentina &amp; Sebastián</div><div class="d">20 &middot; 06 &middot; 2026 &middot; BOGOTÁ</div></div>
     <svg width="100%" height="20" viewBox="0 0 400 20" fill="none" style="display:block;margin:.6rem auto 1.4rem;max-width:320px" aria-hidden="true"><line x1="0" y1="10" x2="158" y2="10" stroke="rgba(201,168,76,.26)" stroke-width="1"/><path d="M178 10 L188 4 L198 10 L188 16 Z" fill="rgba(201,168,76,.08)" stroke="rgba(201,168,76,.58)" stroke-width="1.2"/><line x1="218" y1="10" x2="400" y2="10" stroke="rgba(201,168,76,.26)" stroke-width="1"/></svg>
@@ -1477,10 +1675,9 @@ textarea.in{min-height:80px;resize:vertical;line-height:1.65}
   let cachedBotStart = 0;
 
   function computeBlockBounds(){
-    const topBlockEl = splashEl.querySelector('.top-block');
-    const botBlockEl = splashEl.querySelector('.bot-block');
-    cachedTopEnd   = topBlockEl ? (topBlockEl.offsetTop + topBlockEl.offsetHeight) : H * 0.28;
-    cachedBotStart = botBlockEl ? botBlockEl.offsetTop : H * 0.66;
+    // El contenido está centrado, el corazón ocupa toda la pantalla como fondo decorativo
+    cachedTopEnd   = H * 0.1;
+    cachedBotStart = H * 0.9;
   }
 
   /* ── Arranque ── */
@@ -1523,7 +1720,7 @@ textarea.in{min-height:80px;resize:vertical;line-height:1.65}
   /* ── Corazón paramétrico centrado en la zona visible ── */
   function buildHeartPoints(){
     heartPoints = [];
-    const SIZE = Math.min(W, H) * 0.70;
+    const SIZE = Math.min(W, H) * 0.45;
     off.width  = Math.round(SIZE);
     off.height = Math.round(SIZE * 0.92);
 
@@ -1677,21 +1874,9 @@ textarea.in{min-height:80px;resize:vertical;line-height:1.65}
   function draw(){
     ctx.clearRect(0, 0, W, H);
 
-    /* FIX: Usar valores cacheados en lugar de consultar el DOM cada frame */
-    const topEnd   = cachedTopEnd;
-    const botStart = cachedBotStart;
-
-    /* Fondo sólido en zona top (sobre los bloques HTML que están encima de todos modos) */
-    ctx.fillStyle = 'rgba(6,6,8,1)';
-    ctx.fillRect(0, 0, W, topEnd);
-
-    /* Trail semitransparente en zona del corazón */
-    ctx.fillStyle = 'rgba(6,6,8,.32)';
-    ctx.fillRect(0, topEnd, W, botStart - topEnd);
-
-    /* Fondo sólido en zona bot */
-    ctx.fillStyle = 'rgba(6,6,8,1)';
-    ctx.fillRect(0, botStart, W, H - botStart);
+    /* Trail semitransparente en toda la pantalla */
+    ctx.fillStyle = 'rgba(6,6,8,.28)';
+    ctx.fillRect(0, 0, W, H);
 
     /* Polvo ambiental */
     for(let i = 0; i < dust.length; i++){
