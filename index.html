@@ -177,10 +177,26 @@
 <body>
 
 <div id="song-strip"></div>
+
+<!-- Panel de gestión de canciones -->
+<div id="music-panel" style="display:none;position:fixed;bottom:78px;right:18px;z-index:8998;width:300px;background:rgba(8,5,8,.96);border:1px solid rgba(212,175,55,.35);border-radius:2px;backdrop-filter:blur(16px);box-shadow:0 16px 48px rgba(0,0,0,.7);padding:1.25rem">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.45em;color:#D4AF37">Lista de Canciones</p>
+    <button onclick="toggleMusicPanel()" style="border:none;background:transparent;color:rgba(255,255,255,.4);font-size:1.1rem;line-height:1;cursor:pointer">✕</button>
+  </div>
+  <div id="song-list-ui" style="display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto;margin-bottom:1rem"></div>
+  <div style="border-top:1px solid rgba(212,175,55,.15);padding-top:1rem">
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.38em;color:rgba(212,175,55,.5);margin-bottom:.5rem">Agregar canción (URL de audio .mp3/.ogg)</p>
+    <input id="new-song-title" type="text" placeholder="Nombre de la canción" style="width:100%;padding:.55rem .75rem;background:rgba(255,255,255,.05);border:1px solid rgba(212,175,55,.2);border-radius:2px;color:#fff;font-family:'Cormorant Garamond',serif;font-size:.85rem;outline:none;margin-bottom:6px"/>
+    <input id="new-song-url" type="url" placeholder="https://... url del archivo de audio" style="width:100%;padding:.55rem .75rem;background:rgba(255,255,255,.05);border:1px solid rgba(212,175,55,.2);border-radius:2px;color:#fff;font-family:'Cormorant Garamond',serif;font-size:.85rem;outline:none;margin-bottom:8px"/>
+    <button onclick="addSong()" style="width:100%;padding:.7rem;border:none;border-radius:2px;background:linear-gradient(135deg,#8B6914,#D4AF37);color:#080508;font-family:'Bebas Neue',sans-serif;font-size:.6rem;letter-spacing:.38em;font-weight:700">AGREGAR</button>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:.72rem;font-style:italic;color:rgba(255,255,255,.25);margin-top:.6rem;line-height:1.5">Pega URLs directas a archivos .mp3 o .ogg. No funciona con Spotify, YouTube ni Apple Music.</p>
+  </div>
+</div>
 <div class="music-fab" id="music-fab">
   <button class="fab-action act-play fab-bg" onclick="togglePlay(event)" title="Play / Pausa"><span class="fab-icon" id="fab-play-icon">▶</span></button>
   <button class="fab-action act-prev fab-bg" onclick="prevSong(event)" title="Anterior"><span class="fab-icon">⏮</span></button>
-  <button class="fab-action act-next fab-bg" onclick="nextSong(event)" title="Siguiente"><span class="fab-icon">⏭</span></button>
+  <button class="fab-action act-next fab-bg" onclick="openMusicPanel(event)" title="Lista / Agregar"><span class="fab-icon">🎶</span></button>
   <button class="fab-main" id="fab-main-btn" onclick="togglePlay(event)" title="Música"><span class="note">🎵</span></button>
 </div>
 
@@ -602,7 +618,7 @@
 const EVENT_DATE = new Date('2026-06-14T18:00:00');
 
 const SONGS = [
-  { title: 'Can\'t Help Falling In Love', src: '' },
+  { title: 'A Thousand Years — Christina Perri', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
   { title: 'All of Me — John Legend', src: '' },
   { title: 'Perfect — Ed Sheeran', src: '' },
 ];
@@ -999,51 +1015,81 @@ function submitRsvp() {
    MUSIC
 ====================================================== */
 function tryAutoplay() {
+  const song = SONGS[currentSong];
+  if (!song.src) return;
   const audio = document.getElementById('bg-audio');
-  if (SONGS[currentSong].src) {
-    audio.src = SONGS[currentSong].src;
-    audio.loop = false;
-    audio.play().then(() => {
-      isPlaying = true;
-      updateFabState();
-      showSongStrip();
-    }).catch(() => {});
-    audio.onended = () => { nextSong(); };
-  }
+  audio.src = song.src;
+  audio.loop = false;
+  audio.onended = () => { nextSongAuto(); };
+  audio.play().then(() => {
+    isPlaying = true;
+    updateFabState();
+    showSongStrip();
+  }).catch(() => {
+    // Autoplay blocked by browser — user must tap play manually
+    isPlaying = false;
+    updateFabState();
+  });
 }
 
 function togglePlay(e) {
   e.stopPropagation();
   const audio = document.getElementById('bg-audio');
-  if (!audio.src && SONGS[currentSong].src) {
-    audio.src = SONGS[currentSong].src;
-    audio.onended = () => { nextSong(); };
+  const song = SONGS[currentSong];
+
+  if (!audio.src || audio.src === window.location.href) {
+    if (!song.src) { showNoSrcWarning(); return; }
+    audio.src = song.src;
+    audio.onended = () => { nextSongAuto(); };
   }
-  if (isPlaying) { audio.pause(); isPlaying = false; }
-  else { audio.play().catch(() => {}); isPlaying = true; }
+
+  if (isPlaying) {
+    audio.pause();
+    isPlaying = false;
+  } else {
+    audio.play().then(() => {
+      isPlaying = true;
+      showSongStrip();
+    }).catch(err => {
+      console.warn('Play failed:', err);
+    });
+  }
   updateFabState();
   showSongStrip();
 }
 
 function prevSong(e) {
   e.stopPropagation();
-  currentSong = (currentSong - 1 + SONGS.length) % SONGS.length;
+  // Find the previous song that has a src
+  for (let i = 1; i <= SONGS.length; i++) {
+    const idx = (currentSong - i + SONGS.length) % SONGS.length;
+    if (SONGS[idx].src) { currentSong = idx; break; }
+  }
   loadSong();
 }
 
-function nextSong(e) {
-  if (e) e.stopPropagation();
-  currentSong = (currentSong + 1) % SONGS.length;
-  loadSong();
+function nextSongAuto() {
+  for (let i = 1; i <= SONGS.length; i++) {
+    const idx = (currentSong + i) % SONGS.length;
+    if (SONGS[idx].src) { currentSong = idx; break; }
+  }
+  loadSong(true);
 }
 
-function loadSong() {
+function loadSong(autoplay = false) {
   const audio = document.getElementById('bg-audio');
-  if (SONGS[currentSong].src) {
-    audio.src = SONGS[currentSong].src;
-    if (isPlaying) audio.play().catch(() => {});
+  const song = SONGS[currentSong];
+  if (!song.src) { showSongStrip(); return; }
+  audio.src = song.src;
+  audio.onended = () => { nextSongAuto(); };
+  if (isPlaying || autoplay) {
+    audio.play().then(() => {
+      isPlaying = true;
+      updateFabState();
+    }).catch(() => {});
   }
   showSongStrip();
+  renderSongListUI();
 }
 
 function updateFabState() {
@@ -1055,9 +1101,75 @@ function updateFabState() {
 
 function showSongStrip() {
   const strip = document.getElementById('song-strip');
-  strip.textContent = SONGS[currentSong].title;
+  const song = SONGS[currentSong];
+  strip.textContent = song.src ? song.title : (song.title + ' — sin URL');
   strip.classList.add('visible');
-  setTimeout(() => strip.classList.remove('visible'), 3000);
+  setTimeout(() => strip.classList.remove('visible'), 3500);
+}
+
+function showNoSrcWarning() {
+  const strip = document.getElementById('song-strip');
+  strip.textContent = '⚠ Agrega una URL de audio en 🎶';
+  strip.classList.add('visible');
+  setTimeout(() => strip.classList.remove('visible'), 4000);
+}
+
+/* ---- Music Panel ---- */
+function openMusicPanel(e) {
+  e.stopPropagation();
+  const panel = document.getElementById('music-panel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  renderSongListUI();
+}
+
+function toggleMusicPanel() {
+  const panel = document.getElementById('music-panel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function renderSongListUI() {
+  const el = document.getElementById('song-list-ui');
+  if (!el) return;
+  el.innerHTML = SONGS.map((s, i) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:.6rem .75rem;border-radius:2px;background:${i===currentSong?'rgba(212,175,55,.12)':'rgba(255,255,255,.03)'};border:1px solid ${i===currentSong?'rgba(212,175,55,.4)':'rgba(255,255,255,.06)'}">
+      <button onclick="selectSong(${i})" style="flex:1;text-align:left;border:none;background:transparent;cursor:pointer">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.6rem;letter-spacing:.18em;color:${i===currentSong?'#D4AF37':'rgba(255,255,255,.7)'}">
+          ${i===currentSong && isPlaying ? '▶ ' : ''}${s.title}
+        </div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:.7rem;color:${s.src?'rgba(212,175,55,.45)':'rgba(255,80,80,.45)'};margin-top:2px">
+          ${s.src ? '✓ URL configurada' : '✗ Sin URL de audio'}
+        </div>
+      </button>
+      <button onclick="removeSong(${i})" style="border:none;background:transparent;color:rgba(255,80,80,.5);font-size:.9rem;cursor:pointer;padding:0 4px" title="Eliminar">✕</button>
+    </div>`).join('');
+}
+
+function selectSong(i) {
+  const wasPlaying = isPlaying;
+  currentSong = i;
+  if (!SONGS[i].src) { showNoSrcWarning(); renderSongListUI(); return; }
+  loadSong(wasPlaying);
+}
+
+function addSong() {
+  const title = document.getElementById('new-song-title').value.trim();
+  const src   = document.getElementById('new-song-url').value.trim();
+  if (!title) { alert('Escribe el nombre de la canción.'); return; }
+  if (!src)   { alert('Pega la URL del archivo de audio.'); return; }
+  SONGS.push({ title, src });
+  document.getElementById('new-song-title').value = '';
+  document.getElementById('new-song-url').value = '';
+  renderSongListUI();
+  // Auto-play new song if nothing is playing
+  if (!isPlaying) { currentSong = SONGS.length - 1; loadSong(true); }
+}
+
+function removeSong(i) {
+  if (SONGS.length === 1) { alert('Debe haber al menos una canción en la lista.'); return; }
+  SONGS.splice(i, 1);
+  if (currentSong >= SONGS.length) currentSong = 0;
+  renderSongListUI();
+  showSongStrip();
 }
 
 /* ======================================================
