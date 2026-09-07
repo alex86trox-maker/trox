@@ -199,7 +199,7 @@ section{padding:var(--sec-py) var(--sec-px);position:relative;overflow-x:hidden}
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;
   width:100%;height:100%;
-  padding:max(2rem,4svh) 1.6rem max(2.2rem,4svh);
+  padding:max(3rem,5svh) 1.6rem max(2.2rem,4svh);
   gap:0;
   animation:fadeInUp 1s cubic-bezier(.22,1,.36,1) .3s both
 }
@@ -227,10 +227,12 @@ section{padding:var(--sec-py) var(--sec-px);position:relative;overflow-x:hidden}
 #splash .tag{
   font-family:var(--f-head);font-size:10px;letter-spacing:.52em;color:var(--rose);
   text-transform:uppercase;filter:drop-shadow(0 0 6px rgba(212,105,138,.5));
-  margin-bottom:.55rem;
+  margin-bottom:.55rem;padding-top:.2rem;
 }
 #splash .monogram{
-  font-family:var(--f-script);font-size:clamp(4rem,16vw,6rem);line-height:1;
+  font-family:var(--f-script);font-size:clamp(4rem,16vw,6rem);
+  line-height:1.15;
+  padding-top:.2rem;
   color:var(--gold-l);filter:drop-shadow(0 0 32px rgba(201,168,76,.75));
   margin-bottom:.1rem;
 }
@@ -480,6 +482,38 @@ section{padding:var(--sec-py) var(--sec-px);position:relative;overflow-x:hidden}
 .gal-dot.on{background:var(--rose);box-shadow:0 0 8px rgba(212,105,138,.6);width:18px}
 .gal-foot{text-align:center;margin-top:12px;font-family:var(--f-body);font-size:.95rem;font-style:italic;color:var(--sub);line-height:1.7}
 
+/* ── Upload de fotos ── */
+.gal-upload-wrap{margin-top:1.4rem;text-align:center}
+.gal-upload-label{
+  display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+  padding:.75rem 1.6rem;
+  border:1px dashed rgba(212,105,138,.38);
+  background:rgba(212,105,138,.05);
+  font-family:var(--f-head);font-size:11px;letter-spacing:.28em;color:var(--rose);
+  transition:border-color .25s,background .25s,transform .25s cubic-bezier(.22,1,.36,1);
+}
+.gal-upload-label:hover{border-color:rgba(212,105,138,.65);background:rgba(212,105,138,.1);transform:translateY(-2px)}
+.gal-upload-label input{display:none}
+.gal-upload-note{font-family:var(--f-head);font-size:10px;letter-spacing:.18em;color:var(--hint);margin-top:.6rem}
+.gal-user-grid{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:1.2rem;justify-content:center;
+}
+.gal-user-item{
+  position:relative;width:80px;height:80px;overflow:hidden;
+  border:1px solid rgba(212,105,138,.28);
+  animation:revealScale .4s cubic-bezier(.22,1,.36,1) both;
+}
+.gal-user-item img{width:100%;height:100%;object-fit:cover;display:block}
+.gal-user-del{
+  position:absolute;top:3px;right:3px;
+  width:18px;height:18px;
+  background:rgba(6,6,8,.85);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--rose);font-size:10px;line-height:1;
+  transition:background .2s;
+}
+.gal-user-del:hover{background:var(--rose-d);color:#fff}
+
 /* ══════════════════════════════════════════
    OBSEQUIOS
 ══════════════════════════════════════════ */
@@ -577,6 +611,45 @@ textarea.in{min-height:80px;resize:vertical;line-height:1.65}
 #btn-top{position:fixed;bottom:90px;right:14px;z-index:8000;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(9,9,12,.92);border:1px solid rgba(201,168,76,.38);color:var(--gold);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s,transform .35s cubic-bezier(.22,1,.36,1);box-shadow:var(--glow-gold);backdrop-filter:blur(12px)}
 #btn-top.vis{opacity:1;pointer-events:auto}
 #btn-top:hover{transform:scale(1.12) translateY(-3px)}
+
+/* ══════════════════════════════════════════
+   MÚSICA
+══════════════════════════════════════════ */
+#btn-music{
+  position:fixed;bottom:148px;right:14px;z-index:8000;
+  width:44px;height:44px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(9,9,12,.92);
+  border:1px solid rgba(212,105,138,.38);
+  color:var(--rose);cursor:pointer;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s,transform .35s cubic-bezier(.22,1,.36,1),border-color .3s;
+  box-shadow:0 0 16px rgba(212,105,138,.22);
+  backdrop-filter:blur(12px);
+}
+#btn-music.vis{opacity:1;pointer-events:auto}
+#btn-music:hover{transform:scale(1.12) translateY(-3px);box-shadow:var(--glow-rose)}
+#btn-music.playing{border-color:rgba(212,105,138,.7);box-shadow:var(--glow-rose);animation:pulseRose 2.5s ease-in-out infinite}
+#btn-music .ico-play{display:block}
+#btn-music .ico-pause{display:none}
+#btn-music.playing .ico-play{display:none}
+#btn-music.playing .ico-pause{display:block}
+.music-eq{
+  display:flex;align-items:flex-end;gap:2px;height:16px;
+  position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
+  opacity:0;transition:opacity .3s;
+}
+#btn-music.playing .music-eq{opacity:1}
+.music-eq span{
+  width:2px;background:var(--rose);border-radius:1px;
+  animation:eqBar 1s ease-in-out infinite;
+}
+.music-eq span:nth-child(1){height:4px;animation-delay:0s}
+.music-eq span:nth-child(2){height:10px;animation-delay:.18s}
+.music-eq span:nth-child(3){height:6px;animation-delay:.36s}
+.music-eq span:nth-child(4){height:12px;animation-delay:.08s}
+.music-eq span:nth-child(5){height:5px;animation-delay:.28s}
+@keyframes eqBar{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
 
 /* ══════════════════════════════════════════
    WHATSAPP
@@ -1073,7 +1146,16 @@ textarea.in{min-height:80px;resize:vertical;line-height:1.65}
     <div class="gal-dots" id="gal-dots" role="tablist" aria-label="Fotos"></div>
     <div class="gal-thumbs" id="gal-thumbs"></div>
     <p class="gal-foot">Cada foto cuenta un capítulo de nuestra historia.</p>
-  </section>
+    <!-- Zona de fotos de invitados (IndexedDB local) -->
+    <div class="gal-upload-wrap">
+      <label class="gal-upload-label">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Agrega tu foto al álbum
+        <input type="file" id="gal-file-input" accept="image/*" multiple aria-label="Subir fotos al álbum" />
+      </label>
+      <p class="gal-upload-note">TUS FOTOS SE GUARDAN SOLO EN ESTE DISPOSITIVO</p>
+      <div class="gal-user-grid" id="gal-user-grid"></div>
+    </div>
 
   <!-- OBSEQUIOS -->
   <section id="gifts-sec" class="reveal" data-nav="Obsequios">
@@ -1190,6 +1272,13 @@ textarea.in{min-height:80px;resize:vertical;line-height:1.65}
 <!-- SCROLL TOP -->
 <button id="btn-top" type="button" aria-label="Volver al inicio">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
+<!-- MÚSICA FLOAT -->
+<button id="btn-music" type="button" aria-label="Reproducir/pausar música">
+  <svg class="ico-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+  <svg class="ico-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+  <div class="music-eq" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
 </button>
 
 <!-- WHATSAPP FLOAT -->
@@ -1354,6 +1443,8 @@ textarea.in{min-height:80px;resize:vertical;line-height:1.65}
     initNavDots();
     initScrollTop();
     initWaBtn();
+    initMusic();
+    initGalleryDB();
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
   }
@@ -1552,15 +1643,40 @@ textarea.in{min-height:80px;resize:vertical;line-height:1.65}
     });
     form.addEventListener('submit',e=>{
       e.preventDefault();
-      const name=document.getElementById('rsvp-name').value.trim();
+      const name    = document.getElementById('rsvp-name').value.trim();
+      const guests  = document.getElementById('rsvp-guests').value;
+      const diet    = document.getElementById('rsvp-diet').value.trim();
+      const msg     = document.getElementById('rsvp-msg').value.trim();
       errEl.classList.remove('on');
       if(!name){errEl.textContent='Por favor escribe tu nombre completo para confirmar.';errEl.classList.add('on');document.getElementById('rsvp-name').focus();return;}
+
+      // ── Mostrar pantalla de gracias ──
       form.style.display='none';thanks.classList.add('on');
       const titleEl=document.getElementById('thanks-title');
       const msgEl=document.getElementById('thanks-msg');
-      if(attending==='yes'){titleEl.textContent='¡Nos vemos el 20 de junio!';msgEl.textContent=`${name}, tu lugar en nuestra boda ya está reservado con mucho cariño. ¡Gracias por confirmar!`;}
-      else{titleEl.textContent='Lo entendemos';msgEl.textContent=`${name}, gracias por avisarnos. Estarás en nuestros corazones ese día tan especial.`;}
-      showToast('¡Confirmación enviada con éxito!');
+      if(attending==='yes'){
+        titleEl.textContent='¡Nos vemos el 20 de junio!';
+        msgEl.textContent=`${name}, tu lugar en nuestra boda ya está reservado con mucho cariño. ¡Gracias por confirmar!`;
+      } else {
+        titleEl.textContent='Lo entendemos';
+        msgEl.textContent=`${name}, gracias por avisarnos. Estarás en nuestros corazones ese día tan especial.`;
+      }
+
+      // ── Abrir WhatsApp con la confirmación ──
+      const asistencia = attending==='yes' ? '✅ SÍ asistiré' : '❌ No podré asistir';
+      let texto = `🌹 *Confirmación de asistencia — Boda Valentina & Sebastián*\n\n`;
+      texto    += `👤 *Nombre:* ${name}\n`;
+      texto    += `${asistencia}\n`;
+      texto    += `👥 *Personas:* ${guests}\n`;
+      if(diet)  texto += `🥗 *Restricción alimentaria:* ${diet}\n`;
+      if(msg)   texto += `💬 *Mensaje:* ${msg}\n`;
+      texto    += `\n📅 Sábado 20 de junio de 2026 · 5:00 PM · Bogotá`;
+
+      const WA_NUMBER = '[NÚMERO DE WHATSAPP]'; // reemplaza con el número real ej: 573001234567
+      const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(texto)}`;
+      setTimeout(()=>{ window.open(waUrl, '_blank'); }, 600);
+
+      showToast('¡Abriendo WhatsApp para confirmar!');
     });
   }
 
@@ -1615,6 +1731,155 @@ textarea.in{min-height:80px;resize:vertical;line-height:1.65}
   /* ─── SCROLL TOP ─── */
   function initScrollTop(){
     document.getElementById('btn-top').addEventListener('click',()=>{ smoothScrollTo(0); });
+  }
+
+  /* ─── MÚSICA ─── */
+  function initMusic(){
+    const btn = document.getElementById('btn-music');
+    if(!btn) return;
+
+    // ── Audio element ──
+    const audio = document.createElement('audio');
+    audio.loop  = true;
+    audio.preload = 'none';
+    // Demo: canción royalty-free. Reemplaza esta URL por la de tu canción en Hercules CDN:
+    // Ej: audio.src = 'https://hercules-cdn.com/file_XXXX';
+    audio.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+    audio.volume = 0.55;
+    document.body.appendChild(audio);
+
+    let started = false;
+
+    btn.addEventListener('click', async () => {
+      if(!started){
+        started = true;
+        try{
+          await audio.play();
+          btn.classList.add('playing');
+        } catch(e){
+          started = false;
+          showToast('No se pudo reproducir el audio');
+        }
+      } else if(audio.paused){
+        try{
+          await audio.play();
+          btn.classList.add('playing');
+        } catch(e){ showToast('No se pudo reproducir el audio'); }
+      } else {
+        audio.pause();
+        btn.classList.remove('playing');
+      }
+    });
+
+    audio.addEventListener('pause',  ()=> btn.classList.remove('playing'));
+    audio.addEventListener('play',   ()=> btn.classList.add('playing'));
+    audio.addEventListener('ended',  ()=> btn.classList.remove('playing'));
+
+    btn.classList.add('vis');
+  }
+
+  /* ─── GALERÍA INDEXEDDB ─── */
+  function initGalleryDB(){
+    const DB_NAME    = 'gueka_gallery';
+    const STORE_NAME = 'photos';
+    const DB_VERSION = 1;
+    let db = null;
+
+    function openDB(){
+      return new Promise((res, rej) => {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = e => {
+          const d = e.target.result;
+          if(!d.objectStoreNames.contains(STORE_NAME)){
+            d.createObjectStore(STORE_NAME, { keyPath:'id', autoIncrement:true });
+          }
+        };
+        req.onsuccess = e => res(e.target.result);
+        req.onerror   = e => rej(e.target.error);
+      });
+    }
+
+    function savePhoto(blob){
+      return new Promise((res, rej) => {
+        const tx  = db.transaction(STORE_NAME, 'readwrite');
+        const req = tx.objectStore(STORE_NAME).add({ blob, ts: Date.now() });
+        req.onsuccess = e => res(e.target.result);
+        req.onerror   = e => rej(e.target.error);
+      });
+    }
+
+    function deletePhoto(id){
+      return new Promise((res, rej) => {
+        const tx  = db.transaction(STORE_NAME, 'readwrite');
+        const req = tx.objectStore(STORE_NAME).delete(id);
+        req.onsuccess = () => res();
+        req.onerror   = e => rej(e.target.error);
+      });
+    }
+
+    function getAllPhotos(){
+      return new Promise((res, rej) => {
+        const tx  = db.transaction(STORE_NAME, 'readonly');
+        const req = tx.objectStore(STORE_NAME).getAll();
+        req.onsuccess = e => res(e.target.result);
+        req.onerror   = e => rej(e.target.error);
+      });
+    }
+
+    function blobToUrl(blob){
+      return URL.createObjectURL(blob);
+    }
+
+    function renderItem(id, url){
+      const grid = document.getElementById('gal-user-grid');
+      const wrap = document.createElement('div');
+      wrap.className = 'gal-user-item';
+      wrap.dataset.id = id;
+      const img = document.createElement('img');
+      img.src = url; img.alt = `Foto ${id}`;
+      const del = document.createElement('button');
+      del.className = 'gal-user-del';
+      del.type = 'button';
+      del.setAttribute('aria-label', 'Eliminar foto');
+      del.innerHTML = '✕';
+      del.addEventListener('click', async () => {
+        await deletePhoto(id);
+        URL.revokeObjectURL(url);
+        wrap.remove();
+        showToast('Foto eliminada');
+      });
+      wrap.append(img, del);
+      grid.appendChild(wrap);
+    }
+
+    async function init(){
+      try{
+        db = await openDB();
+        // Cargar fotos guardadas
+        const photos = await getAllPhotos();
+        photos.forEach(p => renderItem(p.id, blobToUrl(p.blob)));
+
+        // Listener de subida
+        const input = document.getElementById('gal-file-input');
+        if(!input) return;
+        input.addEventListener('change', async () => {
+          const files = Array.from(input.files || []);
+          if(!files.length) return;
+          for(const file of files){
+            if(!file.type.startsWith('image/')) continue;
+            const id  = await savePhoto(file);
+            const url = blobToUrl(file);
+            renderItem(id, url);
+          }
+          input.value = '';
+          showToast(`${files.length > 1 ? files.length + ' fotos guardadas' : 'Foto guardada'} ✓`);
+        });
+      } catch(e){
+        console.warn('IndexedDB no disponible:', e);
+      }
+    }
+
+    init();
   }
 
   /* ─── WHATSAPP ─── */
