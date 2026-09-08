@@ -94,35 +94,132 @@
   .ornate-frame::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
   .ornate-frame::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
 
-  /* ===== Full ornate frame overlay — mismo marco floral en todas las secciones ===== */
+  /* =========================================================================
+     PREMIUM FRAME INTEGRATION
+     El objetivo: que el SVG del marco ornamental se sienta "grabado" en el
+     pergamino en vez de una imagen pegada encima. Se logra con:
+       1. Una capa de fondo de pergamino con textura de fibra + viñeta radial
+          que se extiende MÁS ALLÁ del marco, para que sus bordes se fundan
+          con el fondo general en vez de cortar en seco.
+       2. El SVG del marco con filter: drop-shadow doble (sombra de talla +
+          resplandor dorado) para que parezca repujado en el material.
+       3. Un halo dorado ambiental (glow) detrás del marco que respira muy
+          lento, dando sensación de vela/luz de castillo.
+       4. Un sutil "sello de cera" decorativo en las esquinas superior/inferior
+          para reforzar el acabado artesanal.
+       5. Ligero parallax de escala al entrar en viewport para dar profundidad
+          cinematográfica sin ser una animación agresiva.
+     ========================================================================= */
   .framed-section {
     position: relative;
     z-index: 2;
-    padding: 60px 34px !important;
+    padding: 64px 36px !important;
     min-height: 640px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    text-align: center;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  /* Capa 1: textura de pergamino + viñeta, se extiende a todo el section
+     para eliminar el "corte" duro entre secciones y el marco */
+  .framed-section::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 120% 90% at 50% 45%, rgba(255,248,224,.55) 0%, rgba(255,248,224,0) 62%),
+      repeating-linear-gradient(115deg, rgba(122,90,58,.05) 0px, rgba(122,90,58,.05) 1px, transparent 1px, transparent 3px),
+      radial-gradient(ellipse 140% 100% at 50% 50%, transparent 55%, rgba(20,14,8,.16) 100%);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+
+  /* Capa 2: halo dorado ambiental, respira lentamente detrás del marco */
+  .framed-section::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 92%;
+    height: 78%;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(201,162,39,.22) 0%, rgba(201,162,39,.08) 45%, transparent 72%);
+    filter: blur(6px);
+    pointer-events: none;
+    animation: frameGlowBreathe 7s ease-in-out infinite;
+  }
+
+  @keyframes frameGlowBreathe {
+    0%, 100% { opacity: .55; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: .95; transform: translate(-50%, -50%) scale(1.035); }
+  }
+
+  /* Capa 3: el propio marco SVG, "grabado" en el pergamino */
+  .framed-section .frame-art {
+    position: absolute;
+    inset: 8px;
+    z-index: 1;
     background-image: url("https://hercules-cdn.com/file_HFxVy11rtq1bxlqq6fjAf1Lx");
     background-repeat: no-repeat;
     background-position: center;
     background-size: 100% 100%;
-    text-align: center;
+    pointer-events: none;
+    filter:
+      drop-shadow(0 1px 0 rgba(255,252,235,.55))
+      drop-shadow(0 3px 10px rgba(58,36,22,.35))
+      drop-shadow(0 0 22px rgba(201,162,39,.22));
+    opacity: .96;
+    transition: transform 1.1s cubic-bezier(.16,.8,.24,1), opacity 1.1s ease;
+    transform: scale(1.015);
   }
-  .framed-section > * { position: relative; z-index: 2; }
+  .framed-section.in-view .frame-art {
+    transform: scale(1);
+  }
+
+  /* Sello de cera decorativo en las esquinas, refuerza el acabado artesanal */
+  .framed-section .wax-seal {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    z-index: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #9c2b3a 0%, var(--c-d) 55%, #501118 100%);
+    box-shadow: 0 2px 6px rgba(0,0,0,.45), inset 0 1px 2px rgba(255,255,255,.25), inset 0 -2px 4px rgba(0,0,0,.35);
+    opacity: .85;
+  }
+  .framed-section .wax-seal::before {
+    content: "❖";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: rgba(255,230,190,.85);
+  }
+  .framed-section .wax-seal.tl { top: 14px; left: 14px; }
+  .framed-section .wax-seal.br { bottom: 14px; right: 14px; }
+
+  .framed-section > *:not(.frame-art):not(.wax-seal) { position: relative; z-index: 2; }
 
   .fleur {
     width: 26px;
     height: 26px;
     margin: 0 auto 10px;
     opacity: .75;
+    filter: drop-shadow(0 1px 2px rgba(58,36,22,.25));
   }
   .fleur svg { width: 100%; height: 100%; fill: var(--c-d); }
 
   .divider {
     width: 60px;
     height: 1px;
-    background: var(--c-line);
+    background: linear-gradient(90deg, transparent, var(--c-line), transparent);
     margin: 14px auto;
     position: relative;
   }
@@ -136,6 +233,7 @@
     padding: 0 8px;
     color: var(--c-e);
     font-size: 11px;
+    text-shadow: 0 1px 1px rgba(255,255,255,.4);
   }
 
   section {
@@ -615,6 +713,9 @@
 
   <!-- ===================== 2. FOTO PRINCIPAL + NOMBRE ===================== -->
   <section id="pv-portada" class="framed-section">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <button id="pv-retrato-wrap" type="button" aria-label="Cambiar foto principal">
       <img class="cover-img" id="pv-retrato" src="" alt="Foto de los novios" />
     </button>
@@ -646,6 +747,9 @@
 
   <!-- ===================== 3. CUENTA REGRESIVA ===================== -->
   <section id="countdown-sec" class="framed-section">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <div class="fleur reveal"><svg viewBox="0 0 24 24"><path d="M12 2c-1.2 2-1.2 4 0 6-1.2-2-3.2-2.6-5-1.4 1.6.4 2.6 1.8 2.6 3.4-1.6-1-3.6-.6-4.6 1 1.8-.4 3.4.4 3.8 2.2C7 12 5.6 13 4 13c1.4 1.2 3.4 1 4.4-.6-.2 1.8.8 3.4 2.4 4-.4-1.8.4-3.4 2-4.2.2 2-.8 3.8-2.4 4.8 2 .2 3.8-1 4.2-3 .6 1.8 2.4 3 4.4 2.8-1.4-1-1.8-2.8-1-4.4 1.6 1 3.6.6 4.6-1-1.8.4-3.4-.4-3.8-2.2 1.8.4 3.4-.6 3.8-2.4-1.6 1-3.6.6-4.6-1 1.6-.6 2.4-2.2 2-3.8-1 1.4-2.8 1.8-4.4 1 1-1.6.6-3.6-1-4.6.4 1.8-.4 3.4-2.2 3.8C13.2 5.8 12.8 3.8 12 2z"/></svg></div>
     <div class="eyebrow reveal">Falta tan solo</div>
     <div id="cd" class="reveal">00:00:00:00</div>
@@ -655,6 +759,9 @@
 
   <!-- ===================== 4. AGENDAR EN CALENDARIO ===================== -->
   <section id="pv-cal-sec" class="framed-section" data-plan="premium">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <h2 class="section-title reveal">Guarda la Fecha</h2>
     <p class="card-cap reveal">Sábado 24 de Mayo, 2025 — 4:00 P.M.</p>
     <a id="pv-cal-btn" class="btn-outline reveal" href="#" target="_blank" rel="noopener">Añadir a mi calendario</a>
@@ -662,6 +769,9 @@
 
   <!-- ===================== 5. MI HISTORIA ===================== -->
   <section class="framed-section" data-plan="premium">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <h2 class="section-title reveal">Nuestra Historia</h2>
     <img class="cover-img reveal" id="pv-fashion" src="" alt="Los novios" />
     <p id="pv-history" class="card-cap reveal" style="margin-top:16px;">
@@ -671,24 +781,36 @@
 
   <!-- ===================== 6. PROGRAMA / ITINERARIO ===================== -->
   <section class="framed-section" data-plan="premium">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <h2 class="section-title reveal">Programa</h2>
     <div id="pv-itin" class="card-list reveal"></div>
   </section>
 
   <!-- ===================== 7. PADRINOS ===================== -->
   <section class="framed-section" data-plan="deluxe">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <h2 class="section-title reveal">Padrinos de Honor</h2>
     <div id="pv-padr" class="card-list reveal"></div>
   </section>
 
   <!-- ===================== 8. GALERÍA DE FOTOS ===================== -->
   <section id="pv-gal-sec" class="framed-section">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <h2 class="section-title reveal">Galería</h2>
     <div id="pv-galeria" class="gal-prev reveal"></div>
   </section>
 
   <!-- ===================== 9. COLECTOR DE FOTOS / ÁLBUM COMPARTIDO ===================== -->
   <section id="pv-album-sec" class="framed-section" data-plan="premium">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <h2 class="section-title reveal">Álbum Compartido</h2>
     <p class="card-cap reveal">Captura y comparte los momentos de nuestra celebración</p>
     <a id="pv-album-btn" class="btn-outline reveal" href="#" target="_blank" rel="noopener">Subir mis fotos</a>
@@ -696,6 +818,9 @@
 
   <!-- ===================== 10. MÚSICA ===================== -->
   <section id="pv-music-sec" class="framed-section" data-plan="premium">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <h2 class="section-title reveal">Nuestra Música</h2>
     <div id="pv-audio-wrap" class="reveal">
       <button id="pv-play-btn" type="button">▶</button>
@@ -725,36 +850,54 @@
 
   <!-- ===================== 11. MESA DE REGALOS ===================== -->
   <section class="framed-section" data-plan="deluxe">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <h2 class="section-title reveal">Mesa de Regalos</h2>
     <div id="pv-gifts" class="card-list reveal"></div>
   </section>
 
   <!-- ===================== 12. INFO EXTRA ===================== -->
   <section class="framed-section" data-plan="deluxe">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <h2 class="section-title reveal">Información Adicional</h2>
     <div id="pv-extra" class="card-list reveal"></div>
   </section>
 
   <!-- ===================== 13. DRESS CODE ===================== -->
   <section id="pv-dress-sec" class="framed-section">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <h2 class="section-title reveal">Código de Vestimenta</h2>
     <div id="pv-dress" class="card-list reveal"></div>
   </section>
 
   <!-- ===================== 14. LUGAR DEL EVENTO ===================== -->
   <section id="pv-lugar-sec" class="framed-section">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <h2 class="section-title reveal">Lugar de la Celebración</h2>
     <div id="pv-lugar" class="card-cap reveal"></div>
   </section>
 
   <!-- ===================== 15. SECCIÓN LIBRE ===================== -->
   <section id="pv-custom-sec" class="framed-section" data-plan="deluxe">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <h2 id="pv-custom-title" class="section-title reveal">Un Mensaje Especial</h2>
     <p id="pv-custom-text" class="card-cap reveal"></p>
   </section>
 
   <!-- ===================== 16. RSVP / CONFIRMACIÓN ===================== -->
   <section id="pv-rsvp-sec" class="framed-section" data-plan="premium">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <h2 class="section-title reveal">Confirma tu Asistencia</h2>
     <form id="rsvp-form">
       <div>
@@ -788,6 +931,9 @@
 
   <!-- ===================== 17. CIERRE ===================== -->
   <section id="closing-sec" class="framed-section">
+    <div class="frame-art"></div>
+    <div class="wax-seal tl"></div>
+    <div class="wax-seal br"></div>
     <p id="pv-poem" class="card-cap reveal"></p>
     <div id="pv-sign" class="splash-name reveal"></div>
   </section>
@@ -1199,7 +1345,6 @@
   function buildCalendarUrl() {
     var btn = document.getElementById('pv-cal-btn');
     if (!btn) return;
-    var start = (state.date || '2025-01-01').replace(/-/g, '') + 'T' + (state.time || '16:00').replace(':', '') + '00';
     var startDate = new Date(state.date + 'T' + (state.time || '16:00'));
     var endDate = new Date(startDate.getTime() + 4 * 60 * 60 * 1000);
     function fmt(d) {
@@ -1365,7 +1510,7 @@
     }
   }
 
-  /* ============ SCROLL REVEAL ============ */
+  /* ============ SCROLL REVEAL + PARALLAX DE MARCO ============ */
   var revealEls = document.querySelectorAll('.reveal');
   var observer = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
@@ -1376,6 +1521,20 @@
     });
   }, { threshold: 0.15 });
   revealEls.forEach(function (el) { observer.observe(el); });
+
+  // Marco: escala suave de "grabado" al entrar en vista, permanece observado
+  // para reactivarse cada vez que la sección vuelve a ser visible.
+  var framedSections = document.querySelectorAll('.framed-section');
+  var frameObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+      } else {
+        entry.target.classList.remove('in-view');
+      }
+    });
+  }, { threshold: 0.25 });
+  framedSections.forEach(function (el) { frameObserver.observe(el); });
 
   /* ============ INIT ============ */
   applyPaletteToCard(state.palette);
