@@ -6,8 +6,10 @@
 <title>Boda · Isabela & Mateo · Amanecer Dorado</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,600&family=Alex+Brush&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,300&family=Libre+Caslon+Text:ital@0;1&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous"/>
+<link rel="preconnect" href="https://images.unsplash.com" crossorigin/>
+<link rel="preconnect" href="https://hercules-cdn.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600;1,9..144,700&family=Alex+Brush&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet"/>
+<link rel="preload" as="image" href="https://images.unsplash.com/photo-1593614405051-ff61be2b3ff1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{background:#F2E8D5;min-height:100vh}
@@ -33,15 +35,10 @@ body{font-family:'DM Sans',sans-serif;color:#2A1F16;overflow-x:hidden}
 @keyframes ambientGlow{0%,100%{box-shadow:0 0 0 2px rgba(232,160,32,.18)}50%{box-shadow:0 0 0 3px rgba(232,160,32,.5),0 8px 32px rgba(196,120,90,.12)}}
 @keyframes shimmerGold{0%{background-position:0% center}100%{background-position:200% center}}
 @keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-@keyframes rotateRing{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 @keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
-@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
-@keyframes slideOutDown{from{transform:translateY(0);opacity:1}to{transform:translateY(100%);opacity:0}}
-@keyframes slideOutUp{from{transform:translateY(0);opacity:1}to{transform:translateY(-100%);opacity:0}}
 @keyframes musicPulse{0%,100%{box-shadow:0 4px 18px rgba(232,160,32,.4)}50%{box-shadow:0 4px 32px rgba(232,160,32,.75),0 0 48px rgba(196,120,90,.2)}}
 @keyframes noteSpin{from{transform:rotate(-12deg)}50%{transform:rotate(12deg)}to{transform:rotate(-12deg)}}
-@keyframes dustFall{0%{transform:translateY(-10px) rotate(0deg);opacity:.8}100%{transform:translateY(100vh) rotate(360deg);opacity:0}}
-@keyframes espressoPop{from{transform:scale(.9) rotate(-3deg);opacity:0}to{transform:scale(1) rotate(0deg);opacity:1}}
+@keyframes galKenBurns{from{transform:scale(1.06)}to{transform:scale(1)}}
 
 .gold-title{
   font-family:'Fraunces',serif;font-weight:700;font-style:italic;
@@ -53,6 +50,9 @@ body{font-family:'DM Sans',sans-serif;color:#2A1F16;overflow-x:hidden}
 .terra-text{color:#C4785A}
 .amber-text{color:#E8A020}
 
+/* Render offscreen sections cheaply until they scroll near viewport */
+.lazy-section{content-visibility:auto;contain-intrinsic-size:1px 900px}
+
 /* Diamond card */
 .amber-card{
   background:#FFFDF8;border-radius:4px;
@@ -62,9 +62,6 @@ body{font-family:'DM Sans',sans-serif;color:#2A1F16;overflow-x:hidden}
 .amber-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:4px;
   background:linear-gradient(90deg,#C4785A,#E8A020,#C4785A);
-}
-.amber-card::after{
-  content:'';position:absolute;top:0;left:0;right:0;height:4px;background:transparent;
 }
 /* diamond accent corners */
 .amber-card .diam-tl,.amber-card .diam-tr,.amber-card .diam-bl,.amber-card .diam-br{
@@ -92,8 +89,11 @@ body{font-family:'DM Sans',sans-serif;color:#2A1F16;overflow-x:hidden}
 /* Section label */
 .section-label{font-family:'DM Sans',sans-serif;font-size:.55rem;letter-spacing:.6em;font-weight:700;text-transform:uppercase}
 
-/* Gallery WebGL */
-#gal-canvas-host{position:absolute;inset:0;width:100%;height:100%}
+/* Gallery (lightweight CSS crossfade, no WebGL) */
+#gal-viewport{position:relative;height:440px;overflow:hidden;cursor:grab;user-select:none;border-radius:4px;background:#2A1F16}
+.gal-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;will-change:opacity}
+.gal-slide.active{opacity:1;z-index:1}
+.gal-slide img{width:100%;height:100%;object-fit:cover;filter:sepia(.1) saturate(.95);animation:galKenBurns 6s ease-out forwards}
 .gal-vdot{width:6px;height:6px;border-radius:1px;cursor:pointer;border:none;transition:all .3s;background:rgba(232,160,32,.2);padding:0;display:block;transform:rotate(45deg)}
 .gal-vdot.active{background:#E8A020;height:18px;border-radius:2px;box-shadow:0 0 8px rgba(232,160,32,.6)}
 .gal-thumb-v{border-radius:3px;overflow:hidden;flex-shrink:0;width:52px;height:64px;cursor:pointer;border:2px solid rgba(232,160,32,.2);opacity:.35;transition:all .25s;background-size:cover;background-position:center}
@@ -112,15 +112,13 @@ body{font-family:'DM Sans',sans-serif;color:#2A1F16;overflow-x:hidden}
 .acc-chev-open{transform:rotate(180deg)}
 
 /* Social */
-.social-list{display:flex;justify-content:center;gap:2.5rem;list-style:none}
-.social-li{position:relative;cursor:pointer}
-.social-li a{text-decoration:none;display:block}
-.social-li .fa-brands{font-size:3.2em;color:#d9d9d9;display:block}
-.social-li a::before{font-family:"Font Awesome 6 Brands";position:absolute;top:0;left:0;font-size:3.2em;height:0;overflow:hidden;transition:0.5s ease-in-out;display:block}
-.social-li.ig a::before{content:"\f16d";background-image:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);-webkit-background-clip:text;-webkit-text-fill-color:transparent;border-bottom:3px solid #dc2743}
-.social-li.wa a::before{content:"\f232";color:#25D366;border-bottom:3px solid #25D366}
-.social-li.tw a::before{content:"\e61b";color:#1DA1F2;border-bottom:3px solid #1DA1F2}
-.social-li:hover a::before{height:100%}
+.social-list{display:flex;justify-content:center;gap:2rem;list-style:none}
+.social-li a{display:flex;width:52px;height:52px;border-radius:3px;align-items:center;justify-content:center;background:rgba(232,160,32,.08);border:1.5px solid rgba(232,160,32,.25);transition:all .25s;text-decoration:none}
+.social-li a svg{width:24px;height:24px;fill:rgba(251,245,236,.55);transition:fill .25s}
+.social-li.ig a:hover{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);border-color:transparent}
+.social-li.wa a:hover{background:#25D366;border-color:transparent}
+.social-li.tw a:hover{background:#1DA1F2;border-color:transparent}
+.social-li a:hover svg{fill:#FBF5EC}
 
 /* Music FAB */
 .music-fab{position:fixed;z-index:9000;bottom:18px;right:18px;width:48px;height:48px;display:flex;justify-content:flex-end;align-items:flex-end;transition:all .6s cubic-bezier(0.64,0.01,0.07,1.65)}
@@ -163,6 +161,10 @@ button{cursor:pointer}
 #itin-line{position:absolute;left:28px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,transparent,rgba(232,160,32,.5) 8%,rgba(196,120,90,.3) 50%,rgba(232,160,32,.5) 92%,transparent);transform-origin:top;transform:scaleY(0);transition:transform 1.8s cubic-bezier(0.22,1,0.36,1)}
 #itin-line.visible{transform:scaleY(1)}
 .itin-hover{transition:transform .25s}.itin-hover:hover{transform:translateX(4px)}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+}
 </style>
 </head>
 <body>
@@ -192,7 +194,7 @@ button{cursor:pointer}
   <button class="fab-main" id="fab-main-btn" onclick="togglePlay(event)"><span class="note">🎵</span></button>
 </div>
 
-<audio id="bg-audio"></audio>
+<audio id="bg-audio" preload="none"></audio>
 <canvas id="dust-canvas"></canvas>
 
 <!-- ═══════════════════════════════════
@@ -255,7 +257,7 @@ button{cursor:pointer}
   <section style="position:relative;text-align:center;overflow:hidden;min-height:96vh;display:flex;flex-direction:column;background:#2A1F16;padding:0">
     <!-- photo fills top -->
     <div style="position:absolute;inset:0">
-      <img src="https://images.unsplash.com/photo-1593614405051-ff61be2b3ff1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800" alt="Isabela & Mateo" style="width:100%;height:100%;object-fit:cover;opacity:.35;filter:sepia(.25) saturate(.9)"/>
+      <img src="https://images.unsplash.com/photo-1593614405051-ff61be2b3ff1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800" alt="Isabela & Mateo" width="800" height="1000" fetchpriority="high" decoding="async" style="width:100%;height:100%;object-fit:cover;opacity:.35;filter:sepia(.25) saturate(.9)"/>
       <div style="position:absolute;inset:0;background:linear-gradient(to top,#2A1F16 0%,rgba(42,31,22,.7) 45%,rgba(42,31,22,.3) 100%)"></div>
     </div>
 
@@ -315,7 +317,7 @@ button{cursor:pointer}
   </div>
 
   <!-- NUESTRA HISTORIA -->
-  <section style="background:#F2E8D5;padding:3.5rem 1.5rem 4rem">
+  <section class="lazy-section" style="background:#F2E8D5;padding:3.5rem 1.5rem 4rem">
     <div style="text-align:center;margin-bottom:2rem">
       <p class="section-label" style="color:#C4785A;margin-bottom:.5rem">Un amor para toda la vida</p>
       <h2 class="gold-title" style="font-size:2.8rem">Nuestra Historia</h2>
@@ -327,7 +329,7 @@ button{cursor:pointer}
     <div class="amber-card card-hover">
       <div class="diam-tl"></div><div class="diam-tr"></div><div class="diam-bl"></div><div class="diam-br"></div>
       <div style="position:relative;height:220px;overflow:hidden">
-        <img src="https://images.unsplash.com/photo-1768777272585-62187454c46f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800" alt="" style="width:100%;height:100%;object-fit:cover;filter:sepia(.15) saturate(.9)"/>
+        <img src="https://images.unsplash.com/photo-1768777272585-62187454c46f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800" alt="" width="800" height="220" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;filter:sepia(.15) saturate(.9)"/>
         <div style="position:absolute;inset:0;background:linear-gradient(to top,#FFFDF8 0%,transparent 60%)"></div>
         <div style="position:absolute;top:12px;right:12px;background:rgba(42,31,22,.7);border:1px solid rgba(232,160,32,.4);border-radius:3px;padding:4px 14px;font-family:'DM Sans',sans-serif;font-size:.5rem;letter-spacing:.3em;color:#E8A020;font-weight:700;text-transform:uppercase">BOGOTÁ · 2026</div>
       </div>
@@ -340,7 +342,7 @@ button{cursor:pointer}
   </section>
 
   <!-- LA FECHA -->
-  <section style="background:#FBF5EC;padding:3.5rem 1.5rem 4rem">
+  <section class="lazy-section" style="background:#FBF5EC;padding:3.5rem 1.5rem 4rem">
     <div style="text-align:center;margin-bottom:2rem">
       <p class="section-label" style="color:#C07818;margin-bottom:.5rem">El día más especial</p>
       <h2 class="gold-title" style="font-size:2.8rem">La Fecha</h2>
@@ -364,13 +366,13 @@ button{cursor:pointer}
         <div class="diam-tl"></div><div class="diam-tr"></div>
         <div class="section-label" style="color:rgba(196,120,90,.65);font-size:.42rem;margin-bottom:.6rem">HORA</div>
         <div style="font-family:'Fraunces',serif;font-size:3.8rem;font-weight:700;color:#C4785A;line-height:1">6</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:.7rem;color:rgba(42,31,22,.35);font-weight:300;font-style:italic">PM</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:.7rem;color:rgba(42,31,22,.35);font-weight:400;font-style:italic">PM</div>
       </div>
     </div>
   </section>
 
   <!-- COUNTDOWN -->
-  <section style="padding:4rem 1.5rem 5rem;text-align:center;background:#2A1F16;position:relative;overflow:hidden">
+  <section class="lazy-section" style="padding:4rem 1.5rem 5rem;text-align:center;background:#2A1F16;position:relative;overflow:hidden">
     <!-- sun rays bg -->
     <svg style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:420px;height:420px;opacity:.08;pointer-events:none" viewBox="0 0 420 420">
       <g transform="translate(210,210)">
@@ -400,7 +402,7 @@ button{cursor:pointer}
           </div>
           <span class="section-label" style="color:rgba(232,160,32,.5);font-size:.42rem">DÍAS</span>
         </div>
-        <span style="font-family:'Fraunces',serif;font-size:2.2rem;color:rgba(232,160,32,.4);padding-bottom:2.2rem;font-weight:300;animation:blinkColon 1.2s ease-in-out infinite">:</span>
+        <span style="font-family:'Fraunces',serif;font-size:2.2rem;color:rgba(232,160,32,.4);padding-bottom:2.2rem;font-weight:400;animation:blinkColon 1.2s ease-in-out infinite">:</span>
         <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
           <div style="position:relative;width:72px;height:84px;border-radius:3px;background:rgba(232,160,32,.08);border:1.5px solid rgba(232,160,32,.3);display:flex;align-items:center;justify-content:center">
             <div style="position:absolute;top:-4px;left:8px;width:6px;height:6px;background:#E8A020;transform:rotate(45deg)"></div>
@@ -409,7 +411,7 @@ button{cursor:pointer}
           </div>
           <span class="section-label" style="color:rgba(232,160,32,.5);font-size:.42rem">HORAS</span>
         </div>
-        <span style="font-family:'Fraunces',serif;font-size:2.2rem;color:rgba(232,160,32,.4);padding-bottom:2.2rem;font-weight:300;animation:blinkColon 1.2s ease-in-out infinite">:</span>
+        <span style="font-family:'Fraunces',serif;font-size:2.2rem;color:rgba(232,160,32,.4);padding-bottom:2.2rem;font-weight:400;animation:blinkColon 1.2s ease-in-out infinite">:</span>
         <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
           <div style="position:relative;width:72px;height:84px;border-radius:3px;background:rgba(232,160,32,.08);border:1.5px solid rgba(232,160,32,.3);display:flex;align-items:center;justify-content:center">
             <div style="position:absolute;top:-4px;left:8px;width:6px;height:6px;background:#E8A020;transform:rotate(45deg)"></div>
@@ -418,7 +420,7 @@ button{cursor:pointer}
           </div>
           <span class="section-label" style="color:rgba(232,160,32,.5);font-size:.42rem">MIN</span>
         </div>
-        <span style="font-family:'Fraunces',serif;font-size:2.2rem;color:rgba(232,160,32,.4);padding-bottom:2.2rem;font-weight:300;animation:blinkColon 1.2s ease-in-out infinite">:</span>
+        <span style="font-family:'Fraunces',serif;font-size:2.2rem;color:rgba(232,160,32,.4);padding-bottom:2.2rem;font-weight:400;animation:blinkColon 1.2s ease-in-out infinite">:</span>
         <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
           <div style="position:relative;width:72px;height:84px;border-radius:3px;background:rgba(232,160,32,.08);border:1.5px solid rgba(232,160,32,.3);display:flex;align-items:center;justify-content:center">
             <div style="position:absolute;top:-4px;left:8px;width:6px;height:6px;background:#E8A020;transform:rotate(45deg)"></div>
@@ -432,7 +434,7 @@ button{cursor:pointer}
   </section>
 
   <!-- EL LUGAR -->
-  <section style="background:#F2E8D5;padding:3.5rem 1.5rem 4rem">
+  <section class="lazy-section" style="background:#F2E8D5;padding:3.5rem 1.5rem 4rem">
     <div style="text-align:center;margin-bottom:2rem">
       <p class="section-label" style="color:#C4785A;margin-bottom:.5rem">¿Dónde diremos el sí?</p>
       <h2 class="gold-title" style="font-size:2.8rem">El Lugar</h2>
@@ -455,7 +457,7 @@ button{cursor:pointer}
       </button>
       <div id="lugar-body" class="acc-body">
         <div style="border-top:1px solid rgba(232,160,32,.15)">
-          <div style="height:220px"><iframe title="Mapa" src="https://maps.google.com/maps?q=Bogot%C3%A1,+Colombia&output=embed" style="width:100%;height:100%;border:none;display:block" loading="lazy"></iframe></div>
+          <div style="height:220px" id="lugar-map-wrap"></div>
           <div style="padding:1.25rem">
             <a href="https://maps.google.com/maps?q=Bogotá,+Colombia" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border-radius:3px;color:#2A1F16;border:none;padding:.9rem;background:linear-gradient(135deg,#E8A020,#C07818);box-shadow:0 8px 24px rgba(232,160,32,.35);font-family:'DM Sans',sans-serif;font-size:.72rem;letter-spacing:.2em;font-weight:700;text-decoration:none;text-transform:uppercase">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Cómo Llegar
@@ -467,7 +469,7 @@ button{cursor:pointer}
   </section>
 
   <!-- GALERÍA -->
-  <section style="padding:3.5rem 1.5rem 4rem;background:#FBF5EC">
+  <section class="lazy-section" style="padding:3.5rem 1.5rem 4rem;background:#FBF5EC">
     <div style="text-align:center;margin-bottom:2rem">
       <p class="section-label" style="color:#C07818;margin-bottom:.5rem">Momentos juntos</p>
       <h2 class="gold-title" style="font-size:2.8rem">Galería</h2>
@@ -479,9 +481,9 @@ button{cursor:pointer}
     <div id="gal-tabs" style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px"></div>
     <div style="display:flex;gap:12px;align-items:stretch">
       <div id="gal-vdots" style="display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;padding:8px 0;flex-shrink:0;width:14px"></div>
-      <!-- Main viewport — WebGL ZoomBlur -->
-      <div class="amber-card" id="gal-viewport" style="flex:1;position:relative;height:440px;overflow:hidden;cursor:grab;user-select:none;border-radius:4px">
-        <div id="gal-canvas-host" style="position:absolute;inset:0"></div>
+      <!-- Main viewport — lightweight CSS crossfade -->
+      <div class="amber-card" id="gal-viewport">
+        <div id="gal-slides"></div>
         <div style="position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(to top,rgba(42,31,22,.85) 0%,rgba(42,31,22,.08) 45%,transparent 100%)"></div>
         <div id="gal-counter" style="position:absolute;top:12px;left:12px;z-index:10;border-radius:3px;padding:5px 14px;background:rgba(42,31,22,.75);border:1px solid rgba(232,160,32,.4);font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:700;color:#E8A020;letter-spacing:.12em;backdrop-filter:blur(8px)"></div>
         <div style="position:absolute;bottom:0;left:0;right:0;z-index:3;padding:1.5rem 1.25rem 1.1rem">
@@ -499,7 +501,7 @@ button{cursor:pointer}
   </section>
 
   <!-- PROGRAMA -->
-  <section style="padding:3.5rem 1.5rem 4rem;background:#F2E8D5">
+  <section class="lazy-section" style="padding:3.5rem 1.5rem 4rem;background:#F2E8D5">
     <div style="text-align:center;margin-bottom:2rem">
       <p class="section-label" style="color:#C4785A;margin-bottom:.5rem">La noche perfecta</p>
       <h2 class="gold-title" style="font-size:2.8rem">Programa</h2>
@@ -512,7 +514,7 @@ button{cursor:pointer}
   </section>
 
   <!-- PADRINOS -->
-  <section style="padding:3.5rem 1.5rem 4rem;background:#FBF5EC">
+  <section class="lazy-section" style="padding:3.5rem 1.5rem 4rem;background:#FBF5EC">
     <div style="text-align:center;margin-bottom:2rem">
       <p class="section-label" style="color:#C07818;margin-bottom:.5rem">Con todo su amor</p>
       <h2 class="gold-title" style="font-size:2.8rem">Los Padrinos</h2>
@@ -525,7 +527,7 @@ button{cursor:pointer}
   </section>
 
   <!-- INFO EXTRA -->
-  <section style="padding:3.5rem 1.5rem 4rem;background:#F2E8D5">
+  <section class="lazy-section" style="padding:3.5rem 1.5rem 4rem;background:#F2E8D5">
     <div style="text-align:center;margin-bottom:2rem">
       <p class="section-label" style="color:#C4785A;margin-bottom:.5rem">Todo lo que necesitas saber</p>
       <h2 class="gold-title" style="font-size:2.8rem">Info Extra</h2>
@@ -538,7 +540,7 @@ button{cursor:pointer}
   </section>
 
   <!-- HASHTAG -->
-  <section style="padding:3.5rem 1.5rem 4rem;background:#2A1F16;text-align:center;position:relative;overflow:hidden">
+  <section class="lazy-section" style="padding:3.5rem 1.5rem 4rem;background:#2A1F16;text-align:center;position:relative;overflow:hidden">
     <svg style="position:absolute;top:0;left:0;right:0;bottom:0;width:100%;height:100%;opacity:.06;pointer-events:none" viewBox="0 0 480 300" preserveAspectRatio="xMidYMid slice">
       <g transform="translate(240,150)">
         <rect x="-1" y="-140" width="2" height="140" fill="#E8A020"/>
@@ -560,15 +562,15 @@ button{cursor:pointer}
         <p style="font-family:'Alex Brush',cursive;font-size:2rem;color:#E8A020">#IsabelaYMateo2026</p>
       </div>
       <ul class="social-list" style="margin-top:.5rem">
-        <li class="social-li ig"><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
-        <li class="social-li wa"><a href="#"><i class="fa-brands fa-whatsapp"></i></a></li>
-        <li class="social-li tw"><a href="#"><i class="fa-brands fa-x-twitter"></i></a></li>
+        <li class="social-li ig"><a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4zm4.5 3.4a5.1 5.1 0 1 1 0 10.2 5.1 5.1 0 0 1 0-10.2zm0 2A3.1 3.1 0 1 0 12 12.6 3.1 3.1 0 0 0 12 9.4zm5.4-3.6a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z"/></svg></a></li>
+        <li class="social-li wa"><a href="#" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 2a8 8 0 0 1 6.9 12.1l-.3.5.6 2.4-2.5-.6-.5.3A8 8 0 1 1 12 4zm-3.1 4.2c-.2 0-.5 0-.6.4-.2.4-.7 1-.7 1.9 0 1 .7 2 .8 2.1.1.2 1.7 2.9 4.4 3.9 2.1.9 2.5.7 3 .6.4-.1 1.3-.6 1.5-1.1s.2-1 .1-1.1c-.1-.1-.3-.2-.6-.4-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.6.8-.8 1-.1.1-.3.2-.5.1-.4-.1-1.5-.6-2.5-1.6-.8-.8-1.3-1.7-1.5-2-.1-.3 0-.4.1-.6l.5-.6c.1-.2.2-.4.1-.6-.1-.2-.7-1.6-.9-2-.1-.4-.3-.3-.6-.3z"/></svg></a></li>
+        <li class="social-li tw"><a href="#" aria-label="X / Twitter"><svg viewBox="0 0 24 24"><path d="M3 3h4.6l4 5.4L16.2 3H21l-6.6 8.1L21 21h-4.6l-4.3-5.9L7 21H2l7-8.7L3 3zm3.1 1.7 11.4 14.6h2.3L8.4 4.7H6.1z"/></svg></a></li>
       </ul>
     </div>
   </section>
 
   <!-- RSVP -->
-  <section style="padding:3.5rem 1.5rem 4rem;background:#F2E8D5">
+  <section class="lazy-section" style="padding:3.5rem 1.5rem 4rem;background:#F2E8D5">
     <div style="text-align:center;margin-bottom:2rem">
       <p class="section-label" style="color:#C4785A;margin-bottom:.5rem">Tu presencia es nuestro regalo</p>
       <h2 class="gold-title" style="font-size:2.8rem">Confirmar</h2>
@@ -604,7 +606,7 @@ button{cursor:pointer}
   </section>
 
   <!-- MESA DE REGALOS -->
-  <section style="padding:3.5rem 1.5rem 4rem;background:#FBF5EC">
+  <section class="lazy-section" style="padding:3.5rem 1.5rem 4rem;background:#FBF5EC">
     <div style="text-align:center;margin-bottom:2rem">
       <p class="section-label" style="color:#C07818;margin-bottom:.5rem">Con amor</p>
       <h2 class="gold-title" style="font-size:2.8rem">Mesa de Regalos</h2>
@@ -618,7 +620,7 @@ button{cursor:pointer}
   </section>
 
   <!-- FOOTER -->
-  <footer style="padding:3.5rem 1.5rem 2.5rem;text-align:center;background:#2A1F16;border-top:1px solid rgba(232,160,32,.15);position:relative;overflow:hidden">
+  <footer class="lazy-section" style="padding:3.5rem 1.5rem 2.5rem;text-align:center;background:#2A1F16;border-top:1px solid rgba(232,160,32,.15);position:relative;overflow:hidden">
     <svg style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:300px;height:200px;opacity:.07;pointer-events:none" viewBox="0 0 300 200">
       <g transform="translate(150,0)">
         <rect x="-1" y="0" width="2" height="150" fill="#E8A020" rx="1"/>
@@ -644,7 +646,7 @@ button{cursor:pointer}
       <!-- Gueka Ideas -->
       <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid rgba(232,160,32,.12)">
         <div style="display:flex;justify-content:center;margin-bottom:.9rem">
-          <img src="https://hercules-cdn.com/file_DCqqjtYKE0vj2CkcdL4wf9SS" alt="Gueka Ideas" style="width:200px;height:auto;filter:brightness(0) invert(1) opacity(.55) sepia(.3) saturate(.8) hue-rotate(10deg);display:block"/>
+          <img src="https://hercules-cdn.com/file_DCqqjtYKE0vj2CkcdL4wf9SS" alt="Gueka Ideas" width="200" height="60" loading="lazy" decoding="async" style="width:200px;height:auto;filter:brightness(0) invert(1) opacity(.55) sepia(.3) saturate(.8) hue-rotate(10deg);display:block"/>
         </div>
         <p style="font-family:'DM Sans',sans-serif;font-size:.44rem;letter-spacing:.22em;color:rgba(251,245,236,.22);line-height:2;max-width:320px;margin:0 auto;font-weight:700;text-transform:uppercase">
           Esta tarjeta digital es propiedad exclusiva de Gueka Ideas<br/>
@@ -657,9 +659,9 @@ button{cursor:pointer}
 
 </div><!-- /app -->
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const EVENT_DATE = new Date('2026-06-14T18:00:00');
+let countdownTimer=null,dustAnimId=null,dustVisible=true,tabHidden=false;
 
 const SONGS = [
   { title: 'A Thousand Years — Christina Perri', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
@@ -757,9 +759,7 @@ const GIFT_OPTIONS = [
   },
 ];
 
-let currentSong=0,isPlaying=false,galTab=0,galIdx=0,galTimer=null,attendVal='';
-let galAnimating=false;
-let _galThree=null;
+let currentSong=0,isPlaying=false,galTab=0,galIdx=0,galAutoTimer=null,attendVal='';
 
 function closeSplash(){
   document.getElementById('splash').classList.add('hidden');
@@ -770,7 +770,7 @@ function closeSplash(){
 function initAll(){
   buildTicker();buildGallery();buildItinerary();buildPadrinos();
   buildExtraAccordions();buildGiftAccordions();startCountdown();
-  initDust();observeItinLine();
+  initDust();observeItinLine();observePauseOnHidden();
 }
 
 function buildTicker(){
@@ -788,45 +788,56 @@ function startCountdown(){
     document.getElementById('cd-mins').textContent=String(Math.floor((d%3600000)/60000)).padStart(2,'0');
     document.getElementById('cd-secs').textContent=String(Math.floor((d%60000)/1000)).padStart(2,'0');
   }
-  update();setInterval(update,1000);
+  update();countdownTimer=setInterval(update,1000);
 }
 
+/* Lightweight CSS crossfade gallery (replaces heavy WebGL shader gallery) */
 function buildGallery(){
   const el=document.getElementById('gal-tabs');
   el.innerHTML=GAL_TABS.map((t,i)=>`<button class="gallery-tab ${i===0?'active':''}" onclick="switchGalTab(${i})">${t.label}</button>`).join('');
-  initWebGLGallery();initGalTouch();
+  renderGalSlides();
+  initGalTouch();
+  restartGalAuto();
 }
-function initWebGLGallery(){
-  if(_galThree)_galThree.destroy();
-  _galThree=WebGLZoomBlurGallery({
-    hostId:'gal-canvas-host',
-    images:GAL_TABS[galTab].images,
-    onSlideChange:(idx)=>{
-      galIdx=idx;
-      const imgs=GAL_TABS[galTab].images;
-      document.getElementById('gal-caption').textContent=imgs[idx].caption;
-      document.getElementById('gal-counter').textContent=`${idx+1} / ${imgs.length}`;
-      document.getElementById('gal-index-label').textContent=`FOTO ${idx+1} DE ${imgs.length}`;
-      const vd=document.getElementById('gal-vdots');
-      vd.innerHTML=imgs.map((_,i)=>`<button class="gal-vdot ${i===idx?'active':''}" onclick="goGal(${i})"></button>`).join('');
-      const th=document.getElementById('gal-thumbs');
-      th.innerHTML=imgs.map((img,i)=>`<div class="gal-thumb-v ${i===idx?'active':''}" onclick="goGal(${i})" style="background-image:url(${img.src})"></div>`).join('');
-    }
-  });
-  _galThree.start();
+function renderGalSlides(){
   const imgs=GAL_TABS[galTab].images;
-  document.getElementById('gal-caption').textContent=imgs[0].caption;
-  document.getElementById('gal-counter').textContent=`1 / ${imgs.length}`;
-  document.getElementById('gal-index-label').textContent=`FOTO 1 DE ${imgs.length}`;
-  const vd=document.getElementById('gal-vdots');
-  vd.innerHTML=imgs.map((_,i)=>`<button class="gal-vdot ${i===0?'active':''}" onclick="goGal(${i})"></button>`).join('');
-  const th=document.getElementById('gal-thumbs');
-  th.innerHTML=imgs.map((img,i)=>`<div class="gal-thumb-v ${i===0?'active':''}" onclick="goGal(${i})" style="background-image:url(${img.src})"></div>`).join('');
+  const slidesEl=document.getElementById('gal-slides');
+  slidesEl.innerHTML=imgs.map((img,i)=>`<div class="gal-slide ${i===galIdx?'active':''}" data-i="${i}"><img src="${img.src}" alt="" loading="${i===0?'eager':'lazy'}" decoding="async" width="480" height="440"/></div>`).join('');
+  updateGalUI();
 }
-function switchGalTab(i){galTab=i;galIdx=0;galAnimating=false;document.querySelectorAll('.gallery-tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));initWebGLGallery();}
-function goGal(i){if(_galThree)_galThree.goTo(i);}
-function galNext(){if(_galThree)_galThree.next();}
-function galPrev(){if(_galThree)_galThree.prev();}
+function updateGalUI(){
+  const imgs=GAL_TABS[galTab].images;
+  document.getElementById('gal-caption').textContent=imgs[galIdx].caption;
+  document.getElementById('gal-counter').textContent=`${galIdx+1} / ${imgs.length}`;
+  document.getElementById('gal-index-label').textContent=`FOTO ${galIdx+1} DE ${imgs.length}`;
+  const vd=document.getElementById('gal-vdots');
+  vd.innerHTML=imgs.map((_,i)=>`<button class="gal-vdot ${i===galIdx?'active':''}" onclick="goGal(${i})"></button>`).join('');
+  const th=document.getElementById('gal-thumbs');
+  th.innerHTML=imgs.map((img,i)=>`<div class="gal-thumb-v ${i===galIdx?'active':''}" onclick="goGal(${i})" style="background-image:url(${img.src})"></div>`).join('');
+}
+function showGalSlide(newIdx){
+  const imgs=GAL_TABS[galTab].images;
+  const N=imgs.length;
+  galIdx=((newIdx%N)+N)%N;
+  document.querySelectorAll('#gal-slides .gal-slide').forEach(s=>{
+    s.classList.toggle('active',Number(s.dataset.i)===galIdx);
+  });
+  updateGalUI();
+  restartGalAuto();
+}
+function switchGalTab(i){
+  galTab=i;galIdx=0;
+  document.querySelectorAll('.gallery-tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));
+  renderGalSlides();restartGalAuto();
+}
+function goGal(i){showGalSlide(i);}
+function galNext(){showGalSlide(galIdx+1);}
+function galPrev(){showGalSlide(galIdx-1);}
+function restartGalAuto(){
+  clearTimeout(galAutoTimer);
+  if(tabHidden)return;
+  galAutoTimer=setTimeout(()=>{galNext();},4500);
+}
 function initGalTouch(){
   const vp=document.getElementById('gal-viewport');
   let startY=0,drag=false;
@@ -836,65 +847,9 @@ function initGalTouch(){
   window.addEventListener('mouseup',e=>{if(!drag)return;const dy=e.clientY-startY;if(Math.abs(dy)>40)dy<0?galNext():galPrev();drag=false;vp.style.cursor='grab';});
 }
 
-function WebGLZoomBlurGallery({hostId,images,onSlideChange}){
-  let renderer,scene,camera,mat1,mat2,plane1,plane2;
-  let progress=0,mouseX=0.5,mouseY=0.5;
-  let cx1=0.5,cy1=0.5,cx2=0.5,cy2=0.5;
-  let textures=[],rafId=null,destroyed=false,currentIdx=0,autoTimer=null;
-  const host=document.getElementById(hostId);
-  const W=()=>host.offsetWidth,H=()=>host.offsetHeight;
-  const FRAG=`uniform sampler2D map;uniform vec2 center;uniform float strength;uniform vec2 uvOffset;uniform vec2 uvScale;varying vec2 vUv;float rand(vec3 s,float seed){return fract(sin(dot(gl_FragCoord.xyz+seed,s))*43758.5453+seed);}void main(){vec2 tUv=vUv*uvScale+uvOffset;if(abs(strength)>0.001){vec4 col=vec4(0.);float total=0.;vec2 toC=center*uvScale+uvOffset-tUv;float off=rand(vec3(12.9898,78.233,151.7182),0.);for(float t=0.;t<=20.;t++){float pct=(t+off)/20.;float w=2.*(pct-pct*pct);vec4 tx=texture2D(map,tUv+toC*pct*strength);tx.rgb*=tx.a;col+=tx*w;total+=w;}gl_FragColor=col/total;gl_FragColor.rgb/=gl_FragColor.a+0.00001;gl_FragColor.a=1.-abs(strength);}else{gl_FragColor=texture2D(map,tUv);}}`;
-  const VERT=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
-  const lerp=(a,b,t)=>a+(b-a)*t;
-  function uvs(tex){const iR=tex.image.width/tex.image.height,vR=W()/H();let ox=0,oy=0,sx=1,sy=1;if(iR>vR){sx=vR/iR;ox=(1-sx)/2;}else{sy=iR/vR;oy=(1-sy)/2;}return{ox,oy,sx,sy};}
-  function makeMat(tex){const u=uvs(tex);return new THREE.ShaderMaterial({transparent:true,uniforms:{map:{value:tex},center:{value:new THREE.Vector2(.5,.5)},strength:{value:0},uvOffset:{value:new THREE.Vector2(u.ox,u.oy)},uvScale:{value:new THREE.Vector2(u.sx,u.sy)}},vertexShader:VERT,fragmentShader:FRAG});}
-  function makePlane(m){return new THREE.Mesh(new THREE.PlaneGeometry(2,2),m);}
-  function setP(p){const p01=((p%1)+1)%1;mat1.uniforms.strength.value=p01;mat2.uniforms.strength.value=-1+p01;}
-  function navigate(ni){
-    if(ni===currentIdx)return;
-    const N=textures.length;ni=((ni%N)+N)%N;const nx=(ni+1)%N;
-    mat1.uniforms.map.value=textures[ni];mat2.uniforms.map.value=textures[nx];
-    const u1=uvs(textures[ni]),u2=uvs(textures[nx]);
-    mat1.uniforms.uvOffset.value.set(u1.ox,u1.oy);mat1.uniforms.uvScale.value.set(u1.sx,u1.sy);
-    mat2.uniforms.uvOffset.value.set(u2.ox,u2.oy);mat2.uniforms.uvScale.value.set(u2.sx,u2.sy);
-    const t0=performance.now(),dur=900,dir=ni>currentIdx?1:-1,sp=progress%1;
-    function af(now){const t=Math.min((now-t0)/dur,1),e=t<.5?2*t*t:-1+(4-2*t)*t;progress=lerp(sp,sp+dir,e);setP(progress);if(t<1)requestAnimationFrame(af);else progress=Math.round(progress);}
-    requestAnimationFrame(af);
-    currentIdx=ni;onSlideChange&&onSlideChange(ni);
-    clearTimeout(autoTimer);autoTimer=setTimeout(()=>{if(!destroyed)navigate((currentIdx+1)%textures.length);},4500);
-  }
-  function tick(){if(destroyed)return;rafId=requestAnimationFrame(tick);cx1=lerp(cx1,mouseX,.07);cy1=lerp(cy1,mouseY,.07);cx2=lerp(cx2,mouseX,.07);cy2=lerp(cy2,mouseY,.07);mat1.uniforms.center.value.set(cx1,cy1);mat2.uniforms.center.value.set(cx2,cy2);renderer.render(scene,camera);}
-  function onMouse(e){const r=host.getBoundingClientRect();mouseX=(e.clientX-r.left)/r.width;mouseY=1-(e.clientY-r.top)/r.height;}
-  function onResize(){if(!renderer||destroyed)return;renderer.setSize(W(),H());[mat1,mat2].forEach(m=>{if(!m)return;const u=uvs(m.uniforms.map.value);m.uniforms.uvOffset.value.set(u.ox,u.oy);m.uniforms.uvScale.value.set(u.sx,u.sy);});}
-  return{
-    start(){
-      renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
-      renderer.setPixelRatio(window.devicePixelRatio);renderer.setSize(W(),H());
-      host.appendChild(renderer.domElement);
-      camera=new THREE.OrthographicCamera(-1,1,1,-1,.1,10);camera.position.z=1;
-      scene=new THREE.Scene();
-      Promise.all(images.map(img=>new Promise(res=>{new THREE.TextureLoader().load(img.src,tex=>{img._tex=tex;res(tex);});}))).then(txs=>{
-        textures=txs;
-        mat1=makeMat(textures[0]);mat2=makeMat(textures[1]||textures[0]);
-        plane1=makePlane(mat1);plane2=makePlane(mat2);
-        scene.add(plane2,plane1);setP(0);
-        mat1.uniforms.strength.value=-0.9;
-        const t0=performance.now();
-        function ea(now){const tt=Math.min((now-t0)/2000,1),e=tt<.5?2*tt*tt:-1+(4-2*tt)*tt;mat1.uniforms.strength.value=lerp(-.9,0,e);if(tt<1)requestAnimationFrame(ea);}
-        requestAnimationFrame(ea);tick();
-        clearTimeout(autoTimer);autoTimer=setTimeout(()=>{if(!destroyed)navigate(1%textures.length);},4500);
-        host.addEventListener('mousemove',onMouse);window.addEventListener('resize',onResize);
-      });
-    },
-    next(){navigate((currentIdx+1)%images.length);},
-    prev(){navigate((currentIdx-1+images.length)%images.length);},
-    goTo(i){navigate(i);},
-    destroy(){destroyed=true;cancelAnimationFrame(rafId);clearTimeout(autoTimer);host.removeEventListener('mousemove',onMouse);window.removeEventListener('resize',onResize);if(renderer){renderer.dispose();host.innerHTML='';}}
-  };
-}
-
 function buildItinerary(){
   const c=document.getElementById('itin-container');
+  const frag=document.createDocumentFragment();
   ITINERARY.forEach(item=>{
     const d=document.createElement('div');
     d.className='itin-hover';
@@ -910,8 +865,9 @@ function buildItinerary(){
         <div style="font-family:'Fraunces',serif;font-size:.95rem;font-weight:600;color:#2A1F16;margin-bottom:.3rem">${item.title}</div>
         <div style="font-size:.8rem;color:rgba(42,31,22,.5);line-height:1.7">${item.desc}</div>
       </div>`;
-    c.appendChild(d);
+    frag.appendChild(d);
   });
+  c.appendChild(frag);
 }
 
 function buildPadrinos(){
@@ -968,9 +924,16 @@ function toggleAccordion(bodyId,chevId){
   document.getElementById(bodyId).classList.toggle('acc-body-open');
   document.getElementById(chevId).classList.toggle('acc-chev-open');
 }
+/* Load the map iframe only the first time the "El Lugar" section is expanded (saves an eager iframe load) */
+let lugarMapLoaded=false;
 function toggleLugar(){
   document.getElementById('lugar-body').classList.toggle('acc-body-open');
   document.getElementById('lugar-chevron').classList.toggle('acc-chev-open');
+  if(!lugarMapLoaded){
+    lugarMapLoaded=true;
+    const wrap=document.getElementById('lugar-map-wrap');
+    wrap.innerHTML='<iframe title="Mapa" src="https://maps.google.com/maps?q=Bogot%C3%A1,+Colombia&output=embed" style="width:100%;height:100%;border:none;display:block" loading="lazy"></iframe>';
+  }
 }
 function setAttend(btn,val){
   attendVal=val;
@@ -1063,17 +1026,18 @@ function removeSong(i){
   renderSongListUI();showSongStrip();
 }
 
-/* DUST PARTICLES */
+/* DUST PARTICLES — lightweight canvas, pauses when tab hidden or scrolled away */
 function initDust(){
   const canvas=document.getElementById('dust-canvas');
   const ctx=canvas.getContext('2d');
-  let W,H;
+  let W,H,resizeTimer=null;
   function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
-  resize();window.addEventListener('resize',resize);
+  resize();
+  window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(resize,150);});
   const cols=['#E8A020','#C4785A','#FBF5EC','#E8C060','#D4906A'];
-  const pts=Array.from({length:40},()=>mkPt(true));
+  const pts=Array.from({length:18},()=>mkPt(true));
   function mkPt(rand=false){return{x:Math.random()*W,y:rand?Math.random()*H:-10,r:1+Math.random()*3,speed:.3+Math.random()*.8,drift:(Math.random()-.5)*.4,shape:Math.random()>.5?'diamond':'dot',opacity:.1+Math.random()*.4,col:cols[Math.floor(Math.random()*cols.length)]};}
-  function drawDiamond(ctx,x,y,r){ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);ctx.fillRect(-r/2,-r/2,r,r);ctx.restore();}
+  function drawDiamond(c,x,y,r){c.save();c.translate(x,y);c.rotate(Math.PI/4);c.fillRect(-r/2,-r/2,r,r);c.restore();}
   function draw(p){
     ctx.save();ctx.globalAlpha=p.opacity;ctx.fillStyle=p.col;
     if(p.shape==='diamond')drawDiamond(ctx,p.x,p.y,p.r*2);
@@ -1081,15 +1045,25 @@ function initDust(){
     ctx.restore();
   }
   function animate(){
+    if(tabHidden||!dustVisible){dustAnimId=null;return;}
     ctx.clearRect(0,0,W,H);
     pts.forEach(p=>{
       p.y+=p.speed;p.x+=p.drift;
       if(p.y>H+20)Object.assign(p,mkPt());
       draw(p);
     });
-    requestAnimationFrame(animate);
+    dustAnimId=requestAnimationFrame(animate);
   }
+  window.__resumeDust=()=>{if(!dustAnimId&&!tabHidden&&dustVisible)animate();};
   animate();
+}
+
+function observePauseOnHidden(){
+  document.addEventListener('visibilitychange',()=>{
+    tabHidden=document.hidden;
+    if(!tabHidden){if(window.__resumeDust)window.__resumeDust();restartGalAuto();}
+    else{clearTimeout(galAutoTimer);}
+  });
 }
 
 function observeItinLine(){
