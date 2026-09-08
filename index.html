@@ -69,6 +69,91 @@
     font-family: var(--c-serif);
     scroll-behavior: smooth;
     box-shadow: 0 0 80px 20px rgba(0,0,0,.55);
+    /* ── Tono cinematográfico global: película de época levemente desaturada y cálida ── */
+    filter: sepia(.07) contrast(1.04) brightness(.96) saturate(.92);
+  }
+
+  /* ════ SISTEMA DE FILTROS CINEMATOGRÁFICOS ════
+     3 capas no destructivas sobre #card-wrapper:
+     1. Viñeta daguerrotipo — bordes oscuros que concentran la vista al centro
+     2. Grain de película — ruido SVG muy sutil en mix-blend-mode overlay
+     3. Resplandor de vela — calor ámbar pulsante en la parte superior
+  ════ */
+
+  /* Capa 1: Viñeta daguerrotipo — pseudo fijo dentro del wrapper */
+  #card-vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    max-width: 480px;
+    margin: 0 auto;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 90% 70% at 50% 50%,
+        transparent 42%,
+        rgba(28,24,18,.18) 65%,
+        rgba(18,15,10,.48) 82%,
+        rgba(10,9,7,.68) 100%
+      );
+    /* Bordes más oscuros en los lados para efecto cámara antigua */
+    border-left:  1px solid rgba(0,0,0,.08);
+    border-right: 1px solid rgba(0,0,0,.08);
+  }
+
+  /* Capa 2: Grain de película — SVG feTurbulence */
+  #card-grain {
+    position: fixed;
+    inset: 0;
+    z-index: 36;
+    max-width: 480px;
+    margin: 0 auto;
+    pointer-events: none;
+    opacity: .038;
+    mix-blend-mode: overlay;
+    /* El SVG inline genera el ruido fotográfico */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23grain)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 180px 180px;
+    animation: grainShift 0.9s steps(1) infinite;
+  }
+  @keyframes grainShift {
+    0%   { background-position:  0px   0px; }
+    11%  { background-position: -22px -14px; }
+    22%  { background-position:  18px  28px; }
+    33%  { background-position: -35px   8px; }
+    44%  { background-position:  12px -32px; }
+    55%  { background-position: -8px   22px; }
+    66%  { background-position:  30px -18px; }
+    77%  { background-position: -15px  35px; }
+    88%  { background-position:  24px  -6px; }
+    100% { background-position:  0px   0px; }
+  }
+
+  /* Capa 3: Resplandor de vela — calor ámbar en top, frío místico en bottom */
+  #card-candle-glow {
+    position: fixed;
+    inset: 0;
+    z-index: 34;
+    max-width: 480px;
+    margin: 0 auto;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 30% at 50% 0%,
+        rgba(210,178,110,.09) 0%,
+        transparent 70%
+      ),
+      radial-gradient(ellipse 60% 20% at 50% 100%,
+        rgba(80,65,110,.07) 0%,
+        transparent 70%
+      );
+    animation: candleFlicker 5.5s ease-in-out infinite;
+  }
+  @keyframes candleFlicker {
+    0%,100% { opacity: .75; transform: scaleX(1); }
+    20%     { opacity: 1;   transform: scaleX(1.012); }
+    40%     { opacity: .82; transform: scaleX(.994); }
+    60%     { opacity: .95; transform: scaleX(1.008); }
+    80%     { opacity: .78; transform: scaleX(.997); }
   }
 
   #card-wrapper::-webkit-scrollbar { width: 0; height: 0; }
@@ -124,26 +209,67 @@
     50% { opacity:.95; transform:translate(-50%,-50%) scale(1.035); }
   }
   .framed-section .frame-art {
-    position: absolute; inset: 8px; z-index: 1;
+    position: absolute; inset: 0; z-index: 1;
     background-image: url("https://hercules-cdn.com/file_HFxVy11rtq1bxlqq6fjAf1Lx");
     background-repeat: no-repeat; background-position: center;
     background-size: 100% 100%; pointer-events: none;
-    filter: saturate(.55) sepia(.12) hue-rotate(45deg) brightness(1.03)
-      drop-shadow(0 1px 0 rgba(255,255,250,.6))
-      drop-shadow(0 3px 10px rgba(46,43,53,.28))
-      drop-shadow(0 0 20px rgba(164,159,124,.25));
-    opacity: .96;
-    transition: transform 1.1s cubic-bezier(.16,.8,.24,1), opacity 1.1s ease;
-    transform: scale(1.015);
-  }
-  .framed-section.in-view .frame-art { transform: scale(1); }
 
+    /* Multiply: los trazos oscuros se graban sobre el pergamino,
+       el blanco del SVG desaparece completamente */
+    mix-blend-mode: multiply;
+
+    /* Máscara en dos capas compuestas:
+       1. Viñeta radial: esquinas y bordes bien visibles, centro invisible
+       2. Gradientes lineales: bordes superior/inferior se desvanecen suavemente
+       Juntas dan un efecto de papel envejecido impreso */
+    -webkit-mask-image:
+      radial-gradient(ellipse 82% 78% at 50% 50%,
+        transparent 0%,
+        transparent 28%,
+        rgba(0,0,0,.08) 40%,
+        rgba(0,0,0,.55) 58%,
+        rgba(0,0,0,.88) 74%,
+        black 88%,
+        rgba(0,0,0,.75) 100%
+      );
+    mask-image:
+      radial-gradient(ellipse 82% 78% at 50% 50%,
+        transparent 0%,
+        transparent 28%,
+        rgba(0,0,0,.08) 40%,
+        rgba(0,0,0,.55) 58%,
+        rgba(0,0,0,.88) 74%,
+        black 88%,
+        rgba(0,0,0,.75) 100%
+      );
+
+    /* Sepia calibrado: mismo calor que el pergamino #e8e1ce */
+    filter:
+      saturate(.28)
+      sepia(.45)
+      hue-rotate(6deg)
+      brightness(1.06)
+      contrast(.85);
+
+    opacity: .72;
+    transition: transform 1.6s cubic-bezier(.16,.8,.24,1), opacity 1.6s ease;
+    transform: scale(1.025);
+  }
+  .framed-section.in-view .frame-art {
+    transform: scale(1);
+    opacity: .82;
+  }
+
+  /* Los sellos de cera también se funden con el fondo */
   .framed-section .wax-seal {
-    position: absolute; width: 30px; height: 30px; z-index: 1;
+    position: absolute; width: 28px; height: 28px; z-index: 1;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, #8b7fa8 0%, var(--c-d) 55%, #453a63 100%);
-    box-shadow: 0 2px 6px rgba(0,0,0,.4), inset 0 1px 2px rgba(255,255,255,.3), inset 0 -2px 4px rgba(0,0,0,.3);
-    opacity: .85;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3), inset 0 1px 2px rgba(255,255,255,.25), inset 0 -2px 3px rgba(0,0,0,.25);
+    /* sello se integra con viñeta alrededor */
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, black 55%, rgba(0,0,0,.45) 78%, transparent 100%);
+    mask-image: radial-gradient(circle at 50% 50%, black 55%, rgba(0,0,0,.45) 78%, transparent 100%);
+    opacity: .7;
   }
   .framed-section .wax-seal::before {
     content:"❖"; position:absolute; inset:0;
@@ -408,102 +534,7 @@
     100% { opacity: 0; }
   }
 
-  /* ════ 1. SPLASH (dentro de la tarjeta) ════ */
-  #splash {
-    position:fixed; inset:0; z-index:50;
-    max-width:480px; margin:0 auto;
-    background:
-      radial-gradient(circle at 50% 20%, rgba(164,159,124,.18), transparent 60%),
-      linear-gradient(180deg, var(--c-bg) 0%, var(--c-bg-deep) 100%);
-    display:flex; align-items:center; justify-content:center;
-    overflow:hidden;
-    transition:opacity .7s ease, visibility .7s ease;
-  }
-  #splash::before {
-    content:""; position:absolute; inset:0;
-    background-image:url("https://hercules-cdn.com/file_HFxVy11rtq1bxlqq6fjAf1Lx");
-    background-repeat:no-repeat; background-position:center;
-    background-size:108% 108%; opacity:.5;
-    filter:drop-shadow(0 0 24px rgba(164,159,124,.25)); pointer-events:none;
-  }
-  #splash::after {
-    content:""; position:absolute; top:50%; left:50%;
-    width:90%; height:60%; transform:translate(-50%,-50%);
-    background:radial-gradient(circle,rgba(164,159,124,.24) 0%,transparent 70%);
-    filter:blur(10px); animation:frameGlowBreathe 6s ease-in-out infinite; pointer-events:none;
-  }
-  #splash.hide { opacity:0; visibility:hidden; pointer-events:none; }
-
-  .splash-inner {
-    text-align:center; padding:52px 40px;
-    border:1px solid var(--c-e); position:relative; z-index:1;
-    background:rgba(243,238,226,.55); backdrop-filter:blur(2px);
-    box-shadow:0 0 50px rgba(0,0,0,.3), inset 0 0 0 1px rgba(164,159,124,.25);
-    display:flex; flex-direction:column; align-items:center; gap:0;
-    opacity:0; transform:translateY(14px) scale(.98);
-    animation:splashIn 1.1s cubic-bezier(.16,.8,.24,1) .15s forwards;
-  }
-  @keyframes splashIn { to { opacity:1; transform:translateY(0) scale(1); } }
-  .splash-inner::before, .splash-inner::after {
-    content:""; position:absolute; width:40px; height:40px; border:1px solid var(--c-e);
-  }
-  .splash-inner::before { top:-10px; left:-10px; border-right:none; border-bottom:none; }
-  .splash-inner::after  { bottom:-10px; right:-10px; border-left:none; border-top:none; }
-
-  .splash-fleur {
-    width:30px; height:30px; margin:0 auto 20px; opacity:.85;
-    filter:drop-shadow(0 1px 3px rgba(58,36,22,.3));
-    animation:splashFleurSpin 12s linear infinite;
-  }
-  .splash-fleur svg { width:100%; height:100%; fill:var(--c-d); }
-  @keyframes splashFleurSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-
-  #sp-15 {
-    font-family:var(--c-mono); letter-spacing:var(--ls-wide);
-    text-transform:uppercase; font-size:var(--fs-kicker); color:var(--c-dim);
-    margin-bottom:4px;
-  }
-  #sp-name {
-    font-family:var(--c-script); font-size:var(--fs-script-lg);
-    line-height:1.1; color:var(--c-d);
-    margin:14px 0 6px;
-    text-shadow:0 2px 12px rgba(164,159,124,.25);
-  }
-  #sp-date {
-    font-family:var(--c-serif); font-size:var(--fs-body);
-    letter-spacing:var(--ls-mid); color:var(--c-text); margin-bottom:26px;
-  }
-  .splash-divider {
-    width:70px; height:1px;
-    background:linear-gradient(90deg,transparent,var(--c-line),transparent);
-    margin:0 auto 26px; position:relative;
-  }
-  .splash-divider::before {
-    content:"❖"; position:absolute; top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    background:rgba(243,238,226,.55); padding:0 8px; color:var(--c-e); font-size:11px;
-  }
-  #sp-btn {
-    font-family:var(--c-mono); font-size:var(--fs-label);
-    letter-spacing:var(--ls-mid); text-transform:uppercase;
-    background:linear-gradient(180deg,rgba(164,159,124,.12),rgba(164,159,124,0));
-    border:1px solid var(--c-e); color:var(--c-d);
-    padding:14px 34px; cursor:pointer;
-    transition:background .35s, color .35s, box-shadow .35s, transform .25s;
-    display:inline-block; position:relative;
-    box-shadow:inset 0 0 0 1px rgba(164,159,124,.25);
-    animation:splashBtnPulse 3.2s ease-in-out infinite;
-  }
-  @keyframes splashBtnPulse {
-    0%,100%{box-shadow:inset 0 0 0 1px rgba(164,159,124,.25),0 0 0 rgba(164,159,124,0)}
-    50%{box-shadow:inset 0 0 0 1px rgba(164,159,124,.35),0 0 16px rgba(164,159,124,.35)}
-  }
-  #sp-btn::before,#sp-btn::after {
-    content:""; position:absolute; width:8px; height:8px; border:1px solid var(--c-e);
-  }
-  #sp-btn::before{top:-1px;left:-1px;border-right:none;border-bottom:none;}
-  #sp-btn::after{bottom:-1px;right:-1px;border-left:none;border-top:none;}
-  #sp-btn:hover{background:var(--c-d);color:#f3eee2;transform:translateY(-1px);box-shadow:0 0 18px rgba(111,95,146,.45),inset 0 0 0 1px rgba(164,159,124,.5);}
+  /* ════ 1. SPLASH (dentro de la tarjeta) — ELIMINADO, se usa entry splash ════ */
 
   /* ════ 2. PORTADA ════ */
   #pv-portada { padding:52px 36px 44px !important; }
@@ -524,8 +555,28 @@
   #pv-retrato-wrap:hover { transform:scale(1.03); }
 
   #pv-portada .frame-art {
-    background-image:url("https://hercules-cdn.com/file_NzcoIy11dYQ2ze0w6jLe8UGI");
-    background-size:100% 100%; mix-blend-mode:multiply; opacity:1;
+    background-image: url("https://hercules-cdn.com/file_NzcoIy11dYQ2ze0w6jLe8UGI");
+    background-size: 106% 106%;
+    mix-blend-mode: multiply;
+    /* Máscara idéntica a los demás marcos — bordes que se disuelven */
+    -webkit-mask-image:
+      radial-gradient(ellipse 88% 82% at 50% 50%,
+        transparent 22%,
+        rgba(0,0,0,.18) 44%,
+        rgba(0,0,0,.68) 66%,
+        rgba(0,0,0,.88) 82%,
+        rgba(0,0,0,.6) 100%
+      );
+    mask-image:
+      radial-gradient(ellipse 88% 82% at 50% 50%,
+        transparent 22%,
+        rgba(0,0,0,.18) 44%,
+        rgba(0,0,0,.68) 66%,
+        rgba(0,0,0,.88) 82%,
+        rgba(0,0,0,.6) 100%
+      );
+    filter: saturate(.3) sepia(.42) hue-rotate(8deg) brightness(1.1) contrast(.85);
+    opacity: .82;
   }
 
   /* Portada: todos los bloques de texto con gap uniforme */
@@ -697,10 +748,9 @@
   }
   .btn-outline:active { transform: translateY(0); }
 
-  /* ── Botones de canciones y splash — misma base medieval ── */
+  /* ── Botones de canciones y formulario — misma base medieval ── */
   #song-add-btn, #song-suggest-ok,
-  #rsvp-form button[type="submit"],
-  #sp-btn {
+  #rsvp-form button[type="submit"] {
     font-family: "Cormorant Garamond", serif;
     font-size: clamp(10px, 2.6vw, 11.5px);
     letter-spacing: 0.22em;
@@ -722,30 +772,25 @@
   #rsvp-form button[type="submit"] {
     padding: 14px; margin-top: 8px; width: 100%;
   }
-  #sp-btn {
-    padding: 14px 36px; display: inline-block; margin: 0 auto;
-    animation: splashBtnPulse 3.2s ease-in-out infinite;
-  }
   #song-add-btn::before, #song-add-btn::after,
   #song-suggest-ok::before, #song-suggest-ok::after,
   #rsvp-form button[type="submit"]::before,
-  #rsvp-form button[type="submit"]::after,
-  #sp-btn::before, #sp-btn::after {
+  #rsvp-form button[type="submit"]::after {
     content: "";
     position: absolute;
     width: 10px; height: 10px;
     border: 1px solid var(--c-e);
   }
   #song-add-btn::before,#song-suggest-ok::before,
-  #rsvp-form button[type="submit"]::before,#sp-btn::before {
+  #rsvp-form button[type="submit"]::before {
     top:-1px;left:-1px;border-right:none;border-bottom:none;
   }
   #song-add-btn::after,#song-suggest-ok::after,
-  #rsvp-form button[type="submit"]::after,#sp-btn::after {
+  #rsvp-form button[type="submit"]::after {
     bottom:-1px;right:-1px;border-left:none;border-top:none;
   }
   #song-add-btn:hover,#song-suggest-ok:hover,
-  #rsvp-form button[type="submit"]:hover,#sp-btn:hover {
+  #rsvp-form button[type="submit"]:hover {
     background: linear-gradient(180deg, var(--c-d) 0%, #5a4d7a 100%);
     color: #f3eee2;
     box-shadow: inset 0 0 0 3px rgba(255,255,250,.15), 0 4px 20px rgba(111,95,146,.5);
@@ -1063,20 +1108,13 @@
 
 <div id="card-wrapper" data-theme="elegante" data-plan-active="deluxe">
 
+  <!-- Capas de filtro cinematográfico: viñeta + grain + vela -->
+  <div id="card-vignette" aria-hidden="true"></div>
+  <div id="card-grain"    aria-hidden="true"></div>
+  <div id="card-candle-glow" aria-hidden="true"></div>
+
   <canvas id="particle-canvas"></canvas>
   <div id="scroll-progress"><div id="scroll-progress-bar"></div></div>
-
-  <!-- ════════════ 1. SPLASH ════════════ -->
-  <section id="splash">
-    <div class="splash-inner">
-      <div class="splash-fleur"><svg viewBox="0 0 24 24"><path d="M12 2c-1.2 2-1.2 4 0 6-1.2-2-3.2-2.6-5-1.4 1.6.4 2.6 1.8 2.6 3.4-1.6-1-3.6-.6-4.6 1 1.8-.4 3.4.4 3.8 2.2C7 12 5.6 13 4 13c1.4 1.2 3.4 1 4.4-.6-.2 1.8.8 3.4 2.4 4-.4-1.8.4-3.4 2-4.2.2 2-.8 3.8-2.4 4.8 2 .2 3.8-1 4.2-3 .6 1.8 2.4 3 4.4 2.8-1.4-1-1.8-2.8-1-4.4 1.6 1 3.6.6 4.6-1-1.8.4-3.4-.4-3.8-2.2 1.8.4 3.4-.6 3.8-2.4-1.6 1-3.6.6-4.6-1 1.6-.6 2.4-2.2 2-3.8-1 1.4-2.8 1.8-4.4 1 1-1.6.6-3.6-1-4.6.4 1.8-.4 3.4-2.2 3.8C13.2 5.8 12.8 3.8 12 2z"/></svg></div>
-      <div id="sp-15">Nos Casamos</div>
-      <div id="sp-name">Valentina &amp; Santiago</div>
-      <div id="sp-date">24 de Mayo, 2025</div>
-      <div class="splash-divider"></div>
-      <button id="sp-btn" type="button">Abrir Invitación</button>
-    </div>
-  </section>
 
   <!-- ════════════ 2. PORTADA ════════════ -->
   <section id="pv-portada" class="framed-section">
@@ -1368,7 +1406,7 @@
     signature: 'Con amor, Valentina & Santiago',
     palette: 'medieval',
     particles: 'ninguna',
-    showSplash: false,
+    showSplash: false, /* legado — ya no usado */
     splashBtn: 'Abrir Invitación',
     itinerary: [
       { v: '4:00 P.M. — Ceremonia religiosa' },
@@ -1587,13 +1625,6 @@
   }
 
   function renderPreview(){
-    setText('sp-15','Nos Casamos');
-    setText('sp-name',state.name);
-    setText('sp-date',fmtDate(state.date));
-    setText('sp-btn',state.splashBtn);
-    document.getElementById('splash').style.display=state.showSplash?'flex':'none';
-    cardWrapper.classList.toggle('splash-active',!!state.showSplash);
-
     setText('pv-nombre','Boda');
     setText('pv-caption',state.caption);
     setImg('pv-retrato',state.imgKeys.retrato);
@@ -1689,14 +1720,6 @@
   }
   setInterval(tickCountdown,1000);
 
-  /* ── Splash ── */
-  document.getElementById('sp-btn').addEventListener('click',function(){
-    document.getElementById('splash').classList.add('hide');
-    state.showSplash=false;
-    cardWrapper.classList.remove('splash-active');
-    cardWrapper.scrollTo({top:0,behavior:'auto'});
-  });
-
   /* ── Scroll progress + back to top ── */
   var progressBar=document.getElementById('scroll-progress-bar');
   var backToTop=document.getElementById('back-to-top');
@@ -1785,16 +1808,16 @@
     }
   }
 
-  /* ── Scroll reveal ── */
+  /* ── Scroll reveal — root: card-wrapper para scroll interno ── */
   var revealEls=document.querySelectorAll('.reveal');
   var observer=new IntersectionObserver(function(entries){
     entries.forEach(function(entry){if(entry.isIntersecting){entry.target.classList.add('in');observer.unobserve(entry.target);}});
-  },{threshold:0.12});
+  },{root:cardWrapper, threshold:0.08, rootMargin:'0px 0px -40px 0px'});
   revealEls.forEach(function(el){observer.observe(el);});
 
   var frameObserver=new IntersectionObserver(function(entries){
     entries.forEach(function(entry){entry.target.classList.toggle('in-view',entry.isIntersecting);});
-  },{threshold:0.2});
+  },{root:cardWrapper, threshold:0.12});
   document.querySelectorAll('.framed-section').forEach(function(el){frameObserver.observe(el);});
 
   /* ── Init ── */
