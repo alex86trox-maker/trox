@@ -47,8 +47,6 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 input,textarea,select{font-family:inherit;outline:none;border:none;background:none;color:inherit}
 input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
 
-/* ── PETAL CANVAS — removido ─────────────────────────────────────────── */
-
 /* ── CARD WRAPPER ────────────────────────────────────────────────────── */
 #card-wrapper{
   background:var(--c-bg);color:var(--c-text);
@@ -470,10 +468,19 @@ audio#pv-audio{display:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 
 /* ══════════════════════════════════════════════════
-   3-D CARD DECK GALLERY — v2 Professional
+   3-D CARD DECK GALLERY — v3 Proporción mejorada
+   El alto de la escena y el tamaño de las tarjetas
+   ahora están calibrados para llenar mejor el espacio
+   de la sección (menos vacío arriba/abajo), y la
+   animación JS re-escala automáticamente según el
+   tamaño real del contenedor (ver SCALE en el script).
 ══════════════════════════════════════════════════ */
 #deck-scene{
-  width:100%;height:560px;position:relative;overflow:hidden;
+  width:100%;
+  /* Altura proporcional al ancho real de la tarjeta (máx 440px),
+     en vez de un valor fijo que dejaba demasiado espacio muerto */
+  height:clamp(400px, 108vw, 480px);
+  position:relative;overflow:hidden;
   background:radial-gradient(ellipse at 50% 30%,#1c1408 0%,#0a0703 70%);
   cursor:grab;user-select:none;-webkit-user-select:none
 }
@@ -481,7 +488,7 @@ audio#pv-audio{display:none}
 
 /* Ambient floor reflection */
 #deck-scene::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:220px;
+  content:'';position:absolute;bottom:0;left:0;right:0;height:190px;
   background:linear-gradient(to top,rgba(0,0,0,.98) 0%,rgba(0,0,0,.6) 40%,transparent 100%);
   z-index:3;pointer-events:none
 }
@@ -493,11 +500,9 @@ audio#pv-audio{display:none}
   z-index:2;pointer-events:none
 }
 
-/* Fixed editorial hero — removido, título está fuera del deck */
-
 /* Drag hint dots */
 #deck-hint{
-  position:absolute;bottom:1.4rem;left:50%;transform:translateX(-50%);
+  position:absolute;bottom:1.2rem;left:50%;transform:translateX(-50%);
   display:flex;gap:.4rem;z-index:10;pointer-events:none
 }
 .deck-dot{
@@ -511,13 +516,15 @@ audio#pv-audio{display:none}
 #deck-track{
   position:absolute;inset:0;z-index:1;
   perspective:1100px;
-  perspective-origin:50% 38%
+  perspective-origin:50% 40%
 }
 
 /* ── CARD ── */
+/* Tarjetas más grandes (antes 110x154) para que ocupen mejor
+   el espacio disponible de la escena y se vean más presentes */
 .dcard{
   position:absolute;
-  width:110px;height:154px;
+  width:128px;height:179px;
   left:50%;top:50%;
   transform-origin:50% 100%;   /* pivot from card base for arc motion */
   transform-style:preserve-3d;
@@ -568,7 +575,7 @@ audio#pv-audio{display:none}
 /* Reflection below card */
 .dcard-reflection{
   position:absolute;
-  width:110px;height:60px;
+  width:128px;height:70px;
   left:50%;top:50%;
   transform-origin:50% 0%;
   will-change:transform,opacity;
@@ -604,7 +611,6 @@ audio#pv-audio{display:none}
 </head>
 <body>
 
-<!-- SVG canvas removido -->
 <div id="scroll-bar"><div id="scroll-bar-fill"></div></div>
 <div id="lightbox" role="dialog"><img id="lb-img" src="" alt=""/></div>
 <div id="toast"></div>
@@ -615,33 +621,6 @@ audio#pv-audio{display:none}
 <div id="splash">
   <div id="sp-rings">
     <img src="https://hercules-cdn.com/file_rI7key2Ab3AJtmY7HqH1JG9H" alt="anillos de boda" style="width:140px;height:140px;object-fit:contain;display:block;filter:drop-shadow(0 0 18px rgba(212,175,112,.45))"/>
-    <svg viewBox="0 0 140 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none">
-      <!-- Left ring -->
-      <circle cx="52" cy="50" r="32" stroke="#d4af70" stroke-width="3" fill="none"/>
-      <circle cx="52" cy="50" r="26" stroke="#d4af70" stroke-width=".8" fill="none" opacity=".35"/>
-      <circle cx="52" cy="50" r="38" stroke="#d4af70" stroke-width=".5" fill="none" opacity=".15"/>
-      <!-- Ring diamond / stone -->
-      <path d="M52 33 L57 41 L52 46 L47 41 Z" fill="#d4af70" opacity=".9"/>
-      <path d="M52 33 L57 41 L52 38 Z" fill="#c9a450" opacity=".7"/>
-      <path d="M52 33 L47 41 L52 38 Z" fill="#e8d5a0" opacity=".5"/>
-      <!-- Right ring -->
-      <circle cx="88" cy="50" r="32" stroke="#c9a450" stroke-width="3" fill="none"/>
-      <circle cx="88" cy="50" r="26" stroke="#c9a450" stroke-width=".8" fill="none" opacity=".35"/>
-      <circle cx="88" cy="50" r="38" stroke="#c9a450" stroke-width=".5" fill="none" opacity=".15"/>
-      <!-- Ring diamond / stone -->
-      <path d="M88 33 L93 41 L88 46 L83 41 Z" fill="#c9a450" opacity=".9"/>
-      <path d="M88 33 L93 41 L88 38 Z" fill="#b8906a" opacity=".7"/>
-      <path d="M88 33 L83 41 L88 38 Z" fill="#e8d5a0" opacity=".5"/>
-      <!-- Interlock overlap (mask right side of left ring) -->
-      <!-- Fine engraving lines on band -->
-      <path d="M24 54 Q38 56 52 54" stroke="#d4af70" stroke-width=".6" fill="none" opacity=".4"/>
-      <path d="M88 54 Q102 56 116 54" stroke="#c9a450" stroke-width=".6" fill="none" opacity=".4"/>
-      <!-- Corner flourishes -->
-      <path d="M10 20 Q18 14 26 20" stroke="#d4af70" stroke-width=".8" fill="none" opacity=".4"/>
-      <path d="M114 20 Q122 14 130 20" stroke="#c9a450" stroke-width=".8" fill="none" opacity=".4"/>
-      <circle cx="10" cy="20" r="1.5" fill="#d4af70" opacity=".5"/>
-      <circle cx="130" cy="20" r="1.5" fill="#c9a450" opacity=".5"/>
-    </svg>
   </div>
   <div id="sp-names">
     <span id="sp-name" contenteditable="true">Valeria &amp; Rodrigo</span>
@@ -652,15 +631,12 @@ audio#pv-audio{display:none}
   <div id="sp-scroll-hint" style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.3rem;opacity:.5;animation:fadeUp 1s 1.2s both">
     <div style="font-family:'Montserrat',sans-serif;font-size:.55rem;letter-spacing:.4em;text-transform:uppercase;color:#d4af70">Toca para abrir</div>
     <svg width="16" height="26" viewBox="0 0 16 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Mouse body -->
       <rect x="1" y="1" width="14" height="20" rx="7" stroke="#d4af70" stroke-width="1" opacity=".55" fill="none"/>
-      <!-- Scroll wheel -->
       <line x1="8" y1="6" x2="8" y2="10" stroke="#d4af70" stroke-width="1.5" stroke-linecap="round" opacity=".9">
         <animate attributeName="y1" values="6;9;6" dur="1.8s" repeatCount="indefinite"/>
         <animate attributeName="y2" values="10;13;10" dur="1.8s" repeatCount="indefinite"/>
         <animate attributeName="opacity" values=".9;.2;.9" dur="1.8s" repeatCount="indefinite"/>
       </line>
-      <!-- Down chevrons -->
       <path d="M5 23 L8 26 L11 23" stroke="#d4af70" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".5"/>
     </svg>
   </div>
@@ -669,7 +645,6 @@ audio#pv-audio{display:none}
 <!-- ════════ CARD ════════ -->
 <div id="card-wrapper" data-theme="nocturno">
 
-  <!-- THEME SWITCHER -->
   <div class="theme-switcher" style="padding-top:1rem">
     <div class="theme-dot active" data-t="clasico" title="Clásico"></div>
     <div class="theme-dot" data-t="romantico" title="Romántico"></div>
@@ -728,7 +703,7 @@ audio#pv-audio{display:none}
   </section>
 
   <!-- ════════════════════════════════════════════════
-       SECCIÓN 4 · AGENDAR EN CALENDARIO [premium]
+       SECCIÓN 4 · AGENDAR EN CALENDARIO
   ════════════════════════════════════════════════ -->
   <section id="pv-cal-sec" data-plan="premium">
     <div class="plan-badge">✦ Premium</div>
@@ -751,7 +726,7 @@ audio#pv-audio{display:none}
   </section>
 
   <!-- ════════════════════════════════════════════════
-       SECCIÓN 5 · MI HISTORIA [premium]
+       SECCIÓN 5 · MI HISTORIA
   ════════════════════════════════════════════════ -->
   <section id="history-sec" data-plan="premium">
     <div class="plan-badge">✦ Premium</div>
@@ -770,7 +745,7 @@ audio#pv-audio{display:none}
   </section>
 
   <!-- ════════════════════════════════════════════════
-       SECCIÓN 6 · PROGRAMA / ITINERARIO [premium]
+       SECCIÓN 6 · PROGRAMA / ITINERARIO
   ════════════════════════════════════════════════ -->
   <section id="program-sec" data-plan="premium">
     <div class="plan-badge">✦ Premium</div>
@@ -789,7 +764,7 @@ audio#pv-audio{display:none}
   </section>
 
   <!-- ════════════════════════════════════════════════
-       SECCIÓN 7 · PADRINOS [deluxe]
+       SECCIÓN 7 · PADRINOS
   ════════════════════════════════════════════════ -->
   <section id="padrinos-sec" data-plan="deluxe">
     <div class="plan-badge">✦ Deluxe</div>
@@ -810,7 +785,6 @@ audio#pv-audio{display:none}
   ════════════════════════════════════════════════ -->
   <section id="gallery-sec" style="padding:0 0 2.5rem">
 
-    <!-- Título de galería SOBRE el deck -->
     <div style="text-align:center;padding:2.2rem 1rem 1rem;pointer-events:none">
       <div style="font-family:'Great Vibes',cursive;font-size:2.4rem;color:#d4af70;text-shadow:0 0 40px rgba(212,175,112,.5);line-height:1.1">Nuestra Galería</div>
       <div style="width:80px;height:1px;background:linear-gradient(to right,transparent,rgba(212,175,112,.7),transparent);margin:.6rem auto"></div>
@@ -846,7 +820,7 @@ audio#pv-audio{display:none}
   </section>
 
   <!-- ════════════════════════════════════════════════
-       SECCIÓN 9 · ÁLBUM COMPARTIDO [premium]
+       SECCIÓN 9 · ÁLBUM COMPARTIDO
   ════════════════════════════════════════════════ -->
   <section id="pv-album-sec" data-plan="premium">
     <div class="plan-badge">✦ Premium</div>
@@ -856,7 +830,6 @@ audio#pv-audio{display:none}
     <div style="text-align:center">
       <a id="pv-album-btn" href="#" target="_blank" rel="noopener">
         <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" xmlns="http://www.w3.org/2000/svg">
-          <!-- Photo frame classic -->
           <rect x="2" y="3" width="20" height="18" rx="1.5"/>
           <circle cx="8" cy="9" r="2"/>
           <path d="M2 19 L7 13 L11 17 L15 12 L22 19"/>
@@ -868,14 +841,13 @@ audio#pv-audio{display:none}
   </section>
 
   <!-- ════════════════════════════════════════════════
-       SECCIÓN 10 · MÚSICA [premium]
+       SECCIÓN 10 · MÚSICA
   ════════════════════════════════════════════════ -->
   <section id="pv-music-sec" data-plan="premium">
     <div class="plan-badge">✦ Premium</div>
     <div class="section-label">Música del evento</div>
     <div class="gold-line"></div>
 
-    <!-- Reproductor -->
     <div id="pv-audio-wrap">
       <audio id="pv-audio"></audio>
       <div class="audio-top">
@@ -888,7 +860,6 @@ audio#pv-audio{display:none}
       <div class="audio-seek-row">
         <input type="range" id="pv-seek" min="0" max="100" value="0"/>
         <svg style="width:14px;height:14px;color:var(--c-a);flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" xmlns="http://www.w3.org/2000/svg">
-          <!-- Classic speaker horn -->
           <path d="M3 9 H7 L13 4 V20 L7 15 H3 Z" stroke-linejoin="round"/>
           <path d="M17 9 Q20 12 17 15" stroke-linecap="round"/>
           <path d="M19 6 Q24 12 19 18" stroke-linecap="round" opacity=".5"/>
@@ -897,7 +868,6 @@ audio#pv-audio{display:none}
       </div>
     </div>
 
-    <!-- Lista de canciones del programa -->
     <div class="music-suggest" style="margin-top:1.2rem">
       <div class="section-label">Playlist del evento</div>
       <ul id="pv-songs" class="card-list" style="margin-top:.6rem">
@@ -907,7 +877,6 @@ audio#pv-audio{display:none}
       </ul>
     </div>
 
-    <!-- Sugerencias de invitados -->
     <div id="pv-song-suggest-wrap">
       <div class="section-label" style="margin-top:0">Sugiere una canción</div>
       <p class="card-cap" style="font-size:.85rem;margin-bottom:.6rem">¿Tienes una canción favorita? ¡Compártela!</p>
@@ -922,7 +891,7 @@ audio#pv-audio{display:none}
   </section>
 
   <!-- ════════════════════════════════════════════════
-       SECCIÓN 11 · MESA DE REGALOS [deluxe]
+       SECCIÓN 11 · MESA DE REGALOS
   ════════════════════════════════════════════════ -->
   <section id="gifts-sec" data-plan="deluxe">
     <div class="plan-badge">✦ Deluxe</div>
@@ -938,7 +907,7 @@ audio#pv-audio{display:none}
   </section>
 
   <!-- ════════════════════════════════════════════════
-       SECCIÓN 12 · INFO EXTRA [deluxe]
+       SECCIÓN 12 · INFO EXTRA
   ════════════════════════════════════════════════ -->
   <section id="extra-sec" data-plan="deluxe">
     <div class="plan-badge">✦ Deluxe</div>
@@ -1016,7 +985,7 @@ audio#pv-audio{display:none}
   </section>
 
   <!-- ════════════════════════════════════════════════
-       SECCIÓN 15 · SECCIÓN LIBRE [deluxe]
+       SECCIÓN 15 · SECCIÓN LIBRE
   ════════════════════════════════════════════════ -->
   <section id="pv-custom-sec" data-plan="deluxe">
     <div class="plan-badge">✦ Deluxe</div>
@@ -1031,7 +1000,7 @@ audio#pv-audio{display:none}
   </section>
 
   <!-- ════════════════════════════════════════════════
-       SECCIÓN 16 · RSVP / CONFIRMACIÓN [premium]
+       SECCIÓN 16 · RSVP / CONFIRMACIÓN
   ════════════════════════════════════════════════ -->
   <section id="rsvp-sec" data-plan="premium">
     <div class="plan-badge">✦ Premium</div>
@@ -1067,7 +1036,6 @@ audio#pv-audio{display:none}
         <button class="btn-rsvp" type="submit">Confirmar asistencia</button>
       </form>
       <p id="pv-rsvp" class="rsvp-note" contenteditable="true">Para más información contacta a<br/><strong>eventos@bodavaleriarodrigo.com</strong></p>
-      <!-- QR pase de acceso (deluxe) -->
       <div id="rsvp-qr-wrap">
         <div class="section-label" style="margin-bottom:.4rem">Tu pase de acceso</div>
         <canvas id="rsvp-qr-canvas"></canvas>
@@ -1159,7 +1127,7 @@ const card   = document.getElementById('card-wrapper');
 
 function openCard(){
   splash.classList.add('hiding');
-  setTimeout(()=>{ splash.style.display='none'; startPetals(); },700);
+  setTimeout(()=>{ splash.style.display='none'; },700);
 }
 document.getElementById('sp-btn').addEventListener('click',e=>{e.stopPropagation();openCard();});
 splash.addEventListener('click', openCard);
@@ -1280,7 +1248,7 @@ document.getElementById('song-suggest-form').addEventListener('submit',e=>{
 });
 
 /* ═══════════════════════════════════════════════
-   GALLERY
+   GALLERY (miniaturas)
 ═══════════════════════════════════════════════ */
 const galleryGrid = document.getElementById('pv-galeria');
 const photoInput  = document.getElementById('photo-input');
@@ -1348,21 +1316,14 @@ function showToast(msg){
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2400);
 }
 
-/* ═══════════════════════════════════════════════
-   FLOATING PETALS — removido
-═══════════════════════════════════════════════ */
-function startPetals(){ /* desactivado */ }
-
 /* Hearts on RSVP */
 function triggerHearts(){
-  ['♥','♡','✦'].forEach((_,i)=>{
-    for(let j=0;j<6;j++){
-      const el=document.createElement('div');
-      el.textContent=['♥','♡','✦'][Math.floor(Math.random()*3)];
-      el.style.cssText=`position:fixed;pointer-events:none;z-index:2000;left:${20+Math.random()*60}%;top:${30+Math.random()*40}%;font-size:${1+Math.random()*1.6}rem;color:#d4af70;animation:fadeUp .8s ${Math.random()*.6}s both forwards;`;
-      document.body.appendChild(el);setTimeout(()=>el.remove(),1500);
-    }
-  });
+  for(let j=0;j<10;j++){
+    const el=document.createElement('div');
+    el.textContent=['♥','♡','✦'][Math.floor(Math.random()*3)];
+    el.style.cssText=`position:fixed;pointer-events:none;z-index:2000;left:${20+Math.random()*60}%;top:${30+Math.random()*40}%;font-size:${1+Math.random()*1.6}rem;color:#d4af70;animation:fadeUp .8s ${Math.random()*.6}s both forwards;`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),1500);
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -1385,8 +1346,20 @@ document.querySelectorAll('#card-wrapper section').forEach(sec=>{
 });
 
 /* ═══════════════════════════════════════════════
-   3-D CARD DECK v2 — Professional
-   Easing: cubic-bezier, spring physics, floor reflection
+   3-D CARD DECK v3 — Proporción auto-adaptable
+   -----------------------------------------------
+   Novedad clave: la geometría de la animación
+   (translateY, translateZ, reflejo) ya no usa
+   valores fijos asumiendo una escena de 560px.
+   En cambio se calcula un factor SCALE = altura
+   real de la escena / 560 (línea base de diseño),
+   y todas las distancias verticales/profundidad
+   se multiplican por SCALE. Así, sea cual sea el
+   alto real de #deck-scene (que ahora es fluido
+   vía clamp() en CSS), el recorrido de las tarjetas
+   siempre queda centrado y proporcionado dentro
+   de la sección, sin dejar espacio vacío de más
+   ni recortarse en pantallas pequeñas.
 ═══════════════════════════════════════════════ */
 (function initDeck(){
   const PHOTOS = [
@@ -1420,11 +1393,26 @@ document.querySelectorAll('#card-wrapper section').forEach(sec=>{
   const easeInOut  = t => t < .5 ? 2*t*t : -1+(4-2*t)*t;
   const easeOut3   = t => 1 - Math.pow(1-t, 3);
   const easeIn2    = t => t * t;
-  const overshoot  = t => { const s=1.70158; return t*t*((s+1)*t-s); };  // slight bounce
+  const overshoot  = t => { const s=1.70158; return t*t*((s+1)*t-s); };
   const smoothstep = t => t*t*(3-2*t);
 
+  // ── Baseline geometry (línea de diseño original a 560px de alto) ──
+  const BASE_HEIGHT   = 560;
+  const CARD_HALF_H   = 85.5; // mitad del alto real de .dcard (179px) para el reflejo
+
+  // SCALE se recalcula cuando cambia el tamaño real de la escena,
+  // para que el recorrido vertical/profundidad de las tarjetas
+  // siempre quede proporcionado al alto real de la sección.
+  let SCALE = 1;
+  function updateScale(){
+    const h = scene.offsetHeight || BASE_HEIGHT;
+    SCALE = h / BASE_HEIGHT;
+  }
+  updateScale();
+  window.addEventListener('resize', updateScale);
+
   // ── Build hint dots ──────────────────────────────
-  const dots = PHOTOS.map((_, i) => {
+  const dots = PHOTOS.map(() => {
     const d = document.createElement('div');
     d.className = 'deck-dot';
     hint.appendChild(d);
@@ -1442,19 +1430,14 @@ document.querySelectorAll('#card-wrapper section').forEach(sec=>{
       <div class="dcard-face dcard-back">
         <div class="dcard-back-emblem">
           <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Outer octagon -->
             <polygon points="28,2 46,10 54,28 46,46 28,54 10,46 2,28 10,10" stroke="#d4af70" stroke-width=".7" fill="none" opacity=".5"/>
-            <!-- Inner circle -->
             <circle cx="28" cy="28" r="16" stroke="#d4af70" stroke-width=".8" fill="none" opacity=".6"/>
-            <!-- Cross/flourish lines -->
             <line x1="28" y1="12" x2="28" y2="44" stroke="#d4af70" stroke-width=".5" opacity=".3"/>
             <line x1="12" y1="28" x2="44" y2="28" stroke="#d4af70" stroke-width=".5" opacity=".3"/>
             <line x1="16" y1="16" x2="40" y2="40" stroke="#d4af70" stroke-width=".4" opacity=".2"/>
             <line x1="40" y1="16" x2="16" y2="40" stroke="#d4af70" stroke-width=".4" opacity=".2"/>
-            <!-- Center diamond -->
             <path d="M28 20 L33 28 L28 36 L23 28 Z" stroke="#d4af70" stroke-width=".9" fill="none" opacity=".8"/>
             <circle cx="28" cy="28" r="2" fill="#d4af70" opacity=".7"/>
-            <!-- Corner dots -->
             <circle cx="28" cy="4" r="1.2" fill="#d4af70" opacity=".4"/>
             <circle cx="28" cy="52" r="1.2" fill="#d4af70" opacity=".4"/>
             <circle cx="4" cy="28" r="1.2" fill="#d4af70" opacity=".4"/>
@@ -1462,12 +1445,11 @@ document.querySelectorAll('#card-wrapper section').forEach(sec=>{
           </svg>
         </div>
       </div>`;
-    el.addEventListener('click', (e) => {
+    el.addEventListener('click', () => {
       if (Math.abs(dragDelta) < 8) openLightbox(FULL[i]);
     });
     track.appendChild(el);
 
-    // Floor reflection element
     const ref = document.createElement('div');
     ref.className = 'dcard-reflection';
     ref.innerHTML = `<img src="${src}" loading="lazy" draggable="false" alt=""/>`;
@@ -1477,26 +1459,23 @@ document.querySelectorAll('#card-wrapper section').forEach(sec=>{
   });
 
   // ── State ────────────────────────────────────────
-  let offset    = 0;          // 0 → MAX_OFFSET
-  let target    = 0;          // lerp target
-  let vel       = 0;          // momentum velocity
+  let offset    = 0;
+  let target    = 0;
+  let vel       = 0;
   let isDrag    = false;
-  let dragStart = 0;
   let lastX     = 0;
   let lastT     = 0;
   let dragDelta = 0;
   let autoDir   = 1;
   let autoActive= true;
   let autoTimer = null;
-  let prevActiveCard = -1;
 
   const MAX_OFFSET = 1400;
   const AUTO_SPEED = 0.38;
-  const LERP_FACTOR = 0.065;   // smooth spring
+  const LERP_FACTOR = 0.065;
 
   // ── Card position math ────────────────────────────
   function getCardP(i, gP) {
-    // Each card has its own progress window with stagger
     const stagger = i / (N - 1);
     return Math.max(0, Math.min(1, gP - stagger * 0.42));
   }
@@ -1505,57 +1484,52 @@ document.querySelectorAll('#card-wrapper section').forEach(sec=>{
     const sceneW = scene.offsetWidth || 400;
     const p      = getCardP(i, gP);
 
-    // Base horizontal lane — cards spread evenly
-    const margin  = 50;
+    const margin  = 46;
     const xBase   = -sceneW * 0.5 + margin + (i / (N-1)) * (sceneW - margin*2);
 
-    // ── PHASES ──────────────────────────────────────
-    // 0.00–0.25  FLAT BACK   lying horizontal, back up, near floor
-    // 0.25–0.55  RISE        arc from flat → vertical crest
-    // 0.55–0.68  CREST PAUSE stands upright, slight sway, gold glow
-    // 0.68–1.00  CASCADE     folds forward, accelerates into abyss
-
-    let tx, ty, tz, rx, ry = 0, op, shadow = 0;
+    // Valores "crudos" en px, calibrados sobre la línea base de 560px.
+    // Se multiplican por SCALE al final para adaptarse al alto real.
+    let tyRaw, tzRaw, oscRaw = 0, rx, ry = 0, op, shadow = 0;
 
     if (p < 0.25) {
       const t = easeOut3(p / 0.25);
-      tx  = xBase;
-      ty  = 50  + (1-t) * 60;
-      tz  = -120 + t * 50;
-      rx  = -85 + t * 85;
-      op  = 0.15 + t * 0.85;
+      tyRaw = 50  + (1-t) * 60;
+      tzRaw = -120 + t * 50;
+      rx    = -85 + t * 85;
+      op    = 0.15 + t * 0.85;
     }
     else if (p < 0.55) {
       const t = easeInOut((p - 0.25) / 0.30);
-      tx  = xBase;
-      ty  = 50 - t * 20;
-      tz  = -70 + t * 55;
-      rx  = 0  - t * 90;
-      op  = 1;
+      tyRaw = 50 - t * 20;
+      tzRaw = -70 + t * 55;
+      rx    = 0  - t * 90;
+      op    = 1;
       shadow = t;
     }
     else if (p < 0.68) {
       const t = smoothstep((p - 0.55) / 0.13);
-      // micro oscillation at crest
-      const osc = Math.sin(t * Math.PI) * 3;
-      tx  = xBase + osc * 0.5;
-      ty  = 30 - t * 5;
-      tz  = -15;
-      rx  = -90;
-      op  = 1;
+      oscRaw = Math.sin(t * Math.PI) * 3;
+      tyRaw  = 30 - t * 5;
+      tzRaw  = -15;
+      rx     = -90;
+      op     = 1;
       shadow = 1;
     }
     else {
       const t    = easeIn2((p - 0.68) / 0.32);
-      const tOvr = overshoot(Math.min(t * 1.2, 1));   // brief forward lean
-      tx  = xBase;
-      ty  = 25 + t * 240;          // accelerates down
-      tz  = -15 + t * 160;         // surges toward viewer
-      rx  = -90 + tOvr * 195;      // tips past face-down → overshoot
-      ry  = (Math.random() < 0.5 ? 1 : -1) * t * 8 * (i % 3);  // slight Y wobble
-      op  = 1 - Math.pow(Math.max(0, t - 0.55) / 0.45, 1.8);
+      const tOvr = overshoot(Math.min(t * 1.2, 1));
+      tyRaw = 25 + t * 240;
+      tzRaw = -15 + t * 160;
+      rx    = -90 + tOvr * 195;
+      ry    = (Math.random() < 0.5 ? 1 : -1) * t * 8 * (i % 3);
+      op    = 1 - Math.pow(Math.max(0, t - 0.55) / 0.45, 1.8);
       shadow = Math.max(0, 1 - t * 2);
     }
+
+    // Re-escalado proporcional al alto real de la escena
+    const ty = tyRaw * SCALE;
+    const tz = tzRaw * SCALE;
+    const tx = xBase + oscRaw * 0.5 * SCALE;
 
     return { tx, ty, tz, rx, ry, op, shadow };
   }
@@ -1564,7 +1538,6 @@ document.querySelectorAll('#card-wrapper section').forEach(sec=>{
   function applyAll() {
     const gP = Math.max(0, Math.min(1, offset / MAX_OFFSET));
 
-    // Find active card (closest to crest)
     let activeIdx = -1, closestCrest = Infinity;
     cards.forEach((_, i) => {
       const p = getCardP(i, gP);
@@ -1572,7 +1545,6 @@ document.querySelectorAll('#card-wrapper section').forEach(sec=>{
       if (distToCrest < closestCrest) { closestCrest = distToCrest; activeIdx = i; }
     });
 
-    // Update hint dots
     dots.forEach((d, i) => {
       d.classList.toggle('active', i === activeIdx);
     });
@@ -1585,22 +1557,19 @@ document.querySelectorAll('#card-wrapper section').forEach(sec=>{
       el.style.opacity    = Math.max(0, op).toFixed(3);
       el.style.zIndex     = Math.round(p * 20);
 
-      // Crest glow
       const nearCrest = p > 0.5 && p < 0.72;
       el.classList.toggle('at-crest', nearCrest && shadow > 0.5);
 
-      // Dynamic box shadow on .dcard-front (depth illusion)
       const frontEl = el.querySelector('.dcard-front');
       if (frontEl) {
         const sIntensity = (shadow * 30).toFixed(0);
         frontEl.style.boxShadow = `0 ${sIntensity}px ${(shadow*60).toFixed(0)}px rgba(0,0,0,${(shadow*.8).toFixed(2)}), 0 0 0 1px rgba(212,175,112,${(shadow*.2).toFixed(2)})`;
       }
 
-      // Floor reflection — only visible when card is near vertical or just past crest
       const refVisible = p > 0.45 && p < 0.72;
       if (ref) {
         ref.style.opacity = refVisible ? (Math.sin((p - 0.45) / 0.27 * Math.PI) * 0.4).toFixed(3) : '0';
-        ref.style.transform = `translate3d(calc(-50% + ${tx.toFixed(2)}px), calc(-50% + ${(ty+77).toFixed(2)}px), ${(tz-5).toFixed(2)}px) rotateX(${rx.toFixed(2)}deg)`;
+        ref.style.transform = `translate3d(calc(-50% + ${tx.toFixed(2)}px), calc(-50% + ${(ty + CARD_HALF_H*SCALE).toFixed(2)}px), ${(tz-5).toFixed(2)}px) rotateX(${rx.toFixed(2)}deg)`;
       }
     });
   }
@@ -1613,14 +1582,12 @@ document.querySelectorAll('#card-wrapper section').forEach(sec=>{
         if (target >= MAX_OFFSET) { target = MAX_OFFSET; autoDir = -1; }
         if (target <= 0)          { target = 0;          autoDir =  1; }
       }
-      // Momentum coast
       if (Math.abs(vel) > 0.1) {
         target -= vel;
         target  = Math.max(0, Math.min(MAX_OFFSET, target));
         vel    *= 0.93;
       }
     }
-    // Lerp offset to target (smooth spring)
     offset += (target - offset) * LERP_FACTOR;
     applyAll();
     requestAnimationFrame(tick);
@@ -1634,7 +1601,7 @@ document.querySelectorAll('#card-wrapper section').forEach(sec=>{
     isDrag    = true;
     autoActive= false;
     dragDelta = 0;
-    dragStart = lastX = e.touches ? e.touches[0].clientX : e.clientX;
+    lastX     = e.touches ? e.touches[0].clientX : e.clientX;
     lastT     = performance.now();
     vel       = 0;
     clearTimeout(autoTimer);
@@ -1656,7 +1623,6 @@ document.querySelectorAll('#card-wrapper section').forEach(sec=>{
   function onUp() {
     if (!isDrag) return;
     isDrag = false;
-    // Resume auto after 2.8s idle
     clearTimeout(autoTimer);
     autoTimer = setTimeout(() => { autoActive = true; }, 2800);
   }
