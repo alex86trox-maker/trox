@@ -744,18 +744,41 @@
   #card-wrapper[data-plan-active="deluxe"] [data-plan="premium"],
   #card-wrapper[data-plan-active="deluxe"] [data-plan="deluxe"]{display:flex;}
 
+  /* Frame-art dentro del footer — misma textura que las secciones */
+  #gueka-footer .frame-art {
+    position: absolute; inset: 0; z-index: 1;
+    background-image: url("https://hercules-cdn.com/file_HFxVy11rtq1bxlqq6fjAf1Lx");
+    background-repeat: no-repeat; background-position: center;
+    background-size: 100% 100%; pointer-events: none;
+    mix-blend-mode: multiply;
+    -webkit-mask-image:
+      radial-gradient(ellipse 82% 78% at 50% 50%,
+        transparent 0%, transparent 28%,
+        rgba(0,0,0,.08) 40%, rgba(0,0,0,.55) 58%,
+        rgba(0,0,0,.88) 74%, black 88%, rgba(0,0,0,.75) 100%);
+    mask-image:
+      radial-gradient(ellipse 82% 78% at 50% 50%,
+        transparent 0%, transparent 28%,
+        rgba(0,0,0,.08) 40%, rgba(0,0,0,.55) 58%,
+        rgba(0,0,0,.88) 74%, black 88%, rgba(0,0,0,.75) 100%);
+    filter: saturate(.28) sepia(.45) hue-rotate(6deg) brightness(1.06) contrast(.85);
+    opacity: .72;
+  }
+
   /* ════ FOOTER MEJORADO ════ */
   #gueka-footer {
     width: 100%;
     padding: 0;
     text-align: center;
     position: relative;
-    z-index: 37;
+    z-index: 2;
     overflow: hidden;
-    /* Mismo fondo que el resto de la tarjeta */
-    background: var(--c-bg);
+    background: var(--c-bg-deep);
     border-top: 1px solid rgba(154,149,120,.35);
   }
+  /* El footer hereda framed-section pero necesita isolation auto para el mix-blend del logo */
+  #gueka-footer { isolation: auto !important; }
+  #gueka-footer-inner-placeholder { display: none; }
 
   /* Ornamento superior del footer */
   #gueka-footer-top-ornament {
@@ -778,6 +801,7 @@
     gap: 0;
     padding: 42px 24px 38px;
     position: relative;
+    /* Sin z-index para no aislar el stacking context y permitir mix-blend-mode en el logo */
   }
 
   /* Resplandor de fondo detrás del logo */
@@ -833,51 +857,27 @@
     justify-content: center;
     padding: 8px 6px;
     margin-bottom: 6px;
+    /* isolation auto para que multiply funcione contra el fondo del footer */
   }
 
-  /* Resplandor animado detrás del logo */
-  #gueka-logo-glow {
-    position: absolute;
-    inset: -24px -32px;
-    z-index: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(ellipse at center, rgba(255,253,250,.98) 0%, rgba(255,253,246,.75) 42%, transparent 72%),
-      radial-gradient(ellipse at center, rgba(111,95,146,.38) 0%, rgba(111,95,146,.14) 52%, transparent 78%);
-    filter: blur(10px);
-    animation: guekaGlow 5.5s ease-in-out infinite;
-  }
-  @keyframes guekaGlow {
-    0%,100% { opacity:.85; transform: scale(1); }
-    50%     { opacity:1;   transform: scale(1.05); }
-  }
-
-  /* Logo real: visible y centrado */
+  /* Logo como div con background-image y multiply para eliminar el blanco */
   #gueka-logo {
-    position: relative;
-    z-index: 1;
     display: block;
     width: min(340px, 84vw);
-    /* El logo original es beige claro — lo oscurecemos al tono de la marca
-       brightness(0) lo convierte en negro puro, luego sepia+saturate+hue-rotate
-       lo lleva al beige/dorado oscuro de la marca, opacity da suavidad */
-    filter:
-      brightness(0)
-      sepia(1)
-      saturate(3)
-      hue-rotate(2deg)
-      brightness(0.55)
-      opacity(0.88);
+    aspect-ratio: 3 / 2;
+    /* Logo transparente — sin halo blanco */
+    background-image: url("https://hercules-cdn.com/file_YH6uFYs2HnosTkJWRNaJjvRL");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    /* brightness(0) → todo negro → sepia+hue da el tono beige oscuro de la marca
+       Sin halo: el blanco también queda negro, invisible sobre el fondo oscuro */
+    mix-blend-mode: normal;
+    filter: brightness(0) sepia(1) hue-rotate(2deg) saturate(2) brightness(0.62);
     transition: filter .35s ease;
   }
   #gueka-logo-frame:hover #gueka-logo {
-    filter:
-      brightness(0)
-      sepia(1)
-      saturate(4)
-      hue-rotate(2deg)
-      brightness(0.45)
-      opacity(1);
+    filter: brightness(0.6) contrast(1.6) sepia(0.15);
   }
 
   #gueka-logo-tint { display: none; }
@@ -1291,22 +1291,17 @@
   </section>
 
   <!-- ════ FOOTER MEJORADO ════ -->
-  <footer id="gueka-footer">
+  <footer id="gueka-footer" class="framed-section" style="min-height:auto !important;">
+    <div class="frame-art"></div>
     <div id="gueka-footer-top-ornament"></div>
     <div id="gueka-footer-inner">
       <div id="gueka-footer-bg-glow" aria-hidden="true"></div>
 
       <div class="footer-divider-line"></div>
 
-      <!-- Logo Gueka Ideas más grande -->
+      <!-- Logo Gueka Ideas: div con background-image para aplicar blend sin stacking context -->
       <div id="gueka-logo-frame">
-        <div id="gueka-logo-glow" aria-hidden="true"></div>
-        <!-- Elemento invisible que reserva las dimensiones reales del logo -->
-        <img id="gueka-logo"
-          src="https://hercules-cdn.com/file_YH6uFYs2HnosTkJWRNaJjvRL"
-          alt="Gueka Ideas — Create · Invite · Celebrate" />
-        <!-- Capa de color que usa el logo como máscara -->
-        <div id="gueka-logo-tint" aria-hidden="true"></div>
+        <div id="gueka-logo" role="img" aria-label="Gueka Ideas — Create · Invite · Celebrate"></div>
       </div>
 
       <p id="gueka-footer-tagline">Create &nbsp;·&nbsp; Invite &nbsp;·&nbsp; Celebrate</p>
