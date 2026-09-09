@@ -1212,18 +1212,39 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ===== MOUSE GLOW (desktop only) =====
+// ===== MOUSE GLOW (desktop only) — smooth lerp follow =====
 const glow = document.getElementById('mouse-glow');
-let glowVisible = false;
 if (window.matchMedia('(pointer: fine)').matches && glow) {
+  let mouseX = 0, mouseY = 0;
+  let glowX = 0, glowY = 0;
+  let glowVisible = false;
+  let rafId = null;
+
   document.addEventListener('mousemove', (e) => {
-    glow.style.transform = 'translate(' + e.clientX + 'px, ' + e.clientY + 'px) translate(-50%, -50%)';
+    mouseX = e.clientX;
+    mouseY = e.clientY;
     if (!glowVisible) {
+      glowX = mouseX;
+      glowY = mouseY;
       glow.style.opacity = '1';
       glowVisible = true;
     }
+    if (!rafId) {
+      rafId = requestAnimationFrame(animateGlow);
+    }
   }, { passive: true });
-  document.addEventListener('mouseleave', () => { glow.style.opacity = '0'; glowVisible = false; });
+
+  document.addEventListener('mouseleave', () => {
+    glow.style.opacity = '0';
+    glowVisible = false;
+  });
+
+  function animateGlow() {
+    glowX += (mouseX - glowX) * 0.08;
+    glowY += (mouseY - glowY) * 0.08;
+    glow.style.transform = 'translate(' + glowX + 'px,' + glowY + 'px) translate(-50%,-50%)';
+    rafId = requestAnimationFrame(animateGlow);
+  }
 }
 </script>
 </body>
