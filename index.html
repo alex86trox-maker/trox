@@ -312,6 +312,36 @@ footer{background:var(--black);border-top:1px solid var(--border)}
 #backTop:hover{background:var(--wine);transform:translateY(-3px)}
 #backTop svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
 
+@media(min-width:1025px){
+  body.custom-cursor,body.custom-cursor *{cursor:none!important}
+}
+/* ===== CURSOR PERSONALIZADO — punto + aro (identico pagina principal) ===== */
+#cursor-dot,#cursor-ring{
+  pointer-events:none;
+  position:fixed;
+  top:0;left:0;
+  border-radius:50%;
+  opacity:0;
+  z-index:99999;
+  will-change:transform;
+  transition:opacity .4s
+}
+#cursor-dot{
+  width:6px;height:6px;
+  background:var(--rose-mid);
+  transform:translate(-50%,-50%)
+}
+#cursor-ring{
+  width:32px;height:32px;
+  border:1px solid rgba(185,128,143,.7);
+  transform:translate(-50%,-50%);
+  transition:opacity .4s,width .2s,height .2s,border-color .2s
+}
+body:has(*:hover) #cursor-ring.hovering,
+#cursor-ring.hovering{
+  width:48px;height:48px;
+  border-color:var(--rose-mid)
+}
 /* ===== MOUSE GLOW — tomado de la pagina principal ===== */
 #mouse-glow{
   pointer-events:none;
@@ -375,6 +405,7 @@ footer{background:var(--black);border-top:1px solid var(--border)}
   .ft-prefooter{flex-direction:column;align-items:flex-start}
   .ft-prefooter-actions{width:100%}
   #mouse-glow{display:none}
+  #cursor-dot,#cursor-ring{display:none}
 }
 @media(max-width:640px){
   .page-hero{min-height:80vh}
@@ -409,12 +440,15 @@ footer{background:var(--black);border-top:1px solid var(--border)}
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
   .reveal,.reveal-l,.reveal-r{opacity:1!important;transform:none!important}
   #mouse-glow{display:none}
+  #cursor-dot,#cursor-ring{display:none}
 }
 </style>
 </head>
 <body>
 
 <!-- MOUSE GLOW — efecto cursor de la pagina principal -->
+<div id="cursor-dot" aria-hidden="true"></div>
+<div id="cursor-ring" aria-hidden="true"></div>
 <div id="mouse-glow" aria-hidden="true"></div>
 
 <a class="skip-link" href="#main">Saltar al contenido</a>
@@ -1240,6 +1274,74 @@ document.addEventListener('keydown', e => {
     });
   }
 });
+
+// ===== CURSOR PERSONALIZADO — punto + aro (identico pagina principal) =====
+(function(){
+  var dot = document.getElementById('cursor-dot');
+  var ring = document.getElementById('cursor-ring');
+  if (!dot || !ring) return;
+  // Solo desktop
+  if (window.matchMedia('(max-width:1024px)').matches) return;
+  document.body.classList.add('custom-cursor');
+
+  var dotX = 0, dotY = 0;
+  var ringX = 0, ringY = 0;
+  var mouseX = 0, mouseY = 0;
+  var visible = false;
+
+  function onMove(e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    if (!visible) {
+      dotX = mouseX; dotY = mouseY;
+      ringX = mouseX; ringY = mouseY;
+      visible = true;
+      dot.style.opacity = '1';
+      ring.style.opacity = '1';
+    }
+  }
+
+  document.addEventListener('mousemove', onMove, { passive: true });
+  window.addEventListener('mousemove', onMove, { passive: true });
+
+  document.addEventListener('mouseleave', function() {
+    dot.style.opacity = '0';
+    ring.style.opacity = '0';
+    visible = false;
+  });
+  document.addEventListener('mouseenter', function() {
+    if (visible) {
+      dot.style.opacity = '1';
+      ring.style.opacity = '1';
+    }
+  });
+
+  // Hover sobre elementos interactivos — agranda el aro
+  document.addEventListener('mouseover', function(e) {
+    var el = e.target;
+    if (el.closest('a,button,[role="button"],input,select,textarea,.btn-p,.btn-g,.btn-wa,.nav-cta')) {
+      ring.classList.add('hovering');
+    }
+  });
+  document.addEventListener('mouseout', function(e) {
+    var el = e.target;
+    if (el.closest('a,button,[role="button"],input,select,textarea,.btn-p,.btn-g,.btn-wa,.nav-cta')) {
+      ring.classList.remove('hovering');
+    }
+  });
+
+  (function loop() {
+    requestAnimationFrame(loop);
+    // Punto: sigue instantáneamente
+    dotX = mouseX;
+    dotY = mouseY;
+    dot.style.transform = 'translate(' + dotX + 'px,' + dotY + 'px) translate(-50%,-50%)';
+    // Aro: sigue con suavizado
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    ring.style.transform = 'translate(' + ringX + 'px,' + ringY + 'px) translate(-50%,-50%)';
+  })();
+})();
 
 // ===== MOUSE GLOW — efecto cursor (identico pagina principal) =====
 (function(){
