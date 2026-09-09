@@ -67,11 +67,6 @@
     box-shadow: 0 0 80px 20px rgba(0,0,0,.55);
   }
 
-  /* ════ CAPAS CINEMATOGRÁFICAS ════
-     Se aplican como overlays fijos (no como filter sobre el wrapper,
-     porque un filter crearía un contenedor que rompe position:fixed). */
-
-  /* Tono de película de época */
   #card-tone {
     position: fixed; inset: 0; z-index: 33;
     max-width: 480px; margin: 0 auto; left: 0; right: 0;
@@ -80,7 +75,6 @@
     mix-blend-mode: multiply;
   }
 
-  /* Viñeta daguerrotipo */
   #card-vignette {
     position: fixed; inset: 0; z-index: 35;
     max-width: 480px; margin: 0 auto; left: 0; right: 0;
@@ -94,7 +88,6 @@
       );
   }
 
-  /* Grain de película */
   #card-grain {
     position: fixed; inset: 0; z-index: 36;
     max-width: 480px; margin: 0 auto; left: 0; right: 0;
@@ -114,7 +107,6 @@
     100% { background-position:  0px   0px; }
   }
 
-  /* Resplandor de vela */
   #card-candle-glow {
     position: fixed; inset: 0; z-index: 34;
     max-width: 480px; margin: 0 auto; left: 0; right: 0;
@@ -139,7 +131,6 @@
   #card-wrapper::-webkit-scrollbar { width: 0; height: 0; }
   body.splash-active { overflow: hidden; }
 
-  /* ── Barra de progreso ── */
   #scroll-progress {
     position: fixed; top: 0; left: 50%; transform: translateX(-50%);
     width: 100%; max-width: 480px; height: 2px; z-index: 40;
@@ -159,7 +150,6 @@
     pointer-events: none; z-index: 3;
   }
 
-  /* ── Marco ornamental ── */
   .framed-section {
     position: relative; z-index: 2;
     padding: 72px 40px !important;
@@ -229,7 +219,6 @@
   .framed-section .wax-seal.br { bottom:14px; right:14px; }
   .framed-section > *:not(.frame-art):not(.wax-seal) { position:relative; z-index:2; }
 
-  /* ── Ornamentos ── */
   .fleur { width:26px; height:26px; margin:0 auto 14px; opacity:.75; filter:drop-shadow(0 1px 2px rgba(58,36,22,.25)); }
   .fleur svg { width:100%; height:100%; fill:var(--c-d); }
 
@@ -407,7 +396,6 @@
     gap: 16px; width: 100%;
     position: relative;
   }
-  /* Halo claro detrás del texto para que el arte del marco no compita */
   #pv-portada-inner::before {
     content: ""; position: absolute; inset: -26px -14px;
     background: radial-gradient(ellipse 78% 62% at 50% 50%,
@@ -467,8 +455,6 @@
   #pv-nombre {
     font-family: "Great Vibes", cursive;
     font-size: clamp(50px, 14vw, 66px);
-    /* Great Vibes tiene trazos ascendentes/descendentes largos:
-       necesita altura de línea holgada para no tocar el texto vecino. */
     line-height: 1.35;
     padding: 4px 0;
     color: var(--c-text);
@@ -758,72 +744,215 @@
   #card-wrapper[data-plan-active="deluxe"] [data-plan="premium"],
   #card-wrapper[data-plan-active="deluxe"] [data-plan="deluxe"]{display:flex;}
 
-  /* ════ FOOTER ════ */
+  /* ════ FOOTER MEJORADO ════ */
   #gueka-footer {
-    width: 100%; padding: 46px 20px 36px; text-align: center;
-    border-top: 1px solid rgba(154,149,120,.3);
-    /* Fondo claro y sólido: da contraste real al logo morado */
-    background: linear-gradient(180deg, rgba(255,253,248,.55) 0%, #fffdf7 32%, #fffdf7 100%);
-    /* Por encima de las capas de tono/viñeta/grano para que el logo no se apague */
-    position: relative; z-index: 37;
+    width: 100%;
+    padding: 0;
+    text-align: center;
+    position: relative;
+    z-index: 37;
+    overflow: hidden;
+    background: linear-gradient(180deg,
+      #faf7f0 0%,
+      #f5f0e6 30%,
+      #efe8d8 70%,
+      #e8dfc9 100%
+    );
+    border-top: 1px solid rgba(154,149,120,.35);
   }
-  #gueka-footer-inner { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+
+  /* Ornamento superior del footer */
+  #gueka-footer-top-ornament {
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(111,95,146,.2) 20%,
+      rgba(111,95,146,.6) 50%,
+      rgba(111,95,146,.2) 80%,
+      transparent 100%
+    );
+    margin-bottom: 0;
+  }
+
+  #gueka-footer-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 42px 24px 38px;
+    position: relative;
+  }
+
+  /* Resplandor de fondo detrás del logo */
+  #gueka-footer-bg-glow {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 340px; height: 220px;
+    background: radial-gradient(ellipse at 50% 40%,
+      rgba(111,95,146,.18) 0%,
+      rgba(164,159,124,.12) 40%,
+      transparent 72%
+    );
+    pointer-events: none;
+    filter: blur(18px);
+    animation: footerGlowBreath 6s ease-in-out infinite;
+  }
+  @keyframes footerGlowBreath {
+    0%,100% { opacity:.7; transform: translateX(-50%) scale(1); }
+    50%     { opacity:1;  transform: translateX(-50%) scale(1.06); }
+  }
+
+  /* Línea decorativa superior */
+  .footer-divider-line {
+    width: min(280px, 80vw);
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(154,149,120,.5) 20%,
+      rgba(111,95,146,.55) 50%,
+      rgba(154,149,120,.5) 80%,
+      transparent
+    );
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .footer-divider-line::before {
+    content: "❦";
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: #f5f0e6;
+    padding: 0 10px;
+    font-size: 13px;
+    color: rgba(111,95,146,.7);
+    line-height: 1;
+  }
+
+  /* Marco del logo */
   #gueka-logo-frame {
     position: relative;
-    display: inline-flex; align-items: center; justify-content: center;
-    padding: 6px 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 6px;
+    margin-bottom: 6px;
   }
+
+  /* Resplandor animado detrás del logo */
   #gueka-logo-glow {
-    position: absolute; inset: -18px -26px; z-index: 0; pointer-events: none;
+    position: absolute;
+    inset: -24px -32px;
+    z-index: 0;
+    pointer-events: none;
     background:
-      radial-gradient(ellipse at center, rgba(255,253,246,.95) 0%, rgba(255,253,246,.6) 52%, transparent 80%),
-      radial-gradient(ellipse at center, rgba(111,95,146,.32) 0%, rgba(111,95,146,.12) 55%, transparent 82%);
-    filter: blur(8px);
+      radial-gradient(ellipse at center, rgba(255,253,250,.98) 0%, rgba(255,253,246,.75) 42%, transparent 72%),
+      radial-gradient(ellipse at center, rgba(111,95,146,.38) 0%, rgba(111,95,146,.14) 52%, transparent 78%);
+    filter: blur(10px);
     animation: guekaGlow 5.5s ease-in-out infinite;
   }
   @keyframes guekaGlow {
-    0%,100% { opacity:.8; transform: scale(1); }
-    50%     { opacity:1;  transform: scale(1.04); }
+    0%,100% { opacity:.85; transform: scale(1); }
+    50%     { opacity:1;   transform: scale(1.05); }
   }
+
+  /* Logo real: reserva espacio y proporción */
   #gueka-logo {
-    /* Se usa solo para reservar el tamaño y proporción reales del logo */
-    position: relative; z-index: 1;
+    position: relative;
+    z-index: 1;
     display: block;
-    width: min(340px, 82vw);
-    visibility: hidden;
+    /* Más grande y visible que antes */
+    width: min(380px, 88vw);
+    visibility: hidden; /* oculto, solo reserva espacio */
   }
-  /* Capa teñida del morado de los títulos, recortada con la forma del logo */
+
+  /* Capa teñida: imagen del logo con color corporativo */
   #gueka-logo-tint {
-    position: absolute; z-index: 2; inset: 6px 4px;
-    background-color: #43306e;
-    -webkit-mask-image: url("https://hercules-cdn.com/file_v8gp0TZjISS7FWPwuVNC0oze");
-    mask-image: url("https://hercules-cdn.com/file_v8gp0TZjISS7FWPwuVNC0oze");
+    position: absolute;
+    z-index: 2;
+    inset: 8px 6px;
+    /* Color corporativo Gueka: beige/taupe cálido que hace legible el logo */
+    background-color: #7a6d52;
+    -webkit-mask-image: url("https://hercules-cdn.com/file_YH6uFYs2HnosTkJWRNaJjvRL");
+    mask-image: url("https://hercules-cdn.com/file_YH6uFYs2HnosTkJWRNaJjvRL");
     -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
     -webkit-mask-position: center; mask-position: center;
     -webkit-mask-size: contain; mask-size: contain;
-    /* Sombras sin desplazamiento: engrosan el trazo fino y dan el resplandor */
     filter:
-      drop-shadow(0 0 1px #43306e)
-      drop-shadow(0 0 1px #43306e)
-      drop-shadow(0 0 6px rgba(111,95,146,.9))
-      drop-shadow(0 0 16px rgba(111,95,146,.5));
-    transition: transform .35s ease, filter .35s ease;
+      drop-shadow(0 0 1px rgba(122,109,82,.8))
+      drop-shadow(0 0 3px rgba(111,95,146,.6))
+      drop-shadow(0 2px 8px rgba(122,109,82,.5))
+      drop-shadow(0 0 18px rgba(111,95,146,.35));
+    transition: transform .4s ease, filter .4s ease;
     pointer-events: none;
   }
   #gueka-logo-frame:hover #gueka-logo-tint {
-    transform: scale(1.04);
+    transform: scale(1.03);
     filter:
-      drop-shadow(0 0 1px #43306e)
-      drop-shadow(0 0 1px #43306e)
-      drop-shadow(0 0 9px rgba(111,95,146,1))
-      drop-shadow(0 0 22px rgba(111,95,146,.65));
+      drop-shadow(0 0 1px rgba(122,109,82,.9))
+      drop-shadow(0 0 4px rgba(111,95,146,.8))
+      drop-shadow(0 2px 10px rgba(122,109,82,.6))
+      drop-shadow(0 0 26px rgba(111,95,146,.5));
   }
-  @media (prefers-reduced-motion: reduce) { #gueka-logo-glow { animation: none; } }
+
+  /* Subtítulo debajo del logo */
+  #gueka-footer-tagline {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(8px, 2vw, 9.5px);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(107, 101, 119, 0.65);
+    margin-top: 4px;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  /* Línea divisoria antes del texto legal */
+  .footer-legal-line {
+    width: min(200px, 60vw);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(154,149,120,.4), transparent);
+    margin-bottom: 18px;
+  }
+
+  /* Texto legal */
   #gueka-legal {
     font-family: "Cormorant Garamond", serif;
-    font-size: clamp(8.5px, 2.2vw, 10px);
-    letter-spacing: 0.2em; text-transform: uppercase;
-    color: #7a7488; line-height: 2; text-wrap: balance;
+    font-size: clamp(8px, 2vw, 9.5px);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #8a8172;
+    line-height: 2.1;
+    text-wrap: balance;
+    max-width: min(360px, 86vw);
+  }
+  #gueka-legal strong {
+    color: #6b6557;
+    font-weight: 600;
+  }
+
+  /* Ornamento inferior */
+  #gueka-footer-bottom {
+    margin-top: 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: .45;
+  }
+  #gueka-footer-bottom span {
+    font-size: 9px;
+    color: #9a9578;
+    letter-spacing: 0.2em;
+  }
+  #gueka-footer-bottom .dot {
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: #9a9578;
+    flex: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #gueka-logo-glow, #gueka-footer-bg-glow { animation: none; }
   }
 
   /* ════ SCROLL REVEAL ════ */
@@ -901,8 +1030,8 @@
   </div>
 
   <div style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:2;text-align:center;">
-    <img src="https://hercules-cdn.com/file_v8gp0TZjISS7FWPwuVNC0oze" alt="Gueka Ideas"
-      style="width:clamp(110px,32vw,148px);opacity:.4;filter:invert(1) brightness(.8);display:block;margin:0 auto;">
+    <img src="https://hercules-cdn.com/file_YH6uFYs2HnosTkJWRNaJjvRL" alt="Gueka Ideas"
+      style="width:clamp(110px,32vw,148px);opacity:.35;filter:brightness(1.8) grayscale(1);display:block;margin:0 auto;">
   </div>
 </div>
 
@@ -1174,19 +1303,42 @@
     <div id="pv-sign" class="splash-name reveal" style="margin-top:22px;"></div>
   </section>
 
-  <!-- ════ FOOTER ════ -->
+  <!-- ════ FOOTER MEJORADO ════ -->
   <footer id="gueka-footer">
+    <div id="gueka-footer-top-ornament"></div>
     <div id="gueka-footer-inner">
+      <div id="gueka-footer-bg-glow" aria-hidden="true"></div>
+
+      <div class="footer-divider-line"></div>
+
+      <!-- Logo Gueka Ideas más grande -->
       <div id="gueka-logo-frame">
         <div id="gueka-logo-glow" aria-hidden="true"></div>
-        <img id="gueka-logo" src="https://hercules-cdn.com/file_v8gp0TZjISS7FWPwuVNC0oze" alt="Gueka Ideas" />
+        <!-- Elemento invisible que reserva las dimensiones reales del logo -->
+        <img id="gueka-logo"
+          src="https://hercules-cdn.com/file_YH6uFYs2HnosTkJWRNaJjvRL"
+          alt="Gueka Ideas — Create · Invite · Celebrate" />
+        <!-- Capa de color que usa el logo como máscara -->
         <div id="gueka-logo-tint" aria-hidden="true"></div>
       </div>
+
+      <p id="gueka-footer-tagline">Create &nbsp;·&nbsp; Invite &nbsp;·&nbsp; Celebrate</p>
+
+      <div class="footer-legal-line"></div>
+
       <p id="gueka-legal">
-        Esta tarjeta digital es propiedad exclusiva de Gueka Ideas.<br>
+        Esta tarjeta digital es propiedad exclusiva de <strong>Gueka Ideas</strong>.<br>
         Uso permitido únicamente para fines personales.<br>
-        © <span id="gueka-year">2026</span> GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS
+        <strong>© <span id="gueka-year">2026</span> GUEKA IDEAS · TODOS LOS DERECHOS RESERVADOS</strong>
       </p>
+
+      <div id="gueka-footer-bottom" aria-hidden="true">
+        <div class="dot"></div>
+        <span>Diseñado con amor</span>
+        <div class="dot"></div>
+        <span>guekaideas.com</span>
+        <div class="dot"></div>
+      </div>
     </div>
   </footer>
 
@@ -1200,7 +1352,7 @@
 
   /* ═══════ DATOS EDITABLES ═══════ */
   var state = {
-    plan: 'deluxe',                 /* classic | premium | deluxe */
+    plan: 'deluxe',
     name: 'Valentina y Santiago',
     date: '2027-05-24',
     time: '16:00',
@@ -1219,11 +1371,11 @@
     poem: 'Que el amor que hoy celebramos sea el hilo que teja cada uno de nuestros días futuros.',
     signature: 'Con amor, Valentina & Santiago',
     palette: 'medieval',
-    particles: 'ninguna',           /* ninguna | confetti | estrellas | burbujas | corazones | nieve */
-    typography: 'cinzel',           /* cinzel | playfair | cormorant | marcellus */
+    particles: 'ninguna',
+    typography: 'cinzel',
     songSuggestEnabled: true,
     songSuggestWa: '573001234567',
-    audioUrl: '',                   /* URL mp3 opcional */
+    audioUrl: '',
     audioName: 'Canción especial',
     itinerary: [
       { v: '4:00 P.M. — Ceremonia religiosa' },
@@ -1300,7 +1452,6 @@
     }, 750);
   }
   on(entryEnvelope, 'click', openEntrySplash);
-  /* Permite abrir directo con /invitacion.html#abrir */
   if (window.location.hash === '#abrir' || window.location.search.indexOf('abrir') !== -1) {
     entrySplash.classList.add('hide');
     document.body.classList.remove('splash-active');
@@ -1547,7 +1698,6 @@
       if (btn) btn.disabled = false;
       setText('pv-track-time', '0:00');
     } else {
-      /* Sin archivo: suena la melodía demo generada en el navegador */
       setText('pv-track-name', 'Canon en D (demo)');
       setText('pv-track-time', '0:00 / 0:17');
       if (btn) btn.disabled = false;
@@ -1654,12 +1804,9 @@
     if (playBtn) playBtn.textContent = playing ? '❙❙' : '▶';
   }
 
-  /* ── Melodía demo generada en el navegador (sin archivos externos) ──
-     Se usa solo cuando no hay una canción real cargada en state.audioUrl. */
   var demo = {
     ctx: null, gain: null, playing: false, startAt: 0, offset: 0,
     raf: null, timers: [],
-    /* Canon en D — melodía simplificada: [frecuencia, inicio, duración] */
     notes: (function () {
       var f = { fs4:369.99, e4:329.63, d4:293.66, cs4:277.18, b3:246.94, a3:220.00, g3:196.00, fs3:184.997, d3:146.83, a4:440.00, b4:493.88, g4:392.00 };
       var mel = ['fs4','e4','d4','cs4','b3','a3','b3','cs4','d4','cs4','b3','a3','g3','fs3','g3','e4','d4','fs4','a4','g4','fs4','d4','fs4','e4','d4','b3','d4','a4','g4','b4','a4','g4','fs4','d4','e4','cs4','d4','fs4','a4','fs4'];
@@ -1863,7 +2010,6 @@
     Array.prototype.forEach.call(revealEls, function (el) { el.classList.add('in'); });
   }
 
-  /* Red de seguridad: si algo impide el observer, muestra todo tras 3s */
   setTimeout(function () {
     Array.prototype.forEach.call(document.querySelectorAll('.reveal:not(.in)'), function (el) {
       var r = el.getBoundingClientRect();
