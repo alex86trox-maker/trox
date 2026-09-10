@@ -136,7 +136,7 @@ a,button{-webkit-tap-highlight-color:transparent}
 /* =====================================================
    NAV — página principal (idéntico)
    ===================================================== */
-#nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:20px clamp(20px,4vw,60px);display:flex;align-items:center;justify-content:space-between;gap:20px;transition:all .45s var(--ease)}
+#nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:20px clamp(20px,4vw,60px);display:flex;align-items:center;justify-content:space-between;gap:20px;transition:top .45s var(--ease),background .45s var(--ease),padding .45s var(--ease),box-shadow .45s var(--ease)}
 #nav.scrolled{background:rgba(30,0,20,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);padding:13px clamp(20px,4vw,60px);border-bottom:1px solid rgba(185,128,143,.15);box-shadow:0 4px 32px rgba(0,0,0,.4)}
 .nav-left{display:flex;align-items:center;gap:36px;flex:1}
 .nav-logo{display:flex;align-items:center;text-decoration:none;flex-shrink:0}
@@ -482,7 +482,6 @@ footer{background:var(--black);border-top:1px solid var(--border)}
   .modal-body{padding:20px 20px 30px}
   .modal-head h2{font-size:1.5rem}
   .urgency-bar{font-size:.6rem;letter-spacing:.08em;padding:7px 30px 7px 8px;text-align:center}
-  #nav{position:fixed!important;top:34px!important}
   #mob-bar{display:flex}
   .wpp{bottom:90px;right:16px;width:48px;height:48px;display:flex!important;z-index:1000}
   #backTop{bottom:90px;right:72px}
@@ -1216,8 +1215,14 @@ window.addEventListener('scroll', function() {
 
 // NAV SCROLL — página principal
 var nav = document.getElementById('nav');
+var urgencyBar = document.querySelector('.urgency-bar');
+function getUrgencyH() { return urgencyBar ? urgencyBar.offsetHeight : 34; }
+// Set initial top
+nav.style.top = getUrgencyH() + 'px';
 window.addEventListener('scroll', function() {
-  nav.classList.toggle('scrolled', window.scrollY > 60);
+  var scrolled = window.scrollY > 60;
+  nav.classList.toggle('scrolled', scrolled);
+  nav.style.top = scrolled ? '0' : getUrgencyH() + 'px';
 }, { passive: true });
 
 // BACK TO TOP
