@@ -85,7 +85,7 @@ a,button{-webkit-tap-highlight-color:transparent}
 .urgency-bar a{color:#FFD700;text-decoration:underline;text-decoration-style:dotted}
 
 /* ===== NAV (idéntico al de la página principal) ===== */
-#nav{position:fixed;top:36px;left:0;right:0;z-index:1000;padding:20px clamp(20px,4vw,60px);display:flex;align-items:center;justify-content:space-between;gap:20px;transition:all .45s var(--ease)}
+#nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:20px clamp(20px,4vw,60px);display:flex;align-items:center;justify-content:space-between;gap:20px;transition:all .45s var(--ease)}
 #nav.scrolled{background:rgba(30,0,20,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);padding:13px clamp(20px,4vw,60px);border-bottom:1px solid rgba(185,128,143,.15);box-shadow:0 4px 32px rgba(0,0,0,.4)}
 .nav-left{display:flex;align-items:center;gap:36px;flex:1}
 .nav-logo{display:flex;align-items:center;text-decoration:none;flex-shrink:0}
@@ -377,6 +377,8 @@ footer{background:var(--black);border-top:1px solid var(--border)}
 .ft-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
 .ft-col ul li a{font-size:.8rem;color:rgba(232,221,213,.55);text-decoration:none;transition:color .25s,padding-left .25s;display:inline-flex;align-items:center;gap:6px;letter-spacing:.04em}
 .ft-col ul li a:hover{color:var(--cream);padding-left:4px}
+.ft-col ul li a .ft-link-arr{font-size:.6rem;opacity:0;transition:opacity .25s}
+.ft-col ul li a:hover .ft-link-arr{opacity:1}
 .ft-contact-item{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
 .ft-contact-ico{width:32px;height:32px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:border-color .3s,background .3s}
 .ft-contact-ico svg{width:13px;height:13px;stroke:var(--rose-mid);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
@@ -387,7 +389,7 @@ footer{background:var(--black);border-top:1px solid var(--border)}
 .ft-contact-value{font-size:.8rem;color:rgba(232,221,213,.7);line-height:1.5}
 .ft-contact-value a{color:rgba(232,221,213,.7);text-decoration:none;transition:color .25s}
 .ft-contact-value a:hover{color:var(--rose-light)}
-.ft-bot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;padding-bottom:20px}
+.ft-bot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;padding-bottom:80px}
 .ft-copy{font-size:.72rem;letter-spacing:.06em;color:rgba(232,221,213,.75)}
 .ft-legal{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
 .ft-legal a{font-size:.72rem;letter-spacing:.06em;color:rgba(232,221,213,.75);text-decoration:none;cursor:pointer;transition:color .25s,border-color .25s;padding:4px 0;border-bottom:1px solid rgba(232,221,213,.25)}
@@ -395,6 +397,10 @@ footer{background:var(--black);border-top:1px solid var(--border)}
 .ft-legal .ft-sep{color:rgba(232,221,213,.25);font-size:.5rem}
 
 /* ===== RESPONSIVE ===== */
+@media(max-width:1200px){
+  .ft-top{grid-template-columns:1fr 1fr 1fr;gap:36px}
+  .ft-top .ft-col:last-child{grid-column:span 1}
+}
 @media(max-width:1024px){
   #nav .nav-links,#nav .nav-cta,#nav .nav-rating{display:none}
   .nav-burger{display:flex}
@@ -419,6 +425,7 @@ footer{background:var(--black);border-top:1px solid var(--border)}
   .cookie-btn-reject,.cookie-btn-accept{flex:1;text-align:center}
   .stats-grid{grid-template-columns:1fr 1fr}
   .pstrip{height:44vh}
+  .ft-logo-img{height:38px}
   .modal-box{max-height:92vh}
   .modal-head{padding:22px 20px 16px}
   .modal-body{padding:20px 20px 30px}
@@ -459,7 +466,7 @@ footer{background:var(--black);border-top:1px solid var(--border)}
 <nav id="nav" aria-label="Navegación principal">
   <div class="nav-left">
     <a href="/" class="nav-logo" title="VELVETT Agency — Inicio">
-      <img src="https://velvett-agency.com/imagenes/logo.webp" alt="VELVETT Agency" class="nav-logo-img" width="130" height="40">
+      <img src="https://velvett-agency.com/imagenes/logo.webp" alt="VELVETT Agency" class="nav-logo-img" width="200" height="80">
     </a>
     <div class="nav-rating" aria-label="Calificación 4.9 sobre 5">
       <div class="nav-rating-stars" aria-hidden="true">
@@ -1141,15 +1148,8 @@ document.getElementById('ftYear').textContent = new Date().getFullYear();
 /* ---- NAV SCROLL ---- */
 (function(){
   const nav = document.getElementById('nav');
-  const urgencyH = 36;
   function onScroll(){
-    if(window.scrollY > 60){
-      nav.classList.add('scrolled');
-      nav.style.top = '0';
-    } else {
-      nav.classList.remove('scrolled');
-      nav.style.top = urgencyH + 'px';
-    }
+    nav.classList.toggle('scrolled', window.scrollY > 60);
   }
   window.addEventListener('scroll', onScroll, {passive:true});
   onScroll();
