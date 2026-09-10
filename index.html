@@ -418,8 +418,8 @@ footer{background:var(--black);border-top:1px solid var(--border)}
   .hero-trust{display:none}
   .btn-p,.btn-g,.btn-wa{justify-content:center;width:100%}
   .ft-top{grid-template-columns:1fr}
-  .ft-bot{flex-direction:column;align-items:flex-start}
-  .ft-legal{gap:12px}
+  .ft-bot{flex-direction:column;align-items:flex-start;padding-bottom:20px}
+  .ft-legal{gap:12px;flex-wrap:wrap}
   #cookieBanner{flex-direction:column;align-items:flex-start}
   .cookie-btns{width:100%}
   .cookie-btn-reject,.cookie-btn-accept{flex:1;text-align:center}
@@ -432,6 +432,8 @@ footer{background:var(--black);border-top:1px solid var(--border)}
   .modal-head h2{font-size:1.5rem}
   .wpp{bottom:76px}
   .sticky-cta{display:none!important}
+  /* En mobile la urgency bar ocupa 2 líneas (~60px), el nav sube debajo */
+  .urgency-bar{font-size:.6rem;letter-spacing:.12em}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
@@ -466,7 +468,7 @@ footer{background:var(--black);border-top:1px solid var(--border)}
 <nav id="nav" aria-label="Navegación principal">
   <div class="nav-left">
     <a href="/" class="nav-logo" title="VELVETT Agency — Inicio">
-      <img src="https://velvett-agency.com/imagenes/logo.webp" alt="VELVETT Agency" class="nav-logo-img" width="200" height="80">
+      <img src="https://velvett-agency.com/imagenes/logo.webp" alt="VELVETT Agency" class="nav-logo-img" width="200" height="80" loading="eager">
     </a>
     <div class="nav-rating" aria-label="Calificación 4.9 sobre 5">
       <div class="nav-rating-stars" aria-hidden="true">
@@ -921,7 +923,7 @@ footer{background:var(--black);border-top:1px solid var(--border)}
       <!-- Columna 1: Marca -->
       <div class="ft-col">
         <div class="ft-brand-logo">
-          <img src="https://velvett-agency.com/imagenes/logo.webp" alt="VELVETT Agency" class="ft-logo-img" width="140" height="46">
+          <img src="https://velvett-agency.com/imagenes/logo.webp" alt="VELVETT Agency" class="ft-logo-img" width="140" height="46" loading="lazy">
         </div>
         <p class="ft-brand-desc">Agencia de modelos webcam líder en Bogotá. Estudio propio en Fontibón, management profesional y las mejores condiciones del mercado.</p>
         <div class="ft-rating-row" aria-label="Calificación 4.9 sobre 5 con 47 reseñas">
@@ -1148,9 +1150,15 @@ document.getElementById('ftYear').textContent = new Date().getFullYear();
 /* ---- NAV SCROLL ---- */
 (function(){
   const nav = document.getElementById('nav');
+  const ub = document.querySelector('.urgency-bar');
+  function positionNav(){
+    nav.style.top = (ub ? ub.offsetHeight : 36) + 'px';
+  }
   function onScroll(){
     nav.classList.toggle('scrolled', window.scrollY > 60);
   }
+  positionNav();
+  window.addEventListener('resize', positionNav, {passive:true});
   window.addEventListener('scroll', onScroll, {passive:true});
   onScroll();
 })();
