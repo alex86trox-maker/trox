@@ -1010,9 +1010,9 @@ a,button{-webkit-tap-highlight-color:transparent}
       <p class="ft-copy">© <span id="ftYear"></span> VELVETT Agency. Todos los derechos reservados.</p>
       <div class="ft-legal">
         <a href="#" onclick="openModal('modalPrivacy');return false;">Política de Privacidad</a>
-        <span class="ft-sep">◆</span>
+        <span class="ft-sep">·</span>
         <a href="#" onclick="openModal('modalTerms');return false;">Términos y Condiciones</a>
-        <span class="ft-sep">◆</span>
+        <span class="ft-sep">·</span>
         <a href="#" onclick="openModal('modalLegal');return false;">Aviso Legal</a>
       </div>
     </div>
@@ -1135,12 +1135,26 @@ a,button{-webkit-tap-highlight-color:transparent}
     }, { passive: true });
   }
 
-  /* ── NAV SCROLLED ──────────────────────────────────────────────────── */
+  /* ── NAV SCROLLED + POSICIONAMIENTO BAJO URGENCY BAR ──────────────── */
   var nav = document.getElementById('nav');
   if (nav) {
     var urgencyBar = document.querySelector('.urgency-bar');
-    var urgencyH   = urgencyBar ? urgencyBar.offsetHeight : 36;
+
+    function getUrgencyH() {
+      return urgencyBar ? urgencyBar.getBoundingClientRect().height : 0;
+    }
+
+    // Posiciona el nav justo debajo de la urgency bar (crucial en mobile donde la barra se envuelve a 2 líneas)
+    function positionNav() {
+      var h = getUrgencyH();
+      nav.style.top = h + 'px';
+    }
+
+    positionNav();
+    window.addEventListener('resize', positionNav);
+
     window.addEventListener('scroll', function() {
+      var urgencyH = getUrgencyH();
       nav.classList.toggle('scrolled', window.scrollY > urgencyH + 10);
     }, { passive: true });
   }
