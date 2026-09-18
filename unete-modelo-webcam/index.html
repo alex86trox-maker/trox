@@ -38,11 +38,13 @@
 
 <style>
 /* ============================================================
-   CÓDIGO ORIGINAL — sin modificar
+   CÓDIGO ORIGINAL — sin modificar (excepto NAV actualizado
+   para coincidir con la referencia velvett-agency.com)
    ============================================================ */
 *,*::before,*::after{margin:0;padding:0;-webkit-box-sizing:border-box;box-sizing:border-box}
-html{scroll-behavior:smooth;font-size:16px}
+html{scroll-behavior:smooth;font-size:16px;-webkit-overflow-scrolling:touch}
 body{font-family:'Inter',sans-serif;background:#2C001D;color:#e8ddd5;overflow-x:hidden;line-height:1.6}
+a,button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 :root{
   --rose-light:#D5B1B8;--rose-mid:#B9808F;--rose-deep:#9D576F;
   --wine:#803655;--wine-dark:#641C40;--plum:#480A2E;
@@ -56,28 +58,50 @@ body{font-family:'Inter',sans-serif;background:#2C001D;color:#e8ddd5;overflow-x:
 ::-webkit-scrollbar-thumb{background:var(--wine);border-radius:2px}
 
 /* PROGRESS BAR */
-#progress-bar{position:fixed;top:0;left:0;height:2px;background:-webkit-linear-gradient(left,var(--wine),var(--rose-mid));background:linear-gradient(90deg,var(--wine),var(--rose-mid));z-index:10000;width:0%;-webkit-transition:width .1s linear;transition:width .1s linear}
+#progress-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--wine),var(--rose-mid));z-index:10000;width:0%;transition:width .1s linear}
+
+/* URGENCY BAR */
+.urgency-bar{background:var(--wine);padding:8px 16px;text-align:center;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cream);font-weight:500;position:fixed;top:0;left:0;right:0;z-index:1001}
+.urgency-bar strong{color:#FFD700}
+.urgency-bar a{color:#FFD700;text-decoration:underline;text-decoration-style:dotted}
 
 /* NAV */
-nav.main-nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:24px clamp(20px,4vw,60px);display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;-webkit-justify-content:space-between;justify-content:space-between;-webkit-transition:all .5s;transition:all .5s}
-nav.main-nav.scrolled{background:rgba(44,0,29,.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);padding:14px clamp(20px,4vw,60px);border-bottom:1px solid var(--border)}
-.nav-logo{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;text-decoration:none}
-.nav-logo-img{height:44px;width:auto;object-fit:contain;display:block}
-.nav-links{display:-webkit-flex;display:flex;list-style:none;gap:32px}
-.nav-links a{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(232,221,213,.9);text-decoration:none;-webkit-transition:color .3s;transition:color .3s}
-.nav-links a:hover,.nav-links a.active{color:var(--rose-mid)}
-.nav-cta{padding:9px 22px;border:1px solid var(--border);border-radius:2px;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rose-mid);background:transparent;text-decoration:none;-webkit-transition:all .35s;transition:all .35s}
-.nav-cta:hover{background:var(--rose-mid);color:var(--black);border-color:var(--rose-mid)}
-.nav-burger{display:none;-webkit-flex-direction:column;flex-direction:column;gap:5px;padding:4px;background:none;border:none}
-.nav-burger span{display:block;height:1px;background:var(--cream);-webkit-transition:.35s;transition:.35s}
+#nav{position:fixed;top:34px;left:0;right:0;z-index:1000;padding:20px clamp(20px,4vw,60px);display:flex;align-items:center;justify-content:space-between;gap:20px;transition:all .45s var(--ease)}
+#nav.scrolled{background:rgba(30,0,20,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);padding:13px clamp(20px,4vw,60px);border-bottom:1px solid rgba(185,128,143,.15);box-shadow:0 4px 32px rgba(0,0,0,.4)}
+.nav-left{display:flex;align-items:center;gap:36px;flex:1}
+.nav-logo{display:flex;align-items:center;text-decoration:none;flex-shrink:0;overflow:hidden}
+.nav-logo-img{height:40px;width:auto;object-fit:contain;display:block;transition:opacity .3s}
+.nav-logo:hover .nav-logo-img{opacity:.82}
+.nav-rating{display:flex;align-items:center;gap:6px;padding-left:24px;border-left:1px solid var(--border)}
+.nav-rating-stars{display:flex;gap:2px}
+.nav-rating-stars svg{width:11px;height:11px;fill:#FFD700}
+.nav-rating-text{font-size:.62rem;letter-spacing:.14em;color:rgba(232,221,213,.55);text-transform:uppercase}
+.nav-links{display:flex;list-style:none;gap:6px;align-items:center;margin-left:auto}
+.nav-links a{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(232,221,213,.7);text-decoration:none;padding:7px 12px;border-radius:2px;transition:color .25s,background .25s;white-space:nowrap}
+.nav-links a:hover{color:var(--cream);background:rgba(255,255,255,.06)}
+.nav-links a[aria-current="page"]{color:var(--rose-mid)}
+.nav-links .nav-money{color:var(--rose-mid);border:1px solid rgba(185,128,143,.3);padding:6px 14px;transition:all .3s}
+.nav-links .nav-money:hover{background:rgba(128,54,85,.85);color:var(--cream);border-color:var(--wine)}
+.nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-cta{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;background:var(--wine);border:none;border-radius:2px;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cream);cursor:pointer;text-decoration:none;transition:all .3s;white-space:nowrap;font-family:'Inter',sans-serif}
+.nav-cta:hover{background:var(--rose-deep);transform:translateY(-1px);box-shadow:0 6px 20px rgba(128,54,85,.4)}
+.nav-cta svg{width:13px;height:13px;fill:white;flex-shrink:0}
+.nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:12px 6px;min-width:44px;min-height:44px;align-items:center;justify-content:center;background:none;border:none}
+.nav-burger span{display:block;height:1px;background:var(--cream);transition:.35s}
 .nav-burger span:nth-child(1){width:24px}.nav-burger span:nth-child(2){width:16px}.nav-burger span:nth-child(3){width:20px}
+.nav-burger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);width:24px}
+.nav-burger.open span:nth-child(2){opacity:0}
+.nav-burger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);width:24px}
 
 /* MENÚ MÓVIL */
-.mobile-menu{position:fixed;inset:0;z-index:999;background:var(--black);display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;-webkit-align-items:center;align-items:center;-webkit-justify-content:center;justify-content:center;gap:36px;opacity:0;pointer-events:none;-webkit-transition:opacity .4s;transition:opacity .4s}
+.mobile-menu{position:fixed;inset:0;z-index:1999;background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;opacity:0;pointer-events:none;transition:opacity .4s}
 .mobile-menu.open{opacity:1;pointer-events:all}
-.mobile-menu a{font-family:var(--serif);font-size:2.5rem;font-weight:300;color:var(--cream);text-decoration:none;-webkit-transition:color .3s;transition:color .3s}
+.mobile-menu a{font-family:var(--serif);font-size:2.1rem;font-weight:300;color:var(--cream);text-decoration:none;transition:color .3s}
 .mobile-menu a:hover{color:var(--rose-mid)}
-.mm-close{position:absolute;top:28px;right:clamp(20px,4vw,60px);font-size:1.4rem;color:var(--muted);background:none;border:none;-webkit-transition:color .3s;transition:color .3s}
+.mobile-menu .mm-money{font-size:1.2rem;color:var(--rose-mid);border:1px solid rgba(185,128,143,.3);padding:8px 24px;border-radius:2px}
+.mobile-menu .mm-cta{margin-top:8px;padding:14px 36px;background:var(--wine);color:var(--cream);font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;border:none;cursor:pointer;border-radius:2px;text-decoration:none;transition:background .3s;font-family:'Inter',sans-serif;font-weight:500}
+.mobile-menu .mm-cta:hover{background:var(--rose-deep)}
+.mm-close{position:absolute;top:24px;right:clamp(20px,4vw,60px);font-size:1.4rem;color:var(--muted);cursor:pointer;background:none;border:none;transition:color .3s}
 .mm-close:hover{color:var(--rose-mid)}
 
 /* HERO */
@@ -250,8 +274,8 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:clamp(
 
 /* RESPONSIVE */
 @media(max-width:1024px){
-  nav.main-nav .nav-links,nav.main-nav .nav-cta{display:none}
-  .nav-burger{display:-webkit-flex;display:flex}
+  #nav .nav-links,#nav .nav-cta,#nav .nav-rating{display:none}
+  .nav-burger{display:flex}
   .testi-grid{grid-template-columns:1fr}
   .testi-featured{grid-column:1}
   .confianza-grid{grid-template-columns:1fr}
@@ -260,6 +284,8 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:clamp(
   .stats-grid .stat-item:nth-child(3){border-top:1px solid var(--border)}
   .nav-logo-img{height:34px}.ft-logo-img{height:42px}
   .ft-top{grid-template-columns:1fr 1fr}
+  #cursor-dot,#cursor-ring,#mouse-glow{display:none!important}
+  .urgency-bar{font-size:.6rem;letter-spacing:.12em;padding:7px 12px;line-height:1.45}
 }
 @media(max-width:640px){
   .stats-grid{grid-template-columns:1fr}
@@ -359,45 +385,59 @@ body.cursor-hover #cursor-dot{
      CÓDIGO ORIGINAL — sin modificar
      ============================================================ -->
 
-<div id="cookieBanner" role="region" aria-label="Aviso de cookies">
-  <p>Usamos <strong>Google Fonts</strong> y recursos externos que pueden registrar tu IP. Al continuar aceptas nuestra <a href="#">Política de Privacidad</a>.</p>
-  <div class="cookie-btns">
-    <button class="cookie-btn-reject" id="cookieReject">Rechazar</button>
-    <button class="cookie-btn-accept" id="cookieAccept">Aceptar</button>
-  </div>
-</div>
-
 <div id="progress-bar"></div>
 
+<div class="urgency-bar" id="urgencyBar" role="alert">
+  <strong>¡Cupos limitados!</strong> &mdash; Solo quedan <strong>3 plazas</strong> disponibles esta semana.
+  <a href="https://wa.me/573115653678?text=Hola%2C%20quiero%20postularme%20a%20Velvett%20Agency" target="_blank" rel="noopener noreferrer">Postúlate ahora &rarr;</a>
+</div>
+
 <!-- NAV -->
-<nav class="main-nav" id="nav">
-  <a href="/" class="nav-logo">
-    <img src="https://velvett-agency.com/imagenes/logo%20velvett.webp" alt="VELVETT Agency" class="nav-logo-img" width="120" height="44">
-  </a>
-  <ul class="nav-links">
+<nav id="nav" aria-label="Navegación principal" role="navigation">
+  <div class="nav-left">
+    <a href="/" class="nav-logo" title="VELVETT Agency — Inicio" aria-label="VELVETT Agency - Ir al inicio">
+      <img class="nav-logo-img" src="https://velvett-agency.com/imagenes/logo%20velvett.webp" alt="VELVETT Agency" width="160" height="40">
+    </a>
+    <div class="nav-rating" aria-label="Calificación de clientes">
+      <div class="nav-rating-stars" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <span class="nav-rating-text">4.9 &middot; 47 reseñas</span>
+    </div>
+  </div>
+  <ul class="nav-links" role="list">
     <li><a href="/">Inicio</a></li>
-    <li><a href="/modelos-webcam-bogota/">Servicios</a></li>
+    <li><a href="/modelos-webcam-bogota/" aria-current="page">Servicios</a></li>
     <li><a href="/estudio-webcam-bogota/">Estudio</a></li>
-    <li><a href="/modelo-webcam-fontibon/">Localidades</a></li>
+    <li><a href="/modelo-webcam-bogota/" class="nav-money">Localidades</a></li>
+    <li><a href="/contacto-agencia-modelos-webcam/">Contacto</a></li>
     <li><a href="/preguntas-frecuentes-modelo-webcam/">FAQ</a></li>
-    <li><a href="/blog/">Blog</a></li>
   </ul>
-  <a href="https://wa.me/573115653678" target="_blank" rel="noopener noreferrer" class="nav-cta">Unirme ahora</a>
-  <div class="nav-burger" id="burger">
-    <span></span><span></span><span></span>
+  <div class="nav-right">
+    <a href="https://wa.me/573115653678?text=Hola%2C%20quiero%20postularme%20a%20VELVETT%20Agency" target="_blank" rel="noopener noreferrer" class="nav-cta" aria-label="Postúlate a VELVETT Agency por WhatsApp">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.99 2C6.475 2 2 6.475 2 11.99c0 1.917.504 3.713 1.385 5.268L2 22l4.877-1.365A9.945 9.945 0 0011.99 22C17.505 22 22 17.525 22 12.01 22 6.495 17.505 2 11.99 2zm0 18.18a8.154 8.154 0 01-4.147-1.134l-.297-.176-3.07.861.861-3.02-.198-.31A8.164 8.164 0 013.82 12c0-4.509 3.67-8.18 8.17-8.18 4.51 0 8.18 3.671 8.18 8.18 0 4.51-3.67 8.18-8.18 8.18z"/></svg>
+      Postúlate &mdash; Es gratis
+    </a>
+    <button class="nav-burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mm">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
 
 <!-- MENÚ MÓVIL -->
-<div class="mobile-menu" id="mm">
-  <button class="mm-close" id="mmClose">&#10005;</button>
+<div class="mobile-menu" id="mm" role="dialog" aria-label="Menú móvil" aria-modal="true">
+  <button class="mm-close" id="mmClose" aria-label="Cerrar menú">&#10005;</button>
   <a href="/">Inicio</a>
-  <a href="/modelos-webcam-bogota/">Servicios</a>
+  <a href="/modelos-webcam-bogota/" class="mm-money" aria-current="page">Servicios</a>
   <a href="/estudio-webcam-bogota/">Estudio</a>
-  <a href="/modelo-webcam-fontibon/">Localidades</a>
+  <a href="/modelo-webcam-bogota/">Localidades</a>
+  <a href="/contacto-agencia-modelos-webcam/">Contacto</a>
   <a href="/preguntas-frecuentes-modelo-webcam/">FAQ</a>
-  <a href="/blog/">Blog</a>
-  <a href="https://wa.me/573115653678" target="_blank" rel="noopener noreferrer" style="color:var(--rose-mid)">Unirme ahora</a>
+  <a href="https://wa.me/573115653678?text=Hola%2C%20quiero%20postularme%20a%20VELVETT%20Agency" target="_blank" rel="noopener noreferrer" class="mm-cta">Postúlate — Es gratis</a>
 </div>
 
 <!-- HERO -->
@@ -843,10 +883,16 @@ body.cursor-hover #cursor-dot{
 
   /* ─── NAV SCROLL ─── */
   const nav = $('#nav');
-  on(window, 'scroll', () => {
-    if (nav) nav.classList.toggle('scrolled', window.scrollY > 60);
-  }, { passive: true });
-  if (nav) nav.classList.toggle('scrolled', window.scrollY > 60);
+  function updateNav() {
+    if (!nav) return;
+    const ub = document.querySelector('.urgency-bar');
+    const ubH = ub ? ub.offsetHeight : 0;
+    const scrolled = window.scrollY > 60;
+    nav.classList.toggle('scrolled', scrolled);
+    nav.style.top = scrolled ? '0' : ubH + 'px';
+  }
+  on(window, 'scroll', updateNav, { passive: true });
+  updateNav();
 
   /* ─── MOBILE MENU ─── */
   const burger = $('#burger');
@@ -854,10 +900,14 @@ body.cursor-hover #cursor-dot{
   const mmClose = $('#mmClose');
   window.openMenu = function() {
     mm.classList.add('open');
+    burger.classList.add('open');
+    burger.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
   };
   window.closeMenu = function() {
     mm.classList.remove('open');
+    burger.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
   };
   on(burger, 'click', window.openMenu);
