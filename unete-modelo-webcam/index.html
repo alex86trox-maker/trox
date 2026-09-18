@@ -1047,5 +1047,94 @@ window.rejectCookies = function(){
 showCookieBanner();
 })();
 </script>
+
+<!-- CURSOR EFFECT: extracted from velvett-agency.com homepage -->
+<script>
+// ---- CUSTOM CURSOR ----
+(function(){
+  // Only on desktop (pointer device)
+  if(window.matchMedia('(pointer: coarse)').matches) return;
+
+  // Inject cursor elements
+  var dot = document.createElement('div');
+  dot.id = 'cur-dot';
+  var ring = document.createElement('div');
+  ring.id = 'cur-ring';
+  document.body.appendChild(dot);
+  document.body.appendChild(ring);
+
+  // Inject cursor styles
+  var style = document.createElement('style');
+  style.textContent = [
+    '*{cursor:none!important}',
+    '#cur-dot{',
+      'position:fixed;top:0;left:0;width:6px;height:6px;',
+      'background:#803655;border-radius:50%;',
+      'pointer-events:none;z-index:99999;',
+      'transform:translate(-50%,-50%);',
+      'transition:width .15s,height .15s,background .2s,opacity .3s;',
+      'will-change:transform;',
+    '}',
+    '#cur-ring{',
+      'position:fixed;top:0;left:0;width:36px;height:36px;',
+      'border:1.5px solid rgba(185,128,143,.7);border-radius:50%;',
+      'pointer-events:none;z-index:99998;',
+      'transform:translate(-50%,-50%);',
+      'transition:width .2s,height .2s,border-color .2s,opacity .3s;',
+      'will-change:transform;',
+    '}',
+    'body:not(.cur-active) #cur-dot,body:not(.cur-active) #cur-ring{opacity:0}',
+    '.cur-hover #cur-dot{width:10px;height:10px;background:#B9808F}',
+    '.cur-hover #cur-ring{width:56px;height:56px;border-color:rgba(185,128,143,.5)}',
+    '.cur-click #cur-dot{width:4px;height:4px;background:#641C40}',
+    '.cur-click #cur-ring{width:28px;height:28px;border-color:rgba(128,54,85,.9)}',
+  ].join('');
+  document.head.appendChild(style);
+
+  var mx = 0, my = 0;
+  var rx = 0, ry = 0;
+  var raf;
+
+  function lerp(a, b, t){ return a + (b - a) * t; }
+
+  function animate(){
+    rx = lerp(rx, mx, 0.12);
+    ry = lerp(ry, my, 0.12);
+    dot.style.transform  = 'translate3d(calc(' + mx + 'px - 50%),calc(' + my + 'px - 50%),0)';
+    ring.style.transform = 'translate3d(calc(' + rx + 'px - 50%),calc(' + ry + 'px - 50%),0)';
+    raf = requestAnimationFrame(animate);
+  }
+
+  document.addEventListener('mousemove', function(e){
+    mx = e.clientX;
+    my = e.clientY;
+    document.body.classList.add('cur-active');
+    if(!raf) animate();
+  });
+
+  document.addEventListener('mouseleave', function(){
+    document.body.classList.remove('cur-active');
+  });
+
+  var hoverSel = 'a,button,[role="button"],input,select,textarea,.btn-p,.btn-g,.btn-wa,.nav-cta,.faq-hd,.req-card,.vent-item,.step-body,.ban-card,.soc,.wpp,.stat-cell';
+  document.addEventListener('mouseover', function(e){
+    if(e.target.closest(hoverSel)){
+      document.body.classList.add('cur-hover');
+    }
+  });
+  document.addEventListener('mouseout', function(e){
+    if(e.target.closest(hoverSel)){
+      document.body.classList.remove('cur-hover');
+    }
+  });
+
+  document.addEventListener('mousedown', function(){
+    document.body.classList.add('cur-click');
+  });
+  document.addEventListener('mouseup', function(){
+    document.body.classList.remove('cur-click');
+  });
+})();
+</script>
 </body>
 </html>
