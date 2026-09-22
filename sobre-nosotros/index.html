@@ -3,226 +3,166 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>XV Años · Camila Valentina — Halftone Fashion Edition</title>
+    <title>Isabella & Mateo — Nuestra Boda</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bodoni+Moda:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Great+Vibes&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
       :root {
-        --pink:#FF3B7F; --gold:#FFC93C; --cyan:#00E5D4; --purple:#8B5CF6;
-        --green:#4ADE80; --orange:#FF7A45; --blue:#4F9DFF; --red:#FF5A5F;
-        --ink:#05050C; --panel:#0C0C18;
+        --gold:#C9A24B; --gold-light:#E9CD8B; --gold-deep:#9C7A2E;
+        --sage:#8A9873; --blush:#D9A6A0; --wine:#7A3B41;
+        --ivory:#FBF6EE; --cream:#F3E7D6; --panel:#FFFDF9;
+        --ink:#3A332B; --ink-soft:#7A6F60;
       }
       body {
-        background: var(--ink);
+        background: var(--ivory);
         font-family: 'Cormorant Garamond', Georgia, serif;
+        color: var(--ink);
         min-height: 100vh;
         overflow-x: hidden;
       }
-      #app { max-width: 480px; margin: 0 auto; overflow-x: hidden; position: relative; }
-      #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 8888; }
+      #app { max-width: 480px; margin: 0 auto; overflow-x: hidden; position: relative; background: var(--ivory); }
+      #petal-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 8888; }
 
       /* ── Animations ── */
-      @keyframes rainbowShimmer { 0%{background-position:0% center} 100%{background-position:200% center} }
-      @keyframes fadeInUp { from{opacity:0;transform:translateY(32px)} to{opacity:1;transform:translateY(0)} }
-      @keyframes scaleIn { from{opacity:0;transform:scale(0.88)} to{opacity:1;transform:scale(1)} }
-      @keyframes blinkColon { 0%,100%{opacity:1} 50%{opacity:0.1} }
-      @keyframes tickerMove { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+      @keyframes fadeInUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+      @keyframes scaleIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+      @keyframes blinkColon { 0%,100%{opacity:1} 50%{opacity:0.15} }
       @keyframes cdFlip { 0%{transform:rotateX(0)} 50%{transform:rotateX(-90deg)} 100%{transform:rotateX(0)} }
-      @keyframes rotateConic { 0%{--a:0deg} 100%{--a:360deg} }
-      @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
-      @keyframes floatYSm { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
-      @keyframes htIn { to { transform:translate(-50%,-50%) scale(1); opacity:1; } }
-      @keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
-      @keyframes spinSlow { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+      @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+      @keyframes shimmerGold { 0%{background-position:0% center} 100%{background-position:200% center} }
+      @keyframes drawLine { to { stroke-dashoffset: 0; } }
+      @keyframes ringSpin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+      @keyframes petalFall { 0%{transform:translateY(-10px) rotate(0)} 100%{transform:translateY(110vh) rotate(360deg)} }
+      @keyframes softPulse { 0%,100%{opacity:0.65} 50%{opacity:1} }
 
-      .rainbow-text {
-        background: linear-gradient(90deg, var(--pink), var(--gold), var(--cyan), var(--purple), var(--green), var(--orange), var(--pink));
-        background-size: 300% auto;
+      .gold-text {
+        background: linear-gradient(90deg, var(--gold-deep), var(--gold-light), var(--gold), var(--gold-deep));
+        background-size: 250% auto;
         -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
-        animation: rainbowShimmer 5s linear infinite;
+        animation: shimmerGold 6s linear infinite;
       }
+      .cinzel { font-family: 'Cinzel', serif; }
 
-      /* ── Halftone mosaic dots (generated via JS) ── */
-      .halftone-box { display: inline-block; position: relative; animation: floatY 4.5s ease-in-out infinite; }
-      .ht-dot {
-        position: absolute; border-radius: 50%;
-        transform: translate(-50%,-50%) scale(0); opacity: 0;
-        animation: htIn 0.5s cubic-bezier(0.22,1,0.36,1) forwards;
+      /* ── Ornamental SVG system ── */
+      .orn-svg { display: block; }
+      .orn-draw path, .orn-draw line { stroke-dasharray: 400; stroke-dashoffset: 400; animation: drawLine 1.6s ease-out forwards; }
+      .icon-badge {
+        width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        background: var(--panel); border: 1px solid rgba(201,162,75,0.35); box-shadow: 0 4px 18px rgba(154,120,50,0.14);
       }
+      .icon-badge svg { width: 26px; height: 26px; }
+      .corner-orn { position: absolute; width: 46px; height: 46px; opacity: 0.9; pointer-events: none; }
+      .corner-orn.tl { top: 10px; left: 10px; }
+      .corner-orn.tr { top: 10px; right: 10px; transform: scaleX(-1); }
+      .corner-orn.bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
+      .corner-orn.br { bottom: 10px; right: 10px; transform: scale(-1,-1); }
 
-      /* ── Conic rotating rainbow border ── */
-      .conic-border { position: relative; border-radius: 4px; }
-      .conic-border::before {
-        content: ''; position: absolute; inset: -2px; border-radius: 6px; z-index: -1;
-        background: conic-gradient(from 0deg, var(--pink), var(--gold), var(--cyan), var(--purple), var(--green), var(--orange), var(--pink));
-        animation: spinSlow 6s linear infinite;
-      }
-      .conic-border > .conic-inner { position: relative; border-radius: 4px; background: var(--panel); height: 100%; }
-
-      /* ── TICKER ── */
-      .ticker-wrap { overflow: hidden; background: #000; padding: 10px 0; position: relative; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); }
-      .ticker-inner { display: flex; white-space: nowrap; animation: tickerMove 18s linear infinite; }
-      .ticker-item { font-family: 'Bebas Neue', sans-serif; font-size: 0.95rem; letter-spacing: 0.22em; padding: 0 2.5rem; }
-      .ticker-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin: 0 0.2rem; }
+      .frame-card { position: relative; border: 1px solid rgba(201,162,75,0.3); background: var(--panel); }
 
       /* ── SPLASH ── */
       #splash {
         position: fixed; inset: 0; z-index: 9999;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         cursor: pointer; user-select: none; overflow: hidden;
-        background: var(--ink);
-        transition: opacity 0.85s cubic-bezier(0.4,0,0.2,1), transform 0.85s cubic-bezier(0.4,0,0.2,1);
+        background: var(--ivory);
+        transition: opacity 0.9s cubic-bezier(0.4,0,0.2,1), transform 0.9s cubic-bezier(0.4,0,0.2,1);
       }
-      #splash.closing { opacity: 0; transform: scale(1.06) translateY(-20px); pointer-events: none; }
-      #splash .vignette {
-        position: absolute; inset: 0;
-        background: radial-gradient(ellipse 90% 90% at 50% 40%, rgba(20,20,35,0.4) 0%, rgba(5,5,12,0.98) 100%);
-      }
-      #splash .dot-grid {
-        position: absolute; inset: 0; pointer-events: none; opacity: 0.5;
-        background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
-        background-size: 16px 16px;
-      }
-      #splash .content {
-        position: relative; z-index: 10;
-        display: flex; flex-direction: column; align-items: center; text-align: center;
-        padding: 0 2rem;
-        animation: fadeInUp 1s cubic-bezier(0.22,1,0.36,1) 0.4s both;
-      }
-      #splash .fashion-tag {
-        font-family: 'Bebas Neue', sans-serif; font-size: 0.62rem; letter-spacing: 0.6em;
-        color: var(--cyan); margin-bottom: 1.3rem; text-transform: uppercase;
-      }
-      #splash .halftone-15 { margin-bottom: 0.5rem; }
-      #splash .xv-label { font-family: 'Bebas Neue', sans-serif; font-size: 1.05rem; letter-spacing: 0.5em; color: rgba(255,255,255,0.55); margin-bottom: 0.5rem; margin-top: 0.4rem; }
-      #splash .splash-script { font-family: 'Great Vibes', cursive; font-size: 3.2rem; color: #fff; margin-bottom: 1.5rem; }
-      #splash .date-strip {
-        border-radius: 2px; padding: 0.6rem 2rem; margin-bottom: 1.9rem;
-        font-family: 'Bebas Neue', sans-serif; font-size: 0.78rem; letter-spacing: 0.35em;
-        color: rgba(255,255,255,0.92);
-        background: rgba(255,255,255,0.04);
-      }
-      #splash .open-btn {
-        border: none; cursor: pointer; border-radius: 2px;
-        display: flex; align-items: center; gap: 10px; color: #05050C; font-weight: 900;
-        padding: 1.05rem 2.8rem;
-        background: linear-gradient(90deg, var(--pink), var(--gold), var(--cyan), var(--purple), var(--orange));
-        background-size: 250% auto; animation: rainbowShimmer 3s linear infinite;
-        font-family: 'Bebas Neue', sans-serif; font-size: 0.85rem; letter-spacing: 0.42em;
-        box-shadow: 0 10px 40px rgba(255,59,127,0.25);
-      }
-      #splash .tap-hint { font-size: 0.5rem; letter-spacing: 0.18em; color: rgba(255,255,255,0.25); margin-top: 0.85rem; font-family: 'Bebas Neue', sans-serif; }
+      #splash.closing { opacity: 0; transform: scale(1.05) translateY(-16px); pointer-events: none; }
+      #splash .texture { position: absolute; inset: 0; background: radial-gradient(ellipse 85% 65% at 50% 30%, rgba(201,162,75,0.09) 0%, transparent 70%); }
+      #splash .content { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 2rem; animation: fadeInUp 1s cubic-bezier(0.22,1,0.36,1) 0.3s both; }
+      #splash .tag { font-size: 0.62rem; letter-spacing: 0.55em; color: var(--gold-deep); margin-bottom: 1.4rem; text-transform: uppercase; }
+      #splash .monogram-wrap { margin-bottom: 1.5rem; }
+      #splash .names-script { font-family: 'Great Vibes', cursive; font-size: 2rem; color: var(--wine); margin-bottom: 0.4rem; }
+      #splash .amp { color: var(--gold-deep); }
+      #splash .date-strip { border-radius: 1px; padding: 0.65rem 2rem; margin: 1rem 0 2rem; font-size: 0.85rem; letter-spacing: 0.28em; color: var(--ink); background: var(--cream); border: 1px solid rgba(201,162,75,0.35); text-transform: uppercase; }
+      #splash .open-btn { border: 1px solid var(--gold-deep); cursor: pointer; border-radius: 1px; display: flex; align-items: center; gap: 10px; color: var(--gold-deep); font-weight: 600; padding: 1rem 2.6rem; background: transparent; font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.35em; transition: all 0.3s; }
+      #splash .open-btn:hover { background: var(--gold-deep); color: var(--ivory); }
+      #splash .tap-hint { font-size: 0.5rem; letter-spacing: 0.18em; color: var(--ink-soft); margin-top: 1rem; text-transform: uppercase; }
 
       /* ── MAIN ── */
       #main { display: none; }
 
       /* ── HERO ── */
-      #hero { position: relative; text-align: center; overflow: hidden; display: flex; flex-direction: column; min-height: 94vh; background: var(--ink); }
-      #hero .dot-grid { position: absolute; inset: 0; pointer-events: none; opacity: 0.4;
-        background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 16px 16px; }
-      #hero .inner { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; padding: 4rem 1.75rem 3.5rem; flex: 1; }
-      #hero .kicker { font-family: 'Bebas Neue', sans-serif; font-size: 0.85rem; letter-spacing: 0.55em; text-transform: uppercase; color: var(--cyan); margin-bottom: 1rem; }
-      #hero .anos { font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; letter-spacing: 0.55em; color: rgba(255,255,255,0.7); margin-top: 0.6rem; margin-bottom: 0.4rem; }
-      #hero .de { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-style: italic; letter-spacing: 0.22em; color: rgba(255,255,255,0.35); margin: 0.25rem 0; }
-      #hero .name { font-family: 'Great Vibes', cursive; font-size: 3.2rem; color: #fff; margin-bottom: 2rem; }
-      #hero .invite-card { width: 100%; max-width: 340px; margin-bottom: 2.25rem; padding: 3px; }
-      #hero .invite-card .conic-inner { padding: 1.75rem 1.75rem 1.5rem; }
-      #hero .invite-card .inv-kicker { font-family: 'Bebas Neue', sans-serif; font-size: 0.55rem; letter-spacing: 0.5em; color: rgba(255,255,255,0.45); margin-bottom: 0.55rem; }
-      #hero .invite-card .inv-name { font-family: 'Great Vibes', cursive; font-size: 2.1rem; margin-bottom: 0.75rem; }
-      #hero .invite-card .div { height: 1px; margin: 0.75rem 0; background: linear-gradient(to right, transparent, rgba(255,255,255,0.18), transparent); }
-      #hero .invite-card .facts { display: flex; justify-content: center; gap: 1.25rem; flex-wrap: wrap; }
-      #hero .invite-card .fact-sep { width: 1px; background: rgba(255,255,255,0.12); }
-      #hero .invite-card .fact { text-align: center; }
-      #hero .invite-card .fact-label { font-family: 'Bebas Neue', sans-serif; font-size: 0.44rem; letter-spacing: 0.4em; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
-      #hero .invite-card .fact-value { font-family: 'Bodoni Moda', serif; font-size: 0.86rem; font-weight: 700; color: rgba(255,255,255,0.92); }
+      #hero { position: relative; text-align: center; overflow: hidden; display: flex; flex-direction: column; min-height: 94vh; background: var(--ivory); }
+      #hero .bg-photo { position: absolute; inset: 0; z-index: 0; }
+      #hero .bg-photo img { width: 100%; height: 100%; object-fit: cover; }
+      #hero .bg-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(58,51,43,0.35) 0%, rgba(251,246,238,0.35) 60%, var(--ivory) 92%); }
+      #hero .inner { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; padding: 3.2rem 1.75rem 2.5rem; flex: 1; }
+      #hero .kicker { font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.5em; text-transform: uppercase; color: #fff; margin-bottom: 1.6rem; text-shadow: 0 2px 10px rgba(0,0,0,0.35); }
+      #hero .monogram-card { background: rgba(255,253,249,0.94); border-radius: 4px; padding: 1.5rem 2rem 1.25rem; margin-bottom: 1.75rem; box-shadow: 0 12px 40px rgba(58,51,43,0.18); }
+      #hero .names { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.5rem; color: var(--wine); margin-top: 0.6rem; }
+      #hero .save-date { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.3em; color: var(--ink); margin-top: 3rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3); background: rgba(255,253,249,0.9); padding: 0.6rem 1.5rem; border-radius: 2px; }
       #hero .wave-svg { display: block; width: 100%; position: relative; z-index: 10; margin-top: auto; }
 
       /* ── Section Header ── */
-      .sec-header { text-align: center; margin-bottom: 2rem; }
-      .sec-kicker { display: block; font-family: 'Bebas Neue', sans-serif; font-size: 0.55rem; letter-spacing: 0.68em; text-transform: uppercase; color: var(--cyan); margin-bottom: 0.6rem; }
-      .sec-title { font-family: 'Bebas Neue', sans-serif; font-size: 3.1rem; letter-spacing: 0.05em; line-height: 1.15; }
-      .orn-div { display: flex; justify-content: center; margin-top: 0.75rem; gap: 6px; }
-      .orn-div span { width: 6px; height: 6px; border-radius: 50%; }
+      .sec-header { text-align: center; margin-bottom: 2.25rem; }
+      .sec-kicker { display: block; font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.55em; text-transform: uppercase; color: var(--gold-deep); margin-bottom: 0.7rem; }
+      .sec-title { font-family: 'Playfair Display', serif; font-weight: 600; font-style: italic; font-size: 2.5rem; line-height: 1.2; color: var(--wine); }
+      .sec-divider { display: flex; justify-content: center; margin-top: 0.9rem; }
+
+      /* ── QUOTE / VERSE ── */
+      #verse-sec { padding: 3.25rem 2rem; text-align: center; background: var(--cream); }
+      #verse-sec p { font-style: italic; font-size: 1.15rem; line-height: 1.9; color: var(--ink); }
+      #verse-sec .sign { display: block; margin-top: 1rem; font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.3em; color: var(--gold-deep); }
 
       /* ── DATE ── */
-      #date-sec { padding: 3.5rem 1.5rem 4rem; background: #08080f; position: relative; }
+      #date-sec { padding: 3.5rem 1.5rem 4rem; background: var(--ivory); position: relative; }
       .date-cards { display: flex; gap: 12px; position: relative; z-index: 1; }
-      .date-card {
-        flex: 1; border-radius: 4px; text-align: center; padding: 1.75rem 0.5rem 1.5rem;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        background: var(--panel); border: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden;
-      }
-      .date-card .top-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
-      .date-card .card-label { font-family: 'Bebas Neue', sans-serif; font-size: 0.5rem; letter-spacing: 0.42em; color: rgba(255,255,255,0.4); margin-bottom: 0.6rem; }
-      .date-card .card-big { font-family: 'Bebas Neue', sans-serif; font-size: 3.4rem; line-height: 1; }
-      .date-card .card-sub { font-family: 'Bodoni Moda', serif; font-size: 1rem; font-style: italic; color: rgba(255,255,255,0.55); line-height: 1.4; white-space: pre; }
+      .date-card { flex: 1; border-radius: 2px; text-align: center; padding: 1.75rem 0.5rem 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--panel); border: 1px solid rgba(201,162,75,0.3); position: relative; }
+      .date-card .card-label { font-family: 'Cinzel', serif; font-size: 0.5rem; letter-spacing: 0.35em; color: var(--ink-soft); margin-bottom: 0.7rem; }
+      .date-card .card-big { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 3rem; line-height: 1; color: var(--wine); }
+      .date-card .card-sub { font-size: 1rem; font-style: italic; color: var(--ink-soft); line-height: 1.4; white-space: pre; }
 
       /* ── COUNTDOWN ── */
-      #countdown-sec { padding: 5rem 1.5rem; text-align: center; position: relative; background: var(--ink); }
-      .cd-grid { display: flex; align-items: flex-start; justify-content: center; gap: 9px; margin-top: 1rem; }
+      #countdown-sec { padding: 4.5rem 1.5rem; text-align: center; position: relative; background: var(--cream); }
+      .cd-grid { display: flex; align-items: flex-start; justify-content: center; gap: 9px; margin-top: 1.5rem; }
       .cd-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-      .cd-box { position: relative; overflow: hidden; border-radius: 4px; display: flex; align-items: center; justify-content: center;
-        width: 70px; height: 82px; background: var(--panel); border: 1px solid rgba(255,255,255,0.08); }
-      .cd-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; letter-spacing: 0.04em; line-height: 1; transition: all 0.15s; }
+      .cd-box { position: relative; overflow: hidden; border-radius: 2px; display: flex; align-items: center; justify-content: center; width: 68px; height: 80px; background: var(--panel); border: 1px solid rgba(201,162,75,0.35); }
+      .cd-num { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 2.2rem; color: var(--wine); line-height: 1; transition: all 0.15s; }
       .cd-num.flip { animation: cdFlip 0.4s cubic-bezier(0.22,1,0.36,1); }
-      .cd-label { font-family: 'Bebas Neue', sans-serif; font-size: 0.46rem; letter-spacing: 0.36em; color: rgba(255,255,255,0.4); }
-      .cd-colon { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: rgba(255,255,255,0.25); padding-bottom: 2.2rem; animation: blinkColon 1.2s ease-in-out infinite; }
+      .cd-label { font-family: 'Cinzel', serif; font-size: 0.44rem; letter-spacing: 0.3em; color: var(--ink-soft); }
+      .cd-colon { font-size: 1.8rem; color: var(--gold); padding-bottom: 2.2rem; animation: blinkColon 1.2s ease-in-out infinite; }
 
       /* ── LOCATION ── */
-      #location-sec { padding: 3.5rem 1.5rem 4rem; background: #08080f; }
-      .loc-card { border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); background: var(--panel); }
-      .loc-header { display: flex; align-items: center; gap: 18px; padding: 1.5rem 1.5rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
-      .loc-icon { flex-shrink: 0; border-radius: 4px; display: flex; align-items: center; justify-content: center; width: 56px; height: 56px;
-        background: linear-gradient(145deg, var(--pink), var(--purple)); }
-      .loc-name { font-family: 'Bodoni Moda', serif; font-size: 1.05rem; font-weight: 700; color: rgba(255,255,255,0.95); margin-bottom: 3px; }
-      .loc-addr { font-size: 0.76rem; color: rgba(255,255,255,0.4); line-height: 1.5; }
+      #location-sec { padding: 3.5rem 1.5rem 4rem; background: var(--ivory); }
+      .loc-card { border-radius: 3px; overflow: hidden; border: 1px solid rgba(201,162,75,0.3); background: var(--panel); }
+      .loc-header { display: flex; align-items: center; gap: 16px; padding: 1.5rem 1.5rem 1.25rem; border-bottom: 1px solid rgba(201,162,75,0.2); }
+      .loc-name { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+      .loc-addr { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.5; }
       .loc-map { width: 100%; height: 220px; }
-      .loc-map iframe { width: 100%; height: 100%; border: none; display: block; filter: grayscale(35%) invert(0.92) hue-rotate(180deg) contrast(0.9); }
-      .loc-btn-wrap { padding: 1.25rem; }
-      .loc-btn {
-        display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; border-radius: 3px;
-        color: #05050C; cursor: pointer; border: none; text-decoration: none; padding: 1rem;
-        background: linear-gradient(90deg, var(--gold), var(--orange), var(--pink), var(--gold));
-        background-size: 250% auto; animation: rainbowShimmer 3s linear infinite;
-        font-family: 'Bebas Neue', sans-serif; font-size: 0.75rem; letter-spacing: 0.38em; font-weight: 700; transition: transform 0.2s;
-      }
-      .loc-btn:hover { transform: scale(1.02); }
+      .loc-map iframe { width: 100%; height: 100%; border: none; display: block; filter: sepia(18%) saturate(85%); }
+      .loc-btn-wrap { padding: 1.25rem; display: flex; gap: 10px; }
+      .loc-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 9px; border-radius: 2px; color: var(--ivory); cursor: pointer; border: none; text-decoration: none; padding: 1rem; background: var(--wine); font-family: 'Cinzel', serif; font-size: 0.66rem; letter-spacing: 0.24em; transition: transform 0.2s, opacity 0.2s; }
+      .loc-btn.secondary { background: transparent; border: 1px solid var(--gold-deep); color: var(--gold-deep); }
+      .loc-btn:hover { transform: scale(1.02); opacity: 0.92; }
 
       /* ── GALLERY ── */
-      #gallery-sec { padding: 3.5rem 1.5rem 4rem; background: var(--ink); }
-      .gallery-main { position: relative; border-radius: 4px; overflow: hidden; height: 300px; border: 1px solid rgba(255,255,255,0.08); }
-      .gallery-main img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.35s; }
-      .gallery-main .grad-overlay { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: linear-gradient(to top, rgba(5,5,12,0.88) 0%, transparent 55%); }
-      .gallery-caption { position: absolute; bottom: 0; left: 0; right: 0; z-index: 3; text-align: center; padding: 1.5rem 1.25rem 1rem; }
-      .gallery-caption p { font-family: 'Great Vibes', cursive; font-size: 1.5rem; color: #fff; }
-      .gallery-badge { position: absolute; top: 14px; right: 14px; z-index: 10; border-radius: 1px; padding: 5px 14px;
-        background: linear-gradient(135deg, var(--pink), var(--purple)); font-family: 'Bebas Neue', sans-serif; font-size: 0.6rem; font-weight: 700; color: white; letter-spacing: 0.2em; }
-      .gallery-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; display: flex; align-items: center; justify-content: center; border-radius: 2px; width: 42px; height: 42px; cursor: pointer;
-        background: rgba(5,5,12,0.85); border: 1px solid rgba(255,255,255,0.15); font-size: 1.4rem; color: #fff; backdrop-filter: blur(8px); transition: transform 0.2s; }
-      .gallery-arrow:hover { transform: translateY(-50%) scale(1.1); }
+      #gallery-sec { padding: 3.5rem 1.5rem 4rem; background: var(--cream); }
+      .gallery-main { position: relative; border-radius: 3px; overflow: hidden; height: 320px; border: 1px solid rgba(201,162,75,0.3); }
+      .gallery-main img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.4s; }
+      .gallery-main .grad-overlay { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: linear-gradient(to top, rgba(58,51,43,0.75) 0%, transparent 50%); }
+      .gallery-caption { position: absolute; bottom: 0; left: 0; right: 0; z-index: 3; text-align: center; padding: 1.5rem 1.25rem 1.1rem; }
+      .gallery-caption p { font-family: 'Great Vibes', cursive; font-size: 1.6rem; color: #fff; }
+      .gallery-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; display: flex; align-items: center; justify-content: center; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; background: rgba(255,253,249,0.9); border: 1px solid rgba(201,162,75,0.4); color: var(--wine); transition: transform 0.2s; }
+      .gallery-arrow:hover { transform: translateY(-50%) scale(1.08); }
       .gallery-arrow.prev { left: 10px; }
       .gallery-arrow.next { right: 10px; }
       .gallery-thumbs { display: flex; gap: 8px; margin-top: 14px; justify-content: center; flex-wrap: wrap; }
-      .gallery-thumb { border-radius: 2px; overflow: hidden; flex-shrink: 0; width: 48px; height: 48px; cursor: pointer; border: 2px solid rgba(255,255,255,0.08); opacity: 0.4; transform: scale(1); transition: all 0.2s; }
+      .gallery-thumb { border-radius: 2px; overflow: hidden; flex-shrink: 0; width: 50px; height: 50px; cursor: pointer; border: 2px solid transparent; opacity: 0.45; transform: scale(1); transition: all 0.2s; }
       .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-      .gallery-thumb.active { opacity: 1; transform: scale(1.12); }
-      .gallery-dots { display: flex; gap: 6px; justify-content: center; margin-top: 12px; }
-      .gallery-dot { height: 6px; width: 6px; border-radius: 50%; cursor: pointer; border: none; transition: all 0.2s; background: rgba(255,255,255,0.15); padding: 0; }
-      .gallery-dot.active { width: 22px; border-radius: 3px; }
+      .gallery-thumb.active { opacity: 1; transform: scale(1.1); border-color: var(--gold); }
 
       /* ── ITINERARY ── */
-      #itinerary-sec { padding: 3.5rem 1rem 4rem; background: #08080f; position: relative; overflow: hidden; }
+      #itinerary-sec { padding: 3.5rem 1rem 4rem; background: var(--ivory); position: relative; overflow: hidden; }
       .itin-list { position: relative; max-width: 700px; margin: 0 auto; padding: 0 0 1rem; }
-      .itin-spine { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; transform: translateX(-50%);
-        background: linear-gradient(to bottom, var(--pink), var(--gold), var(--cyan), var(--purple), var(--green));
-        transform-origin: top; transform: translateX(-50%) scaleY(0); transition: transform 2s cubic-bezier(0.22,1,0.36,1); }
+      .itin-spine { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; transform: translateX(-50%); background: linear-gradient(to bottom, var(--gold), var(--sage), var(--blush), var(--wine)); transform-origin: top; transform: translateX(-50%) scaleY(0); transition: transform 2s cubic-bezier(0.22,1,0.36,1); }
       .itin-spine.visible { transform: translateX(-50%) scaleY(1); }
-      .itin-item { display: grid; grid-template-columns: 1fr 52px 1fr; align-items: start; gap: 0; margin-bottom: 2.2rem; }
+      .itin-item { display: grid; grid-template-columns: 1fr 62px 1fr; align-items: start; gap: 0; margin-bottom: 2.4rem; }
       .itin-item:last-child { margin-bottom: 0; }
       .itin-slot-left { display: flex; justify-content: flex-end; padding-right: 16px; }
       .itin-slot-right { display: flex; justify-content: flex-start; padding-left: 16px; }
@@ -230,99 +170,85 @@
       .itin-item:nth-child(odd) .itin-slot-right { display: block; visibility: hidden; pointer-events: none; }
       .itin-item:nth-child(even) .itin-slot-left { display: block; visibility: hidden; pointer-events: none; }
       .itin-item:nth-child(even) .itin-slot-right { display: flex; }
-      .itin-node { display: flex; flex-direction: column; align-items: center; gap: 0; z-index: 10; padding-top: 4px; }
-      .itin-diamond { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-      .itin-time-badge { margin-top: 8px; white-space: nowrap; color: rgba(255,255,255,0.75); font-family: 'Bebas Neue', sans-serif; font-size: 0.55rem; letter-spacing: 0.2em; }
-      .itin-card { flex: 1; border-radius: 4px; position: relative; overflow: hidden; padding: 0.9rem 1.1rem;
-        background: var(--panel); border: 1px solid rgba(255,255,255,0.07); max-width: 260px; width: 100%; transition: transform 0.3s; }
+      .itin-node { display: flex; flex-direction: column; align-items: center; gap: 0; z-index: 10; padding-top: 2px; }
+      .itin-time-badge { margin-top: 8px; white-space: nowrap; color: var(--ink); font-family: 'Cinzel', serif; font-size: 0.52rem; letter-spacing: 0.16em; }
+      .itin-card { flex: 1; border-radius: 3px; position: relative; overflow: hidden; padding: 0.9rem 1.1rem; background: var(--panel); border: 1px solid rgba(201,162,75,0.25); max-width: 260px; width: 100%; transition: transform 0.3s; }
       .itin-item:nth-child(odd) .itin-card:hover { transform: translateX(-4px); }
       .itin-item:nth-child(even) .itin-card:hover { transform: translateX(4px); }
-      .itin-card .itin-name { font-family: 'Bodoni Moda', serif; font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.95); margin-bottom: 4px; }
-      .itin-card .itin-desc { font-size: 0.72rem; color: rgba(255,255,255,0.4); line-height: 1.55; }
+      .itin-card .itin-name { font-family: 'Playfair Display', serif; font-size: 0.85rem; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+      .itin-card .itin-desc { font-size: 0.74rem; color: var(--ink-soft); line-height: 1.55; }
       @media (max-width: 520px) {
-        .itin-list { padding: 0 0 1rem 46px; }
-        .itin-spine { left: 21px; transform: translateX(0) scaleY(0); }
+        .itin-list { padding: 0 0 1rem 50px; }
+        .itin-spine { left: 23px; transform: translateX(0) scaleY(0); }
         .itin-spine.visible { transform: translateX(0) scaleY(1); }
-        .itin-item { grid-template-columns: 40px 1fr; gap: 0; margin-bottom: 1.6rem; }
+        .itin-item { grid-template-columns: 46px 1fr; gap: 0; margin-bottom: 1.7rem; }
         .itin-slot-left, .itin-item:nth-child(odd) .itin-slot-left, .itin-item:nth-child(even) .itin-slot-left { display: none !important; visibility: hidden !important; }
         .itin-slot-right, .itin-item:nth-child(odd) .itin-slot-right, .itin-item:nth-child(even) .itin-slot-right { display: flex !important; visibility: visible !important; padding-left: 14px; }
-        .itin-diamond { width: 36px; height: 36px; }
         .itin-card { max-width: 100%; }
       }
 
       /* ── GIFTS ── */
-      #gifts-sec { padding: 3.5rem 1.5rem 4rem; background: var(--ink); }
-      .gift-card { border-radius: 4px; overflow: hidden; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.08); background: var(--panel); transition: border-color 0.3s; }
-      .gift-card.open { border-color: rgba(255,255,255,0.2); }
-      .gift-toggle { display: flex; align-items: center; gap: 1rem; width: 100%; text-align: left; cursor: pointer; border: none; background: transparent; padding: 1.25rem 1.5rem; }
-      .gift-icon { flex-shrink: 0; border-radius: 4px; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; }
+      #gifts-sec { padding: 3.5rem 1.5rem 4rem; background: var(--cream); }
+      .gift-card { border-radius: 3px; overflow: hidden; margin-bottom: 14px; border: 1px solid rgba(201,162,75,0.3); background: var(--panel); transition: border-color 0.3s; }
+      .gift-card.open { border-color: var(--gold-deep); }
+      .gift-toggle { display: flex; align-items: center; gap: 1rem; width: 100%; text-align: left; cursor: pointer; border: none; background: transparent; padding: 1.15rem 1.4rem; }
+      .gift-icon-wrap { width: 50px; height: 50px; flex-shrink: 0; }
+      .gift-icon-wrap svg { width: 100%; height: 100%; }
       .gift-label-wrap { flex: 1; text-align: left; }
-      .gift-label { font-family: 'Bodoni Moda', serif; font-size: 1rem; font-weight: 700; color: rgba(255,255,255,0.92); }
-      .gift-sub { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-top: 2px; }
-      .gift-chevron { transition: transform 0.35s cubic-bezier(0.22,1,0.36,1); color: rgba(255,255,255,0.4); }
+      .gift-label { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 600; color: var(--ink); }
+      .gift-sub { font-size: 0.7rem; color: var(--ink-soft); margin-top: 2px; }
+      .gift-chevron { transition: transform 0.35s cubic-bezier(0.22,1,0.36,1); color: var(--gold-deep); }
       .gift-card.open .gift-chevron { transform: rotate(180deg); }
       .gift-body { max-height: 0; overflow: hidden; transition: max-height 0.45s ease-in-out; }
       .gift-card.open .gift-body { max-height: 600px; }
-      .gift-inner { padding: 0 1.5rem 1.5rem; }
-      .gift-box { border-radius: 4px; padding: 1.5rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); }
-      .gift-box-title { font-family: 'Great Vibes', cursive; font-size: 1.6rem; color: #fff; text-align: center; margin-bottom: 1.25rem; }
-      .gift-input { width: 100%; border-radius: 2px; display: block; margin-bottom: 0.75rem; padding: 0.9rem 1.1rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.88); font-size: 0.88rem; font-family: inherit; outline: none; transition: all 0.2s; }
-      .gift-input::placeholder { color: rgba(255,255,255,0.22); }
-      .gift-input:focus { border-color: rgba(255,255,255,0.3); }
-      .gift-qr-btn { width: 100%; border-radius: 2px; color: #05050C; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0.925rem;
-        font-family: 'Bebas Neue', sans-serif; font-size: 0.75rem; letter-spacing: 0.38em; font-weight: 700;
-        background: linear-gradient(90deg, var(--cyan), var(--green), var(--gold)); background-size: 250% auto; animation: rainbowShimmer 3s linear infinite;
-        transition: transform 0.2s; }
-      .gift-qr-btn:hover { transform: scale(1.02); }
-      .gift-qr-img { display: flex; justify-content: center; margin-top: 1.5rem; }
-      .gift-qr-img .qr-wrap { border-radius: 4px; overflow: hidden; }
+      .gift-inner { padding: 0 1.4rem 1.4rem; }
+      .gift-box { border-radius: 3px; padding: 1.4rem; background: var(--ivory); border: 1px solid rgba(201,162,75,0.2); }
+      .gift-box-title { font-family: 'Great Vibes', cursive; font-size: 1.6rem; color: var(--wine); text-align: center; margin-bottom: 1.2rem; }
+      .gift-input { width: 100%; border-radius: 2px; display: block; margin-bottom: 0.7rem; padding: 0.85rem 1.05rem; border: 1px solid rgba(201,162,75,0.35); background: var(--panel); color: var(--ink); font-size: 0.86rem; font-family: inherit; outline: none; transition: all 0.2s; }
+      .gift-input::placeholder { color: var(--ink-soft); opacity: 0.6; }
+      .gift-input:focus { border-color: var(--gold-deep); }
+      .gift-qr-btn { width: 100%; border-radius: 2px; color: var(--ivory); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0.9rem; font-family: 'Cinzel', serif; font-size: 0.66rem; letter-spacing: 0.24em; background: var(--gold-deep); transition: transform 0.2s, opacity 0.2s; }
+      .gift-qr-btn:hover { transform: scale(1.02); opacity: 0.9; }
+      .gift-qr-img { display: flex; justify-content: center; margin-top: 1.4rem; }
+      .gift-qr-img .qr-wrap { border-radius: 3px; overflow: hidden; border: 6px solid var(--panel); }
 
       /* ── RSVP ── */
-      #rsvp-sec { padding: 4rem 1.5rem 5rem; position: relative; overflow: hidden; background: #08080f; }
-      .rsvp-sub { text-align: center; margin-bottom: 2rem; font-size: 0.88rem; font-style: italic; color: rgba(255,255,255,0.42); line-height: 1.8; }
-      .rsvp-card { border-radius: 4px; padding: 3px; }
-      .rsvp-card .conic-inner { padding: 2rem 1.75rem; }
-      .rsvp-input { width: 100%; border-radius: 2px; display: block; margin-bottom: 0.75rem; padding: 0.95rem 1.2rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.88); font-size: 0.9rem; font-family: inherit; outline: none; }
-      .rsvp-input::placeholder { color: rgba(255,255,255,0.22); }
+      #rsvp-sec { padding: 4rem 1.5rem 5rem; position: relative; overflow: hidden; background: var(--ivory); }
+      .rsvp-sub { text-align: center; margin-bottom: 2rem; font-size: 0.9rem; font-style: italic; color: var(--ink-soft); line-height: 1.8; }
+      .rsvp-card { border-radius: 3px; padding: 1.75rem; }
+      .rsvp-input { width: 100%; border-radius: 2px; display: block; margin-bottom: 0.75rem; padding: 0.9rem 1.15rem; border: 1px solid rgba(201,162,75,0.35); background: var(--ivory); color: var(--ink); font-size: 0.9rem; font-family: inherit; outline: none; }
+      .rsvp-input::placeholder { color: var(--ink-soft); opacity: 0.6; }
+      .rsvp-input:focus { border-color: var(--gold-deep); }
       .rsvp-toggle { display: flex; gap: 0.75rem; margin-bottom: 18px; }
-      .rsvp-btn { flex: 1; border-radius: 2px; cursor: pointer; font-family: 'Bebas Neue', sans-serif; font-size: 0.65rem; letter-spacing: 0.32em; padding: 0.9rem; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.5); transition: all 0.25s; }
-      .rsvp-btn.active { border-color: var(--pink); background: rgba(255,59,127,0.14); color: #fff; }
-      .rsvp-error { font-size: 0.72rem; color: var(--pink); margin-bottom: 8px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.08em; }
-      .rsvp-submit { width: 100%; border-radius: 2px; color: #05050C; cursor: pointer; border: none; padding: 1.1rem;
-        font-family: 'Bebas Neue', sans-serif; font-size: 0.8rem; letter-spacing: 0.36em; font-weight: 700;
-        background: linear-gradient(90deg, var(--pink), var(--gold), var(--cyan), var(--purple));
-        background-size: 250% auto; animation: rainbowShimmer 3s linear infinite; transition: transform 0.2s; }
-      .rsvp-submit:hover { transform: scale(1.02); }
-      .rsvp-hint { text-align: center; margin-top: 0.75rem; font-family: 'Bebas Neue', sans-serif; font-size: 0.48rem; letter-spacing: 0.18em; color: rgba(255,255,255,0.2); }
-      .rsvp-thanks { text-align: center; padding: 2.5rem 0; animation: scaleIn 0.55s cubic-bezier(0.22,1,0.36,1); }
-      .rsvp-thanks-icon { border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 80px; height: 80px; margin: 0 auto 1.25rem;
-        background: linear-gradient(145deg, var(--cyan), var(--green)); }
-      .rsvp-thanks h3 { font-family: 'Great Vibes', cursive; font-size: 4rem; color: #fff; line-height: 1; }
-      .rsvp-thanks p { font-size: 0.9rem; font-style: italic; margin-top: 14px; color: rgba(255,255,255,0.42); line-height: 1.8; }
+      .rsvp-btn { flex: 1; border-radius: 2px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.22em; padding: 0.85rem; border: 1px solid rgba(201,162,75,0.35); background: var(--ivory); color: var(--ink-soft); transition: all 0.25s; }
+      .rsvp-btn.active { border-color: var(--wine); background: var(--wine); color: #fff; }
+      .rsvp-error { font-size: 0.72rem; color: var(--wine); margin-bottom: 8px; }
+      .rsvp-submit { width: 100%; border-radius: 2px; color: var(--ivory); cursor: pointer; border: none; padding: 1.05rem; font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.3em; background: var(--wine); transition: transform 0.2s, opacity 0.2s; }
+      .rsvp-submit:hover { transform: scale(1.015); opacity: 0.92; }
+      .rsvp-hint { text-align: center; margin-top: 0.8rem; font-size: 0.66rem; letter-spacing: 0.05em; color: var(--ink-soft); }
+      .rsvp-thanks { text-align: center; padding: 2rem 0; animation: scaleIn 0.55s cubic-bezier(0.22,1,0.36,1); }
+      .rsvp-thanks h3 { font-family: 'Great Vibes', cursive; font-size: 3.4rem; color: var(--wine); line-height: 1; margin-top: 1rem; }
+      .rsvp-thanks p { font-size: 0.9rem; font-style: italic; margin-top: 14px; color: var(--ink-soft); line-height: 1.8; }
 
       /* ── FOOTER ── */
-      #footer-sec { padding: 5rem 1.5rem 3.5rem; text-align: center; position: relative; overflow: hidden; background: var(--ink); }
-      #footer-sec .poem { font-style: italic; line-height: 2; margin-bottom: 1.75rem; color: rgba(255,255,255,0.35); font-size: 0.95rem; }
-      #footer-sec .signature-pill { display: inline-block; margin-bottom: 2rem; border-radius: 3px; padding: 3px; }
-      #footer-sec .signature-pill .conic-inner { padding: 0.95rem 2.5rem; }
-      #footer-sec .signature-text { font-family: 'Great Vibes', cursive; font-size: 2.3rem; color: #fff; }
-      #footer-sec .brand-copy { margin-top: 1.5rem; font-size: 0.62rem; color: rgba(255,255,255,0.16); letter-spacing: 0.12em; font-family: 'Bebas Neue', sans-serif; }
+      #footer-sec { padding: 4.5rem 1.5rem 3.5rem; text-align: center; position: relative; overflow: hidden; background: var(--wine); color: var(--ivory); }
+      #footer-sec .poem { font-style: italic; line-height: 2; margin-bottom: 1.75rem; color: rgba(251,246,238,0.85); font-size: 0.95rem; }
+      #footer-sec .signature-text { font-family: 'Great Vibes', cursive; font-size: 2.2rem; color: var(--gold-light); margin: 1.25rem 0 1.5rem; }
+      #footer-sec .brand-copy { margin-top: 1.5rem; font-size: 0.62rem; color: rgba(251,246,238,0.35); letter-spacing: 0.1em; }
     </style>
   </head>
   <body>
-    <canvas id="confetti-canvas"></canvas>
+    <canvas id="petal-canvas"></canvas>
     <div id="app">
 
       <!-- SPLASH -->
       <div id="splash" onclick="closeSplash()">
-        <div class="vignette"></div>
-        <div class="dot-grid"></div>
+        <div class="texture"></div>
         <div class="content">
-          <p class="fashion-tag">Halftone · Fashion Edition</p>
-          <div class="halftone-15" id="ht-splash-15"></div>
-          <p class="xv-label">AÑOS DE</p>
-          <p class="splash-script">Camila Valentina</p>
-          <div class="date-strip">19 · DIC · 2026 &nbsp;|&nbsp; 7:00 PM</div>
+          <p class="tag cinzel">Nos casamos</p>
+          <div class="monogram-wrap" id="monogram-splash"></div>
+          <p class="names-script">Isabella <span class="amp">&amp;</span> Mateo</p>
+          <div class="date-strip cinzel">14 · Feb · 2027</div>
           <button class="open-btn" onclick="closeSplash()">Abrir Invitación</button>
           <p class="tap-hint">Toca en cualquier lugar para abrir</p>
         </div>
@@ -333,49 +259,37 @@
 
         <!-- HERO -->
         <section id="hero">
-          <div class="dot-grid"></div>
+          <div class="bg-photo"><img src="https://images.unsplash.com/photo-1721401870202-8e2264ecced2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1000" alt="Isabella y Mateo" /></div>
           <div class="inner">
-            <p class="kicker">Estás invitada a mis</p>
-            <div class="halftone-15" id="ht-hero-15"></div>
-            <p class="anos">AÑOS</p>
-            <p class="de">de</p>
-            <p class="name">Camila Valentina</p>
-            <div class="invite-card conic-border">
-              <div class="conic-inner">
-                <p class="inv-kicker">Invitación Oficial</p>
-                <p class="inv-name rainbow-text">Camila Valentina</p>
-                <div class="div"></div>
-                <div class="facts">
-                  <div class="fact"><div class="fact-label">Fecha</div><div class="fact-value">19 Dic 2026</div></div>
-                  <div class="fact-sep"></div>
-                  <div class="fact"><div class="fact-label">Hora</div><div class="fact-value">7:00 PM</div></div>
-                  <div class="fact-sep"></div>
-                  <div class="fact"><div class="fact-label">Lugar</div><div class="fact-value">Bogotá</div></div>
-                </div>
-              </div>
+            <p class="kicker">Con la bendición de Dios y nuestras familias</p>
+            <div class="monogram-card" id="monogram-hero-wrap">
+              <div id="monogram-hero"></div>
+              <p class="names">Isabella &amp; Mateo</p>
             </div>
+            <p class="save-date">14 de Febrero, 2027 &nbsp;·&nbsp; 5:00 PM &nbsp;·&nbsp; Bogotá</p>
           </div>
           <svg class="wave-svg" viewBox="0 0 480 48" preserveAspectRatio="none">
-            <path d="M0,0 C18,36 54,36 72,18 C90,0 108,0 126,18 C144,36 180,36 198,18 C216,0 234,0 252,18 C270,36 306,36 324,18 C342,0 360,0 378,18 C396,36 432,36 450,18 C468,0 474,12 480,18 L480,48 L0,48 Z" fill="#08080f"/>
+            <path d="M0,24 C60,4 120,44 240,24 C360,4 420,44 480,24 L480,48 L0,48 Z" fill="var(--ivory)"/>
           </svg>
         </section>
 
-        <!-- TICKER -->
-        <div class="ticker-wrap">
-          <div class="ticker-inner" id="ticker-inner"></div>
-        </div>
+        <!-- VERSE -->
+        <section id="verse-sec">
+          <p>"El amor es paciente, es bondadoso.<br>No tiene envidia, no es jactancioso,<br>no se envanece."</p>
+          <span class="sign">1 CORINTIOS 13:4</span>
+        </section>
 
         <!-- DATE -->
         <section id="date-sec">
           <div class="sec-header">
-            <span class="sec-kicker">La noche más especial</span>
-            <h2 class="sec-title rainbow-text">La Fecha</h2>
-            <div class="orn-div" id="orn-date"></div>
+            <span class="sec-kicker">Guarda la fecha</span>
+            <h2 class="sec-title">Nuestro Gran Día</h2>
+            <div class="sec-divider"><div id="orn-date"></div></div>
           </div>
           <div class="date-cards">
-            <div class="date-card"><div class="top-bar" style="background:var(--pink)"></div><div class="card-label">DÍA</div><div class="card-big" style="color:var(--pink)">19</div></div>
-            <div class="date-card"><div class="top-bar" style="background:var(--gold)"></div><div class="card-label">MES · AÑO</div><div class="card-sub">Dic&#10;2026</div></div>
-            <div class="date-card"><div class="top-bar" style="background:var(--cyan)"></div><div class="card-label">HORA</div><div class="card-big" style="color:var(--cyan)">7</div><div class="card-sub">PM</div></div>
+            <div class="date-card"><div class="card-label">DÍA</div><div class="card-big">14</div></div>
+            <div class="date-card"><div class="card-label">MES · AÑO</div><div class="card-sub">Febrero&#10;2027</div></div>
+            <div class="date-card"><div class="card-label">HORA</div><div class="card-big" style="font-size:2rem">5</div><div class="card-sub">PM</div></div>
           </div>
         </section>
 
@@ -383,44 +297,51 @@
         <section id="countdown-sec">
           <div class="sec-header">
             <span class="sec-kicker">Cuenta regresiva</span>
-            <h2 class="sec-title rainbow-text">¡Falta poco!</h2>
+            <h2 class="sec-title">Falta Poco</h2>
+            <div class="sec-divider"><div id="orn-cd"></div></div>
           </div>
           <div class="cd-grid">
-            <div class="cd-col"><div class="cd-box"><span class="cd-num" id="cd-days" style="color:var(--pink)">000</span></div><span class="cd-label">DÍAS</span></div>
+            <div class="cd-col"><div class="cd-box"><span class="cd-num" id="cd-days">000</span></div><span class="cd-label">DÍAS</span></div>
             <span class="cd-colon">:</span>
-            <div class="cd-col"><div class="cd-box"><span class="cd-num" id="cd-hours" style="color:var(--gold)">00</span></div><span class="cd-label">HORAS</span></div>
+            <div class="cd-col"><div class="cd-box"><span class="cd-num" id="cd-hours">00</span></div><span class="cd-label">HORAS</span></div>
             <span class="cd-colon">:</span>
-            <div class="cd-col"><div class="cd-box"><span class="cd-num" id="cd-mins" style="color:var(--cyan)">00</span></div><span class="cd-label">MIN</span></div>
+            <div class="cd-col"><div class="cd-box"><span class="cd-num" id="cd-mins">00</span></div><span class="cd-label">MIN</span></div>
             <span class="cd-colon">:</span>
-            <div class="cd-col"><div class="cd-box"><span class="cd-num" id="cd-secs" style="color:var(--purple)">00</span></div><span class="cd-label">SEG</span></div>
+            <div class="cd-col"><div class="cd-box"><span class="cd-num" id="cd-secs">00</span></div><span class="cd-label">SEG</span></div>
           </div>
         </section>
 
         <!-- LOCATION -->
         <section id="location-sec">
           <div class="sec-header">
-            <span class="sec-kicker">¿Dónde será la magia?</span>
-            <h2 class="sec-title rainbow-text">El Lugar</h2>
-            <div class="orn-div" id="orn-loc"></div>
+            <span class="sec-kicker">¿Dónde será?</span>
+            <h2 class="sec-title">Ceremonia y Recepción</h2>
+            <div class="sec-divider"><div id="orn-loc"></div></div>
+          </div>
+          <div class="loc-card" style="margin-bottom:14px">
+            <div class="loc-header">
+              <div class="icon-badge" id="icon-church"></div>
+              <div>
+                <div class="loc-name">Iglesia Santa Bárbara</div>
+                <div class="loc-addr">Calle 116 #18-45<br>Bogotá, Colombia · 5:00 PM</div>
+              </div>
+            </div>
+            <div class="loc-map"><iframe title="Mapa iglesia" src="https://maps.google.com/maps?q=Bogot%C3%A1,+Colombia&output=embed" loading="lazy"></iframe></div>
+            <div class="loc-btn-wrap">
+              <a class="loc-btn" href="https://maps.google.com/maps?q=Iglesia+Santa+B%C3%A1rbara+Bogot%C3%A1" target="_blank" rel="noopener noreferrer">Cómo llegar</a>
+            </div>
           </div>
           <div class="loc-card">
             <div class="loc-header">
-              <div class="loc-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-              </div>
+              <div class="icon-badge" id="icon-venue"></div>
               <div>
-                <div class="loc-name">Loft Fashion Events</div>
-                <div class="loc-addr">Carrera 15 #93-47<br>Bogotá, Colombia</div>
+                <div class="loc-name">Hacienda Santa Bárbara</div>
+                <div class="loc-addr">Km 4 Vía La Calera<br>Bogotá, Colombia · 7:00 PM</div>
               </div>
             </div>
-            <div class="loc-map">
-              <iframe title="Mapa" src="https://maps.google.com/maps?q=Bogot%C3%A1,+Colombia&output=embed" loading="lazy"></iframe>
-            </div>
+            <div class="loc-map"><iframe title="Mapa recepción" src="https://maps.google.com/maps?q=La+Calera,+Colombia&output=embed" loading="lazy"></iframe></div>
             <div class="loc-btn-wrap">
-              <a class="loc-btn" href="https://maps.google.com/maps?q=Bogotá,+Colombia" target="_blank" rel="noopener noreferrer">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-                Cómo llegar
-              </a>
+              <a class="loc-btn secondary" href="https://maps.google.com/maps?q=La+Calera,+Colombia" target="_blank" rel="noopener noreferrer">Cómo llegar</a>
             </div>
           </div>
         </section>
@@ -428,28 +349,30 @@
         <!-- GALLERY -->
         <section id="gallery-sec">
           <div class="sec-header">
-            <span class="sec-kicker">Momentos para recordar</span>
-            <h2 class="sec-title rainbow-text">Galería</h2>
-            <div class="orn-div" id="orn-gal"></div>
+            <span class="sec-kicker">Momentos para siempre</span>
+            <h2 class="sec-title">Nuestra Historia</h2>
+            <div class="sec-divider"><div id="orn-gal"></div></div>
           </div>
           <div class="gallery-main">
             <img id="gallery-img" src="" alt="" />
             <div class="grad-overlay"></div>
             <div class="gallery-caption"><p id="gallery-caption"></p></div>
-            <div class="gallery-badge" id="gallery-badge"></div>
-            <button class="gallery-arrow prev" onclick="galleryGo(-1)">&#8249;</button>
-            <button class="gallery-arrow next" onclick="galleryGo(1)">&#8250;</button>
+            <button class="gallery-arrow prev" onclick="galleryGo(-1)" aria-label="Anterior">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button class="gallery-arrow next" onclick="galleryGo(1)" aria-label="Siguiente">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
           </div>
           <div class="gallery-thumbs" id="gallery-thumbs"></div>
-          <div class="gallery-dots" id="gallery-dots"></div>
         </section>
 
         <!-- ITINERARY -->
         <section id="itinerary-sec">
           <div class="sec-header">
-            <span class="sec-kicker">La noche de ensueño</span>
-            <h2 class="sec-title rainbow-text">Programa</h2>
-            <div class="orn-div" id="orn-itin"></div>
+            <span class="sec-kicker">Un día para celebrar</span>
+            <h2 class="sec-title">Programa</h2>
+            <div class="sec-divider"><div id="orn-itin"></div></div>
           </div>
           <div class="itin-list" id="itin-list">
             <div class="itin-spine" id="itin-spine"></div>
@@ -459,9 +382,9 @@
         <!-- GIFTS -->
         <section id="gifts-sec">
           <div class="sec-header">
-            <span class="sec-kicker">Si deseas obsequiar</span>
-            <h2 class="sec-title rainbow-text">Regalo con Amor</h2>
-            <div class="orn-div" id="orn-gifts"></div>
+            <span class="sec-kicker">Si deseas obsequiarnos</span>
+            <h2 class="sec-title">Mesa de Regalos</h2>
+            <div class="sec-divider"><div id="orn-gifts"></div></div>
           </div>
           <div id="gifts-list"></div>
         </section>
@@ -469,199 +392,234 @@
         <!-- RSVP -->
         <section id="rsvp-sec">
           <div class="sec-header">
-            <span class="sec-kicker">Confirma tu presencia</span>
-            <h2 class="sec-title rainbow-text">¿Nos acompañas?</h2>
+            <span class="sec-kicker">Confirma tu asistencia</span>
+            <h2 class="sec-title">¿Nos Acompañas?</h2>
           </div>
-          <p class="rsvp-sub">Tu presencia hará esta noche aún más especial.<br>Confirma antes del <strong style="color:#fff">1 de Diciembre</strong></p>
-          <div class="rsvp-card conic-border">
-            <div class="conic-inner">
-              <div id="rsvp-form">
-                <input class="rsvp-input" type="text" id="rsvp-name" placeholder="Tu nombre completo" />
-                <input class="rsvp-input" type="number" id="rsvp-guests" min="1" max="5" placeholder="¿Cuántos asistirán?" />
-                <div class="rsvp-toggle">
-                  <button class="rsvp-btn active" id="rsvp-yes" onclick="setAttendance('yes')">Sí asistiré ✓</button>
-                  <button class="rsvp-btn" id="rsvp-no" onclick="setAttendance('no')">No podré ir</button>
-                </div>
-                <p class="rsvp-error" id="rsvp-error" style="display:none"></p>
-                <button class="rsvp-submit" onclick="submitRsvp()">Confirmar asistencia</button>
-                <p class="rsvp-hint">Confirma antes del 1 de Diciembre · Cupos limitados</p>
+          <p class="rsvp-sub">Tu presencia es el regalo más importante.<br>Confirma antes del <strong style="color:var(--wine)">1 de Enero, 2027</strong></p>
+          <div class="rsvp-card frame-card">
+            <svg class="corner-orn tl orn-svg" id="corner-tl"></svg>
+            <svg class="corner-orn tr orn-svg" id="corner-tr"></svg>
+            <svg class="corner-orn bl orn-svg" id="corner-bl"></svg>
+            <svg class="corner-orn br orn-svg" id="corner-br"></svg>
+            <div id="rsvp-form">
+              <input class="rsvp-input" type="text" id="rsvp-name" placeholder="Tu nombre completo" />
+              <input class="rsvp-input" type="number" id="rsvp-guests" min="1" max="5" placeholder="¿Cuántos asistirán?" />
+              <div class="rsvp-toggle">
+                <button class="rsvp-btn active" id="rsvp-yes" onclick="setAttendance('yes')">Sí asistiré</button>
+                <button class="rsvp-btn" id="rsvp-no" onclick="setAttendance('no')">No podré ir</button>
               </div>
-              <div id="rsvp-thanks" class="rsvp-thanks" style="display:none">
-                <div class="rsvp-thanks-icon">
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#05050C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-                <h3>¡Gracias!</h3>
-                <p>Tu respuesta ha sido registrada.<br>¡Te esperamos con todo el amor!</p>
-              </div>
+              <p class="rsvp-error" id="rsvp-error" style="display:none"></p>
+              <button class="rsvp-submit" onclick="submitRsvp()">Confirmar Asistencia</button>
+              <p class="rsvp-hint">Cupos limitados · Con mucho cariño, esperamos tu respuesta</p>
+            </div>
+            <div id="rsvp-thanks" class="rsvp-thanks" style="display:none">
+              <div id="icon-heart-thanks" style="display:flex;justify-content:center"></div>
+              <h3>Gracias</h3>
+              <p>Tu respuesta ha sido registrada.<br>¡Será una alegría celebrar contigo!</p>
             </div>
           </div>
         </section>
 
         <!-- FOOTER -->
         <footer id="footer-sec">
-          <div class="halftone-15" id="ht-footer-star" style="margin-bottom:1.75rem"></div>
-          <p class="poem">Hoy comienzas a escribir<br>el capítulo más hermoso<br>de tu historia.</p>
-          <div class="signature-pill conic-border"><div class="conic-inner"><p class="signature-text">Con amor, Camila</p></div></div>
-          <p class="brand-copy">© <span id="year"></span> Invitación Digital · Hecha con cariño</p>
+          <div id="icon-rings-footer" style="display:flex;justify-content:center;margin-bottom:1.5rem"></div>
+          <p class="poem">Hoy unimos nuestras vidas<br>para caminar juntos<br>el resto de nuestros días.</p>
+          <p class="signature-text">Isabella &amp; Mateo</p>
+          <p class="brand-copy">© <span id="year"></span> Invitación Digital · Hecha con amor</p>
         </footer>
 
       </div><!-- #main -->
     </div><!-- #app -->
 
     <script>
-    const PALETTE = ['#FF3B7F','#FFC93C','#00E5D4','#8B5CF6','#4ADE80','#FF7A45','#4F9DFF','#FF5A5F'];
-    const EVENT_DATE = new Date('2026-12-19T19:00:00');
+    const COLORS = { gold:'#C9A24B', goldLight:'#E9CD8B', goldDeep:'#9C7A2E', sage:'#8A9873', blush:'#D9A6A0', wine:'#7A3B41' };
+    const WEDDING_DATE = new Date('2027-02-14T17:00:00');
 
-    const GALLERY = [
-      { url:'https://images.unsplash.com/photo-1731335389522-412f9a353f2b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', caption:'La quinceañera' },
-      { url:'https://images.unsplash.com/photo-1566699282355-55466ad57d5b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', caption:'Elegancia y color' },
-      { url:'https://images.unsplash.com/photo-1731335389726-bc6dfc6701b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', caption:'Vestido de ensueño' },
-      { url:'https://images.unsplash.com/photo-1774290686883-bbeaa8840317?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', caption:'La protagonista' },
-      { url:'https://images.unsplash.com/photo-1513151233558-d860c5398176?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', caption:'Fiesta y confeti' },
-      { url:'https://images.unsplash.com/photo-1565630818262-65cd5df24407?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800', caption:'Momento de corona' },
-    ];
+    /* ────────────────────────────────────────────────────────────
+       SVG ICON LIBRARY — consistent viewBox, stroke, and weight
+       All icons share stroke="currentColor" stroke-width="1.6"
+       for a cohesive, elegant hand-drawn line-art aesthetic.
+    ──────────────────────────────────────────────────────────── */
+    const ICONS = {
+      rings: `<svg viewBox="0 0 64 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="24" r="13" stroke="${COLORS.goldDeep}" stroke-width="2"/>
+        <circle cx="40" cy="24" r="13" stroke="${COLORS.gold}" stroke-width="2"/>
+        <path d="M30 10 L32 5 L34 10 L32 8.5 Z" fill="${COLORS.gold}"/>
+        <circle cx="32" cy="6.5" r="1.4" fill="${COLORS.goldLight}"/>
+      </svg>`,
+      church: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="${COLORS.wine}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M24 6v6"/><path d="M21 9h6"/>
+        <path d="M12 42V22a12 12 0 0 1 24 0v20"/>
+        <path d="M8 42h32"/>
+        <path d="M24 42V28"/><path d="M20 32h8"/>
+        <path d="M12 34h6v8h-6z"/><path d="M30 34h6v8h-6z"/>
+      </svg>`,
+      toast: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="${COLORS.wine}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 6 L18 26 a4 6 0 0 0 8 0 L14 6z" transform="translate(-2,0) rotate(-18 18 20)"/>
+        <path d="M34 6 L30 26 a4 6 0 0 0 -8 0 L34 6z" transform="translate(2,0) rotate(18 30 20)"/>
+        <path d="M14 42h6"/><path d="M28 42h6"/>
+        <path d="M17 32v10"/><path d="M31 32v10"/>
+      </svg>`,
+      camera: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="${COLORS.wine}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="6" y="14" width="36" height="26" rx="3"/>
+        <path d="M17 14l3-6h8l3 6"/>
+        <circle cx="24" cy="27" r="8"/>
+        <circle cx="24" cy="27" r="3.2"/>
+        <circle cx="36" cy="19" r="1.4" fill="${COLORS.wine}"/>
+      </svg>`,
+      cake: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="${COLORS.wine}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 8c0 2-2 2-2 4s2 2 2 3"/>
+        <line x1="22" y1="8" x2="22" y2="4"/>
+        <rect x="8" y="26" width="32" height="14" rx="2"/>
+        <path d="M8 30c3-2 5 2 8 0s5 2 8 0 5 2 8 0 5 2 8 0"/>
+        <path d="M12 26v-4c0-2 2-3 4-3h16c2 0 4 1 4 3v4"/>
+      </svg>`,
+      dance: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="${COLORS.wine}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="16" cy="10" r="3"/><path d="M16 15v10l-6 15"/><path d="M16 25l7 4 3 11"/><path d="M16 20l8-3"/>
+        <circle cx="34" cy="10" r="3"/><path d="M34 15v10l6 15"/><path d="M34 25l-7 4-3 11"/><path d="M34 20l-8-3"/>
+      </svg>`,
+      party: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="${COLORS.wine}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 40 L28 12 a4 4 0 0 1 6 6 L6 38z"/>
+        <path d="M22 20l6 6"/>
+        <path d="M34 6l2 4"/><path d="M40 10l-4 2"/><path d="M38 18l4 1"/>
+        <circle cx="14" cy="34" r="1.3" fill="${COLORS.wine}"/><circle cx="10" cy="30" r="1" fill="${COLORS.wine}"/>
+      </svg>`,
+      gift: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="8" y="18" width="32" height="22" rx="2"/>
+        <path d="M8 26h32"/>
+        <path d="M24 18v22"/>
+        <path d="M24 18c-2-6-6-9-10-8-3 .8-3 6 2 8"/>
+        <path d="M24 18c2-6 6-9 10-8 3 .8 3 6-2 8"/>
+      </svg>`,
+      wallet: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="6" y="12" width="36" height="26" rx="3"/>
+        <path d="M6 20h36"/>
+        <circle cx="32" cy="29" r="2.4"/>
+      </svg>`,
+      bank: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 18 L24 8 L42 18"/>
+        <path d="M8 18h32v4H8z"/>
+        <path d="M12 22v14"/><path d="M20 22v14"/><path d="M28 22v14"/><path d="M36 22v14"/>
+        <path d="M6 40h36"/>
+      </svg>`,
+      heart: `<svg viewBox="0 0 48 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 36S6 24 6 12.5C6 5.5 12 2 17 4.5c3 1.5 5.5 4.5 7 7.5 1.5-3 4-6 7-7.5C36 2 42 5.5 42 12.5 42 24 24 36 24 36z" fill="${COLORS.wine}" opacity="0.9"/>
+      </svg>`,
+      pin: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M24 42S10 27 10 17a14 14 0 1 1 28 0c0 10-14 25-14 25z"/>
+        <circle cx="24" cy="17" r="5"/>
+      </svg>`,
+    };
 
-    const ITINERARY = [
-      { icon:'M8 22V19M16 22V19M7 10L5 19H19L17 10M9 10V6a3 3 0 0 1 6 0v4M6 10h12', time:'7:00 PM', name:'Recepción de invitados', desc:'Bienvenida con cóctel y música en vivo', color:'0' },
-      { icon:'M2 19h20M4 19L2 7l5 4 5-8 5 8 5-4-2 12M9 19v-3a3 3 0 0 1 6 0v3', time:'8:00 PM', name:'Entrada de la quinceañera', desc:'El gran momento de Camila con su corte de honor', color:'1' },
-      { icon:'M12 3a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM6 7.5C6 6 7 5 8.5 5H10l2 4-3 3 1 5H8l-1-5-1-4.5zM16 5h1.5C19 5 20 6 20 7.5L19 12l-1 5h-2l1-5-3-3 2-4z', time:'8:30 PM', name:'Vals y coreografía', desc:'El primer vals y la sorpresa coreográfica de la corte', color:'2' },
-      { icon:'M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7', time:'9:30 PM', name:'Cena y brindis', desc:'Banquete especial y palabras desde el corazón', color:'3' },
-      { icon:'M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8M4 16s1-1 2-1 2 1 3 1 2-1 3-1 2 1 3 1 2-1 3-1M2 21h20M7 8v2M12 8v2M17 8v2', time:'10:30 PM', name:'Pastel y sorpresas', desc:'Corte del pastel, lluvia de regalos y más sorpresas', color:'4' },
-      { icon:'M9 18V5l12-2v13M6 15a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM18 13a3 3 0 1 0 0 6 3 3 0 0 0 0-6z', time:'11:00 PM', name:'Baile y fiesta', desc:'¡Pista de baile abierta hasta que el cuerpo aguante!', color:'5' },
-    ];
-
-    const GIFTS = [
-      { key:'nequi',     label:'Nequi',     sub:'Envío digital · Colombia', grad:'linear-gradient(135deg,var(--pink),var(--purple))' },
-      { key:'daviplata', label:'Daviplata', sub:'Envío digital · Colombia', grad:'linear-gradient(135deg,var(--gold),var(--orange))' },
-      { key:'pse',       label:'PSE',       sub:'Pago seguro en línea',     grad:'linear-gradient(135deg,var(--cyan),var(--green))' },
-    ];
-
-    // ── HALFTONE TEXT/SHAPE GENERATOR ──
-    function halftoneText(container, text, opts) {
-      opts = opts || {};
-      const fontSize = opts.fontSize || 130;
-      const fontFamily = opts.fontFamily || "'Bebas Neue', sans-serif";
-      const step = opts.step || 8;
-      const minR = opts.minR || 2;
-      const maxR = opts.maxR || 6.5;
-      const threshold = opts.threshold || 90;
-      const pad = opts.pad || 30;
-
-      const measure = document.createElement('canvas').getContext('2d');
-      measure.font = fontSize + 'px ' + fontFamily;
-      const textWidth = Math.ceil(measure.measureText(text).width);
-      const w = textWidth + pad * 2;
-      const h = Math.ceil(fontSize * 1.15) + pad * 2;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = '#fff';
-      ctx.font = fontSize + 'px ' + fontFamily;
-      ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
-      ctx.fillText(text, w / 2, h / 2 + fontSize * 0.04);
-      const data = ctx.getImageData(0, 0, w, h).data;
-
-      container.style.width = w + 'px';
-      container.style.height = h + 'px';
-      container.innerHTML = '';
-
-      let delayCounter = 0;
-      for (let y = 0; y < h; y += step) {
-        for (let x = 0; x < w; x += step) {
-          const idx = (y * w + x) * 4;
-          if (data[idx] > threshold) {
-            const dot = document.createElement('span');
-            const r = minR + Math.random() * (maxR - minR);
-            const color = PALETTE[Math.floor(Math.random() * PALETTE.length)];
-            dot.className = 'ht-dot';
-            dot.style.left = x + 'px';
-            dot.style.top = y + 'px';
-            dot.style.width = dot.style.height = (r * 2) + 'px';
-            dot.style.background = color;
-            dot.style.boxShadow = '0 0 ' + (r * 1.5) + 'px ' + color;
-            dot.style.animationDelay = (delayCounter * 0.004) + 's';
-            container.appendChild(dot);
-            delayCounter++;
-          }
-        }
-      }
+    function svgIcon(name, colorOverride) {
+      const html = colorOverride ? ICONS[name].replace(/currentColor/g, colorOverride) : ICONS[name];
+      return html;
     }
-    halftoneText(document.getElementById('ht-splash-15'), '15', { fontSize: 150, step: 8 });
-    halftoneText(document.getElementById('ht-hero-15'), '15', { fontSize: 150, step: 8 });
-    halftoneText(document.getElementById('ht-footer-star'), '✦', { fontSize: 90, step: 6, fontFamily: "sans-serif" });
 
-    // Ornament dividers built from palette dots
-    ['orn-date','orn-loc','orn-gal','orn-itin','orn-gifts'].forEach(id => {
-      const el = document.getElementById(id);
-      PALETTE.forEach(c => {
-        const s = document.createElement('span');
-        s.style.background = c;
-        el.appendChild(s);
-      });
+    document.getElementById('icon-church').innerHTML = svgIcon('church');
+    document.getElementById('icon-venue').innerHTML = svgIcon('toast');
+    document.getElementById('icon-heart-thanks').innerHTML = `<div style="width:64px">${svgIcon('heart')}</div>`;
+    document.getElementById('icon-rings-footer').innerHTML = `<div style="width:80px;color:${COLORS.goldLight}">${svgIcon('rings')}</div>`;
+
+    /* ── Floral flourish divider (mirrored curved branch with leaves) ── */
+    function floralDivider(width, color) {
+      color = color || COLORS.gold;
+      const w = width || 160; const h = 22; const half = w / 2;
+      const leaf = (x, y, rot, scale) =>
+        `<path d="M0 0 Q 6 -4 12 0 Q 6 4 0 0 Z" fill="${color}" opacity="0.85"
+           transform="translate(${x},${y}) rotate(${rot}) scale(${scale})"/>`;
+      return `<svg class="orn-svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+        <path d="M ${half} 11 C ${half - 22} 2, ${half - 40} 20, ${half - 62} 11" stroke="${color}" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+        <path d="M ${half} 11 C ${half + 22} 2, ${half + 40} 20, ${half + 62} 11" stroke="${color}" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+        <circle cx="${half}" cy="11" r="3" fill="${color}"/>
+        <circle cx="${half}" cy="11" r="1.1" fill="${COLORS.wine}"/>
+        ${leaf(half - 34, 13, -20, 0.9)}
+        ${leaf(half + 34, 13, 20, -0.9)}
+        ${leaf(half - 52, 8, 10, 0.75)}
+        ${leaf(half + 52, 8, -10, -0.75)}
+      </svg>`;
+    }
+    document.getElementById('orn-date').innerHTML = floralDivider(150);
+    document.getElementById('orn-cd').innerHTML = floralDivider(150, COLORS.wine);
+    document.getElementById('orn-loc').innerHTML = floralDivider(150);
+    document.getElementById('orn-gal').innerHTML = floralDivider(150, COLORS.sage);
+    document.getElementById('orn-itin').innerHTML = floralDivider(150);
+    document.getElementById('orn-gifts').innerHTML = floralDivider(150, COLORS.blush);
+
+    /* ── Corner flourish ornament, reused 4x with CSS transforms ── */
+    const cornerSvg = `<svg viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 2 C2 16 2 30 2 44" stroke="${COLORS.gold}" stroke-width="1.1"/>
+      <path d="M2 2 C16 2 30 2 44 2" stroke="${COLORS.gold}" stroke-width="1.1"/>
+      <path d="M2 2 C10 6 14 12 14 20" stroke="${COLORS.gold}" stroke-width="1" fill="none"/>
+      <circle cx="14" cy="20" r="2.2" fill="${COLORS.wine}"/>
+    </svg>`;
+    ['corner-tl','corner-tr','corner-bl','corner-br'].forEach(id => {
+      document.getElementById(id).outerHTML = cornerSvg.replace('<svg ', `<svg id="${id}" class="corner-orn ${id.split('-')[1]} orn-svg" `);
     });
 
-    // TICKER
-    const tickerPhrases = ['FASHION · XV AÑOS', 'CAMILA VALENTINA', '19 DICIEMBRE 2026', 'THE SHOW STARTS AT 7PM', 'YOU ARE INVITED', 'UNA NOCHE ÚNICA'];
-    const tickerInner = document.getElementById('ticker-inner');
-    let colorIdx = 0;
-    [...tickerPhrases, ...tickerPhrases].forEach(p => {
-      const span = document.createElement('span');
-      span.className = 'ticker-item';
-      span.style.color = PALETTE[colorIdx % PALETTE.length];
-      span.textContent = p;
-      const dot = document.createElement('span');
-      dot.className = 'ticker-dot';
-      dot.style.background = PALETTE[(colorIdx + 1) % PALETTE.length];
-      tickerInner.appendChild(span);
-      tickerInner.appendChild(dot);
-      colorIdx++;
-    });
+    /* ── Monogram (script initials framed by a delicate line ornament) ── */
+    function monogram(container, size) {
+      size = size || 150;
+      const w = size, h = size * 0.62;
+      container.innerHTML = `
+        <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="${w/2}" cy="${h/2}" rx="${w/2 - 4}" ry="${h/2 - 4}" fill="none" stroke="${COLORS.gold}" stroke-width="1" opacity="0.7"/>
+          <text x="${w/2}" y="${h/2 + h*0.16}" text-anchor="middle" font-family="'Great Vibes', cursive" font-size="${h*0.62}" fill="${COLORS.wine}">I &amp; M</text>
+        </svg>`;
+    }
+    monogram(document.getElementById('monogram-splash'), 140);
+    monogram(document.getElementById('monogram-hero'), 130);
+
+    /* ── PETAL FALL BACKGROUND ANIMATION ── */
+    (function () {
+      const canvas = document.getElementById('petal-canvas');
+      const ctx = canvas.getContext('2d');
+      function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      resize(); window.addEventListener('resize', resize);
+      const petalColors = [COLORS.blush, COLORS.gold, COLORS.goldLight, COLORS.sage];
+      const petals = Array.from({ length: 26 }, () => ({
+        x: Math.random() * window.innerWidth, y: Math.random() * -window.innerHeight,
+        size: 5 + Math.random() * 6, speed: 0.35 + Math.random() * 0.55,
+        drift: (Math.random() - 0.5) * 0.6, rot: Math.random() * 360, rotSpeed: (Math.random() - 0.5) * 1.2,
+        alpha: 0.35 + Math.random() * 0.4, color: petalColors[Math.floor(Math.random() * petalColors.length)],
+      }));
+      function drawPetal(p) {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rot * Math.PI) / 180);
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.size, p.size * 0.6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        petals.forEach(p => {
+          p.y += p.speed; p.x += p.drift; p.rot += p.rotSpeed;
+          if (p.y > canvas.height + 10) { p.y = -10; p.x = Math.random() * canvas.width; }
+          if (p.x > canvas.width + 10) p.x = -10; if (p.x < -10) p.x = canvas.width + 10;
+          drawPetal(p);
+        });
+        requestAnimationFrame(loop);
+      }
+      loop();
+    })();
 
     // SPLASH
     function closeSplash() {
       const s = document.getElementById('splash');
       s.classList.add('closing');
-      setTimeout(() => { s.style.display = 'none'; document.getElementById('main').style.display = 'block'; }, 900);
+      setTimeout(() => { s.style.display = 'none'; document.getElementById('main').style.display = 'block'; }, 950);
     }
-
-    // CONFETTI CANVAS (halftone dot rain)
-    (function () {
-      const canvas = document.getElementById('confetti-canvas');
-      const ctx = canvas.getContext('2d');
-      function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-      resize(); window.addEventListener('resize', resize);
-      const dots = Array.from({ length: 42 }, () => ({
-        x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight,
-        size: 2 + Math.random() * 4.5, speed: 0.3 + Math.random() * 0.6,
-        drift: (Math.random() - 0.5) * 0.5, alpha: 0.15 + Math.random() * 0.5,
-        color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
-      }));
-      function loop() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        dots.forEach(d => {
-          d.y += d.speed; d.x += d.drift;
-          if (d.y > canvas.height + 10) { d.y = -10; d.x = Math.random() * canvas.width; }
-          if (d.x > canvas.width + 10) d.x = -10; if (d.x < -10) d.x = canvas.width + 10;
-          ctx.beginPath();
-          ctx.fillStyle = d.color;
-          ctx.globalAlpha = d.alpha;
-          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-          ctx.fill();
-        });
-        ctx.globalAlpha = 1;
-        requestAnimationFrame(loop);
-      }
-      loop();
-    })();
 
     // COUNTDOWN
     function pad(n) { return String(n).padStart(2, '0'); }
     const cdEls = { days: document.getElementById('cd-days'), hours: document.getElementById('cd-hours'), mins: document.getElementById('cd-mins'), secs: document.getElementById('cd-secs') };
     const prevVals = [0, 0, 0, 0];
     function tickCd() {
-      const diff = Math.max(0, EVENT_DATE.getTime() - Date.now());
+      const diff = Math.max(0, WEDDING_DATE.getTime() - Date.now());
       const s = Math.floor(diff / 1000);
       const vals = [Math.floor(s / 86400), Math.floor((s % 86400) / 3600), Math.floor((s % 3600) / 60), s % 60];
       const keys = ['days', 'hours', 'mins', 'secs'];
@@ -674,36 +632,44 @@
     tickCd(); setInterval(tickCd, 1000);
 
     // GALLERY
+    const GALLERY = [
+      { url:'https://images.unsplash.com/photo-1596457221755-b96bc3a6df18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900', caption:'El sí para siempre' },
+      { url:'https://images.unsplash.com/photo-1606216836537-eea72a939072?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900', caption:'Un amor eterno' },
+      { url:'https://images.unsplash.com/photo-1618566864264-fb013f791da4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900', caption:'Manos unidas' },
+      { url:'https://images.unsplash.com/photo-1648154164366-d067faecdc51?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900', caption:'Nuestro primer baile' },
+      { url:'https://images.unsplash.com/photo-1704455305845-d5f66a560e6f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900', caption:'Celebrando la vida' },
+      { url:'https://images.unsplash.com/photo-1721401870229-7d2030874849?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900', caption:'Bajo el mismo cielo' },
+    ];
     let galleryIdx = 0;
     function renderGallery() {
       const g = GALLERY[galleryIdx];
       document.getElementById('gallery-img').src = g.url;
       document.getElementById('gallery-img').alt = g.caption;
       document.getElementById('gallery-caption').textContent = g.caption;
-      document.getElementById('gallery-badge').textContent = (galleryIdx + 1) + ' / ' + GALLERY.length;
       document.querySelectorAll('.gallery-thumb').forEach((el, i) => el.classList.toggle('active', i === galleryIdx));
-      document.querySelectorAll('.gallery-dot').forEach((el, i) => {
-        el.classList.toggle('active', i === galleryIdx);
-        el.style.background = i === galleryIdx ? PALETTE[i % PALETTE.length] : 'rgba(255,255,255,0.15)';
-      });
     }
     function galleryGo(dir) { galleryIdx = (galleryIdx + dir + GALLERY.length) % GALLERY.length; renderGallery(); }
     const thumbsEl = document.getElementById('gallery-thumbs');
-    const dotsEl = document.getElementById('gallery-dots');
     GALLERY.forEach((g, i) => {
       const t = document.createElement('button'); t.className = 'gallery-thumb'; t.onclick = () => { galleryIdx = i; renderGallery(); };
       const img = document.createElement('img'); img.src = g.url; img.alt = g.caption; t.appendChild(img); thumbsEl.appendChild(t);
-      const d = document.createElement('button'); d.className = 'gallery-dot'; d.onclick = () => { galleryIdx = i; renderGallery(); }; dotsEl.appendChild(d);
     });
     renderGallery();
 
     // ITINERARY
+    const ITINERARY = [
+      { icon:'church', time:'5:00 PM', name:'Ceremonia Religiosa', desc:'Iglesia Santa Bárbara — celebración del santo matrimonio' },
+      { icon:'toast',  time:'6:30 PM', name:'Cóctel de Bienvenida', desc:'Recepción con aperitivos y música en vivo' },
+      { icon:'camera', time:'7:00 PM', name:'Sesión de Fotos', desc:'Fotografías con los novios y familiares' },
+      { icon:'cake',   time:'8:00 PM', name:'Cena y Brindis', desc:'Banquete de gala y palabras de nuestros padres' },
+      { icon:'dance',  time:'9:00 PM', name:'Primer Baile', desc:'El vals de los novios abre la pista de baile' },
+      { icon:'party',  time:'9:30 PM', name:'Fiesta', desc:'¡A celebrar hasta el amanecer!' },
+    ];
     const itinList = document.getElementById('itin-list');
     ITINERARY.forEach(item => {
-      const color = PALETTE[Number(item.color) % PALETTE.length];
+      const cardHtml = '<div class="itin-card"><div class="itin-name">' + item.name + '</div><p class="itin-desc">' + item.desc + '</p></div>';
+      const nodeHtml = '<div class="itin-node"><div class="icon-badge">' + svgIcon(item.icon) + '</div><span class="itin-time-badge">' + item.time + '</span></div>';
       const div = document.createElement('div'); div.className = 'itin-item';
-      const cardHtml = '<div class="itin-card" style="border-' + (Number(item.color) % 2 === 0 ? 'right' : 'left') + ':3px solid ' + color + '"><div class="itin-name">' + item.name + '</div><p class="itin-desc">' + item.desc + '</p></div>';
-      const nodeHtml = '<div class="itin-node"><div class="itin-diamond" style="background:' + color + ';box-shadow:0 0 16px ' + color + '66"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + item.icon + '"/></svg></div><span class="itin-time-badge">' + item.time + '</span></div>';
       div.innerHTML = '<div class="itin-slot-left">' + cardHtml + '</div>' + nodeHtml + '<div class="itin-slot-right">' + cardHtml + '</div>';
       itinList.appendChild(div);
     });
@@ -714,24 +680,25 @@
     obs.observe(itinSpine);
 
     // GIFTS
+    const GIFTS = [
+      { key:'nequi',     label:'Nequi',           sub:'Envío digital · Colombia', icon:'wallet' },
+      { key:'daviplata', label:'Daviplata',        sub:'Envío digital · Colombia', icon:'bank' },
+      { key:'luna',      label:'Fondo Luna de Miel', sub:'Contribuye a nuestro viaje', icon:'gift' },
+    ];
     const giftsList = document.getElementById('gifts-list');
     GIFTS.forEach(g => {
       const card = document.createElement('div'); card.className = 'gift-card'; card.id = 'gift-card-' + g.key;
       card.innerHTML =
         '<button class="gift-toggle" onclick="toggleGift(\'' + g.key + '\')">' +
-        '<div class="gift-icon" style="background:' + g.grad + '">' +
-        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12M22 7H2v5h20V7zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>' +
-        '</div>' +
+        '<div class="gift-icon-wrap" style="color:' + COLORS.wine + '">' + svgIcon(g.icon) + '</div>' +
         '<div class="gift-label-wrap"><div class="gift-label">' + g.label + '</div><div class="gift-sub">' + g.sub + '</div></div>' +
-        '<svg class="gift-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+        '<svg class="gift-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>' +
         '</button>' +
         '<div class="gift-body"><div class="gift-inner"><div class="gift-box">' +
         '<p class="gift-box-title">Regalar con ' + g.label + '</p>' +
         '<input class="gift-input" type="text" id="gift-name-' + g.key + '" placeholder="Tu nombre" />' +
         '<input class="gift-input" type="number" id="gift-amount-' + g.key + '" placeholder="Monto (COP)" />' +
-        '<button class="gift-qr-btn" onclick="genQR(\'' + g.key + '\',\'' + g.label + '\')">' +
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM17 14h.01M14 14h.01M20 14h.01M14 17h.01M17 17h.01M20 17h.01M14 20h.01M17 20h.01M20 20h.01"/></svg>' +
-        'Generar QR</button>' +
+        '<button class="gift-qr-btn" onclick="genQR(\'' + g.key + '\',\'' + g.label + '\')">Generar Código QR</button>' +
         '<div class="gift-qr-img" id="gift-qr-' + g.key + '"></div>' +
         '</div></div></div>';
       giftsList.appendChild(card);
@@ -740,9 +707,9 @@
     async function genQR(key, label) {
       const name = document.getElementById('gift-name-' + key).value || 'Invitado';
       const amount = document.getElementById('gift-amount-' + key).value || '0';
-      const data = 'PAGO ' + label.toUpperCase() + ' | ' + name + ' | COP ' + amount;
+      const data = 'REGALO ' + label.toUpperCase() + ' | ' + name + ' | COP ' + amount;
       try {
-        const url = await QRCode.toDataURL(data, { width: 200, color: { dark: '#05050C', light: '#00E5D4' } });
+        const url = await QRCode.toDataURL(data, { width: 200, color: { dark: COLORS.wine, light: '#FBF6EE' } });
         document.getElementById('gift-qr-' + key).innerHTML = '<div class="qr-wrap"><img src="' + url + '" alt="QR"></div>';
       } catch (e) {}
     }
