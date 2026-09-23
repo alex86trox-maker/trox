@@ -735,6 +735,7 @@ footer::before{content:"";position:absolute;inset:0;background:radial-gradient(5
       <a href="/infantiles">Infantiles</a>
       <a href="/matrimonio">Matrimonio</a>
       <a href="/quince-años">Quince Años</a>
+      <a href="/baby-shower">Baby Shower</a>
     </nav>
     <div style="display:flex;align-items:center;gap:.8rem">
       <a href="#planes" class="cart-pill" id="cartPill" aria-live="polite">✦ Plan <b id="cartPillName"></b></a>
@@ -751,6 +752,7 @@ footer::before{content:"";position:absolute;inset:0;background:radial-gradient(5
     <a href="/infantiles">Infantiles</a>
     <a href="/matrimonio">Matrimonio</a>
     <a href="/quince-años">Quince Años</a>
+    <a href="/baby-shower">Baby Shower</a>
     <a href="https://wa.me/573242712162?text=Hola%2C%20quiero%20información%20sobre%20invitaciones%20digitales" target="_blank" rel="noreferrer noopener" class="btn btn-g" style="width:fit-content">Contactar ahora</a>
   </nav>
 </header>
@@ -962,10 +964,19 @@ footer::before{content:"";position:absolute;inset:0;background:radial-gradient(5
           <span class="show-meta">Disponible</span>
           <span class="show-arrow" aria-hidden="true">→</span>
         </button>
+        <button class="show-row" data-idx="8" role="listitem" aria-pressed="false" aria-label="Ver invitaciones de comunión">
+          <span class="show-idx">09</span>
+          <span>
+            <span class="show-name">Comunión</span>
+            <span class="show-sub">Primera comunión · Diseños delicados y llenos de luz</span>
+          </span>
+          <span class="show-meta">Disponible</span>
+          <span class="show-arrow" aria-hidden="true">→</span>
+        </button>
       </div>
       <div class="show-preview">
         <div class="pv-frame">
-          <div class="pv-count" id="pvCount">01 / 08</div>
+          <div class="pv-count" id="pvCount">01 / 09</div>
           <div class="pv-clip">
             <div class="pv-img active" style="background:linear-gradient(135deg,#1e4d38,#0f2418);display:flex;align-items:center;justify-content:center">
               <div style="text-align:center;color:#fff;padding:2rem">
@@ -1013,6 +1024,12 @@ footer::before{content:"";position:absolute;inset:0;background:radial-gradient(5
               <div style="text-align:center;color:#fff;padding:2rem">
                 <div style="font-family:var(--fd);font-size:2.5rem;margin-bottom:.5rem">¡Fiesta!</div>
                 <div style="font-family:var(--fd);font-size:.8rem;letter-spacing:.2em;opacity:.7">FIESTA INFANTIL · COLOMBIA</div>
+              </div>
+            </div>
+            <div class="pv-img" style="background:linear-gradient(135deg,#e9d8a6,#b89b5e);display:flex;align-items:center;justify-content:center">
+              <div style="text-align:center;color:#fff;padding:2rem">
+                <div style="font-family:var(--fs);font-size:3rem;margin-bottom:.5rem">Isabella</div>
+                <div style="font-family:var(--fd);font-size:.8rem;letter-spacing:.2em;opacity:.7">PRIMERA COMUNIÓN · COLOMBIA</div>
               </div>
             </div>
           </div>
@@ -1529,6 +1546,7 @@ footer::before{content:"";position:absolute;inset:0;background:radial-gradient(5
           <a href="/infantiles">Infantiles</a>
           <a href="/matrimonio">Matrimonio</a>
           <a href="/quince-años">Quince Años</a>
+          <a href="/baby-shower">Baby Shower</a>
         </nav>
       </div>
       <div>
@@ -1720,16 +1738,24 @@ const pvImgs = document.querySelectorAll('.pv-img');
 const pvName = document.getElementById('pvName');
 const pvLink = document.getElementById('pvLink');
 const pvCount = document.getElementById('pvCount');
-const pvNames = ['Boda','15 Años','Bautizo','Graduación','Cumpleaños','Empresarial','Baby Shower','Infantiles'];
-const pvWaTexts = ['boda','quinceañera','bautizo','graduación','cumpleaños','evento empresarial','baby shower','fiesta infantil'];
+const pvNames = ['Boda','15 Años','Bautizo','Graduación','Cumpleaños','Empresarial','Baby Shower','Infantiles','Comunión'];
+const pvWaTexts = ['boda','quinceañera','bautizo','graduación','cumpleaños','evento empresarial','baby shower','fiesta infantil','primera comunión'];
 function activateShow(idx) {
   showRows.forEach((r, i) => { r.classList.toggle('active', i === idx); r.setAttribute('aria-pressed', (i === idx).toString()); });
   pvImgs.forEach((img, i) => img.classList.toggle('active', i === idx));
   if (pvName) pvName.textContent = pvNames[idx];
   if (pvLink) pvLink.href = `https://wa.me/573242712162?text=Quiero%20una%20invitación%20digital%20para%20${encodeURIComponent(pvWaTexts[idx])}`;
-  if (pvCount) pvCount.textContent = `0${idx+1} / 08`;
+  if (pvCount) pvCount.textContent = `0${idx+1} / 09`;
 }
-showRows.forEach((row, idx) => row.addEventListener('click', () => activateShow(idx)));
+// Página de cada categoría
+const pvPages = ['/matrimonio','/quince-años','/bautizo','/graduacion','/cumpleaños','/empresarial','/baby-shower','/infantiles','/comunion'];
+showRows.forEach((row, idx) => {
+  row.addEventListener('mouseenter', () => activateShow(idx));
+  row.addEventListener('click', () => {
+    activateShow(idx);
+    if (pvPages[idx]) window.location.href = pvPages[idx];
+  });
+});
 
 // FAQ accordion
 document.querySelectorAll('.acc-btn').forEach(btn => {
