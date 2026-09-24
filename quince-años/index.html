@@ -216,6 +216,8 @@ box-shadow:0 18px 44px rgba(22,33,27,.28);overflow:hidden;transition:transform .
 .wchip .pl{font-size:.46rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
 .wchip .new{font-family:var(--fd);font-size:.95rem;color:var(--green);line-height:1.1}
 .wchip .gal-n{font-size:.42rem;font-weight:600;color:var(--gold);letter-spacing:.04em}
+.wedit-btn{width:100%;margin-top:.7rem;padding:.6rem;border-radius:99px;background:transparent;border:1px solid var(--green);color:var(--green);font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:.25s}
+.wedit-btn:hover{background:var(--green);color:#fff;transform:translateY(-2px)}
 .wfootrow{display:flex;align-items:center;justify-content:space-between;padding-top:.55rem;border-top:1px solid var(--line)}
 .wplans{font-size:.56rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
 .warr{width:28px;height:28px;border-radius:50%;background:rgba(184,155,94,.12);border:1px solid rgba(184,155,94,.3);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.7rem;transition:.25s}
@@ -867,6 +869,18 @@ cta.href=tpl?'#planes':'#disenos';
 cta.textContent=tpl?'Elige tu plan ↓':'Elige una plantilla ↑';
 }
 }
+/* ═══ EDITOR EXTERNO — abre el editor de Gueka Ideas con la plantilla elegida ═══ */
+var EDITOR_URL='https://alex86trox-maker.github.io/trox/editor/';
+function openEditorForTemplate(c){
+var c2=cartGet();
+var plan=c2.plan||'classic';
+var params=new URLSearchParams();
+params.set('plan',plan);
+params.set('cat','quince');
+params.set('tpl',c.name);
+window.open(EDITOR_URL+'?'+params.toString(),'_blank','noreferrer');
+gkToast('✦ Abriendo el editor para <b>'+c.name+'</b>…');
+}
 /* ═══ GALERÍA — 12 tarjetas ═══ */
 var BASE='https://image.qwenlm.ai/public_source/9a965b8a-caf8-4a45-bb09-dce792791ca0/';
 var CARDS=[
@@ -921,6 +935,7 @@ el.innerHTML=
 '<div class="wname">'+c.name+'</div>'+
 '<div class="wprices">'+priceChips()+'</div>'+
 '<div class="wfootrow"><span class="wplans">'+c.tag+' · 3 planes</span><span class="warr" aria-hidden="true">→</span></div>'+
+'<button class="wedit-btn" type="button">✎ &nbsp; Abrir en el editor</button>'+
 '</div>';
 el.addEventListener('click',function(){ selectTemplate(i); });
 var cons=el.querySelector('.wcons');
@@ -929,6 +944,14 @@ cons.addEventListener('click',function(e){
 e.stopPropagation();
 var msg='Hola, tengo una duda sobre el diseño '+c.name+' de la colección 15 Años ✦';
 window.open('https://wa.me/573242712162?text='+encodeURIComponent(msg),'_blank','noreferrer');
+});
+}
+var editBtn=el.querySelector('.wedit-btn');
+if(editBtn){
+editBtn.addEventListener('click',function(e){
+e.stopPropagation();
+selectTemplate(i);
+openEditorForTemplate(c);
 });
 }
 grid.appendChild(el);
