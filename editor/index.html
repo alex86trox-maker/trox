@@ -1247,9 +1247,18 @@ const PARTICLES_OPTS=[
 ];
 const TEMPLATES={
   quince:[
-    {label:'Sofía XV Neon',preset:{name:'Sofía Valentina',age:'15',palette:'neon',caption:'✨ Mi gran noche llega...'}},
-    {label:'Isabella XV Dorado',preset:{name:'Isabella Martínez',age:'15',palette:'dorado',caption:'Quince años de sueños cumplidos'}},
-    {label:'Valentina XV Rosas',preset:{name:'Valentina López',age:'15',palette:'rosas',caption:'La magia de mis 15 comienza'}}
+    {label:'Vals de Ensueño',preset:{name:'Valentina Ríos',age:'15',date:'2027-03-15',palette:'dorado',caption:'✨ El vals que marcará mi gran noche...'}},
+    {label:'Princesa Neón',preset:{name:'Isabella Torres',age:'15',date:'2027-04-22',palette:'neon',caption:'Brillando como una princesa de neón'}},
+    {label:'Jardín de Rosas',preset:{name:'Sofía Mendoza',age:'15',date:'2027-05-08',palette:'rosas',caption:'Mis quince entre pétalos y sueños'}},
+    {label:'Mariposas de Luz',preset:{name:'Camila Herrera',age:'15',date:'2027-06-14',palette:'esmeralda',caption:'Volando hacia mi nueva etapa'}},
+    {label:'Dorada Elegancia',preset:{name:'Mariana Castillo',age:'15',date:'2027-07-05',palette:'dorado',caption:'Elegancia dorada en mi noche especial'}},
+    {label:'Noche de Estrellas',preset:{name:'Luciana Morales',age:'15',date:'2027-07-20',palette:'violeta',caption:'Bajo un cielo lleno de estrellas'}},
+    {label:'Corte Real',preset:{name:'Renata Guzmán',age:'15',date:'2027-08-02',palette:'dorado',caption:'Mi noche, mi corte, mi reinado'}},
+    {label:'TikTok Glam',preset:{name:'Alejandra Soto',age:'15',date:'2027-08-18',palette:'neon',caption:'Glam total para mis quince'}},
+    {label:'Dulce Quince',preset:{name:'Valeria Núñez',age:'15',date:'2027-09-30',palette:'pastel',caption:'Dulzura y magia en un solo día'}},
+    {label:'Corona de Cristal',preset:{name:'Paula Jiménez',age:'15',date:'2027-10-15',palette:'oceano',caption:'Una corona que brilla como el cristal'}},
+    {label:'Baile de Gala',preset:{name:'Natalia Ramírez',age:'15',date:'2027-11-08',palette:'dorado',caption:'Una gala digna de mis quince años'}},
+    {label:'Reina XV',preset:{name:'Daniela Vargas',age:'15',date:'2027-12-20',palette:'fuego',caption:'Hoy me coronan reina de mis quince'}}
   ],
   boda:[
     {label:'Boda Elegante',preset:{name:'Andrea & Carlos',age:'',palette:'dorado',caption:'Nos casamos con todo nuestro amor'}},
@@ -1325,6 +1334,18 @@ const blobURLs={retrato:'',fashion:'',gal:[],audio:''};
 const urlParams=new URLSearchParams(window.location.search);
 const planRaw=(urlParams.get('plan')||state.plan||'classic').toLowerCase();
 state.plan=PLANS[planRaw]?planRaw:'classic';
+/* ── Cargar plantilla automáticamente desde la URL (?cat=quince&tpl=Vals+de+Ensueño) ── */
+const catParam=(urlParams.get('cat')||'').toLowerCase();
+const tplParam=urlParams.get('tpl')||'';
+if(catParam&&TEMPLATES[catParam]){
+  const tplMatch=(TEMPLATES[catParam]||[]).find(t=>t.label.toLowerCase()===tplParam.toLowerCase());
+  if(tplMatch){
+    Object.assign(state,tplMatch.preset);
+    state.category=catParam;
+    const catLabels={quince:'XV Años',boda:'Boda',cumple:'Cumpleaños',bautizo:'Bautizo',comunion:'1ª Comunión',babyshower:'Baby Shower',aniversario:'Aniversario',graduacion:'Graduación'};
+    state.templateLabel=(catLabels[catParam]||catParam)+' — '+tplMatch.label;
+  }
+}
 const ORDER={
   id:safeUrlParam(urlParams.get('order')||urlParams.get('pedido')||''),
   cliente:safeUrlParam(urlParams.get('cliente')||''),
@@ -2751,6 +2772,10 @@ async function init(){
   renderFontGrid();applyFont(state.typography||'montserrat');
   initAudioPlayerControls();bindAudioUpload();syncAudioPlayer();syncSongSuggestUI();
 
+  if(catParam&&tplParam&&state.templateLabel){
+    setTimeout(()=>toast('✓ Plantilla cargada: '+state.templateLabel),400);
+  }
+
   const spBtn=$('#sp-btn');
   if(spBtn)spBtn.addEventListener('click',(e)=>{e.stopPropagation();const splash=$('#splash');if(splash)splash.style.display='none';});
 
@@ -2946,6 +2971,7 @@ const OB_STEPS=[
 ];
 function showOnboarding(){
   if(localStorage.getItem(OB_STORAGE_KEY))return;
+  if(catParam&&tplParam)return; /* viene desde el catálogo con una plantilla ya elegida: saltar bienvenida */
   let step=0;
   const overlay=document.createElement('div');
   overlay.className='ob-overlay';
