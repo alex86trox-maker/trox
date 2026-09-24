@@ -2427,9 +2427,19 @@ function populateTemplateSelect(){
       opt.addEventListener('blur',hideTplHoverPreview);
       opt.addEventListener('click',(e)=>{
         e.stopPropagation();
-        pushHistory();Object.assign(state,tpl.preset);state.category=cat;state.templateLabel=info.label+' — '+tpl.label;markSave();
+        pushHistory();
+        /* Partir de los defaults + el preset para que ninguna sección quede
+           con datos residuales de la plantilla anterior (ej: itinerario, padrinos,
+           dress code, canciones, regalos, extras) cuando el preset no la define */
+        const defaults=makeDefaults();
+        state=Object.assign(defaults,{plan:state.plan,imgKeys:state.imgKeys,galKeys:state.galKeys,audioKey:state.audioKey,audioName:state.audioName},tpl.preset);
+        state.category=cat;state.templateLabel=info.label+' — '+tpl.label;markSave();
         const lbl=$('#tplSelectLabel');if(lbl)lbl.textContent=state.templateLabel;
-        bindInputValues();renderPaletteGrid();renderPreview();
+        bindInputValues();renderPaletteGrid();renderListEditors();renderFontGrid();
+        applyFont(state.typography||'montserrat');
+        if(particleAnim){cancelAnimationFrame(particleAnim);particleAnim=null;}
+        applyParticles(state.particles||'ninguna');
+        renderPreview();
         toast('✓ Plantilla aplicada: '+tpl.label);closeTplDropdown();
       });
       subWrap.appendChild(opt);
