@@ -1905,6 +1905,135 @@ renderAllLists();
 renderCats();
 renderStylesGrid();
 updateSectionLocks();
+/* Nombres de plantilla del catálogo -> estilo del editor */
+const TEMPLATE_ALIASES={
+ "boda-cinema-boda": "boda-noche",
+ "boda-jardin-romantico": "boda-jardín",
+ "boda-atardecer-dorado": "boda-cobre",
+ "boda-hacienda-clasica": "boda-rustica",
+ "boda-novios-al-amanecer": "boda-rosa",
+ "boda-salon-de-cristal": "boda-clasica",
+ "boda-playa-dorada": "boda-playa",
+ "boda-arco-floral": "boda-boho",
+ "boda-ramo-de-novia": "boda-vintage",
+ "boda-orquideas-y-luz": "boda-minimalista",
+ "boda-beso-al-atardecer": "boda-tropicana",
+ "boda-lago-y-serenidad": "boda-azul-marino",
+ "infantil-3d-unicornio-magico": "cumple-unicornio",
+ "infantil-3d-mundo-jurasico": "cumple-dinosaurio",
+ "infantil-3d-aventura-espacial": "cumple-galaxia",
+ "infantil-3d-reino-encantado": "cumple-minnie",
+ "infantil-3d-safari-salvaje": "baby-safari",
+ "infantil-3d-superheroe": "cumple-neon",
+ "infantil-fiesta-de-lujo": "cumple-elegante2",
+ "infantil-neon-party": "cumple-neon",
+ "infantil-jardin-en-flor": "floral-peach",
+ "infantil-vintage-glam": "cumple-vintage",
+ "infantil-tropical-vibes": "cumple-tropical",
+ "infantil-rooftop-night": "cumple-galaxia",
+ "infantil-pastel-dreams": "cumple-pastel",
+ "infantil-golden-hour": "dorada-elegante",
+ "infantil-fiesta-boho": "terracota-boho",
+ "infantil-black-and-gold": "xv-negro-oro",
+ "infantil-confetti-pop": "cumple-confetti",
+ "infantil-luxury-soiree": "cumple-elegante",
+ "graduacion-toga-y-birrete": "grad-clasica",
+ "graduacion-exito-dorado": "grad-dorada",
+ "graduacion-futuro-brillante": "grad-moderna",
+ "graduacion-clasico-universitario": "grad-sobria",
+ "graduacion-honor-y-merito": "grad-tricolor",
+ "graduacion-diploma-de-oro": "dorada-elegante",
+ "graduacion-cum-laude": "grad-magenta",
+ "graduacion-nuevo-horizonte": "grad-tech",
+ "graduacion-summa-cum-laude": "xv-negro-oro",
+ "graduacion-generacion-de-exito": "grad-verde",
+ "graduacion-promesa-del-futuro": "corp-minimalista",
+ "graduacion-inicio-y-logro": "noche-dorada",
+ "empresarial-brand-launch": "corp-azul",
+ "empresarial-annual-gala": "corp-dorado",
+ "empresarial-congress-pro": "corp-minimalista",
+ "empresarial-vip-experience": "xv-negro-oro",
+ "empresarial-executive-summit": "corp-dark",
+ "empresarial-product-reveal": "corp-tech",
+ "empresarial-awards-night": "noche-dorada",
+ "empresarial-investor-forum": "corp-verde",
+ "empresarial-team-building": "cumple-confetti",
+ "empresarial-corporate-dinner": "dorada-elegante",
+ "empresarial-tech-conference": "corp-tech",
+ "empresarial-year-end-gala": "corp-dorado",
+ "cumple-fiesta-de-lujo": "cumple-elegante2",
+ "cumple-neon-party": "cumple-neon",
+ "cumple-jardin-en-flor": "floral-peach",
+ "cumple-vintage-glam": "cumple-vintage",
+ "cumple-tropical-vibes": "cumple-tropical",
+ "cumple-rooftop-night": "cumple-galaxia",
+ "cumple-pastel-dreams": "cumple-pastel",
+ "cumple-golden-hour": "dorada-elegante",
+ "cumple-fiesta-boho": "terracota-boho",
+ "cumple-black-and-gold": "xv-negro-oro",
+ "cumple-confetti-pop": "cumple-confetti",
+ "cumple-luxury-soiree": "cumple-elegante",
+ "comunion-primera-comunion": "celestial-blanca",
+ "comunion-luz-divina": "bautizo-angel",
+ "comunion-fe-y-amor": "bautizo-rosa",
+ "comunion-blanco-celestial": "bautizo-perla",
+ "comunion-cruz-de-plata": "brillo-plata",
+ "comunion-paloma-y-paz": "bautizo-celeste",
+ "comunion-jardin-sagrado": "bautizo-nature",
+ "comunion-rosas-blancas": "xv-blanco-rosa",
+ "comunion-gracia-divina": "lavanda-suave",
+ "comunion-caliz-dorado": "bautizo-dorado",
+ "comunion-cielo-abierto": "cielo-pastel",
+ "comunion-angel-de-luz": "bautizo-angel",
+ "bautizo-angel-celeste": "bautizo-angel",
+ "bautizo-flores-blancas": "bautizo-perla",
+ "bautizo-cruz-dorada": "bautizo-dorado",
+ "bautizo-suave-pastel": "bautizo-menta",
+ "bautizo-nubes-de-algodon": "bautizo-celeste",
+ "bautizo-cielo-estrellado": "bautizo-morado",
+ "bautizo-jardin-encantado": "bautizo-nature",
+ "bautizo-primavera-divina": "bautizo-verde",
+ "bautizo-luz-de-luna": "bautizo-perla",
+ "bautizo-paloma-sagrada": "bautizo-angel",
+ "bautizo-rosas-y-perlas": "bautizo-rosa",
+ "bautizo-suenos-dorados": "bautizo-dorado",
+ "15-años-vals-de-ensueno": "rosa-romantica",
+ "15-años-princesa-neon": "xv-neon-rosa",
+ "15-años-jardin-de-rosas": "floral-peach",
+ "15-años-mariposa-de-luz": "mariposa",
+ "15-años-dorada-elegancia": "dorada-elegante",
+ "15-años-noche-de-estrellas": "xv-galaxia",
+ "15-años-corte-real": "purpura-real",
+ "15-años-tiktok-glam": "brillo-plata",
+ "15-años-dulce-quince": "cielo-pastel",
+ "15-años-corona-de-cristal": "celestial-blanca",
+ "15-años-baile-de-gala": "xv-negro-oro",
+ "15-años-reina-xv": "noche-dorada"
+};
+function resolveStyleId(raw){
+  const id=decodeURIComponent(raw).trim().toLowerCase();
+  return TEMPLATE_ALIASES[id]||TEMPLATE_ALIASES[id.replace(/anos/,'años')]||id;
+}
+/* Carga el estilo desde la URL: editor.html?style=<id o nombre de plantilla> */
+function applyStyleFromUrl(){
+  const p=new URLSearchParams(location.search);
+  const raw=p.get('style')||p.get('plantilla')||location.hash.slice(1);
+  if(!raw) return;
+  const id=resolveStyleId(raw);
+  const s=STYLES.find(x=>x.id===id);
+  if(!s){showToast('Estilo no encontrado, se usa el predeterminado');return;}
+  activeStyle=s;
+  if(s.cat){activeCat=s.cat;renderCats();renderStylesGrid();}
+  document.getElementById('fc-a').value=s.colors.a;
+  document.getElementById('fc-b').value=s.colors.b;
+  document.getElementById('fc-bg').value=s.colors.bg;
+  document.getElementById('fc-bg2').value=s.colors.bg2;
+  document.getElementById('fc-text').value=s.colors.text;
+  document.getElementById('style-trigger-name').textContent=s.name;
+  document.getElementById('style-trigger-thumb').innerHTML=makeSwatchHtml(s.colors);
+  showToast('Estilo "'+s.name+'" cargado');
+}
+applyStyleFromUrl();
 // On mobile, start on editor tab (hide preview by default)
 if(window.innerWidth<=768){
   const preview=document.querySelector('.preview-wrap');
