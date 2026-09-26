@@ -789,6 +789,7 @@ Familia García Montoya</textarea></div>
 
     <div class="publish-wrap">
       <button class="btn-publish" id="btn-publish">✦ DESCARGAR TARJETA ✦</button>
+      <button class="btn-publish" id="btn-share" type="button" style="margin-top:8px;background:#1e4d38;color:#fff;">Copiar enlace para invitados</button>
       <p class="publish-note">El archivo HTML es autónomo y se puede abrir en cualquier navegador.</p>
     </div>
   </div><!-- /sidebar -->
@@ -890,7 +891,7 @@ const STYLES = [
   {id:'celestial-blanca',cat:'quince',name:'Celestial Blanca',plan:'premium',colors:{bg:'#f8f6ff',bg2:'#ede9ff',a:'#7c4dff',b:'#b39ddb',text:'#1a0033'},fonts:{head:"'Cinzel',serif",script:"'Great Vibes',cursive",body:"'Raleway',sans-serif"}},
   {id:'princesa-azul',cat:'quince',name:'Princesa Azul',plan:'basic',colors:{bg:'#001433',bg2:'#000a1a',a:'#64b5f6',b:'#90caf9',text:'#e3f2fd'},fonts:{head:"'Marcellus',serif",script:"'Sacramento',cursive",body:"'Cormorant Garamond',serif"}},
   {id:'esmeralda-lujosa',cat:'quince',name:'Esmeralda Lujosa',plan:'premium',colors:{bg:'#001510',bg2:'#000a08',a:'#4caf50',b:'#a5d6a7',text:'#e8f5e9'},fonts:{head:"'Cinzel',serif",script:"'Great Vibes',cursive",body:"'Cormorant Garamond',serif"}},
-  {id:'floral-peach',cat:'quince',name:'Floral Peach',plan:'basic',colors:{bg:'#2a1010',bg2:'#180808',a:'#ff7043',b:'#ffab91',text:'#fbe9e7'},fonts:{head:"'Playfair Display',serif",script:"'Sacramento',cursive",body:"'Raleway',sans-serif"}},
+  {id:'floral-peach',cat:'quince',name:'Jardín de Rosas',plan:'basic',colors:{bg:'#110008',bg2:'#080004',a:'#ff4d94',b:'#ff1a6e',text:'#fff0f7'},fonts:{head:"'Playfair Display',serif",script:"'Sacramento',cursive",body:"'Raleway',sans-serif"}},
   {id:'lavanda-suave',cat:'quince',name:'Lavanda Suave',plan:'basic',colors:{bg:'#1a0a2e',bg2:'#100018',a:'#ce93d8',b:'#f8bbd9',text:'#f3e5f5'},fonts:{head:"'Marcellus',serif",script:"'Great Vibes',cursive",body:"'Cormorant Garamond',serif"}},
   {id:'oscuro-misterio',cat:'quince',name:'Oscuro Misterio',plan:'premium',colors:{bg:'#0a0a0a',bg2:'#000000',a:'#ff1744',b:'#ff8a80',text:'#fafafa'},fonts:{head:"'Josefin Sans',sans-serif",script:"'Great Vibes',cursive",body:"'Raleway',sans-serif"}},
   {id:'coral-sunset',cat:'quince',name:'Coral Sunset',plan:'basic',colors:{bg:'#1a0c04',bg2:'#0f0802',a:'#ff6f00',b:'#ffb300',text:'#fff8e1'},fonts:{head:"'Playfair Display',serif",script:"'Sacramento',cursive",body:"'Cormorant Garamond',serif"}},
@@ -1775,9 +1776,16 @@ function updatePv(){
   if(pvBusy)return;
   pvBusy=true;
   const state=readState();
-  const html=genHTML(state);
   const iframe=document.getElementById('card-iframe');
-  iframe.srcdoc=html;
+  const folder=realTemplateFolder();
+  if(folder){
+    // Plantilla real: guarda los datos y carga la invitación de su carpeta
+    saveRealPreview(state);
+    iframe.removeAttribute('srcdoc');
+    iframe.src=folder+'?preview=1&v='+Date.now();
+  } else {
+    iframe.srcdoc=genHTML(state);
+  }
   iframe.onload=()=>{pvBusy=false;showPvUpdated();};
   setTimeout(()=>{pvBusy=false;},4000);
   updateProgress();
@@ -1829,15 +1837,82 @@ function setZoom(delta){
 // ════════════════════════════════════════════════════════
 function downloadCard(){
   const state=readState();
-  const html=genHTML(state);
+  const folder=realTemplateFolder();
+  const fileName='tarjeta_xv_'+(state.name.replace(/\s+/g,'_').toLowerCase())+'.html';
+  if(folder){
+    // Descarga la invitación real con los datos del cliente incluidos
+    fetch(folder,{cache:'no-store'})
+      .then(r=>{if(!r.ok)throw new Error(r.status);return r.text();})
+      .then(html=>{
+        const data=JSON.stringify(realData(state)).replace(/</g,'\\u003c');
+        const inject='<script>window.GUEKA_DATA='+data+';<\/script>';
+        const out=html.replace(/<head([^>]*)>/i,'<head$1>'+inject);
+        saveHtmlFile(out,fileName);
+      })
+      .catch(()=>showToast('No se pudo cargar la plantilla. Ábrela desde GitHub Pages.'));
+    return;
+  }
+  saveHtmlFile(genHTML(state),fileName);
+}
+
+function saveHtmlFile(html,fileName){
   const blob=new Blob([html],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;
-  a.download='tarjeta_xv_'+(state.name.replace(/\s+/g,'_').toLowerCase())+'.html';
+  a.download=fileName;
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
   showToast('HTML descargado ✓');
+}
+
+// ════════════════════════════════════════════════════════
+//  PLANTILLAS REALES (carpetas publicadas en GitHub)
+//  Agrega aquí el nombre de cada carpeta que ya tenga su index.html
+// ════════════════════════════════════════════════════════
+const REAL_TEMPLATES=[
+  '15-años-mariposa-de-luz',
+  '15-años-jardin-de-rosas',
+];
+let urlTemplateSlug='';
+
+function realTemplateFolder(){
+  const aliasOf=slug=>(typeof TEMPLATE_ALIASES!=='undefined'&&TEMPLATE_ALIASES[slug])||slug;
+  // 1) La plantilla que vino en la dirección, si sigue con su estilo
+  if(REAL_TEMPLATES.includes(urlTemplateSlug)&&aliasOf(urlTemplateSlug)===activeStyle.id){
+    return encodeURIComponent(urlTemplateSlug)+'/index.html';
+  }
+  // 2) Si el estilo elegido en el cajón tiene una plantilla real
+  const slug=REAL_TEMPLATES.find(s=>aliasOf(s)===activeStyle.id);
+  return slug?encodeURIComponent(slug)+'/index.html':'';
+}
+
+function realData(state){
+  // customColors: true solo si el cliente cambió los colores del estilo
+  const sc=activeStyle.colors||{};
+  const c=state.colors||{};
+  const customColors=['a','b','bg','text'].some(k=>String(c[k]||'').toLowerCase()!==String(sc[k]||'').toLowerCase());
+  return Object.assign({},state,{plan:activePlan,customColors});
+}
+
+function saveRealPreview(state){
+  try{localStorage.setItem('gueka_preview',JSON.stringify(realData(state)));}
+  catch(e){showToast('No se pudo guardar la vista previa');}
+}
+
+// Enlace para compartir: la carpeta + los datos en la dirección (#d=...)
+function shareLink(){
+  const folder=realTemplateFolder();
+  if(!folder){showToast('Esta plantilla aún no está publicada');return;}
+  const json=JSON.stringify(realData(readState()));
+  const b64=btoa(unescape(encodeURIComponent(json))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const link=new URL(folder,location.href).href+'#d='+b64;
+  const done=()=>showToast('Enlace copiado ✓ Pégalo en WhatsApp');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(link).then(done).catch(()=>window.prompt('Copia este enlace:',link));
+  } else {
+    window.prompt('Copia este enlace:',link);
+  }
 }
 
 // ════════════════════════════════════════════════════════
@@ -1883,9 +1958,16 @@ document.getElementById('styles-overlay').addEventListener('click',function(e){i
 document.getElementById('upgrade-overlay').addEventListener('click',function(e){if(e.target===this)closeUpgrade();});
 document.getElementById('btn-download').addEventListener('click',downloadCard);
 document.getElementById('btn-publish').addEventListener('click',downloadCard);
+document.getElementById('btn-share').addEventListener('click',shareLink);
 document.getElementById('btn-preview-tab').addEventListener('click',()=>{
   if(window.innerWidth<=768){
     switchMobileTab('preview');
+    return;
+  }
+  const folder=realTemplateFolder();
+  if(folder){
+    saveRealPreview(readState());
+    window.open(folder+'?preview=1','_blank');
     return;
   }
   const html=genHTML(readState());
@@ -2019,6 +2101,7 @@ function applyStyleFromUrl(){
   const p=new URLSearchParams(location.search);
   const raw=p.get('style')||p.get('plantilla')||location.hash.slice(1);
   if(!raw) return;
+  urlTemplateSlug=decodeURIComponent(raw).trim().toLowerCase().replace(/anos/,'años');
   const id=resolveStyleId(raw);
   const s=STYLES.find(x=>x.id===id);
   if(!s){showToast('Estilo no encontrado, se usa el predeterminado');return;}
