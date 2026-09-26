@@ -2131,10 +2131,103 @@ function checkFadeUps() {
 }
 
 /* ═══════════════════════════════════════════
+   PUENTE CON EL EDITOR DE GUEKA IDEAS
+   Orden de prioridad de los datos:
+    1. window.GUEKA_DATA  → archivo descargado desde el editor
+    2. #d=...             → enlace para compartir con los invitados
+    3. ?preview=1         → vista previa en vivo dentro del editor
+   Si no hay datos, se muestra la invitación de ejemplo.
+═══════════════════════════════════════════ */
+const GUEKA_PARAMS = new URLSearchParams(location.search);
+
+function decodeGuekaData(str) {
+  try {
+    const b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(decodeURIComponent(escape(atob(b64))));
+  } catch (e) { return null; }
+}
+
+function readGuekaData() {
+  if (window.GUEKA_DATA) return window.GUEKA_DATA;
+  const h = location.hash.match(/[#&]d=([^&]+)/);
+  if (h) return decodeGuekaData(h[1]);
+  if (GUEKA_PARAMS.has('preview')) {
+    try { return JSON.parse(localStorage.getItem('gueka_preview') || 'null'); }
+    catch (e) { return null; }
+  }
+  return null;
+}
+
+function applyGuekaData(d) {
+  const PLAN_MAP = { basic: 'classic', classic: 'classic', premium: 'premium', deluxe: 'deluxe' };
+  const TEXT_KEYS = ['name','caption','hashtag','historyText','date','time','venue','address','mapUrl',
+    'albumUrl','waOrganizer','rsvpPara','customTitle','customText','poem','signature'];
+  TEXT_KEYS.forEach(k => { if (typeof d[k] === 'string' && d[k] !== '') state[k] = d[k]; });
+  ['customTitle','customText','poem','signature'].forEach(k => { if (d[k] === '') state[k] = ''; });
+  if (d.showAlbum === false) state.albumUrl = '';
+
+  if (d.plan && PLAN_MAP[d.plan]) state.plan = PLAN_MAP[d.plan];
+  if (typeof d.showSplash === 'boolean') state.showSplash = d.showSplash;
+  if (GUEKA_PARAMS.has('nosplash')) state.showSplash = false;
+  if (typeof d.showSongSuggest === 'boolean') state.songSuggestEnabled = d.showSongSuggest;
+  if (d.waOrganizer) state.songSuggestWa = d.waOrganizer;
+
+  ['itinerary','padrinos','dressCode','songs','gifts','extra'].forEach(k => {
+    if (Array.isArray(d[k])) state[k] = d[k].filter(Boolean).map(v => ({ v: String(v) }));
+  });
+
+  if (Array.isArray(d.gallery)) {
+    const g = d.gallery.filter(x => x && x.src);
+    if (g.length) {
+      state.galKeys = g.map(x => x.src);
+      state.galCaptions = g.map(x => x.cap || '');
+    }
+  }
+  state.photoUrls = { retrato: d.retrato || '', fashion: d.fashion || '' };
+  document.title = 'XV Años · ' + state.name;
+}
+
+// Se ejecuta después de renderPreview: fotos, colores y secciones visibles
+function applyGuekaLook(d) {
+  const setImg = (id, url) => { const el = document.getElementById(id); if (el && url) el.src = url; };
+  setImg('pv-retrato', state.photoUrls.retrato);
+  setImg('pv-fashion', state.photoUrls.fashion);
+
+  const w = document.getElementById('card-wrapper');
+  const c = d.colors || {};
+  // Solo cambia los colores si el cliente los modificó en el editor
+  if (w && d.customColors) {
+    const set = (k, v) => { if (v) w.style.setProperty(k, v); };
+    set('--c-a', c.a); set('--c-b', c.b); set('--c-bg', c.bg);
+    set('--c-text', c.text);
+    if (c.bg) document.body.style.background = c.bg;
+    applyParticles(state.particles);
+  }
+
+  const hide = (id, cond) => { const el = document.getElementById(id); if (el && cond) el.style.display = 'none'; };
+  hide('sec-rsvp', d.showRsvp === false);
+  hide('sec-venue', d.showVenue === false);
+  hide('rsvp-qr-wrap', d.showQr === false);
+  hide('sec-itinerary', !state.itinerary.length);
+  hide('sec-padrinos', !state.padrinos.length);
+  hide('sec-dress', !state.dressCode.length);
+  hide('sec-gifts', !state.gifts.length);
+  hide('sec-extra', !state.extra.length);
+  hide('pv-custom-sec', !state.customTitle && !state.customText);
+
+  const note = document.getElementById('pv-rsvp');
+  if (note && d.rsvpNote) note.textContent = d.rsvpNote;
+}
+
+const GUEKA = readGuekaData();
+if (GUEKA) applyGuekaData(GUEKA);
+
+/* ═══════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════ */
 renderPreview();
 applyParticles(state.particles);
+if (GUEKA) applyGuekaLook(GUEKA);
 initScrollUI();
 if (!state.showSplash) openInvite();
 </script>
