@@ -1821,7 +1821,7 @@ function updatePv(){
     iframe.removeAttribute('srcdoc');
     iframe.src=folder+'?preview=1&v='+Date.now();
   } else {
-    iframe.srcdoc=genHTML(state);
+    iframe.srcdoc=withWatermark(genHTML(state));
   }
   iframe.onload=()=>{pvBusy=false;showPvUpdated();};
   setTimeout(()=>{pvBusy=false;},4000);
@@ -1937,6 +1937,10 @@ function saveRealPreview(state){
   catch(e){showToast('No se pudo guardar la vista previa');}
 }
 
+
+// Marca de agua para estilos generados (no tienen carpeta propia)
+const GK_GUARD="<!-- ═══ GUEKA · PROTECCIÓN (marca de agua + anticopia) ═══ -->\n<style id=\"gueka-guard-css\">\nbody.gk-guard{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}\nbody.gk-guard img{-webkit-user-drag:none;user-drag:none;pointer-events:auto}\nbody.gk-guard input,body.gk-guard textarea{-webkit-user-select:text;user-select:text}\n#gk-wm{position:fixed;inset:0;z-index:2147483646;pointer-events:none;\nbackground-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='190'%3E%3Cg transform='rotate(-28 130 95)' fill='rgba(255,255,255,.34)' stroke='rgba(0,0,0,.18)' stroke-width='.6' font-family='Georgia,serif' text-anchor='middle'%3E%3Ctext x='130' y='92' font-size='24' font-weight='700' letter-spacing='4'%3EMUESTRA%3C/text%3E%3Ctext x='130' y='116' font-size='12' letter-spacing='3'%3EGUEKA IDEAS%3C/text%3E%3C/g%3E%3C/svg%3E\");\nbackground-repeat:repeat}\n#gk-wm-badge{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:2147483647;pointer-events:none;\nbackground:rgba(22,33,27,.82);color:#f3e7c7;font:600 11px/1.3 system-ui,sans-serif;letter-spacing:.08em;\npadding:7px 14px;border-radius:99px;border:1px solid rgba(184,155,94,.6);white-space:nowrap}\n@media print{body.gk-guard>*{display:none!important}body.gk-guard::after{content:\"Impresión no disponible · Gueka Ideas\";display:block;padding:40px;font:16px system-ui}}\n</style>\n<script id=\"gueka-guard-js\">\n(function(){\n  var qs=new URLSearchParams(location.search);\n  var isPreview=true;\n  document.body.classList.add('gk-guard');\n  // Anticopia: clic derecho, arrastrar imágenes, copiar y atajos de guardar/imprimir/ver código\n  var stop=function(e){var t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;e.preventDefault();};\n  ['contextmenu','dragstart','copy','cut','selectstart'].forEach(function(ev){document.addEventListener(ev,stop,true);});\n  document.addEventListener('keydown',function(e){\n    var k=(e.key||'').toLowerCase();\n    if((e.ctrlKey||e.metaKey)&&['s','p','u','c'].indexOf(k)>-1){e.preventDefault();}\n    if(k==='f12'||((e.ctrlKey||e.metaKey)&&e.shiftKey&&['i','j','c'].indexOf(k)>-1)){e.preventDefault();}\n  },true);\n  // Marca de agua en la vista previa del editor\n  if(isPreview){\n    var wm=document.createElement('div');wm.id='gk-wm';document.body.appendChild(wm);\n    var b=document.createElement('div');b.id='gk-wm-badge';b.textContent='VISTA PREVIA · SIN PAGAR';document.body.appendChild(b);\n  }\n})();\n<\/script>\n";
+function withWatermark(html){const i=html.lastIndexOf("</body>");return i<0?html+GK_GUARD:html.slice(0,i)+GK_GUARD+html.slice(i);}
 // Enlace para compartir: la carpeta + los datos en la dirección (#d=...)
 function shareLink(){
   // Only order details go to WhatsApp; the guests' link is delivered after payment.
@@ -2007,7 +2011,7 @@ document.getElementById('btn-preview-tab').addEventListener('click',()=>{
     window.open(folder+'?preview=1','_blank');
     return;
   }
-  const html=genHTML(readState());
+  const html=withWatermark(genHTML(readState()));
   const blob=new Blob([html],{type:'text/html;charset=utf-8'});
   window.open(URL.createObjectURL(blob),'_blank');
 });
@@ -2161,5 +2165,39 @@ if(window.innerWidth<=768){
 }
 setTimeout(()=>updatePv(),120);
 </script>
+<!-- ═══ GUEKA · PROTECCIÓN (marca de agua + anticopia) ═══ -->
+<style id="gueka-guard-css">
+body.gk-guard{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body.gk-guard img{-webkit-user-drag:none;user-drag:none;pointer-events:auto}
+body.gk-guard input,body.gk-guard textarea{-webkit-user-select:text;user-select:text}
+#gk-wm{position:fixed;inset:0;z-index:2147483646;pointer-events:none;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='190'%3E%3Cg transform='rotate(-28 130 95)' fill='rgba(255,255,255,.34)' stroke='rgba(0,0,0,.18)' stroke-width='.6' font-family='Georgia,serif' text-anchor='middle'%3E%3Ctext x='130' y='92' font-size='24' font-weight='700' letter-spacing='4'%3EMUESTRA%3C/text%3E%3Ctext x='130' y='116' font-size='12' letter-spacing='3'%3EGUEKA IDEAS%3C/text%3E%3C/g%3E%3C/svg%3E");
+background-repeat:repeat}
+#gk-wm-badge{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:2147483647;pointer-events:none;
+background:rgba(22,33,27,.82);color:#f3e7c7;font:600 11px/1.3 system-ui,sans-serif;letter-spacing:.08em;
+padding:7px 14px;border-radius:99px;border:1px solid rgba(184,155,94,.6);white-space:nowrap}
+@media print{body.gk-guard>*{display:none!important}body.gk-guard::after{content:"Impresión no disponible · Gueka Ideas";display:block;padding:40px;font:16px system-ui}}
+</style>
+<script id="gueka-guard-js">
+(function(){
+  var qs=new URLSearchParams(location.search);
+  var isPreview=qs.has('preview');
+  document.body.classList.add('gk-guard');
+  // Anticopia: clic derecho, arrastrar imágenes, copiar y atajos de guardar/imprimir/ver código
+  var stop=function(e){var t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;e.preventDefault();};
+  ['contextmenu','dragstart','copy','cut','selectstart'].forEach(function(ev){document.addEventListener(ev,stop,true);});
+  document.addEventListener('keydown',function(e){
+    var k=(e.key||'').toLowerCase();
+    if((e.ctrlKey||e.metaKey)&&['s','p','u','c'].indexOf(k)>-1){e.preventDefault();}
+    if(k==='f12'||((e.ctrlKey||e.metaKey)&&e.shiftKey&&['i','j','c'].indexOf(k)>-1)){e.preventDefault();}
+  },true);
+  // Marca de agua en la vista previa del editor
+  if(false){
+    var wm=document.createElement('div');wm.id='gk-wm';document.body.appendChild(wm);
+    var b=document.createElement('div');b.id='gk-wm-badge';b.textContent='VISTA PREVIA · SIN PAGAR';document.body.appendChild(b);
+  }
+})();
+</script>
+
 </body>
 </html>
