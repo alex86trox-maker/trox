@@ -200,7 +200,7 @@ box-shadow:0 18px 44px rgba(22,33,27,.28);overflow:hidden;transition:transform .
 .wnames{font-family:var(--fs);color:#fff;font-size:1.35rem;line-height:.95}
 .wnames .amp{font-family:var(--fd);font-size:.78rem;color:var(--gold);letter-spacing:.06em}
 .wdate{font-size:.42rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:rgba(184,155,94,.7)}
-.wrsvp{width:82%;background:var(--gold);color:var(--ink);border-radius:99px;padding:.3rem;font-size:.42rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:.1rem}
+.wrsvp{display:block;text-align:center;width:82%;background:var(--gold);color:var(--ink);border-radius:99px;padding:.3rem;font-size:.42rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:.1rem}
 .wfoot{flex-shrink:0;background:rgba(184,155,94,.1);border-top:1px solid rgba(184,155,94,.2);padding:.3rem;text-align:center;font-size:.4rem;letter-spacing:.08em;color:rgba(184,155,94,.6)}
 .wfoot b{color:var(--gold)}
 .b-style{position:absolute;top:-7px;right:7%;z-index:4;background:var(--gold);color:var(--ink);font-size:.5rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.22rem .6rem;border-radius:99px;box-shadow:0 4px 12px rgba(184,155,94,.4)}
@@ -216,8 +216,6 @@ box-shadow:0 18px 44px rgba(22,33,27,.28);overflow:hidden;transition:transform .
 .wchip .pl{font-size:.46rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
 .wchip .new{font-family:var(--fd);font-size:.95rem;color:var(--green);line-height:1.1}
 .wchip .gal-n{font-size:.42rem;font-weight:600;color:var(--gold);letter-spacing:.04em}
-.wedit-btn{width:100%;margin-top:.7rem;padding:.6rem;border-radius:99px;background:transparent;border:1px solid var(--green);color:var(--green);font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:.25s}
-.wedit-btn:hover{background:var(--green);color:#fff;transform:translateY(-2px)}
 .wfootrow{display:flex;align-items:center;justify-content:space-between;padding-top:.55rem;border-top:1px solid var(--line)}
 .wplans{font-size:.56rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
 .warr{width:28px;height:28px;border-radius:50%;background:rgba(184,155,94,.12);border:1px solid rgba(184,155,94,.3);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.7rem;transition:.25s}
@@ -384,6 +382,9 @@ padding:.45rem .9rem;border-radius:99px;opacity:0;pointer-events:none;transition
 .rv{opacity:1;transform:none}
 .cur-dot,.cur-ring{display:none}
 }
+.wphone{text-decoration:none;color:inherit;cursor:pointer}
+.wedit{display:block;margin-top:.7rem;padding:.65rem 1rem;text-align:center;border-radius:999px;background:linear-gradient(135deg,#d4af6a,#b8894a);color:#fff;font-weight:600;font-size:.85rem;text-decoration:none;letter-spacing:.02em;transition:transform .2s,box-shadow .2s}
+.wedit:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(184,137,74,.35)}
 </style>
 </head>
 <body>
@@ -869,33 +870,24 @@ cta.href=tpl?'#planes':'#disenos';
 cta.textContent=tpl?'Elige tu plan ↓':'Elige una plantilla ↑';
 }
 }
-/* ═══ EDITOR EXTERNO — abre el editor de Gueka Ideas con la plantilla elegida ═══ */
-var EDITOR_URL='./editor.html';
-function openEditorForTemplate(c){
-var c2=cartGet();
-var plan=c2.plan||'classic';
-var params=new URLSearchParams();
-params.set('plan',plan);
-params.set('cat','quince');
-params.set('tpl',c.name);
-window.open(EDITOR_URL+'?'+params.toString(),'_blank','noreferrer');
-gkToast('✦ Abriendo el editor para <b>'+c.name+'</b>…');
-}
 /* ═══ GALERÍA — 12 tarjetas ═══ */
+/* Editor: cada plantilla abre editor.html?style=<id> */
+var EDITOR_URL='editor.html';
+function editorLink(c){return EDITOR_URL+'?style='+encodeURIComponent(c.slug);}
 var BASE='https://image.qwenlm.ai/public_source/9a965b8a-caf8-4a45-bb09-dce792791ca0/';
 var CARDS=[
-{name:'Vals de Ensueño',    img:'16390c866-cf9c-4673-b634-bc757d72bf2d.png', quince:'Valentina Ríos',   date:'15 · Mar · 2027', badge:'Más Popular', tag:'Romántico'},
-{name:'Princesa Neón',      img:'169abf264-8e77-4601-a1f7-186006cf7708.png', quince:'Isabella Torres',  date:'22 · Abr · 2027', badge:'Nuevo',       tag:'Neón'},
-{name:'Jardín de Rosas',    img:'177210be6-941a-4b37-b9df-db05c38a08ba.png', quince:'Sofía Mendoza',    date:'8 · May · 2027',  badge:'Exclusivo',   tag:'Floral'},
-{name:'Mariposas de Luz',   img:'1be97566a-7aa9-47f7-b6cd-9a689b1bd9f2.png', quince:'Camila Herrera',   date:'14 · Jun · 2027', badge:'Nuevo',       tag:'Mariposas'},
-{name:'Dorada Elegancia',   img:'12da54590-3d74-4a2d-878a-796ca911ea01.png', quince:'Mariana Castillo', date:'5 · Jul · 2027',  badge:'Más Popular', tag:'Dorado'},
-{name:'Noche de Estrellas', img:'19937ce88-8138-4e64-9a36-6dc7c184f06a.png', quince:'Luciana Morales',  date:'20 · Jul · 2027', badge:'Nuevo',       tag:'Nocturno'},
-{name:'Corte Real',         img:'1ea12fd3c-7113-4f93-ba52-45841ea9f2a4.png', quince:'Renata Guzmán',    date:'2 · Ago · 2027',  badge:'Exclusivo',   tag:'Realeza'},
-{name:'TikTok Glam',        img:'102c4af95-9c1d-4819-a9c4-403f6fe909c9.png', quince:'Alejandra Soto',   date:'18 · Ago · 2027', badge:'Nuevo',       tag:'Moderno'},
-{name:'Dulce Quince',       img:'1f28ffa85-381b-484f-91fa-991afc282877.png', quince:'Valeria Núñez',    date:'30 · Sep · 2027', badge:'Más Popular', tag:'Pastel'},
-{name:'Corona de Cristal',  img:'1669fd968-a57b-45b9-b609-a8c68c16d2a0.png', quince:'Paula Jiménez',    date:'15 · Oct · 2027', badge:'Exclusivo',   tag:'Cristal'},
-{name:'Baile de Gala',      img:'105d8449b-3349-42f0-bcca-9ccdeed55e06.png', quince:'Natalia Ramírez',  date:'8 · Nov · 2027',  badge:'Nuevo',       tag:'Gala'},
-{name:'Reina XV',           img:'124d93636-e23a-4c46-b85c-e1d3776e15a3.png', quince:'Daniela Vargas',   date:'20 · Dic · 2027', badge:'Más Popular', tag:'Reina'}
+{id:'rosa-romantica', slug:'15-años-vals-de-ensueno', name:'Vals de Ensueño',    img:'16390c866-cf9c-4673-b634-bc757d72bf2d.png', quince:'Valentina Ríos',   date:'15 · Mar · 2027', badge:'Más Popular', tag:'Romántico'},
+{id:'xv-neon-rosa', slug:'15-años-princesa-neon', name:'Princesa Neón',      img:'169abf264-8e77-4601-a1f7-186006cf7708.png', quince:'Isabella Torres',  date:'22 · Abr · 2027', badge:'Nuevo',       tag:'Neón'},
+{id:'floral-peach', slug:'15-años-jardin-de-rosas', name:'Jardín de Rosas',    img:'177210be6-941a-4b37-b9df-db05c38a08ba.png', quince:'Sofía Mendoza',    date:'8 · May · 2027',  badge:'Exclusivo',   tag:'Floral'},
+{id:'mariposa', slug:'15-años-mariposa-de-luz', name:'Mariposas de Luz',   img:'1be97566a-7aa9-47f7-b6cd-9a689b1bd9f2.png', quince:'Camila Herrera',   date:'14 · Jun · 2027', badge:'Nuevo',       tag:'Mariposas'},
+{id:'dorada-elegante', slug:'15-años-dorada-elegancia', name:'Dorada Elegancia',   img:'12da54590-3d74-4a2d-878a-796ca911ea01.png', quince:'Mariana Castillo', date:'5 · Jul · 2027',  badge:'Más Popular', tag:'Dorado'},
+{id:'xv-galaxia', slug:'15-años-noche-de-estrellas', name:'Noche de Estrellas', img:'19937ce88-8138-4e64-9a36-6dc7c184f06a.png', quince:'Luciana Morales',  date:'20 · Jul · 2027', badge:'Nuevo',       tag:'Nocturno'},
+{id:'purpura-real', slug:'15-años-corte-real', name:'Corte Real',         img:'1ea12fd3c-7113-4f93-ba52-45841ea9f2a4.png', quince:'Renata Guzmán',    date:'2 · Ago · 2027',  badge:'Exclusivo',   tag:'Realeza'},
+{id:'brillo-plata', slug:'15-años-tiktok-glam', name:'TikTok Glam',        img:'102c4af95-9c1d-4819-a9c4-403f6fe909c9.png', quince:'Alejandra Soto',   date:'18 · Ago · 2027', badge:'Nuevo',       tag:'Moderno'},
+{id:'cielo-pastel', slug:'15-años-dulce-quince', name:'Dulce Quince',       img:'1f28ffa85-381b-484f-91fa-991afc282877.png', quince:'Valeria Núñez',    date:'30 · Sep · 2027', badge:'Más Popular', tag:'Pastel'},
+{id:'celestial-blanca', slug:'15-años-corona-de-cristal', name:'Corona de Cristal',  img:'1669fd968-a57b-45b9-b609-a8c68c16d2a0.png', quince:'Paula Jiménez',    date:'15 · Oct · 2027', badge:'Exclusivo',   tag:'Cristal'},
+{id:'xv-negro-oro', slug:'15-años-baile-de-gala', name:'Baile de Gala',      img:'105d8449b-3349-42f0-bcca-9ccdeed55e06.png', quince:'Natalia Ramírez',  date:'8 · Nov · 2027',  badge:'Nuevo',       tag:'Gala'},
+{id:'noche-dorada', slug:'15-años-reina-xv', name:'Reina XV',           img:'124d93636-e23a-4c46-b85c-e1d3776e15a3.png', quince:'Daniela Vargas',   date:'20 · Dic · 2027', badge:'Más Popular', tag:'Reina'}
 ];
 function priceChips(){
 var h='';
@@ -916,7 +908,7 @@ el.innerHTML=
 '<span class="b-sel">✓ Seleccionada</span>'+
 '<span class="b-style">'+c.badge+'</span>'+
 '<button class="wcons" type="button" title="Consultar este diseño por WhatsApp" aria-label="Consultar por WhatsApp">'+WA_ICON+'</button>'+
-'<div class="wphone">'+
+'<a class="wphone" href="'+editorLink(c)+'" title="Personalizar '+c.name+' en el Editor">'+
 '<div class="wnotch"></div>'+
 '<div class="wscr">'+
 '<img src="'+BASE+c.img+'" alt="'+c.name+'" loading="lazy">'+
@@ -925,33 +917,26 @@ el.innerHTML=
 '<div class="whr"></div>'+
 '<div class="wnames">'+c.quince.split(' ')[0]+'<span class="amp">'+c.quince.split(' ').slice(1).join(' ')+'</span></div>'+
 '<div class="wdate">'+c.date+'</div>'+
-'<button class="wrsvp" tabindex="-1">Confirmar →</button>'+
+'<span class="wrsvp">Confirmar →</span>'+
 '</div>'+
 '</div>'+
 '<div class="wfoot">guekaideas.com/<strong>xv-años</strong></div>'+
-'</div>'+
+'</a>'+
 '</div>'+
 '<div class="wmeta">'+
 '<div class="wname">'+c.name+'</div>'+
 '<div class="wprices">'+priceChips()+'</div>'+
 '<div class="wfootrow"><span class="wplans">'+c.tag+' · 3 planes</span><span class="warr" aria-hidden="true">→</span></div>'+
-'<button class="wedit-btn" type="button">✎ &nbsp; Abrir en el editor</button>'+
+'<a class="wedit" href="'+editorLink(c)+'">Personalizar · Abrir en el Editor →</a>'+
 '</div>';
-el.addEventListener('click',function(){ selectTemplate(i); openEditorForTemplate(c); });
+el.addEventListener('click',function(){ selectTemplate(i); });
+$$('a[href^="'+EDITOR_URL+'"]',el).forEach(function(a){a.addEventListener('click',function(e){e.stopPropagation();cartSet('template',{cat:'quince',slug:'xv-'+i,name:c.name,style:c.id});});});
 var cons=el.querySelector('.wcons');
 if(cons){
 cons.addEventListener('click',function(e){
 e.stopPropagation();
 var msg='Hola, tengo una duda sobre el diseño '+c.name+' de la colección 15 Años ✦';
 window.open('https://wa.me/573242712162?text='+encodeURIComponent(msg),'_blank','noreferrer');
-});
-}
-var editBtn=el.querySelector('.wedit-btn');
-if(editBtn){
-editBtn.addEventListener('click',function(e){
-e.stopPropagation();
-selectTemplate(i);
-openEditorForTemplate(c);
 });
 }
 grid.appendChild(el);
