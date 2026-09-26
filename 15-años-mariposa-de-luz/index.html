@@ -1721,17 +1721,17 @@ async function loadAllPhotos() {
   const retratoEl = document.getElementById('pv-retrato');
   if (retratoEl) {
     const url = await getPhotoURL(db, state.imgKeys.retrato);
-    retratoEl.src = url || PLACEHOLDER_RETRATO;
+    retratoEl.src = url || guekaPhoto('retrato') || PLACEHOLDER_RETRATO;
     // También splash photo
     const splashImg = document.querySelector('#splash .splash-photo img');
-    if (splashImg) splashImg.src = url || PLACEHOLDER_RETRATO;
+    if (splashImg) splashImg.src = url || guekaPhoto('retrato') || PLACEHOLDER_RETRATO;
   }
 
   // ── Foto fashion / historia
   const fashionEl = document.getElementById('pv-fashion');
   if (fashionEl) {
     const url = await getPhotoURL(db, state.imgKeys.fashion);
-    fashionEl.src = url || PLACEHOLDER_FASHION;
+    fashionEl.src = url || guekaPhoto('fashion') || PLACEHOLDER_FASHION;
   }
 
   // ── Galería
@@ -2221,6 +2221,98 @@ function initIntersectionObserver() {
 }
 
 // ════════════════════════════════════════════════════════════════
+//  PUENTE CON EL EDITOR DE GUEKA IDEAS
+//  Orden de prioridad de los datos:
+//   1. window.GUEKA_DATA  → archivo descargado desde el editor
+//   2. #d=...             → enlace para compartir con los invitados
+//   3. ?preview=1         → vista previa en vivo dentro del editor
+//  Si no hay datos, se muestra la invitación de ejemplo.
+// ════════════════════════════════════════════════════════════════
+const GUEKA_PARAMS = new URLSearchParams(location.search);
+
+function decodeGuekaData(str) {
+  try {
+    const b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(decodeURIComponent(escape(atob(b64))));
+  } catch (e) { return null; }
+}
+
+function readGuekaData() {
+  if (window.GUEKA_DATA) return window.GUEKA_DATA;
+  const h = location.hash.match(/[#&]d=([^&]+)/);
+  if (h) return decodeGuekaData(h[1]);
+  if (GUEKA_PARAMS.has('preview')) {
+    try { return JSON.parse(localStorage.getItem('gueka_preview') || 'null'); }
+    catch (e) { return null; }
+  }
+  return null;
+}
+
+function guekaPhoto(key) {
+  return (state.photoUrls && state.photoUrls[key]) || '';
+}
+
+function applyGuekaData(d) {
+  const PLAN_MAP = { basic: 'classic', classic: 'classic', premium: 'premium', deluxe: 'deluxe' };
+  const TEXT_KEYS = ['name','caption','hashtag','historyText','date','time','venue','address','mapUrl',
+    'albumUrl','waOrganizer','rsvpPara','customTitle','customText','poem','signature'];
+  TEXT_KEYS.forEach(k => { if (typeof d[k] === 'string' && d[k] !== '') state[k] = d[k]; });
+  ['customTitle','customText','poem','signature'].forEach(k => { if (d[k] === '') state[k] = ''; });
+
+  if (d.plan && PLAN_MAP[d.plan]) state.plan = PLAN_MAP[d.plan];
+  if (typeof d.showSplash === 'boolean') state.showSplash = d.showSplash;
+  if (GUEKA_PARAMS.has('nosplash')) state.showSplash = false;
+  if (typeof d.showSongSuggest === 'boolean') state.songSuggestEnabled = d.showSongSuggest;
+  if (d.waOrganizer) state.songSuggestWa = d.waOrganizer;
+
+  ['itinerary','padrinos','dressCode','songs','gifts','extra'].forEach(k => {
+    if (Array.isArray(d[k])) state[k] = d[k].filter(Boolean).map(v => ({ v: String(v) }));
+  });
+
+  if (Array.isArray(d.gallery)) {
+    const g = d.gallery.filter(x => x && x.src);
+    if (g.length) {
+      GAL_IMGS.length = 0;
+      g.forEach(x => GAL_IMGS.push(x.src));
+      state.galCaptions = g.map(x => x.cap || '');
+    }
+  }
+
+  state.photoUrls = { retrato: d.retrato || '', fashion: d.fashion || '' };
+  document.title = 'XV Años · ' + state.name;
+}
+
+// Se ejecuta después del INIT original: colores, letras y secciones visibles
+function applyGuekaLook(d) {
+  const w = document.getElementById('card-wrapper');
+  if (!w) return;
+  const set = (k, v) => { if (v) w.style.setProperty(k, v); };
+  const c = d.colors || {};
+  set('--c-a', c.a); set('--c-b', c.b); set('--c-bg', c.bg);
+  set('--c-text', c.text); set('--c-d', c.text);
+  if (c.bg) document.body.style.background = c.bg;
+  const f = d.fonts || {};
+  set('--c-head', f.head); set('--c-script', f.script); set('--c-serif', f.body);
+
+  const hide = (id, cond) => { const el = document.getElementById(id); if (el && cond) el.style.display = 'none'; };
+  hide('rsvp-sec', d.showRsvp === false);
+  hide('venue-sec', d.showVenue === false);
+  hide('rsvp-qr-wrap', d.showQr === false);
+  hide('pv-album-sec', d.showAlbum === false);
+  hide('itin-sec', !state.itinerary.length);
+  hide('padr-sec', !state.padrinos.length);
+  hide('dress-sec', !state.dressCode.length);
+  hide('gifts-sec', !state.gifts.length);
+  hide('extra-sec', !state.extra.length);
+
+  const note = document.getElementById('pv-rsvp');
+  if (note && d.rsvpNote) note.textContent = d.rsvpNote;
+}
+
+const GUEKA = readGuekaData();
+if (GUEKA) applyGuekaData(GUEKA);
+
+// ════════════════════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
@@ -2262,6 +2354,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const name = sw.dataset.name;
     if (name) sw.setAttribute('title', name);
   });
+
+  if (GUEKA) applyGuekaLook(GUEKA);
 });
 </script>
 </body>
