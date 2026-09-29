@@ -388,24 +388,6 @@ box-shadow:0 18px 44px rgba(22,33,27,.28);overflow:hidden;transition:transform .
 .cta-trust{display:flex;gap:1.8rem;justify-content:center;flex-wrap:wrap;font-size:.6rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
 .cta-trust span{display:flex;align-items:center;gap:.5rem}
 .cta-trust span::before{content:"✦";color:var(--gold)}
-/* ============ BUYBAR (resumen de compra) ============ */
-.buybar{position:fixed;left:0;right:0;bottom:0;z-index:1550;background:rgba(30,77,56,.97);backdrop-filter:blur(12px);border-top:1px solid var(--gold);transform:translateY(110%);transition:transform .45s cubic-bezier(.2,.7,.2,1);box-shadow:0 -10px 30px rgba(22,33,27,.25)}
-.buybar.show{transform:none}
-.buybar-in{max-width:1240px;margin:0 auto;padding:.85rem clamp(1.2rem,4vw,2.4rem);display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap}
-.bb-info{display:flex;flex-direction:column;gap:.15rem;flex:1;min-width:190px}
-.bb-step{font-size:.5rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--gold2)}
-.bb-tpl{font-family:var(--fd);font-size:1.05rem;color:#fff}
-.bb-plan{font-size:.62rem;color:var(--mutd)}
-.bb-price{font-family:var(--fd);font-size:1.6rem;color:var(--gold2);white-space:nowrap}
-.bb-cta{display:inline-flex;align-items:center;gap:.5rem;background:var(--gold);color:var(--ink);border-radius:99px;padding:.85rem 1.7rem;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:.25s;white-space:nowrap}
-.bb-cta:hover{background:var(--gold2);transform:translateY(-2px)}
-.bb-cta.dis{opacity:.55;pointer-events:none}
-body.buy-on .floatwa{bottom:5.8rem}
-@media(max-width:640px){
-.bb-price{display:none}
-.buybar-in{gap:.8rem}
-.bb-cta{padding:.75rem 1.2rem;font-size:.62rem}
-}
 /* ============ TOAST ============ */
 .gk-toast{position:fixed;bottom:6.8rem;left:50%;transform:translate(-50%,16px);z-index:5000;background:var(--ink);color:#fff;border:1px solid var(--gold);border-radius:12px;padding:.9rem 1.5rem;font-size:.78rem;font-weight:500;box-shadow:var(--sh-lg);opacity:0;pointer-events:none;transition:.4s cubic-bezier(.2,.7,.2,1);max-width:92vw;text-align:center}
 .gk-toast.show{opacity:1;transform:translate(-50%,0)}
@@ -448,10 +430,8 @@ transition:transform .35s cubic-bezier(.2,.7,.2,1);
 }
 .mwa-bar svg{width:19px;height:19px;fill:#fff;flex-shrink:0}
 .mwa-bar.hide{transform:translateY(110%)}
-body.buy-on .mwa-bar{transform:translateY(110%)}
 .floatwa{display:none}
 body{padding-bottom:calc(3.6rem + env(safe-area-inset-bottom))}
-body.buy-on{padding-bottom:0}
 }
 @media(max-width:1080px){
 .hero-grid{grid-template-columns:1fr;gap:3.5rem}
@@ -538,7 +518,6 @@ footer{padding:2.8rem 0 1.4rem}
 .floatwa{width:50px;height:50px;bottom:1.1rem;right:1.1rem}
 .floatwa svg{width:22px;height:22px}
 .gk-toast{bottom:5.6rem;font-size:.72rem;padding:.75rem 1.2rem}
-body.buy-on .floatwa{bottom:5.2rem}
 }
 @media(max-width:400px){
 .hero-h1{font-size:2.15rem}
@@ -878,18 +857,6 @@ Solicitar por WhatsApp
 <div class="cta-trust"><span>Entrega en 24 h</span><span>2 correcciones incluidas</span><span>Sin límite de envíos</span></div>
 </div>
 </section>
-<!-- ============ BUYBAR — PASO 4 ============ -->
-<div class="buybar" id="buybar" aria-live="polite">
-<div class="buybar-in">
-<div class="bb-info">
-<span class="bb-step" id="bbStep">Paso 2 · Plantilla seleccionada</span>
-<span class="bb-tpl" id="bbTpl">—</span>
-<span class="bb-plan" id="bbPlan">Falta: elige tu plan ↓</span>
-</div>
-<div class="bb-price" id="bbPrice"></div>
-<a class="bb-cta dis" id="bbCta" href="#planes">Elige tu plan ↓</a>
-</div>
-</div>
 <!-- ============ FOOTER ============ -->
 <footer>
 <div class="wrap">
@@ -1065,13 +1032,13 @@ function selectTemplate(i){
 var c=CARDS[i]; if(!c) return;
 cartSet('template',{cat:'quince',slug:'xv-'+i,name:c.name});
 $$('.wcard').forEach(function(w,k){ w.classList.toggle('sel',k===i); });
-syncFunnel(); syncBuybar();
+syncFunnel();
 gkToast('✦ Plantilla <b>'+c.name+'</b> seleccionada · ahora elige tu plan ↓');
 }
 function selectPlan(k){
 var p=GUEKA_PLANS[k]; if(!p) return;
 cartSet('plan',k);
-syncPlansUI(); syncFunnel(); syncBuybar();
+syncPlansUI(); syncFunnel();
 var c=cartGet();
 if(c.template&&c.template.cat==='quince'){
 gkToast('✦ Plan <b>'+p.name+'</b> · $'+p.price.toLocaleString('es-CO')+' COP · ¡completa tu compra abajo!');
@@ -1105,37 +1072,6 @@ if(lbl){
 if(!tpl) lbl.textContent='Paso 2 de 4 · Elige tu plantilla';
 else if(!plan) lbl.textContent='Paso 3 de 4 · Elige tu plan';
 else lbl.textContent='Paso 4 de 4 · Completa tu pago';
-}
-}
-function syncBuybar(){
-var c=cartGet();
-var bar=$('#buybar'); if(!bar) return;
-var tpl=(c.template&&c.template.cat==='quince')?c.template:null;
-var plan=c.plan?GUEKA_PLANS[c.plan]:null;
-document.body.classList.toggle('buy-on',!!tpl);
-bar.classList.toggle('show',!!tpl);
-$('#bbStep').textContent=plan?'Paso 4 · Completa tu pago':'Paso 2 · Plantilla seleccionada';
-$('#bbTpl').textContent=tpl?('Plantilla: '+tpl.name+' · 15 Años'):'—';
-$('#bbPlan').textContent=plan?('Plan '+plan.name+' · '+plan.label+' · Galería '+plan.maxGal+' fotos'):'Falta: elige tu plan ↓';
-$('#bbPrice').textContent=plan?('$'+plan.price.toLocaleString('es-CO')+' COP'):'';
-var cta=$('#bbCta');
-if(tpl&&plan){
-cta.classList.remove('dis');
-cta.setAttribute('target','_blank');
-cta.setAttribute('rel','noreferrer');
-var msg='Hola, quiero completar mi compra ✦\n'+
-'· Categoría: 15 Años\n'+
-'· Plantilla: '+tpl.name+'\n'+
-'· Plan: '+plan.name+' ('+plan.label+')\n'+
-'· Total: $'+plan.price.toLocaleString('es-CO')+' COP\n\n'+
-'¿Me indicas los datos de pago (Nequi / Daviplata / PSE)?';
-cta.href='https://wa.me/573242712162?text='+encodeURIComponent(msg);
-cta.textContent='Completar compra ✦';
-}else{
-cta.classList.add('dis');
-cta.removeAttribute('target');
-cta.href=tpl?'#planes':'#disenos';
-cta.textContent=tpl?'Elige tu plan ↓':'Elige una plantilla ↑';
 }
 }
 /* ═══ GALERÍA — 12 tarjetas ═══ */
@@ -1247,7 +1183,7 @@ if(!isNaN(idx)&&idx>=0&&idx<CARDS.length){
 $$('.wcard').forEach(function(w,k){ w.classList.toggle('sel',k===idx); });
 }
 }
-syncPlansUI(); syncFunnel(); syncBuybar();
+syncPlansUI(); syncFunnel();
 })();
 /* incluye — dotted leader list */
 var features=[
