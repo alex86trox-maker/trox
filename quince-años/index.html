@@ -568,6 +568,25 @@ h2{font-size:1.65rem}
 .wedit:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(184,137,74,.35)}
 .wedit-sec{display:flex;align-items:center;justify-content:center;gap:.35rem;padding:.65rem .6rem;text-align:center;border-radius:999px;border:1px solid var(--green);color:var(--green);font-weight:600;font-size:.72rem;letter-spacing:.04em;text-decoration:none;transition:transform .2s,background .2s,color .2s;cursor:pointer;white-space:nowrap}
 .wedit-sec:hover{background:var(--green);color:#fff;transform:translateY(-2px)}
+/* ═══ MOBILE FIXES — legibilidad al sol + áreas táctiles ampliadas ═══ */
+@media(max-width:640px){
+/* 1) Contraste: textos secundarios más oscuros sobre fondo claro y más claros sobre fondo oscuro */
+:root{--mut:#3f4b44;--faint:#56635b;--mutd:rgba(250,251,249,.92)}
+.wdate{color:#f1dfae;font-size:.5rem;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.wfoot{color:#ecd9a4;font-size:.46rem}
+.hcard-date{color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.55)}
+.hcard-url{color:rgba(255,255,255,.95)}
+.hcard-eyebrow{color:#e6cf9a}
+.wchip .pl{color:var(--mut);font-weight:700}
+.wchip .gal-n{color:#7a5f22;font-weight:700}
+.wplans,.crumb,.hstat small,.stage-cap,.hcd .c small,.plan-deliv,.cta-trust,.fm-label{color:var(--mut)}
+.plan.feat .plan-deliv,.plan.feat .plan-new small{color:var(--mutd)}
+/* 2) Áreas de contacto ampliadas (mínimo 48px de alto) */
+.wedit,.wedit-sec{min-height:48px;padding:.85rem .8rem;font-size:.74rem}
+.wrsvp{position:relative;min-height:26px;display:flex;align-items:center;justify-content:center;padding:.5rem .3rem;font-size:.5rem}
+.wrsvp::after{content:"";position:absolute;inset:-12px -8px}
+.hcard-btn{min-height:48px;padding:.95rem 1rem;font-size:.66rem}
+}
 </style>
 </head>
 <body>
@@ -676,7 +695,7 @@ h2{font-size:1.65rem}
 <div class="stack" id="stack">
 <div class="env"></div>
 <div class="hcard">
-<img src="https://image.qwenlm.ai/public_source/9a965b8a-caf8-4a45-bb09-dce792791ca0/1b63f119a-3f2b-43b9-8945-69504522c9c0.png" alt="Invitación de quince años">
+<img src="img-15/xv-01-560.webp" srcset="img-15/xv-01-560.webp 560w, img-15/xv-01-1024.webp 1024w" sizes="(max-width:640px) 72vw, 340px" width="560" height="560" fetchpriority="high" decoding="async" alt="Invitación de quince años">
 <div class="hcard-in">
 <div class="hcard-eyebrow">Mis XV Años · Quinceañera</div>
 <div class="hcard-names">Valentina<span class="amp">Ríos</span></div>
@@ -1123,7 +1142,17 @@ cta.textContent=tpl?'Elige tu plan ↓':'Elige una plantilla ↑';
 /* Editor: cada plantilla abre editor.html?style=<id> */
 var EDITOR_URL='https://alex86trox-maker.github.io/trox/editor/';
 function editorLink(c){return EDITOR_URL+'?cat=quince&style='+encodeURIComponent(c.slug);}
-var BASE='https://image.qwenlm.ai/public_source/9a965b8a-caf8-4a45-bb09-dce792791ca0/';
+/* Imágenes optimizadas (WebP): 560px para móvil, 1024px para pantallas grandes */
+function imgUrl(i,w){ return 'img-15/xv-'+(i<9?'0':'')+(i+1)+'-'+w+'.webp'; }
+/* Quita el skeleton cuando la imagen carga (o falla, para no dejar el hueco en shimmer) */
+function markLoaded(img){
+if(!img) return;
+var box=img.parentNode;
+function done(){ box.classList.add('loaded'); }
+if(img.complete){ done(); return; }
+img.addEventListener('load',done);
+img.addEventListener('error',done);
+}
 var CARDS=[
 {id:'rosa-romantica', slug:'15-años-vals-de-ensueno', name:'Vals de Ensueño',    img:'16390c866-cf9c-4673-b634-bc757d72bf2d.png', quince:'Valentina Ríos',   date:'15 · Mar · 2027', badge:'Más Popular', tag:'Romántico'},
 {id:'xv-neon-rosa', slug:'15-años-princesa-neon', name:'Princesa Neón',      img:'169abf264-8e77-4601-a1f7-186006cf7708.png', quince:'Isabella Torres',  date:'22 · Abr · 2027', badge:'Nuevo',       tag:'Neón'},
@@ -1160,7 +1189,7 @@ el.innerHTML=
 '<a class="wphone" href="'+editorLink(c)+'" title="Personalizar '+c.name+' en el Editor">'+
 '<div class="wnotch"></div>'+
 '<div class="wscr">'+
-'<img src="'+BASE+c.img+'" alt="'+c.name+'" loading="lazy">'+
+'<img src="'+imgUrl(i,560)+'" srcset="'+imgUrl(i,560)+' 560w, '+imgUrl(i,1024)+' 1024w" sizes="(max-width:768px) 46vw, (max-width:1100px) 30vw, 22vw" width="560" height="560" alt="'+c.name+'" loading="'+(i<2?'eager':'lazy')+'" decoding="async">'+
 '<div class="wcontent">'+
 '<div class="wmono">G</div>'+
 '<div class="whr"></div>'+
@@ -1178,7 +1207,8 @@ el.innerHTML=
 '<div class="wfootrow"><span class="wplans">'+c.tag+' · 3 planes</span><span class="warr" aria-hidden="true">→</span></div>'+
 '<a class="wedit" href="'+editorLink(c)+'">Personalizar · Abrir en el Editor →</a>'+
 '</div>';
-el.addEventListener('click',function(){ selectTemplate(i); });
+markLoaded(el.querySelector('.wscr img'));
+	el.addEventListener('click',function(){ selectTemplate(i); });
 $$('a[href^="'+EDITOR_URL+'"]',el).forEach(function(a){a.addEventListener('click',function(e){e.stopPropagation();cartSet('template',{cat:'quince',slug:'xv-'+i,name:c.name,style:c.id});});});
 var cons=el.querySelector('.wcons');
 if(cons){
