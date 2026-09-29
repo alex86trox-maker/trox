@@ -895,7 +895,6 @@ Familia García Montoya</textarea></div>
 </div><!-- /workspace -->
 
 <!-- ═══ STYLES DRAWER ══════════════════════════════ -->
-<!-- CORRECCIÓN: el cajón empieza CERRADO (sin la clase "open"); solo se abre al pulsar el selector de estilo -->
 <div class="styles-overlay" id="styles-overlay">
   <div class="styles-drawer">
     <div class="sd-header">
@@ -1257,16 +1256,11 @@ function setPlan(p){
 }
 
 function updateSectionLocks(){
-  // sec 9-12 = premium, 13-16 = deluxe
   const secPlan = {9:'premium',10:'premium',11:'premium',12:'premium',13:'deluxe',14:'deluxe',15:'deluxe',16:'deluxe',17:'deluxe',18:'deluxe'};
   Object.entries(secPlan).forEach(([n,plan])=>{
     const lock = document.getElementById('lock-sec-'+n);
     if(!lock) return;
-    if(canAccess(plan)){
-      lock.style.display='none';
-    } else {
-      lock.style.display='inline-flex';
-    }
+    lock.style.display = canAccess(plan) ? 'none' : 'inline-flex';
   });
 }
 
@@ -1362,8 +1356,7 @@ function renderAllLists(){
 function toggleSec(id){
   const el=document.getElementById(id);
   if(!el)return;
-  const isOpen=el.classList.contains('open');
-  el.classList.toggle('open',!isOpen);
+  el.classList.toggle('open',!el.classList.contains('open'));
 }
 
 // ════════════════════════════════════════════════════════
@@ -1418,7 +1411,6 @@ function renderStylesGrid(){
 
   if(!filtered.length){wrap.innerHTML='<div class="sd-empty">Sin resultados. Intenta otra búsqueda.</div>';return;}
 
-  // Group by category when showing 'all'
   let html='';
   if(activeCat==='all'){
     CATS.filter(c=>c.id!=='all').forEach(cat=>{
@@ -1444,7 +1436,7 @@ function styleCardHtml(s){
 }
 
 // ════════════════════════════════════════════════════════
-//  PALETAS PROFESIONALES (reemplazan los colores libres)
+//  PALETAS PROFESIONALES
 //  a: acento · b: metálico · bg: fondo · bg2: fondo base · text: texto
 // ════════════════════════════════════════════════════════
 const PALETTES=[
@@ -1487,9 +1479,7 @@ function applyPalette(id){
 }
 
 // ════════════════════════════════════════════════════════
-//  TIPOGRAFÍAS (5 combinaciones + edición por tipo de texto)
-//  name: nombre principal · script: títulos de sección
-//  head: subtítulos, botones y números · body: párrafos y listas
+//  TIPOGRAFÍAS
 // ════════════════════════════════════════════════════════
 const FONT_OPTIONS=[
   {v:"'Sacramento',cursive",l:'Sacramento (manuscrita)'},
@@ -1553,7 +1543,6 @@ function renderFonts(){
     </button>`;
   }).join('');
   list.querySelectorAll('[data-fc]').forEach(b=>b.addEventListener('click',()=>applyFontCombo(b.dataset.fc)));
-  // Selectores por tipo de texto (incluye la letra actual aunque no esté en la lista)
   roles.innerHTML=`<div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--e-mut);margin:4px 0 8px;">Personalizar cada texto</div>`+
     FONT_ROLES.map(r=>{
       const val=cur[r.k];
@@ -1633,7 +1622,9 @@ function applyFx(id){
   showToast('Efecto "'+o.name+'" aplicado');
 }
 
-// Esta función se copia dentro de la invitación generada (se serializa con toString)
+// Esta función se copia dentro de la invitación generada (se serializa con toString).
+// Las partículas se dibujan en un lienzo ADELANTE del contenido (ver z-index del canvas)
+// y con más tamaño/opacidad para que se noten sobre las secciones.
 function gkFx(cfg){
   var c=document.getElementById('particle-canvas');
   if(!c||!c.getContext)return;
@@ -1642,18 +1633,18 @@ function gkFx(cfg){
   size();window.addEventListener('resize',size);
   var A=cfg.a,B=cfg.b,type=cfg.type;
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var base={fl:14,st:28,pe:16,bu:14,di:14,orig:22}[type]||18;
-  var n=Math.max(4,Math.round(base*cfg.k*(reduce?.4:1)));
+  var base={fl:20,st:40,pe:22,bu:18,di:18,orig:28}[type]||22;
+  var n=Math.max(6,Math.round(base*cfg.k*(reduce?.4:1)));
   var TAU=Math.PI*2;
   function rnd(a,b){return a+Math.random()*(b-a);}
   function make(initial){
     var p={x:rnd(0,W),y:rnd(0,H),s:0,vx:0,vy:0,r:rnd(0,TAU),vr:rnd(-.015,.015),ph:rnd(0,TAU),al:0,col:Math.random()<.55?A:B};
-    if(type==='fl'){p.s=rnd(4,8);p.vy=rnd(.35,.75);p.al=rnd(.35,.6);if(!initial)p.y=-20;}
-    else if(type==='pe'){p.s=rnd(5,9);p.vy=rnd(.4,.85);p.al=rnd(.35,.6);p.vr=rnd(-.03,.03);if(!initial)p.y=-20;}
-    else if(type==='st'){p.s=rnd(1.4,3.6);p.vx=rnd(-.06,.06);p.vy=rnd(-.06,.06);p.al=rnd(.35,.85);p.col=Math.random()<.7?B:'255,255,255';}
-    else if(type==='bu'){p.s=rnd(4,13);p.vy=-rnd(.3,.65);p.al=rnd(.3,.55);if(!initial)p.y=H+20;}
-    else if(type==='di'){p.s=rnd(3,6.5);p.vy=rnd(.3,.65);p.al=rnd(.45,.75);if(!initial)p.y=-20;}
-    else{p.s=rnd(2,6);p.vx=rnd(-.12,.12);p.vy=-rnd(.12,.47);p.al=rnd(.08,.43);p.t=Math.random()>.5?'b':'s';if(!initial)p.y=H+20;}
+    if(type==='fl'){p.s=rnd(6,12);p.vy=rnd(.5,1);p.al=rnd(.7,1);if(!initial)p.y=-20;}
+    else if(type==='pe'){p.s=rnd(7,13);p.vy=rnd(.55,1.1);p.al=rnd(.7,1);p.vr=rnd(-.03,.03);if(!initial)p.y=-20;}
+    else if(type==='st'){p.s=rnd(2,4.6);p.vx=rnd(-.08,.08);p.vy=rnd(-.08,.08);p.al=rnd(.6,1);p.col=Math.random()<.7?B:'255,255,255';}
+    else if(type==='bu'){p.s=rnd(6,18);p.vy=-rnd(.4,.8);p.al=rnd(.6,.95);if(!initial)p.y=H+20;}
+    else if(type==='di'){p.s=rnd(4,8);p.vy=rnd(.4,.8);p.al=rnd(.7,1);if(!initial)p.y=-20;}
+    else{p.s=rnd(3,8);p.vx=rnd(-.15,.15);p.vy=-rnd(.2,.6);p.al=rnd(.45,.9);p.t=Math.random()>.5?'b':'s';if(!initial)p.y=H+20;}
     return p;
   }
   var ps=[],i;
@@ -1668,46 +1659,47 @@ function gkFx(cfg){
   }
   var draw={
     fl:function(p){
-      ctx.rotate(p.r);ctx.fillStyle=rgba(p.col,.85);
+      ctx.rotate(p.r);ctx.fillStyle=rgba(p.col,.95);
       for(var k=0;k<5;k++){ctx.rotate(TAU/5);ctx.beginPath();ctx.ellipse(0,-p.s*.75,p.s*.42,p.s*.75,0,0,TAU);ctx.fill();}
-      ctx.beginPath();ctx.arc(0,0,p.s*.3,0,TAU);ctx.fillStyle=rgba(B,.95);ctx.fill();
+      ctx.beginPath();ctx.arc(0,0,p.s*.3,0,TAU);ctx.fillStyle=rgba(B,1);ctx.fill();
     },
     pe:function(p){
       ctx.rotate(p.r);ctx.scale(Math.cos(t*.03+p.ph),1);
       var s=p.s;ctx.beginPath();ctx.moveTo(0,-s);
       ctx.bezierCurveTo(s*.9,-s*.6,s*.7,s*.7,0,s);ctx.bezierCurveTo(-s*.7,s*.7,-s*.9,-s*.6,0,-s);
-      var g=ctx.createLinearGradient(0,-s,0,s);g.addColorStop(0,rgba(p.col,.95));g.addColorStop(1,rgba(p.col,.45));
+      var g=ctx.createLinearGradient(0,-s,0,s);g.addColorStop(0,rgba(p.col,1));g.addColorStop(1,rgba(p.col,.6));
       ctx.fillStyle=g;ctx.fill();
     },
     st:function(p){
-      ctx.globalAlpha=p.al*(.35+.65*Math.abs(Math.sin(t*.025+p.ph)));
-      ctx.beginPath();ctx.arc(0,0,p.s*1.6,0,TAU);ctx.fillStyle=rgba(p.col,.12);ctx.fill();
-      sparkle(p.s,rgba(p.col,.95));
+      ctx.globalAlpha=p.al*(.4+.6*Math.abs(Math.sin(t*.025+p.ph)));
+      ctx.beginPath();ctx.arc(0,0,p.s*2,0,TAU);ctx.fillStyle=rgba(p.col,.2);ctx.fill();
+      sparkle(p.s,rgba(p.col,1));
     },
     bu:function(p){
       var g=ctx.createRadialGradient(-p.s*.3,-p.s*.3,0,0,0,p.s);
-      g.addColorStop(0,'rgba(255,255,255,.18)');g.addColorStop(1,rgba(p.col,.14));
+      g.addColorStop(0,'rgba(255,255,255,.3)');g.addColorStop(1,rgba(p.col,.22));
       ctx.beginPath();ctx.arc(0,0,p.s,0,TAU);ctx.fillStyle=g;ctx.fill();
-      ctx.lineWidth=.8;ctx.strokeStyle=rgba(p.col,.7);ctx.stroke();
-      ctx.beginPath();ctx.arc(-p.s*.35,-p.s*.35,p.s*.22,0,TAU);ctx.fillStyle='rgba(255,255,255,.7)';ctx.fill();
+      ctx.lineWidth=1.2;ctx.strokeStyle=rgba(p.col,.9);ctx.stroke();
+      ctx.beginPath();ctx.arc(-p.s*.35,-p.s*.35,p.s*.22,0,TAU);ctx.fillStyle='rgba(255,255,255,.85)';ctx.fill();
     },
     di:function(p){
       var s=p.s;ctx.rotate(Math.sin(t*.01+p.ph)*.35);
       ctx.beginPath();ctx.moveTo(-s,-s*.35);ctx.lineTo(-s*.5,-s);ctx.lineTo(s*.5,-s);ctx.lineTo(s,-s*.35);ctx.lineTo(0,s*1.2);ctx.closePath();
-      ctx.fillStyle='rgba(255,255,255,.14)';ctx.fill();
-      ctx.lineWidth=.7;ctx.strokeStyle=rgba(B,.9);ctx.stroke();
+      ctx.fillStyle=rgba(B,.35);ctx.fill();
+      ctx.lineWidth=1;ctx.strokeStyle=rgba(B,1);ctx.stroke();
       ctx.beginPath();ctx.moveTo(-s,-s*.35);ctx.lineTo(s,-s*.35);ctx.moveTo(-s*.5,-s);ctx.lineTo(-s*.2,-s*.35);ctx.lineTo(0,s*1.2);ctx.lineTo(s*.2,-s*.35);ctx.lineTo(s*.5,-s);
-      ctx.strokeStyle=rgba(B,.5);ctx.stroke();
+      ctx.strokeStyle=rgba('255,255,255',.6);ctx.stroke();
       var glint=Math.sin(t*.04+p.ph);
-      if(glint>.9){ctx.globalAlpha=(glint-.9)*10;ctx.translate(s*.4,-s*.6);sparkle(s*.45,'rgba(255,255,255,.95)');}
+      if(glint>.85){ctx.globalAlpha=Math.min(1,(glint-.85)*7);ctx.translate(s*.4,-s*.6);sparkle(s*.55,'rgba(255,255,255,1)');}
     },
     orig:function(p){
       if(p.t==='b'){
-        ctx.beginPath();ctx.ellipse(-p.s*1.2,-p.s*.5,p.s*1.4,p.s*.9,-.4,0,TAU);ctx.fillStyle=rgba(A,.6);ctx.fill();
-        ctx.beginPath();ctx.ellipse(p.s*1.2,-p.s*.5,p.s*1.4,p.s*.9,.4,0,TAU);ctx.fill();
-        ctx.beginPath();ctx.ellipse(0,0,p.s*.2,p.s*.9,0,0,TAU);ctx.fillStyle=rgba(B,.75);ctx.fill();
+        var flap=1+Math.sin(t*.12+p.ph)*.35;
+        ctx.beginPath();ctx.ellipse(-p.s*1.2,-p.s*.5,p.s*1.4*flap,p.s*.9,-.4,0,TAU);ctx.fillStyle=rgba(A,.9);ctx.fill();
+        ctx.beginPath();ctx.ellipse(p.s*1.2,-p.s*.5,p.s*1.4*flap,p.s*.9,.4,0,TAU);ctx.fill();
+        ctx.beginPath();ctx.ellipse(0,0,p.s*.2,p.s*.9,0,0,TAU);ctx.fillStyle=rgba(B,1);ctx.fill();
       }else{
-        ctx.font=(p.s*2)+'px serif';ctx.fillStyle=rgba(B,.65);ctx.fillText('✦',0,0);
+        ctx.font=(p.s*3)+'px serif';ctx.fillStyle=rgba(B,.95);ctx.fillText('\u2726',0,0);
       }
     }
   };
@@ -1724,13 +1716,13 @@ function gkFx(cfg){
     if(out||p.x<-30||p.x>W+30){var np=make(false);for(var key in np)p[key]=np[key];}
   }
   function drawShoot(){
-    if(!shoot&&Math.random()<.004)shoot={x:rnd(W*.3,W),y:rnd(0,H*.35),l:0};
+    if(!shoot&&Math.random()<.006)shoot={x:rnd(W*.3,W),y:rnd(0,H*.35),l:0};
     if(!shoot)return;
     shoot.l++;
     var prog=shoot.l/55,x=shoot.x-shoot.l*6,y=shoot.y+shoot.l*3;
     var g=ctx.createLinearGradient(x,y,x+60,y-30);
-    g.addColorStop(0,rgba(B,.8*(1-prog)));g.addColorStop(1,rgba(B,0));
-    ctx.strokeStyle=g;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+60,y-30);ctx.stroke();
+    g.addColorStop(0,rgba(B,1*(1-prog)));g.addColorStop(1,rgba(B,0));
+    ctx.strokeStyle=g;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+60,y-30);ctx.stroke();
     if(shoot.l>55)shoot=null;
   }
   function tick(){
@@ -1749,7 +1741,6 @@ function selectStyle(id){
   const s=STYLES.find(x=>x.id===id);
   if(!s) return;
   activeStyle=s;
-  // sync color pickers
   document.getElementById('fc-a').value=s.colors.a;
   document.getElementById('fc-b').value=s.colors.b;
   document.getElementById('fc-bg').value=s.colors.bg;
@@ -1757,12 +1748,8 @@ function selectStyle(id){
   document.getElementById('fc-text').value=s.colors.text;
   activePalette='original';renderPalettes();
   activeFontCombo='original';customFonts=null;renderFonts();
-  // update trigger label
   document.getElementById('style-trigger-name').textContent=s.name;
   document.getElementById('style-trigger-thumb').innerHTML=makeSwatchHtml(s.colors,s.cat);
-  // si el estilo pertenece a una categoría distinta a la anterior, actualiza
-  // los textos y ejemplos (foto, historia, itinerario, regalos…) para que
-  // la invitación generada haga sentido con la nueva categoría
   const catChanged=s.cat!==lastAppliedCat;
   if(catChanged) applyCategoryDefaults(s.cat);
   closeStylesDrawer();
@@ -1861,7 +1848,8 @@ function genHTML(state){
 html{scroll-behavior:smooth;}
 body{background:${c.bg2};font-family:${f.body};color:${c.text};overflow-x:hidden;min-height:100vh;}
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:${c.bg2};}::-webkit-scrollbar-thumb{background:rgba(${ra},.3);border-radius:2px;}
-#particle-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
+/* Las partículas van POR DELANTE del contenido (z-index 900 > card-wrapper 10) pero debajo del splash (1000) y de los controles flotantes; no bloquean clics */
+#particle-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:900;}
 /* SPLASH */
 ${state.showSplash?`
 #splash{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:${c.bg2};text-align:center;transition:opacity .8s ease,visibility .8s;}
@@ -2002,8 +1990,8 @@ section.visible .sec-sub{transition-delay:.1s;}
 section.visible .card,section.visible .gal-wrap,section.visible .two-col{transition-delay:.14s;}
 section.visible .cd-display{transition-delay:.1s;}
 section.visible .sec-div,section.visible .sec-sub,section.visible .card,section.visible .gal-wrap,section.visible .two-col,section.visible .cd-display{opacity:1;transform:translateY(0);}
-/* BACK TO TOP */
-#btt{position:fixed;bottom:1.4rem;right:1.4rem;z-index:200;width:42px;height:42px;border-radius:50%;background:rgba(${rbg2},.9);border:1px solid rgba(${rb},.45);color:${c.b};font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 2px 14px rgba(0,0,0,.45);}
+/* BACK TO TOP (por encima de las partículas) */
+#btt{position:fixed;bottom:1.4rem;right:1.4rem;z-index:950;width:42px;height:42px;border-radius:50%;background:rgba(${rbg2},.9);border:1px solid rgba(${rb},.45);color:${c.b};font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 2px 14px rgba(0,0,0,.45);}
 @media(max-width:480px){section{padding:2.5rem 1.2rem;}.card{padding:1rem;}}
 </style></head><body>
 <canvas id="particle-canvas"></canvas>
@@ -2398,7 +2386,6 @@ function downloadCard(){
   const folder=realTemplateFolder();
   const fileName='tarjeta_xv_'+(state.name.replace(/\s+/g,'_').toLowerCase())+'.html';
   if(folder){
-    // Descarga la invitación real con los datos del cliente incluidos
     fetch(folder,{cache:'no-store'})
       .then(r=>{if(!r.ok)throw new Error(r.status);return r.text();})
       .then(html=>{
@@ -2458,13 +2445,12 @@ function saveRealPreview(state){
   catch(e){showToast('No se pudo guardar la vista previa');}
 }
 
-
 // Marca de agua para estilos generados (no tienen carpeta propia)
-const GK_GUARD="<!-- ═══ GUEKA · PROTECCIÓN (marca de agua + anticopia) ═══ -->\n<style id=\"gueka-guard-css\">\nbody.gk-guard{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}\nbody.gk-guard img{-webkit-user-drag:none;user-drag:none;pointer-events:auto}\nbody.gk-guard input,body.gk-guard textarea{-webkit-user-select:text;user-select:text}\n#gk-wm{position:fixed;inset:0;z-index:2147483646;pointer-events:none;\nbackground-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='190'%3E%3Cg transform='rotate(-28 130 95)' fill='rgba(255,255,255,.34)' stroke='rgba(0,0,0,.18)' stroke-width='.6' font-family='Georgia,serif' text-anchor='middle'%3E%3Ctext x='130' y='92' font-size='24' font-weight='700' letter-spacing='4'%3EMUESTRA%3C/text%3E%3Ctext x='130' y='116' font-size='12' letter-spacing='3'%3EGUEKA IDEAS%3C/text%3E%3C/g%3E%3C/svg%3E\");\nbackground-repeat:repeat}\n#gk-wm-badge{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:2147483647;pointer-events:none;\nbackground:rgba(22,33,27,.82);color:#f3e7c7;font:600 11px/1.3 system-ui,sans-serif;letter-spacing:.08em;\npadding:7px 14px;border-radius:99px;border:1px solid rgba(184,155,94,.6);white-space:nowrap}\n@media print{body.gk-guard>*{display:none!important}body.gk-guard::after{content:\"Impresión no disponible · Gueka Ideas\";display:block;padding:40px;font:16px system-ui}}\n</style>\n<script id=\"gueka-guard-js\">\n(function(){\n  var qs=new URLSearchParams(location.search);\n  var isPreview=true;\n  document.body.classList.add('gk-guard');\n  // Anticopia: clic derecho, arrastrar imágenes, copiar y atajos de guardar/imprimir/ver código\n  var stop=function(e){var t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;e.preventDefault();};\n  ['contextmenu','dragstart','copy','cut','selectstart'].forEach(function(ev){document.addEventListener(ev,stop,true);});\n  document.addEventListener('keydown',function(e){\n    var k=(e.key||'').toLowerCase();\n    if((e.ctrlKey||e.metaKey)&&['s','p','u','c'].indexOf(k)>-1){e.preventDefault();}\n    if(k==='f12'||((e.ctrlKey||e.metaKey)&&e.shiftKey&&['i','j','c'].indexOf(k)>-1)){e.preventDefault();}\n  },true);\n  // Marca de agua en la vista previa del editor\n  if(isPreview){\n    var wm=document.createElement('div');wm.id='gk-wm';document.body.appendChild(wm);\n    var b=document.createElement('div');b.id='gk-wm-badge';b.textContent='VISTA PREVIA · SIN PAGAR';document.body.appendChild(b);\n  }\n})();\n<\/script>\n";
+const GK_GUARD="<!-- ═══ GUEKA · PROTECCIÓN (marca de agua + anticopia) ═══ -->\n<style id=\"gueka-guard-css\">\nbody.gk-guard{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}\nbody.gk-guard img{-webkit-user-drag:none;user-drag:none;pointer-events:auto}\nbody.gk-guard input,body.gk-guard textarea{-webkit-user-select:text;user-select:text}\n#gk-wm{position:fixed;inset:0;z-index:2147483646;pointer-events:none;\nbackground-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='190'%3E%3Cg transform='rotate(-28 130 95)' fill='rgba(255,255,255,.34)' stroke='rgba(0,0,0,.18)' stroke-width='.6' font-family='Georgia,serif' text-anchor='middle'%3E%3Ctext x='130' y='92' font-size='24' font-weight='700' letter-spacing='4'%3EMUESTRA%3C/text%3E%3Ctext x='130' y='116' font-size='12' letter-spacing='3'%3EGUEKA IDEAS%3C/text%3E%3C/g%3E%3C/svg%3E\");\nbackground-repeat:repeat}\n#gk-wm-badge{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:2147483647;pointer-events:none;\nbackground:rgba(22,33,27,.82);color:#f3e7c7;font:600 11px/1.3 system-ui,sans-serif;letter-spacing:.08em;\npadding:7px 14px;border-radius:99px;border:1px solid rgba(184,155,94,.6);white-space:nowrap}\n@media print{body.gk-guard>*{display:none!important}body.gk-guard::after{content:\"Impresión no disponible · Gueka Ideas\";display:block;padding:40px;font:16px system-ui}}\n</style>\n<script id=\"gueka-guard-js\">\n(function(){\n  var isPreview=true;\n  document.body.classList.add('gk-guard');\n  var stop=function(e){var t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;e.preventDefault();};\n  ['contextmenu','dragstart','copy','cut','selectstart'].forEach(function(ev){document.addEventListener(ev,stop,true);});\n  document.addEventListener('keydown',function(e){\n    var k=(e.key||'').toLowerCase();\n    if((e.ctrlKey||e.metaKey)&&['s','p','u','c'].indexOf(k)>-1){e.preventDefault();}\n    if(k==='f12'||((e.ctrlKey||e.metaKey)&&e.shiftKey&&['i','j','c'].indexOf(k)>-1)){e.preventDefault();}\n  },true);\n  if(isPreview){\n    var wm=document.createElement('div');wm.id='gk-wm';document.body.appendChild(wm);\n    var b=document.createElement('div');b.id='gk-wm-badge';b.textContent='VISTA PREVIA · SIN PAGAR';document.body.appendChild(b);\n  }\n})();\n<\/script>\n";
 function withWatermark(html){const i=html.lastIndexOf("</body>");return i<0?html+GK_GUARD:html.slice(0,i)+GK_GUARD+html.slice(i);}
-// Enlace para compartir: la carpeta + los datos en la dirección (#d=...)
+
+// Pedido por WhatsApp: solo se envían los datos de la compra
 function shareLink(){
-  // Only order details go to WhatsApp; the guests' link is delivered after payment.
   const PLANS={basic:['Básico','$80.000'],premium:['Premium','$140.000'],deluxe:['Deluxe','$200.000']};
   const p=PLANS[activePlan]||PLANS.basic;
   const style=document.getElementById('style-trigger-name').textContent.trim();
@@ -2508,7 +2494,6 @@ function switchMobileTab(tab){
     preview.classList.add('mobile-show');
     tabEditor.classList.remove('active');
     tabPreview.classList.add('active');
-    // trigger a preview update when switching to preview tab
     schedulePv(0);
   }
 }
@@ -2685,47 +2670,12 @@ renderFonts();
 renderFx();
 // Asegura que el cajón de estilos quede cerrado al cargar o refrescar la página
 closeStylesDrawer();
-// On mobile, start on editor tab (hide preview by default)
 if(window.innerWidth<=768){
   const preview=document.querySelector('.preview-wrap');
-  if(preview) preview.classList.remove('mobile-show'); // ensure hidden
+  if(preview) preview.classList.remove('mobile-show');
 }
 initZoomDisplay();
 setTimeout(()=>updatePv(),120);
 </script>
-<!-- ═══ GUEKA · PROTECCIÓN (marca de agua + anticopia) ═══ -->
-<style id="gueka-guard-css">
-body.gk-guard{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-body.gk-guard img{-webkit-user-drag:none;user-drag:none;pointer-events:auto}
-body.gk-guard input,body.gk-guard textarea{-webkit-user-select:text;user-select:text}
-#gk-wm{position:fixed;inset:0;z-index:2147483646;pointer-events:none;
-background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='190'%3E%3Cg transform='rotate(-28 130 95)' fill='rgba(255,255,255,.34)' stroke='rgba(0,0,0,.18)' stroke-width='.6' font-family='Georgia,serif' text-anchor='middle'%3E%3Ctext x='130' y='92' font-size='24' font-weight='700' letter-spacing='4'%3EMUESTRA%3C/text%3E%3Ctext x='130' y='116' font-size='12' letter-spacing='3'%3EGUEKA IDEAS%3C/text%3E%3C/g%3E%3C/svg%3E");
-background-repeat:repeat}
-#gk-wm-badge{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:2147483647;pointer-events:none;
-background:rgba(22,33,27,.82);color:#f3e7c7;font:600 11px/1.3 system-ui,sans-serif;letter-spacing:.08em;
-padding:7px 14px;border-radius:99px;border:1px solid rgba(184,155,94,.6);white-space:nowrap}
-@media print{body.gk-guard>*{display:none!important}body.gk-guard::after{content:"Impresión no disponible · Gueka Ideas";display:block;padding:40px;font:16px system-ui}}
-</style>
-<script id="gueka-guard-js">
-(function(){
-  var qs=new URLSearchParams(location.search);
-  var isPreview=qs.has('preview');
-  document.body.classList.add('gk-guard');
-  // Anticopia: clic derecho, arrastrar imágenes, copiar y atajos de guardar/imprimir/ver código
-  var stop=function(e){var t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;e.preventDefault();};
-  ['contextmenu','dragstart','copy','cut','selectstart'].forEach(function(ev){document.addEventListener(ev,stop,true);});
-  document.addEventListener('keydown',function(e){
-    var k=(e.key||'').toLowerCase();
-    if((e.ctrlKey||e.metaKey)&&['s','p','u','c'].indexOf(k)>-1){e.preventDefault();}
-    if(k==='f12'||((e.ctrlKey||e.metaKey)&&e.shiftKey&&['i','j','c'].indexOf(k)>-1)){e.preventDefault();}
-  },true);
-  // Marca de agua en la vista previa del editor
-  if(false){
-    var wm=document.createElement('div');wm.id='gk-wm';document.body.appendChild(wm);
-    var b=document.createElement('div');b.id='gk-wm-badge';b.textContent='VISTA PREVIA · SIN PAGAR';document.body.appendChild(b);
-  }
-})();
-</script>
-
 </body>
 </html>
