@@ -2327,24 +2327,56 @@ function schedulePv(delay=350){
   pvTimer=setTimeout(updatePv,delay);
 }
 
+// Estado de la vista previa anterior: permite no volver al splash ni al inicio en cada edición
+let pvLast={styleId:null,showSplash:null};
+
+function readPvView(iframe,state){
+  try{
+    const doc=iframe.contentDocument,win=iframe.contentWindow;
+    if(!doc||!doc.body||pvLast.styleId!==activeStyle.id||pvLast.showSplash!==state.showSplash)return null;
+    const sp=doc.getElementById('splash');
+    const opened=!sp||sp.classList.contains('hidden')||getComputedStyle(sp).display==='none';
+    return {opened,y:win.scrollY||0};
+  }catch(e){return null;}
+}
+
+// Reaplica lo que el cliente ya tenía: splash cerrado y misma posición de scroll
+function restorePvView(iframe,view){
+  try{
+    const doc=iframe.contentDocument,win=iframe.contentWindow;
+    if(!doc||!view)return;
+    const sp=doc.getElementById('splash');
+    if(view.opened&&sp)sp.style.display='none';
+    // 'instant' porque la tarjeta usa scroll suave y se vería un recorrido desde arriba
+    const go=()=>win.scrollTo({top:view.y,left:0,behavior:'instant'});
+    go();setTimeout(go,350);
+  }catch(e){/* otro origen: no se puede restaurar */}
+}
+
 function updatePv(){
-  if(pvBusy)return;
+  if(pvBusy){schedulePv(400);return;} // no se pierde la edición si aún se está cargando
   pvBusy=true;
   const state=readState();
   const iframe=document.getElementById('card-iframe');
   const folder=realTemplateFolder();
+  const view=readPvView(iframe,state);
+  pvLast={styleId:activeStyle.id,showSplash:state.showSplash};
   if(folder){
     // Plantilla real: guarda los datos y carga la invitación de su carpeta
     saveRealPreview(state);
     iframe.removeAttribute('srcdoc');
     iframe.src=folder+'?preview=1&v='+Date.now();
   } else {
-    iframe.srcdoc=withWatermark(genHTML(state));
+    let html=withWatermark(genHTML(state));
+    // Si ya estaba abierta, el splash nace oculto para que no parpadee
+    if(view&&view.opened)html=html.replace('</head>','<style>#splash{display:none!important}</style></head>');
+    iframe.srcdoc=html;
   }
   iframe.onload=()=>{
     pvBusy=false;
     // Las plantillas reales son otra página: se les agrega el efecto elegido por encima
     if(folder)injectFx(iframe.contentWindow,state);
+    restorePvView(iframe,view);
     showPvUpdated();
   };
   setTimeout(()=>{pvBusy=false;},4000);
