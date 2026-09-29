@@ -2420,9 +2420,22 @@ const REAL_TEMPLATES=[
   '15-años-jardin-de-rosas',
 ];
 let urlTemplateSlug='';
+// Carpetas que realmente existen (se comprueba al cargar). Si no existe, se usa la invitación integrada
+const AVAILABLE_REAL=new Set();
+
+function probeRealTemplates(){
+  return Promise.all(REAL_TEMPLATES.map(slug=>
+    fetch('../'+encodeURIComponent(slug)+'/',{cache:'no-store'})
+      .then(r=>r.ok?r.text():'')
+      // Algunos servidores devuelven la app principal en vez de un 404: se descarta
+      .then(t=>{if(t&&!/<div id="root"/.test(t))AVAILABLE_REAL.add(slug);})
+      .catch(()=>{})
+  ));
+}
 
 function realTemplateFolder(){
   const aliasOf=slug=>(typeof TEMPLATE_ALIASES!=='undefined'&&TEMPLATE_ALIASES[slug])||slug;
+  const REAL_TEMPLATES=[...AVAILABLE_REAL];
   // 1) La plantilla que vino en la dirección, si sigue con su estilo
   if(REAL_TEMPLATES.includes(urlTemplateSlug)&&aliasOf(urlTemplateSlug)===activeStyle.id){
     return '../'+encodeURIComponent(urlTemplateSlug)+'/';
@@ -2675,7 +2688,8 @@ if(window.innerWidth<=768){
   if(preview) preview.classList.remove('mobile-show');
 }
 initZoomDisplay();
-setTimeout(()=>updatePv(),120);
+// Primero se comprueba qué plantillas reales existen; luego se dibuja la vista previa
+probeRealTemplates().then(()=>updatePv());
 </script>
 </body>
 </html>
