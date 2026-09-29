@@ -1626,7 +1626,7 @@ function applyFx(id){
 // Las partículas se dibujan en un lienzo ADELANTE del contenido (ver z-index del canvas)
 // y con más tamaño/opacidad para que se noten sobre las secciones.
 function gkFx(cfg){
-  var c=document.getElementById('particle-canvas');
+  var c=document.getElementById(cfg.id||'particle-canvas');
   if(!c||!c.getContext)return;
   var ctx=c.getContext('2d'),W=0,H=0,dpr=Math.min(window.devicePixelRatio||1,2);
   function size(){W=window.innerWidth;H=window.innerHeight;c.width=W*dpr;c.height=H*dpr;c.style.width=W+'px';c.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0);}
@@ -1638,13 +1638,17 @@ function gkFx(cfg){
   var TAU=Math.PI*2;
   function rnd(a,b){return a+Math.random()*(b-a);}
   function make(initial){
-    var p={x:rnd(0,W),y:rnd(0,H),s:0,vx:0,vy:0,r:rnd(0,TAU),vr:rnd(-.015,.015),ph:rnd(0,TAU),al:0,col:Math.random()<.55?A:B};
-    if(type==='fl'){p.s=rnd(6,12);p.vy=rnd(.5,1);p.al=rnd(.7,1);if(!initial)p.y=-20;}
-    else if(type==='pe'){p.s=rnd(7,13);p.vy=rnd(.55,1.1);p.al=rnd(.7,1);p.vr=rnd(-.03,.03);if(!initial)p.y=-20;}
+    // z = profundidad: las piezas lejanas son más chicas, lentas y tenues (efecto cascada con parallax)
+    var p={x:rnd(0,W),y:rnd(0,H),s:0,vx:0,vy:0,r:rnd(0,TAU),vr:rnd(-.015,.015),ph:rnd(0,TAU),al:0,z:rnd(.55,1.15),col:Math.random()<.55?A:B};
+    // Al reaparecer se reparten en una franja alta para que no caigan en oleadas
+    var spread=rnd(20,Math.max(60,H*.35));
+    if(type==='fl'){p.s=rnd(6,12);p.vy=rnd(.5,1);p.al=rnd(.7,1);if(!initial)p.y=-spread;}
+    else if(type==='pe'){p.s=rnd(7,13);p.vy=rnd(.55,1.1);p.al=rnd(.7,1);p.vr=rnd(-.03,.03);if(!initial)p.y=-spread;}
     else if(type==='st'){p.s=rnd(2,4.6);p.vx=rnd(-.08,.08);p.vy=rnd(-.08,.08);p.al=rnd(.6,1);p.col=Math.random()<.7?B:'255,255,255';}
-    else if(type==='bu'){p.s=rnd(6,18);p.vy=-rnd(.4,.8);p.al=rnd(.6,.95);if(!initial)p.y=H+20;}
-    else if(type==='di'){p.s=rnd(4,8);p.vy=rnd(.4,.8);p.al=rnd(.7,1);if(!initial)p.y=-20;}
-    else{p.s=rnd(3,8);p.vx=rnd(-.15,.15);p.vy=-rnd(.2,.6);p.al=rnd(.45,.9);p.t=Math.random()>.5?'b':'s';if(!initial)p.y=H+20;}
+    else if(type==='bu'){p.s=rnd(6,18);p.vy=-rnd(.4,.8);p.al=rnd(.6,.95);if(!initial)p.y=H+spread;}
+    else if(type==='di'){p.s=rnd(4,8);p.vy=rnd(.4,.8);p.al=rnd(.7,1);if(!initial)p.y=-spread;}
+    else{p.s=rnd(3,8);p.vx=rnd(-.15,.15);p.vy=-rnd(.2,.6);p.al=rnd(.45,.9);p.t=Math.random()>.5?'b':'s';if(!initial)p.y=H+spread;}
+    p.s*=p.z;p.vy*=p.z;p.vx*=p.z;p.al*=Math.min(1,.45+p.z*.6);
     return p;
   }
   var ps=[],i;
@@ -1704,16 +1708,21 @@ function gkFx(cfg){
     }
   };
   var paint=draw[type]||draw.orig;
-  function move(p){
+  // k = factor de tiempo (1 a 60 fps) para que la velocidad sea igual en cualquier pantalla
+  function move(p,k){
     if(type==='st'){
-      p.x+=p.vx;p.y+=p.vy;
+      p.x+=p.vx*k;p.y+=p.vy*k;
       if(p.x<-10)p.x=W+10;if(p.x>W+10)p.x=-10;if(p.y<-10)p.y=H+10;if(p.y>H+10)p.y=-10;
       return;
     }
-    p.y+=p.vy;p.r+=p.vr;
-    p.x+=p.vx+(type==='orig'?0:Math.sin(t*.015+p.ph)*(type==='bu'?.25:.4));
-    var out=p.vy>0?p.y>H+20:p.y<-20;
-    if(out||p.x<-30||p.x>W+30){var np=make(false);for(var key in np)p[key]=np[key];}
+    // Viento suave y lento que empuja todo en conjunto + vaivén propio de cada pieza
+    var gust=(Math.sin(t*.004)*.35+Math.sin(t*.0013)*.25)*p.z;
+    var sway=(Math.sin(t*.012+p.ph)*.45+Math.sin(t*.031+p.ph*2)*.15)*p.z;
+    p.y+=p.vy*k;p.r+=p.vr*k;
+    if(type==='orig')p.x+=p.vx*k;
+    else p.x+=(p.vx+sway*(type==='bu'?.6:1)+(type==='bu'?gust*.4:gust))*k;
+    var out=p.vy>0?p.y>H+30:p.y<-30;
+    if(out||p.x<-60||p.x>W+60){var np=make(false);if(np.x<-30||np.x>W+30)np.x=rnd(0,W);for(var key in np)p[key]=np[key];}
   }
   function drawShoot(){
     if(!shoot&&Math.random()<.006)shoot={x:rnd(W*.3,W),y:rnd(0,H*.35),l:0};
@@ -1725,16 +1734,20 @@ function gkFx(cfg){
     ctx.strokeStyle=g;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+60,y-30);ctx.stroke();
     if(shoot.l>55)shoot=null;
   }
-  function tick(){
-    t++;ctx.clearRect(0,0,W,H);
+  var last=0;
+  function tick(now){
+    var dt=last?Math.min(50,now-last):16.7;last=now;
+    var k=dt/16.667;t+=k;ctx.clearRect(0,0,W,H);
     for(var j=0;j<ps.length;j++){
-      var p=ps[j];move(p);
-      ctx.save();ctx.translate(p.x,p.y);ctx.globalAlpha=p.al;paint(p);ctx.restore();
+      var p=ps[j];move(p,k);
+      // Aparecen y se desvanecen suavemente en los bordes (sin saltos bruscos)
+      var fade=type==='st'?1:Math.max(0,Math.min(1,(p.y+30)/90,(H+30-p.y)/90));
+      ctx.save();ctx.translate(p.x,p.y);ctx.globalAlpha=p.al*fade;paint(p);ctx.restore();
     }
     if(type==='st'&&!reduce)drawShoot();
     requestAnimationFrame(tick);
   }
-  tick();
+  requestAnimationFrame(tick);
 }
 
 function selectStyle(id){
@@ -2328,7 +2341,12 @@ function updatePv(){
   } else {
     iframe.srcdoc=withWatermark(genHTML(state));
   }
-  iframe.onload=()=>{pvBusy=false;showPvUpdated();};
+  iframe.onload=()=>{
+    pvBusy=false;
+    // Las plantillas reales son otra página: se les agrega el efecto elegido por encima
+    if(folder)injectFx(iframe.contentWindow,state);
+    showPvUpdated();
+  };
   setTimeout(()=>{pvBusy=false;},4000);
   updateProgress();
 }
@@ -2391,7 +2409,7 @@ function downloadCard(){
       .then(html=>{
         const data=JSON.stringify(realData(state)).replace(/</g,'\\u003c');
         const inject='<script>window.GUEKA_DATA='+data+';<\/script>';
-        const out=html.replace(/<head([^>]*)>/i,'<head$1>'+inject);
+        const out=html.replace(/<head([^>]*)>/i,'<head$1>'+inject).replace(/<\/body>/i,fxSnippet(state)+'</body>');
         saveHtmlFile(out,fileName);
       })
       .catch(()=>showToast('No se pudo cargar la plantilla. Ábrela desde GitHub Pages.'));
@@ -2420,29 +2438,61 @@ const REAL_TEMPLATES=[
   '15-años-jardin-de-rosas',
 ];
 let urlTemplateSlug='';
-// Carpetas que realmente existen (se comprueba al cargar). Si no existe, se usa la invitación integrada
-const AVAILABLE_REAL=new Set();
+// Carpetas que realmente existen (se comprueba al cargar): slug -> dirección que responde.
+// Si no existe, se usa la invitación integrada
+const AVAILABLE_REAL=new Map();
 
 function probeRealTemplates(){
-  return Promise.all(REAL_TEMPLATES.map(slug=>
-    fetch('../'+encodeURIComponent(slug)+'/',{cache:'no-store'})
-      .then(r=>r.ok?r.text():'')
-      // Algunos servidores devuelven la app principal en vez de un 404: se descarta
-      .then(t=>{if(t&&!/<div id="root"/.test(t))AVAILABLE_REAL.add(slug);})
-      .catch(()=>{})
-  ));
+  const isReal=t=>!!t&&!/<div id="root"/.test(t)&&!/Page Not Found/i.test(t);
+  const tryUrl=url=>fetch(url,{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>isReal(t)?url:'').catch(()=>'');
+  return Promise.all(REAL_TEMPLATES.map(slug=>{
+    const base='../'+encodeURIComponent(slug)+'/';
+    // Algunos servidores no entregan index.html al abrir la carpeta: se prueba también con el archivo
+    return tryUrl(base).then(u=>u||tryUrl(base+'index.html')).then(u=>{if(u)AVAILABLE_REAL.set(slug,u);});
+  }));
 }
 
 function realTemplateFolder(){
   const aliasOf=slug=>(typeof TEMPLATE_ALIASES!=='undefined'&&TEMPLATE_ALIASES[slug])||slug;
-  const REAL_TEMPLATES=[...AVAILABLE_REAL];
+  const REAL_TEMPLATES=[...AVAILABLE_REAL.keys()];
   // 1) La plantilla que vino en la dirección, si sigue con su estilo
   if(REAL_TEMPLATES.includes(urlTemplateSlug)&&aliasOf(urlTemplateSlug)===activeStyle.id){
-    return '../'+encodeURIComponent(urlTemplateSlug)+'/';
+    return AVAILABLE_REAL.get(urlTemplateSlug);
   }
   // 2) Si el estilo elegido en el cajón tiene una plantilla real
   const slug=REAL_TEMPLATES.find(s=>aliasOf(s)===activeStyle.id);
-  return slug?'../'+encodeURIComponent(slug)+'/':'';
+  return slug?AVAILABLE_REAL.get(slug):'';
+}
+
+// ── Efecto animado sobre plantillas reales (carpetas externas) ──
+// Crea su propio lienzo POR DELANTE de todo (z-index alto, sin bloquear clics) y ejecuta gkFx
+function fxCfg(state){
+  const hex=h=>hex2rgb(h);
+  return {id:'gk-fx-canvas',type:state.effect,a:hex(state.colors.a),b:hex(state.colors.b),k:state.fxK};
+}
+function fxActive(state){return !!state.effect&&state.effect!=='none'&&state.effect!=='orig';}
+
+// Para la vista previa en vivo: el iframe es del mismo sitio, se inyecta directamente
+function injectFx(win,state){
+  try{
+    if(!win||!fxActive(state))return;
+    const doc=win.document;
+    if(!doc||!doc.body||doc.getElementById('gk-fx-canvas'))return;
+    const cv=doc.createElement('canvas');
+    cv.id='gk-fx-canvas';
+    cv.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2147483000;';
+    doc.body.appendChild(cv);
+    const s=doc.createElement('script');
+    s.textContent='('+gkFx.toString()+')('+JSON.stringify(fxCfg(state))+');';
+    doc.body.appendChild(s);
+  }catch(e){/* la plantilla está en otro origen: no se puede tocar */}
+}
+
+// Para la descarga: el mismo efecto como texto listo para pegar antes de </body>
+function fxSnippet(state){
+  if(!fxActive(state))return '';
+  return '<canvas id="gk-fx-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2147483000;"></canvas>'+
+    '<script>('+gkFx.toString()+')('+JSON.stringify(fxCfg(state))+');<\/script>';
 }
 
 function realData(state){
@@ -2527,7 +2577,10 @@ document.getElementById('btn-preview-tab').addEventListener('click',()=>{
   const folder=realTemplateFolder();
   if(folder){
     saveRealPreview(readState());
-    window.open(folder+'?preview=1','_blank');
+    const tab=window.open(folder+'?preview=1','_blank');
+    // La pestaña nueva es del mismo sitio: se le agrega el efecto cuando termina de cargar
+    const st=readState();
+    if(tab)tab.addEventListener('load',()=>injectFx(tab,st));
     return;
   }
   const html=withWatermark(genHTML(readState()));
